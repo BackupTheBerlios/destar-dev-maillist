@@ -1,0 +1,4416 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r804 - in branches: . santiago
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r804%20-%20in%20branches%3A%20.%20santiago&In-Reply-To=%3C200708312233.l7VMXXMU007109%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000342.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r804 - in branches: . santiago</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r804%20-%20in%20branches%3A%20.%20santiago&In-Reply-To=%3C200708312233.l7VMXXMU007109%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r804 - in branches: . santiago">santiago at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep  1 00:33:33 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000342.html">[Destar-dev] r805 - branches/santiago
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#341">[ date ]</a>
+              <a href="thread.html#341">[ thread ]</a>
+              <a href="subject.html#341">[ subject ]</a>
+              <a href="author.html#341">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-09-01 00:33:24 +0200 (Sat, 01 Sep 2007)
+New Revision: 804
+
+Added:
+   branches/santiago/
+   branches/santiago/CHANGELOG.txt
+   branches/santiago/cfg_phone_epygi.py
+   branches/santiago/cfg_phone_iax.py
+   branches/santiago/cfg_phone_mgcp.py
+   branches/santiago/cfg_phone_queue.py
+   branches/santiago/cfg_phone_sip.py
+   branches/santiago/configlets.py
+   branches/santiago/page_user_settings.ptl
+   branches/santiago/panelutils.py
+Removed:
+   branches/santiago/CHANGELOG.txt
+   branches/santiago/cfg_phone_epygi.py
+   branches/santiago/cfg_phone_iax.py
+   branches/santiago/cfg_phone_mgcp.py
+   branches/santiago/cfg_phone_queue.py
+   branches/santiago/cfg_phone_sip.py
+   branches/santiago/configlets.py
+   branches/santiago/page_user_settings.ptl
+   branches/santiago/panelutils.py
+Log:
+added branch for testing
+
+
+
+Copied: branches/santiago (from rev 800, trunk)
+
+Deleted: branches/santiago/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-24 23:26:42 UTC (rev 800)
++++ branches/santiago/CHANGELOG.txt	2007-08-31 22:33:24 UTC (rev 804)
+@@ -1,1221 +0,0 @@
+-2007-08-24:
+-* cfg_trunk_sip port optional. Comment by Joan-Carles Samaranch
+-* cfg_app_agentcallbacklogin. variable replacement was missing. Thanks
+-  to Joan-Carles Samaranch 
+-* cfg_app_dnd. Fixed typos. Thanks to Joan-Carles Samaranch 
+-* cfg_trunk_iax:
+-  - port optional. Comment by Joan-Carles Samaranch
+-  - Added register with RSA keys. Thanks to Joan-Carles Samaranch 
+-  - Removed default trunk name
+-
+-2007-08-22:
+-* Cast of billsec as integer in page_stats_cdr.ptl
+-
+-2007-08-20:
+-* confilets.py: fixed typo. Thanks to Joan-Carles Samaranch
+-* cfg_opt_sipnotify.py: fixed class name. Thanks to Joan-Carles Samaranch
+-* cfg_opt_oppanel.py: Increased web_hostname length. Thanks to Joan-Carles Samaranch
+-
+-2007-08-16:
+-* Added phone_user_dial.ptl: Initial work to click-to-dial from user's phone book.
+-
+-2007-08-15:
+-* cfg_phone_sip: dtmf auto by default. Patch by Tzafrir
+-
+-2007-08-14:
+-* cfg_phone_iax: defaultip= line added if not empty value. Patch by Tzafrir
+-* Added page_user_phonebook.ptl. Thanks to Tzafrir
+-
+-2007-08-13:
+-* configlets.py: only add queues if the really exist
+-
+-2007-08-10:
+-* cfg_ivr_treenode: fixed context for appendExten
+-* cfg_opt_voicemail: gettext(form strings). operator=yes
+-* cfg_trunk_sip:
+-  - removed default trunk name
+-  - phone is optional
+-* configlets.py: 
+-  - Arranged createExtensionConfig 
+-  - removed penalty from queues
+-* cfg_trunk_zapdynamic:
+-  - Truely added pridialplan config
+-  - Added coding config
+-  - Added switchtype config
+-
+-2007-08-03:
+-* cfg_trunk_zapdynamic: added panel, pridialplan configs and some default
+-  settings.
+-
+-2007-08-01:
+-* Updated es.po
+-* Added all: target in Makefile
+-* Some gettext related fixes
+-* panelutils.py, page_admin_panel: Initial Panel context config
+-
+-2007-07-31:
+-* configlets.py: fixed bug in appendExten
+-
+-2007-07-30:
+-* fixed awful bug on cascade deletion of configlets due to circular dependencies.
+-* updated agentes and general settings in destar_cfg.py
+-
+-2007-07-27:
+-* cfg_opt_did.py: fixed typos on appendExten().
+-* Templates, cfg_opt_settings:  changed logo location.
+-
+-2007-07-26:
+-* Now header title is an option on CfgOptSettings.
+-* Fixed some int values expected where strings types found.
+-* Added Themes support in Templates.ptl and CfgOptSettings.
+-* Added FileWidgwt to ConfigHelper and option to upload a logo image on CfgOptSettings.
+-* configlets.py, cfg_*: appendExten() uses 'n' priority and doesn't reset the
+-  priority when the extension changes.
+-* configlets.py: allows monitoring incoming calls
+-* cfg_phone_{sip,iax}: added inbound monitoring
+-
+-2007-07-10:
+-* Improved call-forwarding applications:
+-	- Added a menu and made asterisk say the digits pressed.
+-	- TODO: check Devstate lower case.
+-* Added a more clear message to DND application.
+-* Changed inexistant 'privacy-invalid' sound for 'invalid'.
+-* cfg_opt_music: fixed typo. by jmacz
+-* cfg_app_meetme: better description. by jmacz
+-* Updated es.po. by jmacz
+-
+-2007-07-09:
+-* cfg_phone_ext: &quot;alias extension&quot; for shor name and obj title
+-* Built-in attended transfer seems to need chan_local.
+-* cfg_dialout_normal: SetVar is depricated.
+-
+-2007-07-04:
+-* Improved Record-Sound Application.
+-* Added cfg_ivr_treenode to make simple IVR trees.
+-* Merged Queue Statistics from 0.2.X branch.
+-* Added routine to install initial queue.db
+-* Added https support
+-* Always treat voicemail pin as int, not string.
+-
+-2007-07-03:
+-* Use configlet shortName on logs if name is not present.
+-* Changed 'print' for 'sys.stderr.write' on some log messages.
+-* cfg_opt_zappri: CRC is optional, CAS format is better with colons.
+-* cfg_phone_ext: use this more like a 'virtual' extension than just an alias.
+-* Added configlet._id as Queue member priority.
+-* panelutils.py: small typos on PARK and QUEUE.
+-
+-2007-06-30:
+-* Added option to return to operator on macro-voicemail.
+-
+-2007-06-28:
+-* page_admin_cfwstate.ptl: small fix on subrutine call.
+-* page_user_info.ptl: _q_level should be 1.
+-* Added logging information for destar's users sessions.
+-* Added logging information for configlets edition.
+-* Moved misc/page_admin_systemstate to / and added more info.
+-
+-2007-06-27:
+-* Added zaptel dynamic spans support (TDMoE)
+-
+-2007-06-21:
+-* page_admin_cfwstate.ptl: updated to Quixote 2
+-* Added version.py
+-
+-2007-06-15:
+-* cfg_phone_queue.py: queuetimeout works without queuetimeoutext
+-
+-2007-06-13:
+-* cfg_phone_queue: string Spanish to English
+-* cfg_trunk_iax.py: added remote port setting
+-* cfg_trunk_iax.py: added registry option
+-  - using username instead of trunk name in register line
+-
+-2007-06-12:
+-* Fixed bug in Dialouts. Added fields to change Caller ID.
+-
+-2007-06-08:
+-* Added page_admin_cfwstate.ptl to show CFIM, CFBS and DND state.
+-
+-2007-06-07:
+-* cfg_trunk_sip.py: Some changes in register and cmd lines to be compatible with budgetone.nl
+-* cfg_dialout_normal.py: Better call handling when channels are unavailable
+-
+-2007-06-06:
+-* Removed default op-panel config in destar_cfg.py sample.
+-* Added srvlookup setting for sip.conf
+-* Fixed op-panel button config for queues
+-* Fixed typo in cfg_trunk_sip Dial cmd
+-
+-2007-05-30:
+-* Menu adjustment for other languages, _() is not needed.
+-
+-2007-05-29:
+-* cfg_trunk_sip: Added port= setting in sip.conf 
+-* Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+-
+-2007-05-27:
+-* Fixed bug in page_owner.ptl that made it forbidden.
+-
+-2007-05-15:
+-* Little bug fix: need to load app_cut to make the right UserEvent.
+-
+-2007-05-08:
+-* Added the needed UserEvents in the dialplan to manage DND completely.
+-* Fixed some apps names
+-
+-2007-05-07:
+-* Added Astdbkey for the extension buttons in the panel.
+-
+-2007-04-25
+-* Added panel buttons for agents. (still does not work at all)
+-* Allow configuring op_server debug level.
+-* Fixed bug in macro-voicemail: added missing t and T extensions and a priority after calling VoiceMail application.
+-
+-2007-04-24:
+-* Use actual pbx instead pbx1 in cfg_app_agentcallbacklogin
+-* cfg_phone_queue: a few more order in the form variables.
+-
+-2007-04-20:
+-* queues and agents general settings in cfg_opt_queuesagents.py.  
+-
+-2007-04-19:
+-* configlets.py: fixed technologies for agents, persistent queues members
+-* cfg_phone_agent.py: allow agents with no password
+-* cfg_app_agentcallbacklogin.py, added change location ext,
+-  allow silent login, automatic logout,
+-  remove DND when agent logs in.
+-* New groupName and ptl for queues and agents
+-* Fixed bug in the login page.
+-
+-2007-04-18:
+-* Added AgentCallbackLogin config
+-* Added agent config page
+-
+-2007-04-16:
+-* Configlets that extends from CfgOptSingle now can be deleted.
+-* Fixed Bug #8932
+-* Updated es.po
+-
+-2007-04-11:
+-* Added support for queue agents (not just phones) and an agent login extension.
+-
+-2007-04-10:
+-* Added port option in sip trunks
+-
+-2007-04-01:
+-* Meetme configuration adjustments. Pin an dynamic rooms work.
+-* Added __init__ and fixup methods th CfgApp in configlets.py
+-
+-2007-03-22:
+-* Fixed permissions for the default Manager API Access
+-
+-2007-03-20:
+-* fixed a bug related with encoding in form widgets
+-* Allow to configure a scanspec string for ChanSpy
+-
+-2007-03-16:
+-*session.py: added utf-8 in request.response, because quixote-2 uses ISO-8859-1 as default
+-*ConfigHelper: had to do some converting to unicode
+-
+-2007-03-14:
+-* page_stats_cdr: added name attribute in the form. Fixes bug #10622 
+-- closed img tags
+-* cfg_opt_manager.py: fixed an options problem, cosmetic changes
+-* ConfigHelper: Don't translate &quot;&quot; strings in single and multi select widgets
+-
+-2007-03-08:
+-* Fixed an unicode and select widgets problem
+-* Added _q_traverse() at page_main, to handle exceptions correctly
+-* Fixed a cfg_opt_music.py problem
+-
+-2007-03-05:
+-* Fixed crazy ids assignment, Patch by ceronman
+-* Fixed some bugs &quot;introduced&quot; by the strict unicode handling
+-
+-2007-03-03
+-* Bad example line. Default values are not stored in destar_cfg.py
+-* Enable qualify option for IAX phones.
+-* Add the Speex Codec (<A HREF="http://www.speex.org/">http://www.speex.org/</A>) as an option and make it default in the example.
+-
+-2007-03-01:
+-* `Apply changes` relaods MoH
+- 
+-2007-02-28:
+-* ConfigHelper.ptl: Fix a problem in __addit__ method, when creating a new
+-* object all createAsteriskConfig() from all objects where called.
+-* Little name change to skip check in checkConfig() (for extensions to jump in an IVR)
+-* Better dialout's macros handling
+-* Added -j xgettext's option in po/Makefile
+-
+-2007-02-27:
+-* languages.py: installing the gettext classes using unicode
+-* changing the file's encoding to utf-8, everybody should use unicode.
+-
+-2007-02-26:
+-* Fixed &quot;cancel&quot; option in page_login
+-* cfg_dialout_normal: adding r Dial option if no Authenticate() is used
+-* Added r Dial option for macro-dial-std-exten
+-
+-2007-02-22:
+-* Fixed statistics displaying
+-
+-2007-02-21:
+-* Added new configlet for configure some IAX general options.
+-
+-2007-02-16:
+-* Added externhost support in sip.conf through SIP Options.
+-* Redirecting to login when no user is logged
+-* Create PBX configuration tip
+-
+-2007-02-08:
+-* Added DISA support (Patch #1878 by imesper)
+-
+-2007-02-05:
+-* Bug fix related with request object adding configlets.
+-* page_config.ptl: some configletTip functions were called without self.
+-* Cosmetic changes and clidnumin added to cfg_trunk_fwdiax.py
+-* Added clidnumin to cfg_trunk_zap*.py
+-* Adjusted all labels and caller identifier for trunks.
+-
+-2007-01-30:
+-* Bug fixes related with request object and redirect function.
+-
+-2007-01-29:
+-* Added &quot;filter_output&quot; publisher's funcion. It changed everything to text/html content-type,
+-  including css. Needs some revision. Fixes bug #10130
+-
+-2007-01-22:
+-* Merged last changes from quixote2 branch into trunk
+-
+-2007-01-21:
+-* added tapi support
+-* Releasing and taging 0.2.2 version
+-
+-2007-01-19:
+-* Fixed hungup typo
+-
+-2007-01-16:
+-* Merging quixote2 branch and trunk 
+-
+-2007-01-15:
+-* Fixed recording. Patch by Harald Holzer
+-* dont add modules to modules.conf, if they does not exists (Bug #9708). Patch by Harald Holzer
+-* added sip tos option. Patch by Harald Holzer
+-* added queue timeout. Patch by Harald Holzer
+-* added callerid(number) option on incoming calls. Patch by Harald Holzer
+-- added callerid(number) option on outcoming calls
+-- added sip from domain option
+-- added DID custom mapping option
+-* some better defaults. Patch by Harald Holzer
+-* add early media support in dialmacro. Patch by Harald Holzer
+-- add parallel ringing support in dialmacro
+-- add call forward only on trunk support in dialmacro
+-* added sip pedantic option. Patch by Harald Holzer
+-
+-2007-01-13:
+-* Deleted some debug prints.
+-
+-2006-12-28:
+-* page_main and Templates: fixed menus displaying.
+-* page_config_trunks.ptl: fixed typo.
+-* page_logout.ptl: fixed redirect.
+-* page_user*.ptl and page_admin*.ptl: corrected some 
+-  function's &quot;position&quot;
+-
+-2006-12-29:
+-* &quot;updated&quot; version
+-* First attempt to detect if cdr_sqlite3_custom.so exists
+-
+-2006-12-13:
+-* Added global nat option for sip  in cfg_opt_sip_network.py
+-* Cosmetical changes in cfg_opt_sip_network.py
+-
+-2006-12-07:
+-* Added queue (member) and hint config for non SIP phones.
+-* Partial fix for bug #9633. Needs more test.
+-
+-2006-12-04:
+-* REALLY Moved language=** from [general] to [channels] in zapata.conf. Thanks to tzafrir! :)
+-* Create an entry in op_buttons.cfg for Queues.
+-
+-2006-12-03:
+-* Added queues web form variables for iax, zap ad mgcp phones 
+-* Fixed some html warnings.
+-
+-2006-12-02:
+-* All missing page_* &quot;upgraded&quot;, but there is still work to do.
+-
+-2006-12-01:
+-* All page_config files upgraded
+-* page_main: removed a surplus and wrong _q_exports
+-
+-2006-11-30:
+-* All page_admin and page_user files upgraded
+-
+-2006-11-29:
+-* Renamed PageMain to Page
+-* Upgraded page_user, page_user_info and page_logout
+-
+-2006-11-21
+-* Configlet to listen active calls with ChanSpy
+-
+-2006-11-16
+-* Removed unnecessary global configlet_tree's in configlets.createIncomingContext()
+-* Moved language=** from [general] to [channels] in zapata.conf. Thanks to tzafrir! :)
+-
+-2006-11-14:
+-* Added email variable to the cfg_phone_* configlets. Closes bug #9462.
+-* Set int type for the email pin.
+-
+-2006-11-11:
+-* Updated fr.po. Thanks to Anthony Piron.
+-
+-2006-11-10:
+-* configlets.py: added _X incoming context rule. Closes bug #9419.
+-
+-2006-11-09:
+-* configlets.py: fixed incoming context rule.
+-
+-2006-11-05
+-* page_stats_cdr.ptl: display records in DESC order.
+-* page_stats_phone.ptl, page_stats_trunks.ptl, page_stats_dialouts.ptl:
+-  Fixed current month
+- 
+-2006-10-31:
+-* A test with page_main and page_login.
+-* Simple and ugly bug fix for #9281.
+-
+-2006-10-30:
+-* panelutils: Insterting again startPanelDaemon and stopPanelDaemon,
+-  cause ./destar was using the last one.
+-* destar: starts panel when destar begins
+-
+-2006-10-28:
+-* Updated Version. TODO: Define it in only one place
+-* Template.ptl: importing get_directory_path to replace 
+-  Publisher's namespace_stack
+-* session.py: New (draft) class for managing Destar's sessions
+-* Publisher.py: -taken off all session management related stuff
+-  - publishing PageMain from page_main
+-* page_main.ptl: PageMain: Directory class-based
+-
+-2006-10-25:
+-* First attempt to upgrade publisher 
+-
+-2006-10-24:
+-* New branch for quixote2 transition
+-* Moved every form2 to form
+-
+-2006-10-17:
+-* Display op-panel restarting result
+-* cfg_opt_oppanel: deleted duplicate and wrong variables
+-* Some improvements in changing op-panel buttons size function
+-* cfg_phone_queue.py: Allow to ring instead of playing MoH
+-
+-2006-10-14:
+-* Allow changing the size of panel buttons
+-
+-2006-10-13
+-* panelutils: using restart option instead of stop and the restart
+-* First step to allow changing the size of op-panel buttons
+-* No default dial group in the zap trunks
+-* Cosmetic changes in cfg_opt_oppanel.py
+-* Allow the incoming calls jump to a Virtual PBX
+-* Cosmetic changes in cfg_trunk_*.py
+-
+-2006-10-10
+-* Little bug fix in autoattendant
+-* Removed unnecessary stuff
+-
+-2006-09-29
+-* cfg_phone_zap.py: 
+-- calleridnum was missed. Fixes bug #8943
+-- callgroup config was done in /etc/zaptel.conf. Fixes bug #8944	
+-
+-2006-09-26
+-* configlets: fixed undetectable little bug on dialout_secret writing.
+-
+-2006-09-24
+-* backend.py: using writeAsteriskConfig() after createAsteriskConfig()
+-  in reloadAsterisk. Fixes Bug #8777
+-* Makefile: .mo file are removed in clean-languages:, not in clean:
+-
+-2006-09-23
+-* Allows to load func_* modules 
+-
+-2006-09-20
+-* StatsHelper.ptl and some page_stats_*.ptl, using getMonthnames() to 
+-  allow translate strings in date html selects. Fixes bug #8842
+-* StatsHelper.ptl: some pychart label weren't using unicode().
+-* page_stats_cdr.ptl: new M_(message) function = _(str(message)). It really
+-  fixes bug #8745
+-
+-2006-09-19
+-* Added dependencies for the trunks. Fixed Bug #8836.
+-* Added some translations.
+-* Updated es.po header and added a missing translation.
+-* Replaced _('string') by _(str('string')) on the [html] functions.
+-* Fixed Bug #8745.
+-
+-2006-09-18
+-* Added sort (default True) param to the getChoice function in backend.py
+-* Bug #8257 closed.
+-
+-2006-09-15
+-* Remove unnecessary imports.
+-* Fixed bug #7951 checking the existence of a PBX.
+-* Fixed bug #7952 replacing Monitor by MixMonitor in the queues.
+-* Allow monitoring for the other phones types.
+-
+-2006-09-14
+-* Use md5secret instead secret in sip.conf.
+-* Ths SIP password is not optional.
+-
+-2006-09-13
+-* The auth=md5 line in sip.conf is wrong. auth is the auth name, not the auth type.
+-* Closes Bug #007917.
+-
+-2006-09-11
+-* Wait time to answer and digit timeout were fixed on the code for the AutoAttendant. 
+-
+-2006-09-09
+-* Languages stuff do not have to be re-created each time destar is installed.
+-
+-2006-09-07
+-* StatsHelper.ptl: solved some problems with gettext and pychart. Fixes bug#8689
+-* page_stats_cdr.ptl: Now it works with translations.
+-
+-2006-09-07
+-* Meetme needs a timer
+-* Applied patch from Debian on Makefile.
+-
+-2006-09-05
+-* Reordered config menu, the real one didn't agree with each _q_menupos. 
+-* sort() function for submenus was missed
+-* Changes in Makefile to allow use it on FreeBSD. (And close bug #8004) It still needs some testing, 
+-  I don't have a FreeBSD box.
+-
+-2006-09-04
+-* Applied missing changes in Templates.ptl from patch #1090. Thanks to alenvers. Closes [ Bug #8014 ] _q_disc and _q_title translation not displayed. 
+-* Added code to automate docbook documentation for configlets.
+-* Fixed typo in cfg_opt_zap_trunk.py
+-
+-2006-08-28
+-* Fixed bug on pbx dependencies not created for sip phones.
+-* Make command-line-only backend mode work again using 'destar -b'
+-* Updated man page.
+-* Alternative solution to '[ Bug #7916 ] Menus don't work on IE', by modifying page_admin.ptl, page_user.ptl and page_owner.ptl to allow automatic listing of their submenus.
+-* Fixed pbx displaying on cfg_quickdial_*
+-* Included up to date destar_cfg.py example.
+-* Added cfg_opt_codec.py, page_config_codecs.ptl to allow codec order selection for SIP and IAX. Depricates cfg_opt_sip_audio.py
+-* Removed depricated function &quot;useContext()&quot;.
+-* Small changes on cdrutils.py, Makefile, page_user_info.ptl.
+-* Added sqlite tip on page_config.ptl.
+-* Fixed '[Bug #8576] From Debian: #384630 breaks related software', by not writing asterisk files until the user clics on &quot;Save all changes&quot;.
+-* Fixed '[Bug #8577] From Debian: #384632 writes wrong configuration files', by getting list of codecs and formats from ASTERISK_MODULES_DIR, and warning the user about missing needed codecs.
+-* Also changed 'preloaded' modules writing format on modules.conf
+-* Some code to generate basic documentation from configlets. Todo: create in docbook format.
+-
+-2006-08-25
+-* Closed [ Bug #8010 ] tests.py needs the executable flags.
+-* Applied [ Patch #1152 ] Mixmonitor outgoing calls, by juanmanuel.
+-* Applied [ Patch #1193 ] Sometimes dialling the pound or number sign &quot;#&quot; is needed, by juanmanuel.
+-* Better python/quixote versions checking to allow python2.3 users use quixote-1.0
+-  (and make dasenjo happy).
+-* Applied [ Patch #1279 ] customize private quickdial prefix, by hholzer.
+-
+-2006-08-09
+-* Fixed media path issue in IAX phones.
+-
+-2006-08-08
+-* Added hint support, applied patch #1291, by hholzer
+-* Changed some field lengths in cfg_trunk_iax.py
+-* Fixed bug #8171, applied patch #1232, by hholzer
+-
+-2006-08-06
+-* Added isAddable() method in all cfg_phone_*.py
+-* Fixed bug #8303, applied patch #1273, by hholzer
+-* cfg_phone_ext.py: the extension in Goto() was missed 
+-
+-2006-08-01
+-* Load app_cdr module (NoCDR() application) at startup
+-
+-2006-07-21
+-* AstDB adjustments
+-* Fixed bug #8147
+-
+-2006-07-20
+-* configlets.py: fixed small bug on an unreferenced variable.
+-* deleted static/page.html since it's not needed anymore.
+-
+-2006-07-10
+-* DigitTimeout is deprecated on *-1.2
+-
+-2006-07-09
+-* Fixed priority in macro-dial-std-exten
+-
+-2006-07-07
+-* Macro dial-std-exten adjustments (asterisk 1.2 stuff)
+-* Some DB typos fixed
+-
+-2006-06-29
+-* Updated french translation. Applied patch #1171. by alenvers
+-
+-2006-06-23
+-* Added reportlab pdf exporting example to misc/ thanks to Ian Esper.
+-* configlets.py: fixed configlet_tree warning. Closes Bug #7980.
+-* destar: fixed 'port' option bug.
+-
+-2006-06-22
+-* Fixed little typo in cfg_phone_zap.py
+-
+-2006-06-21
+-* Fixed conding in French and Spanish .po files. Successful changes need to be
+-  confirmed. It will close #7950
+-  TODO: check codings in whole destar
+-
+-2006-06-20
+-* Applied patches from debian package. Closes patches #1144, #1145 and #1146.
+-
+-2006-06-17
+-* Applied patch #1090: I18n cosmetics+Makefile(s) by alenvers.
+-* Some little i18n changes in cdrutils
+-* Changed AbsoluteTimeout by Set(TIMEOUT(absolute)=). Absolutetimeout is deprecated in *-1.2
+-* Changed SetCID{Name,Num} by CALLERID, because they're deprecated in *-1.2.
+-* Upgraded cfg_opt_music.py to new musiconhold.conf syntax.
+-* Small fix to page_stats_phone.ptl and page_owner_pbx.ptl.
+-* Updated basic documentation.
+-* Added new features: cfg_opt_monitor.py and cfg_opt_transfer.py.
+-* Applications DBGet and DBPut have been deprecated in favor of functions in asterisk-1.2.
+-
+-2006-06-16
+-* Changed SetVar by Set. SetVar is deprecated in *-1.2
+-
+-2006-06-12
+-* configlets.py: Fixed small bug on trunk redirection.
+-* Small patch to CSS (still menus won't work on IE).
+-
+-2006-06-10
+-* With the new menu and virtual pbx stuff, &quot;Administrator&quot; user becomes &quot;Virtual PBX Administrator&quot; (we gotta document the whole new thing).
+-
+-2006-06-09
+-* configlets.py: Changed 'ext' comprobation for each pbx.
+-* page_stats_*.ptl: Now we use the custom cdr fields (only page_stats_phone.ptl left). Closes bug #5964.
+-* cfg_phone_sip.py: Increased 'ext' field size.
+-* panelutils.py: changed panel path according to op-panel-0.26.
+-
+-2006-06-05
+-* Renamed page_stats_callstats.ptl to page_stats_calls.ptl
+-* Somehow 'disposition' field now has string values, instead of numeric ones.
+-
+-2006-05-31
+-* Templates.ptl: Restored, fixed a wrong html title header
+-* destar: Using gettext in (almost?) all the strings.
+-* Use VERSION to put versioning information.
+-
+-2006-05-30
+-* Changed menu distribution.
+-* Modified to allow virtual pbx: cfg_app_directory, cfg_app_play, cg_app_echo, cfg_app_record, cfg_app_music.
+-* Actual new custom CDR fields: intrunk, outtrunk, pbx and dialout.
+-* A SIP phone depends on its pbx (other phones remaining).
+-* Modified cfg_ivr_autoatt to virtual pbx scheme.
+-* Added pbx dependencies on cfg_app_voicemail and cfg_app_meetme.
+-* Added pbx dependencies on all cfg_app_*.
+-* Added pbx dependencies on all cfg_phone_*.
+-
+-2006-05-29
+-* Added initial cdr_sqlite3_custom.conf support.
+-* Modified cfg_appmeetme and cfg_app_voicemail to allow virtual pbxs.
+-
+-2006-05-28
+-* configlets.py, backend.py: removed some modules.
+-* page_admin_cdr.ptl, cdrutils.py: started Sqlite3 transition.
+-* page_admin_callsstats.ptl, StatsHelper.ptl: transition to sqlite3.
+-* Added page_owner_cdr.ptl and page_owner.ptl to let people check CDR by Virtual PBX.
+-
+-2006-05-27
+-* Fixed some typos.
+-* Removed function useContext from configlets.py.
+-* Now sip phones need to have an extension (it's safer this way).
+-* Added cfg_app_callfw and cfg_app_dnd to virtual pbx boilerplate.
+-* Deleted depricated contrib/destarctl file.
+-* Moved TIPS.txt to misc.
+-* Added cfg_opt_pbx.py and page_config_pbx.ptl to handle virtual pbx configlets.
+-
+-2006-05-26
+-* Final changes to initial new style.
+-** Added virtual/hosted pbx feature.
+-	- Changed &quot;phones&quot; context to &quot;pbx-name&quot; context.
+-	- Modified macro-dial-std-exten to support several pbx.
+-	- Modified all configlet main classes to allow virtual pbxs.
+-	- Applied new scheme to cfg_phone_sip.py (other phones are pending).
+-	- Applied new scheme to cfg_opt_did.py (other opts are pending).
+-
+-2006-05-25
+-* Deleted some unused/not-supported-anymore files from misc directory.
+-* Added debian init.d file on misc/debian.
+-* backend.py: Updated VoiceMail2 to newer VoiceMail.
+-* Shiny new looking style, thanks to Avatar Ltd. (TODO: test with several browsers).
+-* Fixed path on language.py.
+-* Fixed quixote version message.
+-
+-2006-05-24
+-* Applied Patch #1073, thanks to Anthony:
+-	- Better language support, by user prefers.
+-	- Unittest for translations.
+-* Destar checks for quixote &gt;= 1.2 and &lt; 2.0. Closing Bug #7314.
+-* Added first french l10n version, fr.po (Patch #1042). Thanks to Anthony.
+-* Using xgettext instead of pygettext in Makefile. Closing Bug #7425. Thanks to Anthony.
+-
+-2006-05-03:
+-* ConfigHelper.ptl: fixed bug with renaming configlets with dynamic dependencies
+-* Zap phone group is optional 
+-
+-2006-04-27:
+-* configlets.py: fixed bug with Cfg.renameDependencies()
+-
+-2006-04-24
+-* configlets.py: fixed rename line
+-* panelutils.py: fixed trunk section name
+-* cfg_phone_*.py: phones depends on the dialout_* vars
+-
+-2006-04-20
+-* cfg_dialout_normal.py: added support for dynamically generated dependencies. This is for &quot;trunk_*&quot; like dependencies.
+-
+-2006-04-08
+-* cfg_ivr_autoatt.py: this configlets depends on the moh, an ext and an ivr.
+-
+-2006-04-03
+-*Merged changes from branches/performance-experimental to trunk (&quot;Ave Maria, dame punteria&quot; :P).
+-
+-2006-03-23
+-* configlets.py: Changed spaces with tabs
+-* configlets.py: Added DepType class
+-* configlets.py: Replaced Dependency class with DependentObject
+-* configlets.py: added dependet_objs to Cfg
+-* configlets.py: added generic createDependencies() method to Cfg
+-* ConfigHelper.ptl: showDependencies function from configletsForm now displays dependency description
+-* cfg_opt_did.py: changed spaces with tabs and improved identation
+-* cfg_opt_did.py: added Dependency Descriptors
+-
+-2006-03-17
+-* ConfigHelper.ptl: Fixed bug with cascade delete button.
+-* ConfigHelper.ptl: Fixed bug with dependencies types
+-* configlets.py: Added Cfg.ClearDependencies method
+-* configlets.py: Changed ConfigletTree.deleteConfiglet method
+-
+-2006-03-14
+-*destar: added -r &lt;port&gt;|--port=&lt;port&gt; option on command line.
+-*cfg_opt_zap_audio.py: Added some usefull default options.
+-
+-2006-03-5:
+-* configlets.py: Added getFullDependencies() method to Cfg
+-* configlets.py: Added hasDependencies() method to Cfg
+-* ConfigHelper.ptl: Added showDependencie function to configletsForm
+-
+-2006-02-28
+-*configlets.py: again receive 's' exten on CreateIncomingContext, added mail field for voicemail notifications.
+-*backend.py: Added timeout to macro-voicemail.
+-*cfg_phone_zap.py: updated createDialEntry.
+-*cfg_opt_music.py: increased 'Directory' field lenght.
+-*cfg_trunk_zap.py: fixed typo.
+-*cfg_phone_sip.py: added mail field for voicemail notifications.
+-*cfg_trunk_zappri.py: changed order of some parammeters, fixed error on panel button creation when several channels are specified.
+-*cfg_opt_zap_audio.py: Added some usefull default options.
+-
+-2006-02-23
+-*Added page_admin_phonestats.ptl: initial implementation for extension estatistics (still buggy).
+-*Added misc/debian/cfg_opt_networking.py: debian specific network configuration.
+-*Added cfg_phone_epygi.py: remote extension on a Quadro Epygi PBX.
+-
+-2006-02-19:
+-* configlets.py: Cfg.__getattr__() method is back due to AttributeExceptions in VarListManager.updateTrunks()
+-* configlets.py: added Cfg.updateDependencies() method
+-* configlets.py: added Cfg.dependencies field
+-* configlets.py: added Dependency Class
+-* ConfigHelper.ptl: added dependency renaming in configletsForm().saveConfig()
+-* cfg_opt_did.py: added createDependencies() method for testing.
+-
+-2006-02-16:
+-* Fixed typo en configlets.py
+-* configlets.py: fixed bug with duplecated dialout entries in VarListManager.updateDialouts() method
+-* cfg_phone_iax.py, cfg_phone_sip.py, cfg_phone_mgcp.py, cfg_phone_queue.py, cfg_phone_zap.py, cfg_phone_ext.py: changed if varlist_manager.hasDialouts() &gt; 0 with if varlist_manager.hasDialouts()
+-
+-2006-02-15:
+-* cfg_dialout_normal.py, cfg_phone_iax.py, cfg_app_meetme.py, cfg_app_record.py, cfg_opt_sip_network.py, cfg_phone_ext.py, cfg_opt_voicemail.py, cfg_app_parking.py, cfg_opt_zap_trunk.py, cfg_app_quickdial_phone.py, cfg_opt_logger.py, cfg_app_dnd.py, cfg_app_conference.py, cfg_app_saytime.py, cfg_opt_pickup.py, cfg_trunk_capimsn.py, cfg_app_echo.py, cfg_phone_zap.py, misc/cfg_app_phraserecording.py, misc/cfg_app_aa.py, cfg_opt_rawcfg.py, cfg_ivr_autoatt.py, cfg_opt_music.py, cfg_trunk_fwdiax.py, cfg_app_voicemail.py, cfg_opt_settings.py, cfg_phone_sip.py, cfg_app_quickdial_global.py, cfg_opt_manager.pycfg_opt_sip_audio.py, cfg_trunk_capi.py, cfg_app_directory.py, cfg_app_play.py, cfg_app_milliwatt.py, cfg_ivr_raw.py, cfg_trunk_iaxtel.py, cfg_phone_queue.py, cfg_phone_mgcp.py, cfg_opt_did.py, cfg_opt_enum.py, cfg_opt_zappri.py, cfg_opt_zap_audio.py, cfg_opt_zap_phone.py, cfg_app_callfw.py: Added createVariables method
+-* some bug fixes
+-*Added Dial options so that when SetMusicOnHold is used, Dial is passed the 'm' option.
+-
+-2006-02-14:
+-* cfg_dialgout_normal.py: fixed bug with isAddable method
+-* configlets.py: a 'variables' creation is performed in Cfg constructor
+-* cfg_opt_oppanel.py, cfg_trunk_iax.py, cfg_ivr_autoatt.py, cfg_app_music.py,  cfg_opt_user.py: added createVariables() method
+-* backend.py: fixed bug with fixupConfiglets() fuctions and recreation of variables in VarListManager.
+-
+-2006-02-13
+-*Applied patch sent by &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">juan.coronado at avatar.com.co</A>&gt; with some improvements. Closes #6389.
+-*Fixed small but anoying bug on dialout timeout.
+-* configlets.py: fixed bug in ConfigletTree.hasConfiglet() method.
+-* configlets.py: Removed debugger break point in Cfg.createPythonConfig() method.
+-* configlets.py: fixed bug in CfgTrunk.fixup() method.
+-* backend.py: added fixupConfiglets() function again. This time fixupConfiglet is much faster than previous version. This fuction is used at loadPythonConfig() and createPythonConfig()
+-* configlets.py: added hasConfiglet() method to ConfigletTree class. Removed  __getattr__() method form Cfg. fixup() method is back in CfgPhone, now is smaller and faster.
+-* added createVariables() method to CfgPermDial, CfgPermDeny and CfgOptRtp classes.
+-
+-2006-02-07
+-* Changed the metadata specification ('variables' list) from class definition to createVariables() method in all configlets
+-
+-2006-02-04
+-* fixup() method has been removed from all configlets except from Cfg base class
+-* configlets.py: VarListManager class has been added. This class will be used to store referential integrity functionality. VarListManager. This class also serves to improve performance avoiding repetitive loops arround configlets groups.
+-* New method createVariables added to some configlets. This methods manages metadata information stored in the 'variables' field. Now the metadata creation and synchronization is separated: syncronization is performed via fixup() and metadata creation is performed via createVariables(). createConfiglets creates all 'variables' from zero.
+-* WARNING. this changes are incomplete, some destar functionality is broken.
+-
+-2006-01-31
+-* page_admin_callsstats.ptl, page_admin_dialoutsstats.ptl,  page_admin_trunksstats.ptl,
+-  StatsHelper.ptl: fixed bug #6182.
+-* Added a menu position to the pages about cdr and statistics
+-
+-2006-01-28
+-* configlets.py fixed bug with ConfigletTree.getConfigletByName()
+-* various fixups added.
+-
+-2006-01-27
+-* Added useful prefix handling for dialouts :)
+-
+-2006-01-16
+-* cfg_trunk_zappri.py: Changed channel attribute for channels.
+-* Various bug fixes
+-* configlets.py: A tree is now used to store configlets instead the old plain list. The class ConfigletTree is used for that purpose. Tree's branches represent groups.
+-* backend.py: All the old config_entries references has been replaced by references to the new tree, configlet_tree. In the future many of this functions could be deleted, some are still in the code only as stub
+-* All files with references to the config_entries list has been changed.	
+-* All references to config_entries has been replaced by configlet_tree, the tree structure
+-
+-2006-01-14
+-* cfg_trunk_zappri.py: Fixed wrong 'channels' instead of 'channel'.
+-* backend.py: Fixed missing identation.
+-
+-2005-12-27
+-* Added page_user_quickdiallist.ptl to show the global and private quick dial list.
+-* cfg_phone_zap: Made zap group optional.
+-
+-2005-12-26
+-* Removed backend.fixupConfiglets() from backend.py
+-* Added __getattr__ method to Cfg class in configlets.py
+-* Now each configlet will fixup it self in a &quot;intelligent&quot; way each time that an attribute is needed.
+-* A LOT of performance improvement.
+-
+-2005-12-24
+-* Added initial support for global and private quick dial lists.
+-* page_admin_dialoutsstats.ptl: Fixed confusion between inbound and outbound.
+-
+-2005-12-22
+-*cfg_phone_queue.py: fixed bug #5885: MoH fails in calls from PSTN placed directly on queues.
+-*configlets.py: is recommended to use _X. instead of _.
+-
+-2005-12-19
+-*backend.py: fixed bug on CFIM/CFBS, still needs more testing.
+-* Added &quot;CallerID&quot; field on CDR form and results.
+-
+-2005-12-17
+-* Added a title for new objects in each configlet to make a little 
+-  improvement in i18n.
+-
+-2005-12-15
+-*configlets: fixed Call Forwarding so an extension can only forward to the extensions it can call itself.
+-*cfg_phone_zap: The default group was 1 :s.
+-*cfg_opt_music: added 'custom' type.
+-*page_admin_cdr: let cost be calculated from CDR account field set on dialouts.
+-
+-2005-12-09
+-*cfg_trunk_sip: make registration optional.
+-
+-2005-12-04
+-* configlets.py: redirect everything on incoming context, except the extensions defined on DIDs. Closes bug #5799.
+-
+-2005-12-02
+-* page_main.ptl: shows the login form when the user has not logged in
+-  in the main page.
+-
+-2005-11-30
+-* configlets.py: reduce the effect of the parammeters limit avoiding to write the &quot;False&quot; values on the destar_cfg.py file. Closes bug: #5578
+-
+-2005-11-29
+-* Applied patch#722 submitted by xed0 trough berlios site:
+-	-Fix Trunk zappri
+-	-Load of app_directory module
+-* Applied patch sent by Francesco Crescioli:
+-	-cfg_trunk_sip.py: use the hostname instead of the peer name
+-	-cfg_dialout_normal.py, configlets.py: added prefix support.
+-	-added cfg_opt_sip_network.py for some sip network options.
+-* page_login display the login form when the user has typed an incorrect
+-  username or password
+-* page_user.ptl: Removed user menu entry when the user has not logged in 
+-
+-2005-11-20
+-* Templates.ptl: Uses XHTML Transitional instead of Strict. Closes bug: #5590
+-* page_admin_cdr.ptl, cdrutils,py: use deferred translations with N_() to allow 
+-translations in the call details. Closes bug: #5692
+-
+-2005-11-15
+-* Added Dialouts and Trunks graphical reports thanks to Ceronman.
+-
+-2005-11-13
+-* Updated INSTALL.txt
+-
+-2005-11-09
+-* Added an initial spanish translation PO file
+-
+-2005-11-07
+-* Updated README.txt
+-* CHANGELOG.txt, destar: added notes about other project contributors.
+-* Updated TODO.txt
+-
+-2005-11-05
+-* Statistics Patch from Manuel Alejandro Cer&#65533;n applied. It implements some
+-  graphic statistics reports, generated with PyChart 
+-  <A HREF="http://home.gna.org/pychart/">http://home.gna.org/pychart/</A>
+-* page_config_reload.py: added missing '&lt;p&gt;&lt;/p&gt;' tags.
+-* Increased secret field size for all phones.
+-* page_admin_pbxstate, page_user_state, misc/page_admin_systemstate: Added refreshing time of 10 seconds.
+-* cfg_opt_voicemail.py: added email notification options.
+-* configlets.py: removed german timezone for voicemail until a better handling of timezones, validate names with '-' or spaces.
+-* manager.py: lesss output to reduce cpu load.
+-
+-2005-11-04
+-* cfg_phone_queue.py: fixed typos, added &quot;join&quot; option.
+-
+-2005-10-29
+-* cfg_ivr_autoatt.py: allow dial a digit to jump to operator's extension during
+-the file playback.
+-
+-2005-10-28
+-* cfg_trunk_zappbx.py: new zap trunk to call through a PBX
+-* cfg_phone_zap.py: typo fixed
+-* backend.py: little bug fixed
+-* Fixed a problem with the inbounds calls of zap and sip trunks
+-
+-2005-10-24
+-* cfg_trunk_iax.py: Oops, Fixed missing 'secret' field.
+-
+-2005-10-22
+-* Rewrited all op-panel integration to make it more usable and cleaner:
+-	- Added cfg_opt_oppanel.py: a configlet to manage the panel configuration.
+-	- Now panel html files are not copied but symlinked.
+-	- Tested with original tarball and with the .deb package I'm working on.
+-	- Initial configuration must be made on panelutils.py and Makefile to make this work.
+-	- TODO: make more tests of panel integration and document configuration steps.
+-* cfg_opt_manager.py,ConfigHelper.ptl: fixed little bug regarding optional &quot;mchoice&quot; widget.
+-
+-2005-10-20
+-* Fixed some XHTML warnings.
+-* page_admin_cdr.ptl: Fixed bug when showing cost of calls.
+-* Fixed phone authentication bugs (password can be phone secret or voicemail pin and don't show 'login' option if user type is &quot;User&quot;).
+-* Global interface cleaning of &quot;future plans&quot; messages (Redirect to wiki pages instead).
+-* Added '&lt;p&gt;&lt;/p&gt;' tags to several messages that didn't have them.
+-* Made some other html improvements (e.g. table headers).
+-* Added cfg_opt_zappri.py,cfg_trunk_zappri.py: initial support for zap pri trunks.
+-
+-2005-10-19
+-* cfg_trunk_iax.py: improved authentication part. 
+-* Added initial support for call queues.
+-* cfg_opt_rawcfg.py: little change to let some fields be bigger.
+-* backend.py: make sure the destar_cfg.py file gets updated before writing config files.
+-* Improved cfg_ivr_autoatt.py with playback pause and timed jump to ivr.
+-* page_user_settings.ptl,cfg_app_callfw.py: modified a bit the way features are stored on astdb (This needs more testing).
+-* Show cost of calls based on &quot;accountcode&quot; field of cdr. This field is filled depending on the price per minute of every trunk/dialout. The field is not meant for that, but this is an aproach to tarification.
+-
+-2005-10-18
+-* cfg_dialout_normal.py: validate trunk_price
+-
+-2005-10-12
+-* cfg_trunk_iax.py: changes based on several tests with two asterisk/destar machines.
+-
+-2005-09-26
+-* Changed config menu order. patch from santiago.
+-* Makefile: little change to allow all developers make a release easier.
+-
+-2005-09-23
+-* Big change: created class CfgIVR, changed cfg_opt_autoatt.py to cfg_ivr_autoatt and added cfg_ivr_raw.py since many people could have a weird custom auto-attendant and we want to use it on other parts of the program.
+-* Changed DID's to work with new trunk and auto-attendant scheme. Now we can declare DID's per trunk and route then to a phone or auto-attendant.
+-* Improved cfg_phone_ext.py
+-* page_logout.ptl: don't let the programmer user logout (TODO: hide 'logout' on the menu).
+-
+-2005-09-21
+-* Fixed bug on cfg_dialout_normal.py and configlets.py related to a GotoIf command.
+-* cfg_phone_sip.py: force a well formed caller-id. 
+-
+-2005-09-05
+-* Changed applications context from &quot;default&quot; to &quot;apps&quot;.
+-* Added cfg_opt_pickup.py to set pickup extension
+-* Added cfg_app_callfw.py to set call forwarding
+-* Added cfg_app_dnd.py to set 'do not disturb'
+-* Made some improvements on several cfg_app_*
+-* cfg_phone_sip.py, cfg_phone_iax.py: Fixed typo.
+-* paneltils.py: fixed and added some buttons
+-
+-2005-09-02
+-* Improved some code of cfg_trunks with inheritance.
+-* Improved page_logout.ptl behavior a bit.
+-* Improved some code of cfg_phones with inheritance.
+-* Added support for gsm, g729 and g723.1 codecs in sip audio options
+-
+-2005-09-01
+-* cfg_dialout_normal.py: Fixed wrong Goto
+-* configlets.py: continued support for auto-attendants on CfgTrunk, cfg_trunk_zap, iax and sip.
+-* Changed page_user_pbxstate.ptl to page_admin_pbxstate.ptl for usability reasons
+-* Changed writing concept: now asterisk files are written with every little change
+-* Changed page_config_write.ptl to page_config_viewconf.ptl. Now the backups are created without asking.
+-* &quot;Standardized&quot; common options in the phones, they appear in the same order
+-* Added dialout support for iax, zap and mgcp phones
+-* &quot;notransfer&quot; iax option is wrote in the asterisk config files
+-
+-2005-08-25
+-* Added misc/page_admin_systemstatus.ptl to show cpu load, memory info, etc.
+-* fixed a missing 'Programmer' user type on page_user.ptl and page_user_info.ptl
+-
+-2005-08-23
+-* Added 'new' and 'old' voicemail messages on page_user_state.ptl 
+-
+-2005-08-22
+-* Added a message when there is nothing to write (empty destar_cfg.py)
+-* Added a warning message if there is not destar_cfg.py
+-* Re-added &quot;Phone Features or Settings&quot; by migrating old code from UserUI.ptl and UserPage.ptl to page_user_settings.ptl, and added options to change voicemail pin and extension password.
+-* Changed page_login password from StringWidget to Passwordwidget.
+-* Re-added &quot;Phone State&quot; by migrating old code from UserUI.ptl and UserPage.ptl to page_user_state.ptl
+-
+-2005-08-19
+-* Added &quot;enable time restriction&quot; option to cfg_phone_sip 
+-* cfg_opt_logger.py: fixed the facility's single_select 
+-
+-2005-08-18
+-* Added initial support for radio-buttons
+-* Added initial support for:
+-  - auto-attendants
+-  - dialout-entries
+-
+-2005-04-28
+-* some CDR improvement
+-
+-2005-04-04
+-
+-* Big infrastructural change. Basically, we will have one page_*.ptl file
+-  for each generated page. In main_page.ptl became quite complex because of
+-  all sorts of RTTI-voodoo to Pythons dictionary that I now do. But the
+-  other page_*.ptl files are now usually much simpler.
+-  * makes *Page.ptl and *UI.ptl obsolete
+-  * allows the navition menu to be automatically generated
+-* beefed up the configuration tips, e.g. with hints about config file
+-  writability
+-* move config file backup into it's own page_config_backup.ptl
+-
+-2005-03-17
+-
+-* beginnings of fxo/fxs support (e.g. for TDM400P)
+-
+-2005-03-10
+-
+-* fix callerid
+-
+-2005-02-17
+-
+-* changed the encoding to UTF-8, change HTML a bit so that it is nearer to
+-  HTML-4.0.1-strict conformance.
+-
+-2005-02-04
+-
+-* beginning of Flash Operator Panel integration
+-
+-2005-01-27
+-
+-* some more CDR code
+-
+-2004-09-02
+-
+-* added cfg_opt_rawcfg, to allow arbitrary config file snippets
+-* removed l_amaflags and l_disposition from cdrutils.py, this will
+-  make it easier later to have different database backends
+-
+-2004-08-19
+-
+-* enabled parking app
+-* fixed layout with integer-widgets
+-* added checks to load module option, record- and playback app
+-* added format options to playback app
+-* updated cfg_opt_rtp.py while writing <A HREF="http://openfacts.berlios.de/index-en.phtml?title=DeStarConfiglets">http://openfacts.berlios.de/index-en.phtml?title=DeStarConfiglets</A>
+-* don't ask zaptel.conf to be backed up
+-* make all 4 configuration tips appear after a fresh install
+-
+-2004-08-18
+-
+-* moved development to <A HREF="http://developer.berlios.de/projects/destar/">http://developer.berlios.de/projects/destar/</A>
+-* the dialplan is now much simpler
+-* fixed cfg_line_iaxtrunk.py, it does no longer break
+-* homogenized display of telco lines
+-* added multiple incoming MSN capability to ISDN over CAPI
+-* one MSN can only be assigned once
+-* put functionality into User -&gt; Phone settings
+-
+-2004-08-16
+-
+-* fixed tab/whitespace fixed config file creation for IAX voicemailbox
+-* added notransfer to CfgPhoneIAX, delete canreinvite from the same
+-* don't return None menu if there is no CDR
+-* backend.py: make getConfiglet known in configlets.py, so that configlets can use it, too
+-* cfg_line_fwdiax.py: added default name, don't use hard-coded SIP technology
+-* ConfigUI.py: bug fix
+-* don't break if pysqlite is there, but no cdr.db
+-
+-2004-08-13
+-
+-* finished login/logout capability
+-* different default configuration
+-* added configuration tips for first-time starters
+-* backend.countConfiglets() can now count specific object types
+-* new configlets.generatePassword() 'function' (callable class)
+-* nicer cfg_opt_manager.py, generate secure passwords
+-* removed or disabled some unfinished configlets
+-* again fiddled with the CSS
+-
+-
+-2004-08-12
+-
+-* added CfgOptUser as well as beginnings of session object
+-  with auto-login-based-on-ip-feature
+-* added logout code (login has to be done via auto-login feature
+-  so far)
+-* moved UI logic for the user page into ui/User.ptl
+-* Admin.ptl and Users.ptl print some of the TODO-items as teasers :-)
+-* incorporated Medusa into the code base
+-* fixed bug in the menu calculation, multi-choice widgets
+-* allow configlets to be retrieved by their .name propery
+-
+-2004-08-09
+-
+-* fixed parking config
+-* centralized channel state calculations
+-* added Asterisk Status to User menu
+-* added individual phone status to Asterisk Status
+-
+-
+-2004-08-08
+-
+-* basic support for DND, CFIM, CFBS
+-* virtual phones added, first one is CfgPhoneExt for additional extensions
+-
+-
+-2004-08-06
+-
+-* manager.py now automatically reconnects when Asterisk does a restart
+-* fixed bug when parsing event messages
+-* allow setAttr to grow the html grid
+-* add option for auto-refresh
+-* again rewrote the manager interface
+-* allow configlet.key = val
+-* cfg_app_park now adds a self-parking extension
+-* fixed up/down moving of Configlets
+-* the backend now checks that we don't have two thingies with the same name
+-  or extension
+-* added cfg_app_saytime
+-* got rid of my own Widget.py module, now we're back to original Quixote
+-
+-
+-2004-08-05
+-
+-* even more changes to the layout :-)
+-* fixed HTML layout of PBX state
+-* got rid of manager.isconnected
+-* manager does no longer hang for some seconds when Asterisk is down
+-* manager re-connects if Asterisk get's up again
+-* now the checkConfig() method of the configlets works
+-
+-
+-2004-07-30
+-
+-* started to revamp basic template &amp; CSS
+-* dynamically generated left menu
+-* fixed up&amp;down buttons
+-
+-
+-2004-07-26
+-
+-* always try to connect to the manager whenever the status page is called
+-* added some phone pictures I'll use later
+-
+-
+-2004-07-22
+-
+-* added name field to all Phones and all Lines, we need this for the
+-  status box
+-* added technology variable to all Lines
+-* added channel() method to all Phones and Lines
+-* added User.ptl
+-* added HtmlTable based on PyHtmlTables into Templates
+-* let Admin.ptl use the new cdrtools, limit display to the last 30 entries
+-* hide context from phone forms
+-* cdrutils.cdrSelect() -&gt; cdrutils.select()
+-* added manager.py and made it handle manager commands and events. For
+-  the latter, you have to subclass ManagerClient and redefine handle_event()
+-
+-
+-2004-07-20
+-
+-* added simple CDR display, still VERY crude, don't use it if you have
+-  thousand of CDR records
+-* fixed creation of manager.conf
+-* new configlets.context_entries where I store all the used contexts, with
+-  configlets.useContext() to add entries to it, usually in the fixup()
+-  method
+-* NeedModule -&gt; needModule
+-* store full path in instances of AsteriskConfigFile.fn
+-* better function doc strings in backend.py
+-* backup config files before overwriting if the config file is not from us
+-* groupCount -&gt; countConfiglets
+-* fixUp -&gt; fixup
+-* CfgPhoneIax got voicemail settings as well, because they are now put into
+-  CfgPhone as methods
+-* CfgOptLogger got syslog abilities
+-
+-
+-2004-07-19
+-
+-* beginnings of voicemail, already in CfgSipPhone
+-* introducation of Cfg.fixup() to do post-load setup, e.g. only unhide the
+-  DID entry in Phones if one of the Lines actually support DID
+-* allow entries to be moved up and down
+-* fixed writing into destar_cfg.py
+-* fixed loading of destar_cfg.py, especially when the cfg file did not
+-  define all configlet variables because it was written with an older
+-  version of DeStar
+-* niced up CfgOptLogger
+-* CfgAppParking now uses features.conf as does Asterisk CVS
+-
+-
+-2004-07-15
+-
+-* add delete and cancel button to forms
+-* big restructure of code: we now have individual cfg_*.py
+-  that are read dynamically, so you can drop in your own
+-* backend.py is pretty much what asterisk.py used to be
+-* beginnings of context/permission support
+-* enhanced CfgLineCapi
+-* better docs in the *.txt files
+-* somewhat nicer forms
+-
+-
+-2004-07-12
+-
+-* added Labels to forms
+-* support for phone permissions (via Asterisk contexts)
+-* support for disable phone numbers
+-
+-
+-2004-07-09
+-
+-* you can now add &amp; edit configurables
+-* nicer layout for error messages in the form
+-* disabled german translations for now
+-* added preliminary sidemenu
+-* now you can even write your configuration
+-* new IaxPhone configurable
+
+Copied: branches/santiago/CHANGELOG.txt (from rev 803, trunk/CHANGELOG.txt)
+
+Deleted: branches/santiago/cfg_phone_epygi.py
+===================================================================
+--- trunk/cfg_phone_epygi.py	2007-08-24 23:26:42 UTC (rev 800)
++++ branches/santiago/cfg_phone_epygi.py	2007-08-31 22:33:24 UTC (rev 804)
+@@ -1,302 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# This file has Copyright by Alejandro Rios P.
+-# Destar has Copyright (C) 2005 by Holger Schurig,
+-# Based on cfg_phone_sip.py file
+-# 
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-#
+-
+-
+-from configlets import *
+-import panelutils
+-
+-
+-class CfgPhoneEpygiSip(CfgPhone):
+-
+-	shortName = _(&quot;Remote SIP extension - Epygi&quot;)
+-	newObjectTitle = _(&quot;New SIP Epigy extension&quot;)
+-	technology = &quot;SIP&quot;
+-
+-	def createVariables(self):
+-		self.variables = [
+-			VarType(&quot;pbx&quot;,    
+-				title=_(&quot;Virtual PBX&quot;), 
+-				type=&quot;choice&quot;, 
+-				options=getChoice(&quot;CfgOptPBX&quot;)),
+-
+-			VarType(&quot;name&quot;,
+-					title=_(&quot;Name&quot;),
+-					len=15),
+-			
+-			VarType(&quot;secret&quot;,
+-					title=_(&quot;Password&quot;),
+-					optional=True,
+-					len=15),
+-
+-			VarType(&quot;gw&quot;,
+-					title=_(&quot;IP address of Epygi gateway&quot;),
+-					len=15),
+-
+-			VarType(&quot;nat&quot;,
+-					title=_(&quot;Is the trunk behind NAT ?&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+-			VarType(&quot;ext&quot;,
+-					title=_(&quot;Extension&quot;),
+-					len=6),
+-
+-			VarType(&quot;dtmfmode&quot;,
+-					title=_(&quot;DTMF mode:&quot;),
+-					type=&quot;choice&quot;,
+-					options=( (&quot;rfc2833&quot;,_(&quot;RFC 2833 (RTP)&quot;)),
+-						  (&quot;inband&quot;,_(&quot;In Band (only with ulaw/alaw)&quot;)),
+-						  (&quot;info&quot;,_(&quot;SIP INFO&quot;)) ), default=&quot;info&quot;),
+-
+-			VarType(&quot;Call Group&quot;,
+-					title=_(&quot;Call group&quot;),
+-					type=&quot;label&quot;),
+-
+-			VarType(&quot;enablecallgroup&quot;,
+-					title=_(&quot;Enable call group&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True,
+-					default=False), 
+-
+-			VarType(&quot;callgroup&quot;,
+-					title=_(&quot;Call group number&quot;),
+-					optional=True),
+-
+-			VarType(&quot;QueueLab&quot;,
+-					title=_(&quot;Call Queues&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-
+-			VarType(&quot;queues&quot;,
+-					title=_(&quot;Agent of queues:&quot;),
+-					type=&quot;mchoice&quot;,
+-					optional=True,
+-					options=getChoice(&quot;CfgPhoneQueue&quot;),
+-					hide=True),
+-
+-			VarType(&quot;panelLab&quot;,
+-					title=_(&quot;Operator Panel&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-
+-			VarType(&quot;panel&quot;,
+-					title=_(&quot;Show this extension in the panel&quot;),
+-					type=&quot;bool&quot;,
+-					hide=True,
+-					optional=True),
+-
+-			VarType(&quot;Voicemail&quot;,
+-					title=_(&quot;Voicemail settings&quot;),
+-					type=&quot;label&quot;,
+-					len=6),
+-
+-			VarType(&quot;usemwi&quot;,
+-					title=_(&quot;Signal waiting mail&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+-			VarType(&quot;pin&quot;,
+-					title=_(&quot;Voicemail PIN&quot;),
+-					type=&quot;int&quot;,
+-					optional=True,
+-					len=6),
+-
+-			VarType(&quot;email&quot;,
+-					title=_(&quot;E-mail&quot;),
+-					optional=True,
+-					len=60),
+-			
+-			VarType(&quot;Outbound&quot;,
+-					title=_(&quot;Calls from the phone&quot;),
+-					type=&quot;label&quot;),
+-
+-			VarType(&quot;calleridnum&quot;,
+-					title=_(&quot;Caller-Id Number&quot;),
+-					optional=True),
+-
+-			VarType(&quot;calleridname&quot;,
+-					title=_(&quot;Caller-Id Name&quot;),
+-					optional=True),		
+-
+-			VarType(&quot;Monitoring&quot;,
+-					title=_(&quot;Monitoring&quot;),
+-					type=&quot;label&quot;,
+-					len=6),
+-
+-			VarType(&quot;monitor&quot;,
+-					title=_(&quot;Monitor calls made from this extension?&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorfilename&quot;,
+-					title=_(&quot;Monitor file name&quot;),
+-					hint=_(&quot;Otherwise it will use Date-CallerIdName(CallerIdNum)-Exten&quot;),
+-					len=25,
+-					optional=True),
+-
+-			VarType(&quot;monitorfileformat&quot;,
+-					title=_(&quot;Monitor file format&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;gsm&quot;,_(&quot;GSM&quot;)),
+-							(&quot;wav&quot;,_(&quot;WAV&quot;)),
+-							(&quot;wav49&quot;,_(&quot;WAV49&quot;))),
+-					default=&quot;gsm&quot;),
+-
+-			VarType(&quot;monitorappend&quot;,
+-					title=_(&quot;Append to existing file instead of overwriting it?&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorwhenbridged&quot;,
+-					title=_(&quot;Save audio only while the channel is bridged?&quot;),
+-					hint=_(&quot;Does not include conferences&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;heardvol&quot;,
+-					title=_(&quot;Heard volume factor&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;+4&quot;,_(&quot;+4&quot;)),
+-					(&quot;+3&quot;,_(&quot;+3&quot;)),
+-					(&quot;+2&quot;,_(&quot;+2&quot;)),
+-					(&quot;+1&quot;,_(&quot;+1&quot;)),
+-					(&quot;0&quot;,_(&quot;0&quot;)),
+-					(&quot;-1&quot;,_(&quot;-1&quot;)),
+-					(&quot;-2&quot;,_(&quot;-2&quot;)),
+-					(&quot;-3&quot;,_(&quot;-3&quot;)),                   
+-					(&quot;-4&quot;,_(&quot;-4&quot;))),	
+-					default=&quot;0&quot;),
+-
+-			VarType(&quot;spokenvol&quot;,
+-					title=_(&quot;Spoken volume factor&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;+4&quot;,_(&quot;+4&quot;)),
+-					(&quot;+3&quot;,_(&quot;+3&quot;)),
+-					(&quot;+2&quot;,_(&quot;+2&quot;)),
+-					(&quot;+1&quot;,_(&quot;+1&quot;)),
+-					(&quot;0&quot;,_(&quot;0&quot;)),
+-					(&quot;-1&quot;,_(&quot;-1&quot;)),
+-					(&quot;-2&quot;,_(&quot;-2&quot;)),
+-					(&quot;-3&quot;,_(&quot;-3&quot;)),                   
+-					(&quot;-4&quot;,_(&quot;-4&quot;))),
+-					default=&quot;0&quot;),
+-					
+-			VarType(&quot;Dialout&quot;,
+-					title=_(&quot;Allowed dialout-entries&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-
+-			VarType(&quot;timeout&quot;,
+-					title=_(&quot;Enable time restriction?&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True,
+-					hide=True),]
+-
+-		if varlist_manager.hasDialouts():
+-			self.variables += varlist_manager.getDialouts()
+-			for v in self.variables:
+-				if v.name == &quot;Dialout&quot; or v.name==&quot;timeout&quot;:
+-					v.hide = False
+-					
+-		queues = len(configlet_tree.getConfigletsByName('CfgPhoneQueue'))
+-		if queues &gt; 0:
+-			for v in self.variables:
+-				if v.name == &quot;QueueLab&quot; or v.name == &quot;queues&quot;:
+-					v.hide = False
+-		self.dependencies = [
+-			DepType(&quot;pbx&quot;, 
+-					type=&quot;hard&quot;,
+-					message = _(&quot;This is a Dependency&quot;)),
+-		]
+-		for var in self.__dict__.keys():
+-			if var.startswith('dialout_'):
+-				self.dependencies.append(
+-					DepType(var,
+-							type=&quot;hard&quot;,
+-							message = _(&quot;This is a Dependency&quot;)))
+-
+-	def createDependencies(self):
+-		for dep in self.dependencies:
+-			if self.__dict__.has_key(dep.name):
+-				obj_name = dep.name[8:] # get the name after &quot;dialout_&quot;
+-				import configlets
+-				obj = configlets.configlet_tree.getConfigletByName(obj_name)
+-				if obj is None:
+-					return
+-				dependent_obj = DependentObject(self, dep)
+-				obj.dependent_objs.append(dependent_obj)
+-
+-	def isAddable(self):
+-		&quot;We can only add this object if we have at least one pbx defined.&quot;
+-
+-		# BUG: it does somehow not work to simply write for obj in config_entries,
+-		# despite the &quot;from configlets import *&quot; above
+-		import configlets
+-		if len(configlets.configlet_tree.getConfigletsByName('CfgOptPBX')) &gt; 0:
+-			return True
+-		return False
+-	isAddable = classmethod(isAddable)
+-
+-	def fixup(self):
+-		CfgPhone.fixup(self)			
+-		
+-	def createAsteriskConfig(self):
+-		needModule(&quot;chan_sip&quot;)
+-		needModule(&quot;app_authenticate&quot;)
+-
+-		sip = AstConf(&quot;sip.conf&quot;)
+-		sip.setSection(self.name)
+-		sip.append(&quot;type=friend&quot;)
+-		sip.append(&quot;qualify=yes&quot;)
+-		sip.appendValue(self, &quot;secret&quot;)
+-		sip.append(&quot;host=dynamic&quot;)
+-		sip.append(&quot;fromdomain=%s&quot; % self.gw)
+-		sip.append(&quot;dtmfmode=%s&quot; % self.dtmfmode)
+-		sip.append(&quot;fromuser=%s&quot; % self.name)
+-		sip.append(&quot;username=%s&quot; % self.name)
+-		sip.append(&quot;context=out-%s&quot; % self.name)
+-		sip.append(&quot;canreinvite=no&quot;)
+-
+-		if self.calleridname and self.calleridnum:
+-			sip.append('callerid=&quot;%s&quot; &lt;%s&gt;' % (self.calleridname, self.calleridnum))
+-		elif self.calleridname:
+-			sip.append('callerid=&quot;%s&quot; &lt;%s&gt;' % (self.calleridname, self.ext))
+-		elif self.calleridnum:
+-			sip.append('callerid=&quot;%s&quot; &lt;%s&gt;' % (self.name,self.calleridnum))
+-		else:
+-			sip.append('callerid=&quot;%s&quot; &lt;%s&gt;' % (self.name,self.ext))
+-
+-		if self.enablecallgroup:
+-			sip.append('callgroup=%s' % self.callgroup)
+-			sip.append('pickupgroup=%s' % self.callgroup)
+-
+-		if self.nat:
+-			sip.append(&quot;nat=yes&quot;)
+-		
+-		extensions = AstConf(&quot;extensions.conf&quot;)
+-		extensions.setSection(self.pbx)
+-		if self.ext:
+-			extensions.appendExten(self.ext, &quot;Macro(dial-std-exten,%s/%s@%s:5060,out-%s,%s,%s)&quot; % (self.technology,self.name,self.gw,self.name,self.pbx,self.ext), self.pbx)
+-
+-		self.createVoicemailConfig(sip)
+-		self.createOutgoingContext()
+-		self.createPanelConfig()
+-		self.createQueuesConfig()
+
+Copied: branches/santiago/cfg_phone_epygi.py (from rev 803, trunk/cfg_phone_epygi.py)
+
+Deleted: branches/santiago/cfg_phone_iax.py
+===================================================================
+--- trunk/cfg_phone_iax.py	2007-08-24 23:26:42 UTC (rev 800)
++++ branches/santiago/cfg_phone_iax.py	2007-08-31 22:33:24 UTC (rev 804)
+@@ -1,298 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# Copyright (C) 2005 by Holger Schurig
+-# 
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-#
+-
+-
+-from configlets import *
+-import panelutils
+-
+-
+-class CfgPhoneIax(CfgPhone):
+-
+-	shortName = _(&quot;Normal IAX phone&quot;)
+-	newObjectTitle = _(&quot;New IAX phone&quot;)
+-	technology = &quot;IAX2&quot;
+-	def createVariables(self):
+-		self.variables = [
+-			VarType(&quot;pbx&quot;,    
+-				title=_(&quot;Virtual PBX&quot;), 
+-				type=&quot;choice&quot;, 
+-				options=getChoice(&quot;CfgOptPBX&quot;)),
+-
+-			VarType(&quot;name&quot;,
+-					title=_(&quot;Name&quot;),
+-					len=15),
+-
+-			VarType(&quot;secret&quot;,
+-					title=_(&quot;Password&quot;),
+-					optional=True,
+-					len=15),
+-
+-			VarType(&quot;host&quot;,
+-					title=_(&quot;IP address of phone&quot;),
+-					optional=True,
+-					len=15),
+-
+-			VarType(&quot;qualify&quot;,
+-					title=_(&quot;Qualify? (yes|no|xxx)&quot;),
+-					optional=True,
+-					len=5),
+-
+-			VarType(&quot;ext&quot;,
+-					title=_(&quot;Extension&quot;),
+-					len=6),
+-
+-			VarType(&quot;did&quot;,
+-					title=_(&quot;Allow direct dialling from outside?&quot;),
+-					type=&quot;bool&quot;,
+-					hide=True,
+-					default=False),
+-	
+-			VarType(&quot;Call Group&quot;,
+-					title=_(&quot;Call group&quot;),
+-					type=&quot;label&quot;),
+-
+-			VarType(&quot;enablecallgroup&quot;,
+-					title=_(&quot;Enable call group&quot;),
+-					type=&quot;bool&quot;,
+-					optional=False,
+-					default=False), 
+-
+-			VarType(&quot;callgroup&quot;,
+-					title=_(&quot;Call group number&quot;),
+-					optional=True),
+-
+-			VarType(&quot;QueueLab&quot;,
+-					title=_(&quot;Call Queues&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-			
+-			VarType(&quot;queues&quot;,
+-					title=_(&quot;Agent of queues:&quot;),
+-					type=&quot;mchoice&quot;,
+-					optional=True,
+-					options=getChoice(&quot;CfgPhoneQueue&quot;),
+-					hide=True),
+-	
+-	
+-			VarType(&quot;panelLab&quot;,
+-					title=_(&quot;Operator Panel&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-
+-			VarType(&quot;panel&quot;,
+-					title=_(&quot;Show this extension in the panel&quot;),
+-					type=&quot;bool&quot;,
+-					hide=True,
+-					optional=True),
+-	
+-			VarType(&quot;Voicemail&quot;,
+-					title=_(&quot;Voicemail settings&quot;),
+-					type=&quot;label&quot;),
+-
+-			VarType(&quot;usemwi&quot;,
+-					title=_(&quot;Signal waiting mail&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+-			VarType(&quot;pin&quot;,
+-					title=_(&quot;Voicemail PIN&quot;),
+-					type=&quot;int&quot;,
+-					optional=True,
+-					len=6),
+-
+-			VarType(&quot;email&quot;,
+-					title=_(&quot;Voicemail email&quot;),
+-					optional=True,
+-					len=60),
+-			
+-
+-			VarType(&quot;notransfer&quot;,
+-					title=_(&quot;Skip asterisk media path?&quot;),
+-					type=&quot;bool&quot;),
+-	
+-			VarType(&quot;Outbound&quot;,
+-					title=_(&quot;Calls from the phone&quot;),
+-					type=&quot;label&quot;),
+-
+-			VarType(&quot;calleridnum&quot;,
+-					title=_(&quot;Caller-Id Number&quot;),
+-					optional=True),
+-
+-			VarType(&quot;calleridname&quot;,
+-					title=_(&quot;Caller-Id Name&quot;),
+-					optional=True),
+-
+-			VarType(&quot;Monitoring&quot;,
+-					title=_(&quot;Monitoring&quot;),
+-					type=&quot;label&quot;,
+-					len=6),
+-
+-			VarType(&quot;monitor&quot;,
+-					title=_(&quot;Monitor calls made from this extension?&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorinbound&quot;,
+-					title=_(&quot;Monitor calls made to this extension?&quot;),
+-					optional=True,
+-					default=False,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorfilename&quot;,
+-					title=_(&quot;Monitor file name&quot;),
+-					hint=_(&quot;Otherwise it will use Date-CallerIdName(CallerIdNum)-Exten&quot;),
+-					len=25,
+-					optional=True),
+-
+-			VarType(&quot;monitorfileformat&quot;,
+-					title=_(&quot;Monitor file format&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;gsm&quot;,_(&quot;GSM&quot;)),
+-							(&quot;wav&quot;,_(&quot;WAV&quot;)),
+-							(&quot;wav49&quot;,_(&quot;WAV49&quot;))),
+-					default=&quot;gsm&quot;),
+-
+-			VarType(&quot;monitorappend&quot;,
+-					title=_(&quot;Append to existing file instead of overwriting it?&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorwhenbridged&quot;,
+-					title=_(&quot;Save audio only while the channel is bridged?&quot;),
+-					hint=_(&quot;Does not include conferences&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;heardvol&quot;,
+-					title=_(&quot;Heard volume factor&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;+4&quot;,_(&quot;+4&quot;)),
+-					(&quot;+3&quot;,_(&quot;+3&quot;)),
+-					(&quot;+2&quot;,_(&quot;+2&quot;)),
+-					(&quot;+1&quot;,_(&quot;+1&quot;)),
+-					(&quot;0&quot;,_(&quot;0&quot;)),
+-					(&quot;-1&quot;,_(&quot;-1&quot;)),
+-					(&quot;-2&quot;,_(&quot;-2&quot;)),
+-					(&quot;-3&quot;,_(&quot;-3&quot;)),                   
+-					(&quot;-4&quot;,_(&quot;-4&quot;))),	
+-					default=&quot;0&quot;),
+-
+-			VarType(&quot;spokenvol&quot;,
+-					title=_(&quot;Spoken volume factor&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;+4&quot;,_(&quot;+4&quot;)),
+-					(&quot;+3&quot;,_(&quot;+3&quot;)),
+-					(&quot;+2&quot;,_(&quot;+2&quot;)),
+-					(&quot;+1&quot;,_(&quot;+1&quot;)),
+-					(&quot;0&quot;,_(&quot;0&quot;)),
+-					(&quot;-1&quot;,_(&quot;-1&quot;)),
+-					(&quot;-2&quot;,_(&quot;-2&quot;)),
+-					(&quot;-3&quot;,_(&quot;-3&quot;)),                   
+-					(&quot;-4&quot;,_(&quot;-4&quot;))),
+-					default=&quot;0&quot;),
+-					
+-			VarType(&quot;Dialout&quot;,
+-					title=_(&quot;Allowed dialout-entries&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-
+-			VarType(&quot;timeout&quot;,
+-					title=_(&quot;Enable time restriction?&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True,
+-					hide=True),]
+-
+-		if varlist_manager.hasDialouts():
+-			self.variables += varlist_manager.getDialouts()
+-			for v in self.variables:
+-				if v.name == &quot;Dialout&quot; or v.name==&quot;timeout&quot;:
+-					v.hide = False
+-					
+-		queues = len(configlet_tree.getConfigletsByName('CfgPhoneQueue'))
+-		if queues &gt; 0:
+-			for v in self.variables:
+-				if v.name == &quot;QueueLab&quot; or v.name == &quot;queues&quot;:
+-					v.hide = False
+-		self.dependencies = [
+-			DepType(&quot;pbx&quot;, 
+-					type=&quot;hard&quot;,
+-					message = _(&quot;This is a Dependency&quot;)),
+-			]
+-		for var in self.__dict__.keys():
+-			if var.startswith('dialout_'):
+-				self.dependencies.append(
+-					DepType(var,
+-							type=&quot;hard&quot;,
+-							message = _(&quot;This is a Dependency&quot;)))
+-
+-	def createDependencies(self):
+-		for dep in self.dependencies:
+-			if self.__dict__.has_key(dep.name):
+-				obj_name = dep.name[8:] # get the name after &quot;dialout_&quot;
+-				import configlets
+-				obj = configlets.configlet_tree.getConfigletByName(obj_name)
+-				if obj is None:
+-					return
+-				dependent_obj = DependentObject(self, dep)
+-				obj.dependent_objs.append(dependent_obj)
+-
+-	def isAddable(self):
+-		&quot;We can only add this object if we have at least one pbx defined.&quot;
+-
+-		# BUG: it does somehow not work to simply write for obj in config_entries,
+-		# despite the &quot;from configlets import *&quot; above
+-		import configlets
+-		if len(configlets.configlet_tree.getConfigletsByName('CfgOptPBX')) &gt; 0:
+-			return True
+-		return False
+-	isAddable = classmethod(isAddable)
+-
+-	def createAsteriskConfig(self):
+-		needModule(&quot;res_crypto&quot;)
+-		needModule(&quot;chan_iax2&quot;)
+-														    
+-		iax = AstConf(&quot;iax.conf&quot;)
+-		iax.setSection(self.name)
+-		iax.append(&quot;type=friend&quot;)
+-		iax.appendValue(self, &quot;secret&quot;)
+-		iax.append(&quot;host=dynamic&quot;)
+-		if self.host != '':
+-			iax.appendValue(self, &quot;host&quot;, &quot;defaultip&quot;)
+-		iax.append(&quot;context=out-%s&quot; % self.name)
+-		if self.calleridname and self.calleridnum:
+-			iax.append('callerid=&quot;%s&quot; &lt;%s&gt;' % (self.calleridname, self.calleridnum))
+-		elif self.calleridname:
+-			iax.append('callerid=&quot;%s&quot;' % self.calleridname)
+-		elif self.calleridnum:
+-			iax.append('callerid=&lt;%s&gt;' % self.calleridnum)
+-		
+-		if self.enablecallgroup:
+-			iax.append('callgroup=%s' % self.callgroup)
+-			iax.append('pickupgroup=%s' % self.callgroup)
+-
+-		if not self.notransfer:
+-			iax.append(&quot;notransfer=yes&quot;)
+-		if self.qualify:
+-			iax.appendValue(self, &quot;qualify&quot;)
+-
+-		self.createExtensionConfig()
+-		self.createVoicemailConfig(iax)
+-		self.createOutgoingContext()
+-		self.createPanelConfig()
+-		self.createQueuesConfig()
+
+Copied: branches/santiago/cfg_phone_iax.py (from rev 803, trunk/cfg_phone_iax.py)
+
+Deleted: branches/santiago/cfg_phone_mgcp.py
+===================================================================
+--- trunk/cfg_phone_mgcp.py	2007-08-24 23:26:42 UTC (rev 800)
++++ branches/santiago/cfg_phone_mgcp.py	2007-08-31 22:33:24 UTC (rev 804)
+@@ -1,284 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# Copyright (C) 2004 by Michael Bielicki, TAAN Softworks Corp.
+-# Based on work by Holger Schurig
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-#
+-
+-
+-from configlets import *
+-
+-
+-class CfgPhoneMGCP(CfgPhone):
+-
+-	shortName = _(&quot;Normal MGCP phone&quot;)
+-	newObjectTitle = _(&quot;New MGCP phone&quot;)
+-	technology = &quot;MGCP&quot;
+-	
+-	def createVariables(self):
+-		self.variables = [
+-			VarType(&quot;pbx&quot;,    
+-				title=_(&quot;Virtual PBX&quot;), 
+-				type=&quot;choice&quot;, 
+-				options=getChoice(&quot;CfgOptPBX&quot;)),
+-
+-			VarType(&quot;name&quot;,
+-					title=_(&quot;Name&quot;),
+-					len=15,
+-					hint=_(&quot;&quot;&quot;If you haven't configured a name for your phone please use the IP address here.&quot;&quot;&quot;)),
+-			VarType(&quot;secret&quot;,
+-					title=_(&quot;Password&quot;),
+-					optional=True,
+-					len=15),
+-
+-			VarType(&quot;host&quot;,
+-					title=_(&quot;IP address of phone&quot;),
+-					len=15),
+-
+-			VarType(&quot;ext&quot;,
+-					title=_(&quot;Extension&quot;),
+-					optional=True,
+-					len=6),
+-
+-			VarType(&quot;nat&quot;,
+-					title=_(&quot;NAT&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+-			VarType(&quot;threeway&quot;,
+-					title=_(&quot;Three way calling&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+-			VarType(&quot;transfer&quot;,
+-					title=_(&quot;Enable Call transfer&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+-			VarType(&quot;forward&quot;,
+-					title=_(&quot;Enable Call forward&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+-			VarType(&quot;did&quot;,
+-					title=_(&quot;Allow direct dialling from outside?&quot;),
+-					type=&quot;bool&quot;,
+-					hide=True,
+-					default=False),
+-
+-			VarType(&quot;Call Group&quot;,
+-					title=_(&quot;Call group&quot;),
+-					type=&quot;label&quot;),
+-
+-			VarType(&quot;enablecallgroup&quot;,
+-					title=_(&quot;Enable call group&quot;),
+-					type=&quot;bool&quot;,
+-					optional=False,
+-					default=False), 
+-
+-			VarType(&quot;callgroup&quot;,
+-					title=_(&quot;Call group number&quot;),
+-					optional=True),
+-	
+-			VarType(&quot;QueueLab&quot;,
+-					title=_(&quot;Call Queues&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-			
+-			VarType(&quot;queues&quot;,
+-					title=_(&quot;Agent of queues:&quot;),
+-					type=&quot;mchoice&quot;,
+-					optional=True,
+-					options=getChoice(&quot;CfgPhoneQueue&quot;),
+-					hide=True),
+-
+-			VarType(&quot;Voicemail&quot;,
+-					title=_(&quot;Voicemail settings&quot;),
+-					type=&quot;label&quot;,
+-					len=6),
+-
+-			VarType(&quot;usemwi&quot;,
+-					title=_(&quot;Signal waiting mail&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+-			VarType(&quot;pin&quot;,
+-					title=_(&quot;Voicemail PIN&quot;),
+-					optional=True,
+-					len=6),
+-
+-			VarType(&quot;email&quot;,
+-					title=_(&quot;Voicemail email&quot;),
+-					optional=True,
+-					len=60),
+-			
+-			VarType(&quot;Outbound&quot;,
+-					title=_(&quot;Calls from the phone&quot;),
+-					type=&quot;label&quot;),
+-
+-			VarType(&quot;calleridnum&quot;,
+-					title=_(&quot;Caller-Id-Number&quot;),
+-					optional=True),
+-
+-			VarType(&quot;calleridname&quot;,
+-					title=_(&quot;Caller-Id-Name&quot;),
+-					optional=True),
+-
+-			VarType(&quot;Monitoring&quot;,
+-					title=_(&quot;Monitoring&quot;),
+-					type=&quot;label&quot;,
+-					len=6),
+-
+-			VarType(&quot;monitor&quot;,
+-					title=_(&quot;Monitor calls made from this extension?&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorfilename&quot;,
+-					title=_(&quot;Monitor file name&quot;),
+-					hint=_(&quot;Otherwise it will use Date-CallerIdName(CallerIdNum)-Exten&quot;),
+-					len=25,
+-					optional=True),
+-
+-			VarType(&quot;monitorfileformat&quot;,
+-					title=_(&quot;Monitor file format&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;gsm&quot;,_(&quot;GSM&quot;)),
+-							(&quot;wav&quot;,_(&quot;WAV&quot;)),
+-							(&quot;wav49&quot;,_(&quot;WAV49&quot;))),
+-					default=&quot;gsm&quot;),
+-
+-			VarType(&quot;monitorappend&quot;,
+-					title=_(&quot;Append to existing file instead of overwriting it?&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorwhenbridged&quot;,
+-					title=_(&quot;Save audio only while the channel is bridged?&quot;),
+-					hint=_(&quot;Does not include conferences&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;heardvol&quot;,
+-					title=_(&quot;Heard volume factor&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;+4&quot;,_(&quot;+4&quot;)),
+-					(&quot;+3&quot;,_(&quot;+3&quot;)),
+-					(&quot;+2&quot;,_(&quot;+2&quot;)),
+-					(&quot;+1&quot;,_(&quot;+1&quot;)),
+-					(&quot;0&quot;,_(&quot;0&quot;)),
+-					(&quot;-1&quot;,_(&quot;-1&quot;)),
+-					(&quot;-2&quot;,_(&quot;-2&quot;)),
+-					(&quot;-3&quot;,_(&quot;-3&quot;)),                   
+-					(&quot;-4&quot;,_(&quot;-4&quot;))),	
+-					default=&quot;0&quot;),
+-
+-			VarType(&quot;spokenvol&quot;,
+-					title=_(&quot;Spoken volume factor&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;+4&quot;,_(&quot;+4&quot;)),
+-					(&quot;+3&quot;,_(&quot;+3&quot;)),
+-					(&quot;+2&quot;,_(&quot;+2&quot;)),
+-					(&quot;+1&quot;,_(&quot;+1&quot;)),
+-					(&quot;0&quot;,_(&quot;0&quot;)),
+-					(&quot;-1&quot;,_(&quot;-1&quot;)),
+-					(&quot;-2&quot;,_(&quot;-2&quot;)),
+-					(&quot;-3&quot;,_(&quot;-3&quot;)),                   
+-					(&quot;-4&quot;,_(&quot;-4&quot;))),
+-					default=&quot;0&quot;),
+-					
+-			VarType(&quot;Dialout&quot;,
+-					title=_(&quot;Allowed dialout-entries&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-
+-			VarType(&quot;timeout&quot;,
+-					title=_(&quot;Enable time restriction?&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True,
+-					hide=True),]
+-
+-		if varlist_manager.hasDialouts():
+-			self.variables += varlist_manager.getDialouts()
+-			for v in self.variables:
+-				if v.name == &quot;Dialout&quot; or v.name==&quot;timeout&quot;:
+-					v.hide = False
+-					
+-		queues = len(configlet_tree.getConfigletsByName('CfgPhoneQueue'))
+-		if queues &gt; 0:
+-			for v in self.variables:
+-				if v.name == &quot;QueueLab&quot; or v.name == &quot;queues&quot;:
+-					v.hide = False
+-		self.dependencies = [
+-			DepType(&quot;pbx&quot;, 
+-					type=&quot;hard&quot;,
+-					message = _(&quot;This is a Dependency&quot;)),
+-		]
+-		for var in self.__dict__.keys():
+-			if var.startswith('dialout_'):
+-				self.dependencies.append(
+-					DepType(var,
+-							type=&quot;hard&quot;,
+-							message = _(&quot;This is a Dependency&quot;)))
+-		
+-	def createDependencies(self):
+-		for dep in self.dependencies:
+-			if self.__dict__.has_key(dep.name):
+-				obj_name = dep.name[8:] # get the name after &quot;dialout_&quot;
+-				import configlets
+-				obj = configlets.configlet_tree.getConfigletByName(obj_name)
+-				if obj is None:
+-					return
+-				dependent_obj = DependentObject(self, dep)
+-				obj.dependent_objs.append(dependent_obj)
+-
+-	def isAddable(self):
+-		&quot;We can only add this object if we have at least one pbx defined.&quot;
+-
+-		# BUG: it does somehow not work to simply write for obj in config_entries,
+-		# despite the &quot;from configlets import *&quot; above
+-		import configlets
+-		if len(configlets.configlet_tree.getConfigletsByName('CfgOptPBX')) &gt; 0:
+-			return True
+-		return False
+-	isAddable = classmethod(isAddable)
+-
+-	def createAsteriskConfig(self):
+-		needModule(&quot;chan_mgcp&quot;)
+-
+-		mgcp = AstConf(&quot;mgcp.conf&quot;)
+-		mgcp.setSection(self.host)
+-		mgcp.append(&quot;host=%s&quot; % self.host)
+-		mgcp.append(&quot;transfer=%s&quot; % self.transfer)
+-		mgcp.append(&quot;threewaycalling=%s&quot; % self.threeway)
+-		mgcp.append(&quot;callwaiting=no&quot;)
+-		mgcp.append(&quot;nat=%s&quot; % self.nat)
+-		mgcp.append(&quot;context=out-%s&quot; % self.name)
+-		mgcp.append(&quot;cancallforward=%s&quot; % self.forward)
+-		if self.calleridname and self.calleridnum:
+-			mgcp.append('callerid=&quot;%s&quot; &lt;%s&gt;' % (self.calleridname, self.calleridnum))
+-		elif self.calleridname:
+-			mgcp.append('callerid=&quot;%s&quot;' % self.calleridname)
+-		elif self.calleridnum:
+-			mgcp.append('callerid=&lt;%s&gt;' % self.calleridnum)
+-
+-		if self.enablecallgroup:
+-			mgcp.append('callgroup=%s' % self.callgroup)
+-			mgcp.append('pickupgroup=%s' % self.callgroup)
+-
+-		self.createExtensionConfig()
+-		self.createVoicemailConfig(mgcp)
+-		self.createOutgoingContext()
+-		self.createQueuesConfig()
+
+Copied: branches/santiago/cfg_phone_mgcp.py (from rev 803, trunk/cfg_phone_mgcp.py)
+
+Deleted: branches/santiago/cfg_phone_queue.py
+===================================================================
+--- trunk/cfg_phone_queue.py	2007-08-24 23:26:42 UTC (rev 800)
++++ branches/santiago/cfg_phone_queue.py	2007-08-31 22:33:24 UTC (rev 804)
+@@ -1,290 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# Destar has Copyright (C) 2005 by Holger Schurig,
+-# This file has Copyright (C) 2005 by Alejandro Rios P.
+-# 
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-#
+-
+-
+-from configlets import *
+-
+-
+-class CfgPhoneQueue(CfgPhone):
+-
+-	shortName = _(&quot;Normal Call Queue&quot;)
+-	newObjectTitle = _(&quot;New Call Queue&quot;)
+-	technology = &quot;QUEUE&quot;
+-	groupName = &quot;Queues&quot;
+-	
+-	def createVariables(self):
+-		self.variables = [
+-			VarType(&quot;pbx&quot;,    
+-				title=_(&quot;Virtual PBX&quot;), 
+-				type=&quot;choice&quot;, 
+-				options=getChoice(&quot;CfgOptPBX&quot;)),
+-
+-			VarType(&quot;name&quot;,
+-					title=_(&quot;Name&quot;),
+-					len=15),
+-
+-			VarType(&quot;ext&quot;,
+-					title=_(&quot;Extension&quot;),
+-					optional=True,
+-					len=6),
+-
+-                        VarType(&quot;clid&quot;,
+-                                        title = _(&quot;Change Caller ID name to:&quot;),
+-                                        len = 25,
+-                                        optional = True),
+-
+-			VarType(&quot;timeout&quot;,
+-					title=_(&quot;Agent calling timeout&quot;),
+-					optional=True,
+-					len=6),
+-
+-			VarType(&quot;retry&quot;,
+-					title=_(&quot;How long to wait before trying all the members again?&quot;),
+-					optional=True,
+-					len=6),
+-
+-	                VarType(&quot;queuetimeout&quot;,
+-        	            		title=_(&quot;Queue timeout&quot;),
+-                                	optional=True,
+-                                	len=6),
+-
+-                	VarType(&quot;queuetimeoutext&quot;,
+-                        		title=_(&quot;On queue timeout forward to extension&quot;),
+-                        		type=&quot;choice&quot;,
+-                        		optional=True,
+-                        		options=getChoice(&quot;CfgPhone&quot;)),
+-
+-			VarType(&quot;moh&quot;,
+-					title=_(&quot;Music-on-hold class&quot;),
+-					type=&quot;choice&quot;,
+-					optional=True,
+-					options=getChoice(&quot;CfgOptMusic&quot;)),
+-
+-			VarType(&quot;ring&quot;,
+-					title=_(&quot;Ring instead of playing Music-on-Hold?&quot;),
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;strategy&quot;,
+-					title=_(&quot;Strategy:&quot;),
+-					type=&quot;choice&quot;,
+-					options=((&quot;ringall&quot;,_(&quot;Ring all - ring all available channels until one answers&quot;)),
+-						(&quot;roundrobin&quot;,_(&quot;Round robin - take turns ringing each available interface&quot;)),
+-						(&quot;leastrecent&quot;,_(&quot;Least recent - ring interface which was least recently called by this queue&quot;)), 
+-						(&quot;fewestcalls&quot;,_(&quot;Fewest calls - ring the one with fewest completed calls from this queue&quot;)), 
+-						(&quot;random&quot;,_(&quot;Random - ring random interface&quot;)), 
+-						(&quot;rrmemory&quot;,_(&quot;Round robin with memory - remember where we left off last ring pass&quot;))), 
+-					default=&quot;ringall&quot;),
+-
+-			VarType(&quot;Announces&quot;,
+-					title=_(&quot;Announces&quot;),
+-					type=&quot;label&quot;,
+-					len=6),
+-
+-			VarType(&quot;announce&quot;,
+-					title=_(&quot;Announce queue position to caller?&quot;),
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;announcefrequency&quot;,
+-					title=_(&quot;How often to announce queue position and/or estimated holdtime to caller&quot;),
+-					optional=True,
+-					len=6),
+-
+-			VarType(&quot;announceholdtime&quot;,
+-					title=_(&quot;Include estimated hold time in position announcements?&quot;),
+-					type=&quot;choice&quot;,
+-					options=( 	(&quot;yes&quot;,_(&quot;Yes&quot;)),
+-							(&quot;no&quot;,_(&quot;No&quot;)),
+-							(&quot;once&quot;,_(&quot;Only Once&quot;))),
+-					default=&quot;no&quot;),
+-	
+-			VarType(&quot;Monitoring&quot;,
+-					title=_(&quot;Monitoring&quot;),
+-					type=&quot;label&quot;,
+-					len=6),
+-
+-			VarType(&quot;monitor&quot;,
+-					title=_(&quot;Monitor answered calls?&quot;),
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorfilename&quot;,
+-					title=_(&quot;Monitor file name&quot;),
+-					hint=_(&quot;Otherwise it will use Date-CallerIdName(CallerIdNum)-Exten&quot;),
+-					len=25,
+-					optional=True),
+-
+-			VarType(&quot;monitorfileformat&quot;,
+-					title=_(&quot;Monitor file format&quot;),
+-					type=&quot;choice&quot;,
+-					options=(	(&quot;gsm&quot;,_(&quot;GSM&quot;)),
+-							(&quot;wav&quot;,_(&quot;WAV&quot;)),
+-							(&quot;wav49&quot;,_(&quot;WAV49&quot;))), 
+-					default=&quot;gsm&quot;),
+-
+-			VarType(&quot;monitorappend&quot;,
+-					title=_(&quot;Append to existing file instead of overwriting it?&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;heardvol&quot;,
+-					title=_(&quot;Heard volume factor&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;+4&quot;,_(&quot;+4&quot;)),
+-					(&quot;+3&quot;,_(&quot;+3&quot;)),
+-					(&quot;+2&quot;,_(&quot;+2&quot;)),
+-					(&quot;+1&quot;,_(&quot;+1&quot;)),
+-					(&quot;0&quot;,_(&quot;0&quot;)),
+-					(&quot;-1&quot;,_(&quot;-1&quot;)),
+-					(&quot;-2&quot;,_(&quot;-2&quot;)),
+-					(&quot;-3&quot;,_(&quot;-3&quot;)),                   
+-					(&quot;-4&quot;,_(&quot;-4&quot;))),	
+-					default=&quot;0&quot;),
+-
+-			VarType(&quot;spokenvol&quot;,
+-					title=_(&quot;Spoken volume factor&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;+4&quot;,_(&quot;+4&quot;)),
+-					(&quot;+3&quot;,_(&quot;+3&quot;)),
+-					(&quot;+2&quot;,_(&quot;+2&quot;)),
+-					(&quot;+1&quot;,_(&quot;+1&quot;)),
+-					(&quot;0&quot;,_(&quot;0&quot;)),
+-					(&quot;-1&quot;,_(&quot;-1&quot;)),
+-					(&quot;-2&quot;,_(&quot;-2&quot;)),
+-					(&quot;-3&quot;,_(&quot;-3&quot;)),                   
+-					(&quot;-4&quot;,_(&quot;-4&quot;))),
+-					default=&quot;0&quot;),
+-					
+-			VarType(&quot;panelLab&quot;,
+-					title=_(&quot;Operator Panel&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-
+-			VarType(&quot;panel&quot;,
+-					title=_(&quot;Show this queue in the panel&quot;),
+-					type=&quot;bool&quot;,
+-					hide=True,
+-					optional=True),]
+-
+-		self.dependencies = [
+-			DepType(&quot;pbx&quot;, 
+-					type=&quot;hard&quot;,
+-					message = _(&quot;This is a Dependency&quot;)),
+-			DepType(&quot;moh&quot;, 
+-					type=&quot;hard&quot;,
+-					message = _(&quot;This is a Dependency&quot;)),
+-
+-		]
+-	
+-	def checkConfig(self):
+-                res = CfgPhone.checkConfig(self)
+-                if res:
+-                        return res
+-		if self.announce and not self.announcefrequency:
+-			return ('announcefrequency',_(&quot;You should select a frequency&quot;))
+-
+-	def isAddable(self):
+-		&quot;We can only add this object if we have at least one pbx defined.&quot;
+-
+-		# BUG: it does somehow not work to simply write for obj in config_entries,
+-		# despite the &quot;from configlets import *&quot; above
+-		import configlets
+-		if len(configlets.configlet_tree.getConfigletsByName('CfgOptPBX')) &gt; 0:
+-			return True
+-		return False
+-	isAddable = classmethod(isAddable)
+-
+-		
+-	def createAsteriskConfig(self):
+-		needModule(&quot;app_queue&quot;)
+-		needModule(&quot;res_monitor&quot;)
+-
+-		c = AstConf(&quot;queues.conf&quot;)
+-		c.setSection(self.name)
+-		if self.moh:
+-			c.append(&quot;musiconhold=%s&quot; % self.moh)
+-		c.appendValue(self, &quot;strategy&quot;)
+-		if self.retry:
+-			c.appendValue(self, &quot;retry&quot;)
+-		if self.timeout:
+-			c.appendValue(self, &quot;timeout&quot;)
+-		if self.announce:
+-			c.append(&quot;announce-frequency=%s&quot; % self.announcefrequency)
+-			c.append(&quot;announce-holdtime=%s&quot; % self.announceholdtime)
+-
+-		extensions = AstConf(&quot;extensions.conf&quot;)
+-		extensions.setSection(self.pbx)
+-		
+-		mon_line=&quot;&quot;
+-
+-		if self.monitor:
+-			needModule(&quot;app_mixmonitor&quot;)
+-			options = &quot;&quot;
+-			if self.monitorappend:
+-				options = 'a' 
+-			if self.heardvol == self.spokenvol:
+-				options = options+'W(%s)' % (self.heardvol)
+-			else:          
+-				options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+-			if self.monitorfilename:
+-				mon_line = &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options)
+-			else:
+-				mon_line = &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options)
+-
+-		qnames = []
+-		if self.ext:
+-		    qnames.append(self.ext)
+-		if self.name:
+-		    qnames.append(self.name)
+-
+-		for qname in qnames:
+-			opt = &quot;Tth&quot;
+-			if mon_line:
+-				extensions.appendExten(qname, mon_line, self.pbx)
+-
+-			if self.ring:
+-				opt = opt + &quot;r&quot;
+-
+-                        if self.clid:
+-                                needModule(&quot;func_callerid&quot;)
+-                                extensions.appendExten(qname,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, self.pbx)
+-				
+-			if self.moh:
+-				extensions.appendExten(qname, &quot;Answer&quot;, self.pbx)
+-				extensions.appendExten(qname, &quot;SetMusicOnHold(%s)&quot; % self.moh, self.pbx)
+-
+-			if self.queuetimeout:
+-				opt = opt + &quot;n&quot;
+-				extensions.appendExten(qname, &quot;Queue(%s|%s|||%s)&quot; % (self.name, opt, self.queuetimeout), self.pbx)
+-				if self.queuetimeoutext:
+-					import configlets
+-					obj = configlets.configlet_tree.getConfigletByName(self.queuetimeoutext)
+-					try:
+-						extensions.appendExten(qname, &quot;Goto(%s,%s,1)&quot; %  (obj.pbx, self.queuetimeoutext), self.pbx)
+-					except AttributeError:
+-						pass
+-			else:
+-				extensions.appendExten(qname, &quot;Queue(%s|%s)&quot; % (self.name, opt), self.pbx)
+-		self.createPanelConfig()
+-
+-        def createPanelConfig(self):
+-                try:
+-                        if panelutils.isConfigured() == 1 and self.panel:
+-                                panelutils.createQueueButton(self)
+-                except AttributeError:
+-                        pass
+
+Copied: branches/santiago/cfg_phone_queue.py (from rev 801, trunk/cfg_phone_queue.py)
+
+Deleted: branches/santiago/cfg_phone_sip.py
+===================================================================
+--- trunk/cfg_phone_sip.py	2007-08-24 23:26:42 UTC (rev 800)
++++ branches/santiago/cfg_phone_sip.py	2007-08-31 22:33:24 UTC (rev 804)
+@@ -1,311 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# Copyright (C) 2005 by Holger Schurig,
+-# add ons by Michael Bielicki, TAAN Softworks Corp.
+-# 
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-#
+-
+-
+-from configlets import *
+-import md5
+-
+-
+-class CfgPhoneSip(CfgPhone):
+-
+-	shortName = _(&quot;Normal SIP phone&quot;)
+-	newObjectTitle = _(&quot;New SIP phone&quot;)
+-	description = _(&quot;This is a SIP phone account, to be used by hard-phones, soft-phones, ATAs, etc.&quot;)
+-	technology = &quot;SIP&quot;
+-	
+-	def createVariables(self):
+-		self.variables = [
+-			VarType(&quot;pbx&quot;,    
+-				title=_(&quot;Virtual PBX&quot;), 
+-				type=&quot;choice&quot;, 
+-				options=getChoice(&quot;CfgOptPBX&quot;)),
+-
+-			VarType(&quot;name&quot;,
+-				title=_(&quot;Name&quot;),
+-				len=15),
+-
+-			VarType(&quot;secret&quot;,
+-					title=_(&quot;Password&quot;),
+-					len=15),
+-
+-			VarType(&quot;host&quot;,
+-					title=_(&quot;IP address of phone&quot;),
+-					optional=True,
+-					len=15),
+-					
+-			VarType(&quot;nat&quot;,
+-					title=_(&quot;Is the trunk behind NAT ?&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+-			VarType(&quot;ext&quot;,
+-					title=_(&quot;Extension&quot;),
+-					len=13),
+-					
+-			VarType(&quot;dtmfmode&quot;,
+-					title=_(&quot;DTMF mode:&quot;),
+-					type=&quot;choice&quot;,
+-					options=(
+-						(&quot;auto&quot;,_(&quot;Find automatically&quot;)),
+-						(&quot;rfc2833&quot;,_(&quot;RFC 2833 (RTP)&quot;)),
+-						(&quot;inband&quot;,_(&quot;In Band (only with ulaw/alaw)&quot;)),
+-						(&quot;info&quot;,_(&quot;SIP INFO&quot;)) ), 
+-					default=&quot;auto&quot;),
+-	
+-			VarType(&quot;Call Group&quot;,
+-					title=_(&quot;Call group&quot;),
+-					type=&quot;label&quot;),
+-			
+-			VarType(&quot;enablecallgroup&quot;,
+-					title=_(&quot;Enable call group&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True,
+-					default=False), 
+-					
+-			VarType(&quot;callgroup&quot;,
+-					title=_(&quot;Call group number&quot;),
+-					optional=True),
+-	
+-			VarType(&quot;QueueLab&quot;,
+-					title=_(&quot;Call Queues&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-			
+-			VarType(&quot;queues&quot;,
+-					title=_(&quot;Agent of queues:&quot;),
+-					type=&quot;mchoice&quot;,
+-					optional=True,
+-					options=getChoice(&quot;CfgPhoneQueue&quot;),
+-					hide=True),
+-	
+-			VarType(&quot;panelLab&quot;,
+-					title=_(&quot;Operator Panel&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-			
+-			VarType(&quot;panel&quot;,
+-					title=_(&quot;Show this extension in the panel&quot;),
+-					type=&quot;bool&quot;,
+-					hide=True,
+-					optional=True),
+-	
+-			VarType(&quot;Voicemail&quot;,
+-					title=_(&quot;Voicemail settings&quot;),
+-					type=&quot;label&quot;,
+-					len=6),
+-					
+-			VarType(&quot;usemwi&quot;,
+-					title=_(&quot;Signal waiting mail&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-			
+-			VarType(&quot;pin&quot;,
+-					title=_(&quot;Voicemail PIN&quot;),
+-					type=&quot;int&quot;,
+-					optional=True,
+-					len=6),
+-			
+-			VarType(&quot;email&quot;,
+-					title=_(&quot;Voicemail email&quot;),
+-					optional=True,
+-					len=60),
+-			
+-			VarType(&quot;Outbound&quot;,
+-					title=_(&quot;Calls from the phone&quot;),
+-					type=&quot;label&quot;),
+-			
+-			VarType(&quot;calleridnum&quot;,
+-					title=_(&quot;Caller-Id Number&quot;),
+-					optional=True),
+-			
+-			VarType(&quot;calleridname&quot;,
+-					title=_(&quot;Caller-Id Name&quot;),
+-					optional=True),
+-				
+-			VarType(&quot;Monitoring&quot;,
+-					title=_(&quot;Monitoring&quot;),
+-					type=&quot;label&quot;,
+-					len=6),
+-
+-			VarType(&quot;monitor&quot;,
+-					title=_(&quot;Monitor calls made from this extension?&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorinbound&quot;,
+-					title=_(&quot;Monitor calls made to this extension?&quot;),
+-					optional=True,
+-					default=False,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorfilename&quot;,
+-					title=_(&quot;Monitor file name&quot;),
+-					hint=_(&quot;Otherwise it will use Date-CallerIdName(CallerIdNum)-Exten&quot;),
+-					len=25,
+-					optional=True),
+-
+-			VarType(&quot;monitorfileformat&quot;,
+-					title=_(&quot;Monitor file format&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;gsm&quot;,_(&quot;GSM&quot;)),
+-							(&quot;wav&quot;,_(&quot;WAV&quot;)),
+-							(&quot;wav49&quot;,_(&quot;WAV49&quot;))),
+-					default=&quot;gsm&quot;),
+-
+-			VarType(&quot;monitorappend&quot;,
+-					title=_(&quot;Append to existing file instead of overwriting it?&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;monitorwhenbridged&quot;,
+-					title=_(&quot;Save audio only while the channel is bridged?&quot;),
+-					hint=_(&quot;Does not include conferences&quot;),
+-					optional=True,
+-					type=&quot;bool&quot;),
+-
+-			VarType(&quot;heardvol&quot;,
+-					title=_(&quot;Heard volume factor&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;+4&quot;,_(&quot;+4&quot;)),
+-					(&quot;+3&quot;,_(&quot;+3&quot;)),
+-					(&quot;+2&quot;,_(&quot;+2&quot;)),
+-					(&quot;+1&quot;,_(&quot;+1&quot;)),
+-					(&quot;0&quot;,_(&quot;0&quot;)),
+-					(&quot;-1&quot;,_(&quot;-1&quot;)),
+-					(&quot;-2&quot;,_(&quot;-2&quot;)),
+-					(&quot;-3&quot;,_(&quot;-3&quot;)),                   
+-					(&quot;-4&quot;,_(&quot;-4&quot;))),	
+-					default=&quot;0&quot;),
+-
+-			VarType(&quot;spokenvol&quot;,
+-					title=_(&quot;Spoken volume factor&quot;),
+-					type=&quot;choice&quot;,
+-					options=(       (&quot;+4&quot;,_(&quot;+4&quot;)),
+-					(&quot;+3&quot;,_(&quot;+3&quot;)),
+-					(&quot;+2&quot;,_(&quot;+2&quot;)),
+-					(&quot;+1&quot;,_(&quot;+1&quot;)),
+-					(&quot;0&quot;,_(&quot;0&quot;)),
+-					(&quot;-1&quot;,_(&quot;-1&quot;)),
+-					(&quot;-2&quot;,_(&quot;-2&quot;)),
+-					(&quot;-3&quot;,_(&quot;-3&quot;)),                   
+-					(&quot;-4&quot;,_(&quot;-4&quot;))),
+-					default=&quot;0&quot;),
+-					
+-			VarType(&quot;Dialout&quot;,
+-					title=_(&quot;Allowed dialout-entries&quot;),
+-					type=&quot;label&quot;,
+-					hide=True),
+-					
+-			VarType(&quot;timeout&quot;,
+-					title=_(&quot;Enable time restriction?&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True,
+-					hide=True),]
+-
+-		if varlist_manager.hasDialouts():
+-			self.variables += varlist_manager.getDialouts()
+-			for v in self.variables:
+-				if v.name == &quot;Dialout&quot; or v.name==&quot;timeout&quot;:
+-					v.hide = False
+-					
+-		queues = len(configlet_tree.getConfigletsByName('CfgPhoneQueue'))
+-		if queues &gt; 0:
+-			for v in self.variables:
+-				if v.name == &quot;QueueLab&quot; or v.name == &quot;queues&quot;:
+-					v.hide = False
+-
+-		self.dependencies = [
+-			DepType(&quot;pbx&quot;, 
+-					type=&quot;hard&quot;,
+-					message = _(&quot;This is a Dependency&quot;)),
+-		]
+-		for var in self.__dict__.keys():
+-			if var.startswith('dialout_'):
+-				self.dependencies.append(
+-					DepType(var,
+-							type=&quot;hard&quot;,
+-							message = _(&quot;This is a Dependency&quot;)))
+-
+-	def createDependencies(self):
+-		for dep in self.dependencies:
+-			if self.__dict__.has_key(dep.name):
+-				if dep.name.startswith('dialout_'):
+-					obj_name = dep.name[8:] # get the name after &quot;dialout_&quot;
+-				else:
+-					obj_name = self.__dict__[dep.name]
+-				import configlets
+-				obj = configlets.configlet_tree.getConfigletByName(obj_name)
+-				if obj is None:
+-					return
+-				dependent_obj = DependentObject(self, dep)
+-				obj.dependent_objs.append(dependent_obj)
+-
+-	def isAddable(self):
+-		&quot;We can only add this object if we have at least one pbx defined.&quot;
+-
+-		# BUG: it does somehow not work to simply write for obj in config_entries,
+-		# despite the &quot;from configlets import *&quot; above
+-		import configlets
+-		if len(configlets.configlet_tree.getConfigletsByName('CfgOptPBX')) &gt; 0:
+-			return True
+-		return False
+-	isAddable = classmethod(isAddable)
+-
+-	def createAsteriskConfig(self):
+-		needModule(&quot;chan_sip&quot;)
+-		needModule(&quot;app_authenticate&quot;)
+-
+-		sip = AstConf(&quot;sip.conf&quot;)
+-		sip.setSection(self.name)
+-		sip.append(&quot;type=friend&quot;)
+-		sip.append(&quot;qualify=yes&quot;)
+-		m = md5.new()
+-		m.update('%s:asterisk:%s' % (self.name,self.secret))
+-		sip.append(&quot;md5secret=%s&quot; % m.hexdigest())
+-		sip.append(&quot;host=dynamic&quot;)
+-		if self.host:
+-			sip.appendValue(self, &quot;host&quot;, &quot;defaultip&quot;)
+-		sip.append(&quot;dtmfmode=%s&quot; % self.dtmfmode)
+-		sip.append(&quot;context=out-%s&quot; % self.name)
+-		sip.append(&quot;canreinvite=no&quot;)
+-
+-		if self.calleridname:
+-			sip.append('callerid=&quot;%s&quot; &lt;%s&gt;' % (self.calleridname, self.ext))
+-		else:
+-			sip.append('callerid=&quot;%s&quot; &lt;%s&gt;' % (self.name,self.ext))
+-
+-		if self.enablecallgroup:
+-			sip.append('callgroup=%s' % self.callgroup)
+-			sip.append('pickupgroup=%s' % self.callgroup)
+-
+-		if self.nat:
+-			sip.append(&quot;nat=yes&quot;)
+-
+-        	try:
+-            		pbx = self.pbx
+-        	except AttributeError:
+-            		pbx = &quot;phones&quot;
+-		sip.append(&quot;subscribecontext=%s&quot; % pbx)
+-
+-		self.createExtensionConfig()
+-		self.createVoicemailConfig(sip)
+-		self.createOutgoingContext()
+-		self.createPanelConfig()
+-		self.createQueuesConfig()
+
+Copied: branches/santiago/cfg_phone_sip.py (from rev 803, trunk/cfg_phone_sip.py)
+
+Deleted: branches/santiago/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-08-24 23:26:42 UTC (rev 800)
++++ branches/santiago/configlets.py	2007-08-31 22:33:24 UTC (rev 804)
+@@ -1,1231 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# Copyright (C) 2005 by Holger Schurig
+-#
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
+-#
+-
+-
+-import sys, os, types, sha, binascii, time
+-import panelutils
+-
+-CONF_DIR = &quot;/etc/asterisk&quot;
+-DOC_DIR = os.getenv('DESTAR_DOC_DIR', default='/tmp/destar-doc')
+-CONF_TAG = &quot;; Automatically created by DESTAR\n&quot;
+-ASTERISK_MODULES_DIR = os.getenv('ASTERISK_MODULES_DIR', default='/usr/lib/asterisk/modules') 
+-
+-
+-class AsteriskConfigFile:
+-	&quot;&quot;&quot;
+-	A class to generate Asterisk configuration files more easily.
+-
+-	Create an AstConf class with the filename of the configfile, change
+-	sections and append lines or extension lines. When you call you
+-	destroy the class (normally at the end of program), the config file
+-	will be written. You can force a write with the write() method.
+-
+-	This autowrite on destroy allows us to create an instance of this
+-	class at several places in the source code, add stuff and be sure that
+-	all those writes will make it into the config file.
+-	&quot;&quot;&quot;
+-
+-
+-	def __init__(self, fn):
+-		if fn == 'zaptel.conf':
+-			fn = os.path.join(&quot;/etc&quot;, fn)
+-		if fn == 'op_server.cfg' or \
+-		   	fn == 'op_buttons.cfg' or\
+-			fn == 'op_style.cfg' :
+-			fn = os.path.join(panelutils.PANEL_CONF_DIR, fn)
+-		elif fn.find('/')==-1:
+-			fn = os.path.join(CONF_DIR, fn)
+-		self.fn		  = fn
+-		self.sections = {}		# dictionary of sections
+-		self.order	  = []		# ordered list of sections
+-		self.dirty	  = False		# nothing to write yet
+-		self.extpriority = 1
+-		self.section  = &quot;general&quot;
+-		self.destar_comment = True
+-		#self.lastext  = None
+-		self.addedexts  = {}
+-
+-	def write(self, f=None):
+-		&quot;Write myself into the config file&quot;
+-		if self.dirty:
+-			if not f:
+-				f = open(self.fn, &quot;w&quot;)
+-			if self.destar_comment:
+-				f.write(CONF_TAG)
+-			for sect in self.order:
+-				if sect:
+-					f.write(&quot;\n[%s]&quot; % sect)
+-				f.write(&quot;\n&quot;)
+-				for l in self.sections[sect]:
+-					f.write(l)
+-					f.write(&quot;\n&quot;)
+-			self.dirty = False
+-	
+-
+-	def setSection(self, sect):
+-		&quot;Select a config file section where append() etc will put their data&quot;
+-		self.section = sect
+-		self.extpriority  = 1
+-
+-	def hasSection(self, sect):
+-		&quot;Does the section already exists?&quot;
+-		return sect in self.sections
+-
+-	def append(self,l):
+-		&quot;&quot;&quot;Append an ordinary line to the current section&quot;&quot;&quot;
+-		try:
+-			self.sections[self.section].append(l)
+-		except KeyError:
+-			self.sections[self.section] = [l]
+-			self.order.append(self.section)
+-		self.dirty = True
+-
+-	def prepend(self,l):
+-		&quot;&quot;&quot;Prepend an ordinary line to the current section&quot;&quot;&quot;
+-		try:
+-			self.sections[self.section].insert(0,l)
+-		except KeyError:
+-			self.sections[self.section] = [l]
+-			self.order.append(self.section)
+-		self.dirty = True
+-
+-	def appendExten(self, ext, l, context=&quot;phones&quot;, e=None, label=None):
+-		&quot;&quot;&quot;Append an extension line l to the current section. Append
+-		an optional error extenion e as well. Uses 'n' special
+-		priority.&quot;&quot;&quot;
+-
+-		priority = '1'
+-
+-		if not self.addedexts.has_key(context):
+-			self.addedexts[context] = [ext]
+-		else:
+-			if ext in self.addedexts[context]:	
+-				priority = 'n'
+-			else:
+-				self.addedexts[context].append(ext)
+-
+-		if label:
+-		    self.append(&quot;exten=%s,%s(%s),%s&quot; % (ext, priority, label, l))
+-		else:
+-		    self.append(&quot;exten=%s,%s,%s&quot; % (ext, priority, l))
+-
+-		if e:
+-			self.append(&quot;exten=%s,%s,%s&quot; % (ext, 'n+101', e))
+-			
+-	def setPriority(self,n):
+-		&quot;&quot;&quot;Manually set extension priority to an arbitrary number.&quot;&quot;&quot;
+-		self.extpriority = n
+-
+-	def appendValue(self,conf,var, name=None):
+-		&quot;&quot;&quot;Write an value that is inside an configuration class&quot;&quot;&quot;
+-		try:
+-			val = getattr(conf,var)
+-		except:
+-			return
+-
+-		if not name:
+-			name = var
+-
+-		if val==None:
+-			return
+-
+-		if type(val) == types.IntType:
+-			self.append(&quot;%s=%d&quot; % (name, val))
+-		elif type(val) == types.StringType:
+-			self.append(&quot;%s=%s&quot; % (name, val))
+-		elif type(val) == types.FloatType:
+-			self.append(&quot;%s=%f&quot; % (name, val))
+-		elif type(val) == types.BooleanType:
+-			if val:
+-				self.append(&quot;%s=yes&quot; % name)
+-			else:
+-				self.append(&quot;%s=no&quot; % name)
+-		else:
+-			print &quot;invalid type &quot;, val
+-			raise Exception
+-
+-
+-asterisk_configfiles = []
+-
+-
+-def AstConf(fn):
+-	&quot;&quot;&quot;Retrieve the AsteriskConfigFile class that contains file 'fn'
+-	from our config file cache, create a new class if it doesn't exist.&quot;&quot;&quot;
+-	global asterisk_configfiles
+-	for cfg, obj in asterisk_configfiles:
+-		if cfg == fn:
+-			return obj
+-	obj = AsteriskConfigFile(fn)
+-	asterisk_configfiles.append( (fn,obj) )
+-	return obj
+-
+-
+-
+-
+-#########################################################################
+-
+-class __PasswordGeneratorClass:
+-	def __init__(self):
+-		self.hash = sha.new(&quot;D35tar r0ck5&quot;)
+-		self.hash.update(str(time.time()))
+-
+-	def __call__(self, len=6, seed=&quot;&quot;):
+-		try:
+-			self.hash.update(open(&quot;/dev/urandom&quot;, &quot;rb&quot;).read(32))
+-		except IOError:
+-			self.hash.update(str(time.time()))
+-
+-		if seed:
+-			self.hash.update(str(seed))
+-		return binascii.b2a_base64(self.hash.digest())[:len]
+-
+-generatePassword = __PasswordGeneratorClass()
+-
+-
+-#########################################################################
+-
+-
+-def needModule(mod,preload=False):
+-	c = AstConf(&quot;modules.conf&quot;)
+-	if not &quot;modules&quot; in dir(c):
+-		c.modules = Holder(
+-			pbx =	[
+-				&quot;pbx_config&quot;,
+-				&quot;pbx_spool&quot;,
+-				&quot;pbx_functions&quot;,
+-				],
+-			codec = [
+-				],
+-			format = [
+-				],
+-			res =	[ &quot;res_musiconhold&quot;,
+-				  &quot;res_features&quot; ],
+-			cdr =	[	
+-				  &quot;cdr_sqlite3_custom&quot;,
+-				  &quot;cdr_csv&quot;, #To be used as a backup
+-				],
+-			chan =	[ ],
+-			func =	[ 
+-				&quot;func_callerid&quot;,
+-				],
+-			app =	[
+-				&quot;app_db&quot;,
+-				&quot;app_dial&quot;, # needs res_musiconhold, res_parking
+-				&quot;app_macro&quot;,
+-				&quot;app_playback&quot;,
+-				&quot;app_cdr&quot;,
+-				],
+-			preload = [],
+-			)
+-		# Get list of codecs and formats from ASTERISK_MODULES_DIR
+-		for f in os.listdir(ASTERISK_MODULES_DIR):
+-			if f.startswith('codec_'): c.modules[&quot;codec&quot;].append(f[:-3])
+-			if f.startswith('format_'): c.modules[&quot;format&quot;].append(f[:-3])
+-	
+-	if preload:
+-		sect = c.modules[&quot;preload&quot;]
+-	else: 
+-		sect = mod.split(&quot;_&quot;)[0]
+-		try:
+-			sect = c.modules[sect]
+-		except KeyError:
+-			# create new array
+-			c.modules[sect] = [mod]
+-			sect = c.modules[sect]
+-			return
+-	# sect contains now the entire section array
+-	if not mod in sect:
+-		sect.append(mod)
+-
+-
+-
+-#########################################################################
+-
+-class ConfigletTree:
+-	
+-	def __init__(self):
+-		self.groups = {}
+-		self.name = ''
+-	
+-	def __getitem__(self, key):
+-		if self.groups.has_key(key):
+-			return self.groups[key]
+-		else: return []
+-
+-	def __setitem__(self, key, val):
+-		self.groups[key] = val
+-		
+-	def __iter__(self):
+-		for group in self.groups.values():
+-			for element in group:
+-				yield element
+-				
+-	def __str__(self):
+-		stringname = ''
+-		for element in self:
+-			stringname += str(element) + ', '
+-		return stringname[:-2]
+-	
+-	def __len__(self):
+-		length = 0
+-		for i in self.groups.values():
+-			length += len(i)
+-		return length
+-			
+-	def updateConfiglet(self, obj):
+-		configlet_list = self.groups[obj.groupName]
+-		
+-		
+-		for i in range(len(configlet_list)):
+-			if configlet_list[i]._id == obj._id:
+-				configlet_list[i] = obj
+-				
+-	def deleteConfiglet(self, _id, deleted=[]):
+-		if _id in deleted:
+-			return
+-		else:
+-			deleted.append(_id)
+-		for group in self.groups.values():
+-			for i in range(len(group)):
+-				if group[i]._id == _id:
+-					for dep in group[i].dependent_objs:
+-						self.deleteConfiglet(dep.configlet._id,deleted)
+-					obj = group[i]
+-					try: 
+-						obj_name = obj.name
+-					except AttributeError:
+-						obj_name = obj.shortName
+-					sys.stderr.write (&quot;[%s] Deleting configlet '%s' with id '%s' from group '%s\n'&quot; % (time.asctime(time.localtime()), obj_name, obj._id, obj.groupName))
+-					if not obj._id in deleted:
+-						deleted.append(obj._id)
+-					del group[i]
+-					return
+-					
+-	def moveConfigletUp(self, _id):
+-		obj = self.getConfiglet(_id)
+-		configlet_list = self.groups[obj.groupName]
+-		try: 
+-			obj_name = obj.name
+-		except AttributeError:
+-			obj_name = obj.shortName
+-		sys.stderr.write (&quot;[%s] Moving up configlet '%s' with id '%s' in group '%s'\n&quot; % (time.asctime(time.localtime()), obj_name, obj._id, obj.groupName))
+-		
+-		for i in range(len(configlet_list)):
+-			if configlet_list[i]._id == obj._id and i &gt; 0:
+-				configlet_list[i] = configlet_list[i-1]
+-				configlet_list[i-1] = obj
+-				return obj
+-		return None
+-		
+-	def moveConfigletDown(self, _id):
+-		obj = self.getConfiglet(_id)
+-		configlet_list = self.groups[obj.groupName]
+-		try: 
+-			obj_name = obj.name
+-		except AttributeError:
+-			obj_name = obj.shortName
+-		sys.stderr.write (&quot;[%s] Moving down configlet '%s' with id '%s' in group '%s'\n&quot; % (time.asctime(time.localtime()), obj_name, obj._id, obj.groupName))
+-		
+-		for i in range(len(configlet_list)):
+-			if configlet_list[i]._id == obj._id and i &lt; (len(configlet_list) -1):
+-				configlet_list[i] = configlet_list[i+1]
+-				configlet_list[i+1] = obj
+-				return obj
+-		return None
+-	
+-	def getConfigletsByGroup(self, groupName):
+-		return self[groupName]
+-	
+-	#TODO: Make this as fast as getConfigletsByGroup
+-	def getConfigletsByName(self, name):
+-		result = []
+-		for obj in self:
+-			if obj.shortName == name or obj.__class__.__name__ == name:
+-				result.append(obj)
+-		return result
+-
+-	def getConfigletsByClass(self, _class):
+-		result = []
+-		for obj in self:
+-			if isinstance(obj, _class):
+-				result.append(obj)
+-		return result
+-		
+-	def hasConfiglet(self, _class):
+-		for obj in self:
+-			if obj.__class__.__name__ == _class: 
+-				return True
+-		return False
+-			
+-
+-	def empty(self):
+-		return len(self)==0
+-		
+-	def getConfiglet(self, _id):
+-		for obj in self:
+-			try:
+-				if obj._id == int(_id):
+-					return obj
+-			except:
+-				pass
+-		return None
+-		
+-	def getConfigletByName(self, name):
+-		for obj in self:
+-			try:
+-				if obj.name == name:
+-					return obj
+-			except:
+-				pass
+-		return None
+-		
+-	def addConfiglet(self, configlet):
+-		if not self.groups.has_key(configlet.groupName):
+-			self.groups[configlet.groupName] = []
+-		try: 
+-			obj_name = configlet.name
+-		except AttributeError:
+-			obj_name = configlet.shortName
+-		sys.stderr.write (&quot;[%s] Loading configlet '%s' with id '%s' in group '%s'\n&quot; % (time.asctime(time.localtime()), obj_name, configlet._id, configlet.groupName))
+-		self.groups[configlet.groupName].append(configlet)
+-		
+-	def generateUniqueId(self):
+-		ids = [i._id for i in self]
+-		newid = 0
+-		while newid in ids:
+-			newid = newid + 1
+-		return newid
+-
+-
+-configlet_tree = ConfigletTree()
+-
+-class Holder(object):
+-	&quot;&quot;&quot;
+-	This is a simple wrapper class so that you can write
+-
+-	 foo = Holder(bar = 1,
+-				baz = &quot;test&quot;)
+-	instead of
+-
+-	 foo[&quot;bar&quot;] = 1
+-	 baz[&quot;bar&quot;] = &quot;test&quot;
+-
+-	Holder will be a base class for all configuration options and
+-	modules.
+-	&quot;&quot;&quot;
+-
+-	def __init__(self, **kw):
+-		self.__dict__.update(kw)
+-
+-	def keys(self):
+-		&quot;&quot;&quot;Return list of stored variables.&quot;&quot;&quot;
+-		return self.__dict__.keys()
+-
+-	def __getitem__(self,key):
+-		&quot;&quot;&quot;Allows access to the variables via obj[name] syntax.&quot;&quot;&quot;
+-		return self.__dict__[key]
+-
+-	def __setitem__(self,key,val):
+-		&quot;&quot;&quot;Allows access to the variables via obj[name] syntax.&quot;&quot;&quot;
+-		self.__dict__[key] = val
+-
+-	def __repr__(self):
+-		return &quot;&lt;configlets.Holder object: &quot; + self.__dict__.__repr__()
+-
+-
+-class DepType(Holder):
+-	&quot;&quot;&quot;We use this class to store meta-information about dependendencies&quot;&quot;&quot;
+-	
+-	def __init__(self,name,**kw):
+-		Holder.__init__(self,**kw)
+-		self.name = name
+-		self.__dict__.setdefault(&quot;type&quot;,&quot;hard&quot;)
+-		self.__dict__.setdefault(&quot;message&quot;, _(&quot;This is a Dependency&quot;))
+-
+-class VarType(Holder):
+-	&quot;&quot;&quot;We use this class to store meta-information about configuration variables&quot;&quot;&quot;
+-
+-	def __init__(self,name,**kw):
+-		Holder.__init__(self,**kw)
+-		self.name = name
+-		self.__dict__.setdefault(&quot;type&quot;,&quot;string&quot;)
+-		self.__dict__.setdefault(&quot;len&quot;,60)
+-		self.__dict__.setdefault(&quot;size&quot;,20)
+-		self.__dict__.setdefault(&quot;title&quot;,self.name)
+-		self.__dict__.setdefault(&quot;hint&quot;,&quot;&quot;)
+-		self.__dict__.setdefault(&quot;optional&quot;, False)
+-		self.__dict__.setdefault(&quot;read&quot;, &quot;admin&quot;)		# admin, user, all
+-		self.__dict__.setdefault(&quot;write&quot;, &quot;admin&quot;)
+-		#self.__dict__.setdefault(&quot;default&quot;, &quot;&quot;)
+-		self.__dict__.setdefault(&quot;hide&quot;, False)
+-		self.__dict__.setdefault(&quot;render_br&quot;, True)
+-	
+-
+-
+-
+-
+-class DependentObject:
+-	def __init__(self, configlet, dependency):
+-		self.configlet = configlet
+-		self.dependency = dependency
+-
+-class Cfg(Holder):
+-	&quot;&quot;&quot;Base class for all configlets.
+-
+-	Configlets belong to a group, see CfgPhone, CfgOpt, CfgTrunk etc. The
+-	group is also stored in the variable 'group'.
+-
+-	Configlets also contain data. This data is stored quite normally, as
+-	anyone would store data inside a class. What is not so normal is that
+-	a configurable has a variables[] array that contains various VarType
+-	objects that describe those variables (name, description, default
+-	value, length etc). This descriptions are used to automatically
+-	create forms.
+-
+-	And, last not least, a configurabe also have a name, stored in 'shortName'
+-	(to keep 'name' available for actual data).&quot;&quot;&quot;
+-
+-	#shortName = &quot;Cfg class (do not use directly)&quot;
+-	#group	   = &quot;Generic option&quot;
+-	variables  = []
+-	dependent_objs = []
+-	dependencies = []
+-
+-
+-	def __init__(self,autoAdd=True,**kw):
+-		&quot;&quot;&quot;Stores values from '*kw' into self.__dict__ and add the
+-		newly instantiated object into configlets.configlet_tree if
+-		'autoAdd' says so.&quot;&quot;&quot;
+-
+-		Holder.__init__(self,**kw)
+-
+-		# Store the object into global array
+-		global configlet_tree
+-		self._id = configlet_tree.generateUniqueId()
+-		if autoAdd:
+-			configlet_tree.addConfiglet(self)
+-		else:
+-			self.createVariables();
+-			self.fixup();
+-
+-		for v in self.variables:
+-			# Labels don't have values. We set 'optional' to True
+-			# so that we later don't get warnings about missing
+-			# values.
+-			if v.type==&quot;label&quot;:
+-				v.optional = True
+-				continue
+-				
+-		self.dependent_objs = []
+-		self.dependencies = []
+-				
+-	def __getattr__(self, field):
+-		self.createVariables()
+-		self.fixup()
+-		if self.__dict__.has_key(field):
+-			return self.__dict__[field]
+-		else:
+-			raise AttributeError
+-
+-	def lookPanel(self):
+-		if panelutils.isConfigured() == 1:
+-			for v in self.variables:
+-				if v.name == &quot;panelLab&quot; or v.name == &quot;panel&quot;:
+-					v.hide = False
+-					
+-	def renameDependencies(self, new_name):
+-		for dep in self.dependent_objs:
+-				dep.configlet.__dict__[dep.dependency.name] = new_name
+-
+-	def hasDependencies(self):
+-		return len(self.dependent_objs) &gt; 0
+-
+-	def createDependencies(self):
+-		for dep in self.dependencies:
+-			if self.__dict__.has_key(dep.name):
+-				obj_name = self.__dict__[dep.name]
+-				import configlets
+-				obj = configlets.configlet_tree.getConfigletByName(obj_name)
+-				if obj is None:
+-					return
+-				dependent_obj = DependentObject(self, dep)
+-				obj.dependent_objs.append(dependent_obj)
+-
+-	def createVariables(self):
+-		variables = []
+-		
+-	def clearDependencies(self):
+-		self.dependent_objs = []
+-
+-	def fixup(self):
+-		&quot;&quot;&quot;Each configlet's fixup() method get's called after the
+-		modules have been loaded from the config file.&quot;&quot;&quot;
+-
+-		# Make sure all variables are set:
+-		for v in self.variables:
+-			if not self.__dict__.has_key(v.name):
+-				_v = &quot;&quot;
+-				#print v.name,v.type
+-				if v.__dict__.has_key(&quot;default&quot;):
+-					#print &quot;set&quot;,v.name,&quot;to default&quot;,v.default
+-					_v = v.default
+-				elif v.type in [&quot;string&quot;,&quot;rostring&quot;,&quot;choice&quot;,&quot;mchoice&quot;,&quot;radio&quot;]:
+-					#print &quot;set&quot;,v.name,&quot;to ''&quot;
+-					_v = &quot;&quot;
+-				elif v.type==&quot;int&quot;:
+-					#print &quot;set&quot;,v.name,&quot;to 0&quot;
+-					_v = 0
+-				elif v.type==&quot;bool&quot;:
+-					#print &quot;set&quot;,v.name,&quot;to false&quot;
+-					_v = False
+-				elif v.type==&quot;label&quot;:
+-					continue
+-				else:
+-					print &quot;didn't set&quot;,v.name,&quot;to anything&quot;
+-				#print &quot;set %s %s to&quot; % (v.type, v.name), _v
+-				self.__dict__[v.name] = _v
+-
+-
+-	def head(self):
+-		&quot;&quot;&quot;Configlets can return a tuple of headers and values via
+-		row() that can be used to display them in tables.
+-
+-		This method gives the header. Usually it will be overwritten.&quot;&quot;&quot;
+-
+-		return ( _(&quot;Extension&quot;),_(&quot;Type&quot;) )
+-
+-
+-	def row(self):
+-		&quot;&quot;&quot;Like head(), but returns a table row.&quot;&quot;&quot;
+-
+-		try:
+-			ext = self.ext
+-		except AttributeError:
+-			ext = _('None')
+-		return (ext, self.shortName)
+-
+-
+-	def isAddable(self):
+-		&quot;&quot;&quot;Teturns True if it is OK to create instances of this class.
+-
+-		This can be used to check if a configlet should be presented
+-		in the menu. The method is a classMethod, so that we can call
+-		it without instantiating an object, e.g. we can call this
+-		like CfgOptPhoneZap.isAddable().&quot;&quot;&quot;
+-
+-		# Normally every object is addable
+-		return True
+-	isAddable = classmethod(isAddable)
+-
+-
+-	def checkConfig(self):
+-		&quot;&quot;&quot;Test if all variables are set, used by createAsteriskConfig().
+-		May be overridden for additional test.&quot;&quot;&quot;
+-
+-		# Make sure we don't add two thingies with the same extension on the same pbx
+-		global configlet_tree
+-		if self.__dict__.has_key('ext'):
+-			for o in configlet_tree:
+-				if o==self: continue
+-				try:
+-					if o.ext == self.ext and o.pbx == self.pbx:
+-						return (&quot;ext&quot;, _(&quot;Extension already in use on that PBX&quot;))
+-				except AttributeError:
+-					pass
+-
+-		# Make sure we don't add two thingies with the same name
+-		if self.__dict__.has_key('name'):
+-			if not self.name.replace('_','').isalnum():
+-				return (&quot;name&quot;, _(&quot;Name should only contain characters, numbers or _&quot;))
+-			for o in configlet_tree:
+-				if o==self: continue
+-				try:
+-					if o.name == self.name:
+-						return (&quot;name&quot;, _(&quot;Name already in use&quot;))
+-				except AttributeError:
+-					pass
+-
+-
+-
+-	def createAsteriskConfig(self):
+-		&quot;Creates AsteriskConfigFile entries if checkConfig() gave us an 'ok'.&quot;
+-		if self.checkConfig()==None:
+-			self.createAsteriskConfig()
+-
+-
+-	def createPythonConfig(self):
+-		&quot;&quot;&quot;Returns an array of strings that resends this class in Python
+-		syntax. Can be stored in cfg.py (or whereever) and re-read with
+-		execfile().&quot;&quot;&quot;
+-
+-		python_cfg = []
+-		python_cfg.append(&quot;%s(&quot; % self.__class__.__name__)
+-
+-		for v in self.variables:
+-			if not self.__dict__.has_key(v.name): continue
+-			_v = self.__dict__[v.name]
+-			if _v == None or _v == &quot;&quot;:
+-				continue
+-			#print v.name,v.type,_v
+-			if v.__dict__.has_key(&quot;default&quot;) and _v==v.default:
+-				continue
+-			if v.type in (&quot;string&quot;,&quot;rostring&quot;,&quot;choice&quot;,&quot;mchoice&quot;,&quot;radio&quot;):
+-				cont = '&quot;%s&quot;' % _v
+-			elif v.type==&quot;text&quot;:
+-				cont = '&quot;&quot;&quot;%s&quot;&quot;&quot;' % _v
+-			elif v.type==&quot;int&quot;:
+-				if _v == 0:
+-					continue
+-				else:
+-					cont = _v
+-			elif v.type==&quot;bool&quot;:
+-				if _v:
+-					cont = &quot;True&quot;
+-				else:
+-					continue
+-			elif v.type==&quot;label&quot;:
+-				continue
+-			else:
+-				print &quot;unknown type&quot;, v.type
+-				cont = v.type
+-			python_cfg.append(&quot;\t%-8s = %s,&quot; % (v.name, cont))
+-		python_cfg.append(&quot;\t)&quot;)
+-		python_cfg.append(&quot;&quot;)
+-		return python_cfg
+-
+-	def writeDoc(self, d=None):
+-		&quot;Write my documentation&quot;
+-		if not d:
+-			d = DOC_DIR
+-		fn = os.path.join(d, &quot;%s.xml&quot; % self.__class__.__name__.lower())
+-		f = open(fn, &quot;w&quot;)
+-		f.write('&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;')
+-		f.write(&quot;\n&quot;)
+-		f.write(&quot;&lt;!-- file: autogenerated/%s.xml --&gt;&quot; % self.__class__.__name__.lower())
+-		f.write(&quot;\n&quot;)
+-		f.write(&quot;&lt;!-- File automatically created by DESTAR --&gt;&quot;)
+-		f.write(&quot;\n&quot;)
+-		f.write('&lt;!-- xml-parent-document: &quot;../configlets.xml&quot; --&gt;')
+-		f.write(&quot;\n&quot;)
+-		f.write(&quot;&lt;!-- Destar Manual --&gt;&quot;)
+-		f.write(&quot;\n&quot;)
+-		f.write(&quot;&lt;!-- Distributed under the same Destar license  --&gt;&quot;)
+-		f.write(&quot;\n\n&quot;)
+-		f.write('&lt;sect2 id=&quot;%s&quot;&gt;\n\n' % self.__class__.__name__.lower())
+-		f.write(&quot;&lt;title&gt;%s - %s&lt;/title&gt;\n\n&quot; % (self.groupName,self.shortName))
+-
+-		try:
+-			if self.description:
+-				f.write(&quot;&lt;para&gt;%s&lt;/para&gt;\n\n&quot; % self.description)
+-		except AttributeError:
+-			print _(&quot;The configlet '%s' does not have a description&quot; % self.__class__.__name__)
+-		
+-		f.write(&quot;&lt;para&gt;Form fields:&lt;/para&gt;\n\n&lt;itemizedlist&gt;\n\n&quot;)
+-		for var in self.variables:
+-			if var.title:
+-				f.write(&quot;  &lt;listitem&gt;\n    &lt;para&gt;\n&quot;)
+-				if var.type == &quot;label&quot;:
+-					f.write(&quot;Section [%s]&quot; % var.title)
+-				else:
+-					f.write(&quot;%s&quot; % var.title)
+-					if var.hint:
+-						f.write(&quot;: %s&quot; % var.hint)
+-				f.write(&quot;\n    &lt;/para&gt;\n  &lt;/listitem&gt;\n&quot;)
+-		f.write(&quot;&lt;/itemizedlist&gt;\n\n&quot;)
+-		f.write(&quot;&lt;/sect2&gt;&quot;)
+-	
+-
+-#######################################################################
+-#
+-# Accessors for various settings
+-#
+-
+-def getSetting(name, default=None):
+-	return getConfig('CfgOptSettings',name, default)
+-
+-
+-def getChoice(clazz):
+-	&quot;&quot;&quot;
+-	Here we actually use a trick. In the configlets, the variables[]
+-	get's build once at configlets load-time. While the configlets are
+-	in the middle of being loaded, you can't really iterate in
+-	configlets.configlet_tree to get a list of, say, all Phones. So this
+-	iteration needs to be postponed. We do this with a lambda function.
+-
+-	This getChoice() uses __getChoice(), which is not defined here in
+-	configlets. It comes from backend.py. But because backend.py imports
+-	us, we don't import backend.py. Therefore, backend.py &quot;implants&quot;
+-	this helper function with &quot;configlets._getChoice = getChoice&quot;.
+-	&quot;&quot;&quot;
+-
+-	return (lambda : __getChoice(clazz=clazz))
+-
+-
+-#######################################################################
+-#
+-# Base classes for the different configlet groups
+-#
+-
+-class CfgOpt(Cfg):
+-	&quot;&quot;&quot;Base class for all Asterisk options.&quot;&quot;&quot;
+-
+-	groupName = &quot;Options&quot;
+-
+-
+-	def __init__(self,**kw):
+-		Cfg.__init__(self,**kw)
+-
+-	def head(self):
+-		return (_(&quot;Name&quot;),_(&quot;Info&quot;))
+-
+-
+-	def row(self):
+-		return (self.shortName,'')
+-
+-
+-
+-
+-class CfgOptSingle(CfgOpt):
+-	&quot;&quot;&quot;Some Asterisk options should only exist exactly once in the
+-	config. Descend them from this class.&quot;&quot;&quot;
+-
+-	groupName = &quot;Options&quot;
+-
+-
+-	def isAddable(self, clazz=None):
+-		&quot;&quot;&quot;Allow Options to be added exactly once. We'll enforce this
+-		by looking if the current class is already contained in
+-		configlet_tree.
+-
+-		If	a child class, e.g.	 CfgOptZapAudio.isAddable(), wants
+-		to call us, then 'self' is no longer CfgOptZapAudio, but it
+-		is CfgOptSingle. This is because of the classMethod
+-		attribute of isAddable. So we have an optional parameter
+-		'clazz' where the child class can tell us which class should
+-		be unique in the configlet_tree.&quot;&quot;&quot;
+-
+-		global configlet_tree
+-		if not clazz:
+-			clazz = self
+-		for o in configlet_tree:
+-			#print o.__class__, clazz
+-			if o.__class__ == clazz: return False
+-		return True
+-	isAddable = classmethod(isAddable)
+-
+-class VarListManager:
+-
+-	def __init__(self):
+-		self.trunks = []
+-		self.dialouts = []
+-		
+-	def hasTrunks(self):
+-		return len(self.trunks)&gt;0
+-		
+-	def getTrunks(self):
+-		return self.trunks
+-		
+-	def updateTrunks(self):
+-		self.trunks = []
+-		global configlet_tree
+-		for obj in configlet_tree['Trunks']:
+-			self.trunks.append(VarType(&quot;trunk_%s&quot; % obj.name, title=_(&quot;%s&quot;) % obj.name, type=&quot;bool&quot;, optional=True,render_br=False))
+-			self.trunks.append(VarType(&quot;trunk_%s_price&quot; % obj.name, title=_(&quot;Price/Account_code for this pattern&quot;), type=&quot;int&quot;, optional=True, len=10, default=0))
+-
+-	def hasDialouts(self):
+-		return len(self.dialouts)&gt;0
+-
+-	def getDialouts(self):
+-		return self.dialouts
+-
+-	def updateDialouts(self):
+-		self.dialouts = []
+-		global configlet_tree
+-		for obj in configlet_tree['Dialout']:
+-			self.dialouts.append(VarType(&quot;dialout_%s&quot; % obj.name, title=_(&quot;%s&quot;) % obj.name, type=&quot;bool&quot;, optional=True,render_br=False))
+-			self.dialouts.append(VarType(&quot;dialout_%s_secret&quot; % obj.name, title=_(&quot;Password:&quot;), len=50, optional=True))
+-
+-varlist_manager = VarListManager()
+-
+-
+-class CfgTrunk(Cfg):
+-	&quot;&quot;&quot;Base class for external lines.&quot;&quot;&quot;
+-
+-	groupName = &quot;Trunks&quot;
+-
+-
+-	def __init__(self,**kw):
+-		Cfg.__init__(self,**kw)
+-
+-	def fixup(self):
+-		Cfg.fixup(self)
+-		self.lookPanel()
+-
+-
+-	def head(self):
+-		return (_(&quot;Name&quot;), _(&quot;Type&quot;), _(&quot;Dial Command&quot;))
+-
+-
+-	def row(self):
+-		return (self.name, self.shortName, self.dial)
+-
+-
+-	def channel(self):
+-		return &quot;%s/%s&quot; % (self.technology, self.name)
+-
+-	def isAddable(self):
+-		&quot;We can only add this object if we have at least one other phone defined.&quot;
+-
+-		# BUG: it does somehow not work to simply write for obj in configlet_tree,
+-		# despite the &quot;from configlets import *&quot; above
+-		global configlet_tree
+-		if len(configlet_tree['Phones']) &gt; 0:
+-			return True
+-		else:
+-			return False
+-	isAddable = classmethod(isAddable)
+-	# BUG: if the choosed phone is deleted, we have a problem
+-
+-	def checkConfig(self):
+-		res = Cfg.checkConfig(self)
+-		if res:
+-			return res
+-		if self.contextin == 'phone' and not self.phone:
+-			return ('phone',_(&quot;You should select a phone to ring to&quot;))
+-
+-	def createIncomingContext(self): 
+-		c = AstConf(&quot;extensions.conf&quot;)
+-		contextin = &quot;in-%s&quot; % self.name
+-		c.setSection(contextin)
+-		c.appendExten(&quot;s&quot;,&quot;Set(CDR(intrunk)=%s)&quot; %  self.name, context=contextin)
+-		if self.clid:
+-			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, context=contextin)
+-		if self.clidnumin:
+-			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin, context=contextin)
+-		global configlet_tree
+-		if self.contextin == 'phone' and self.phone:
+-			obj = configlet_tree.getConfigletByName(self.phone)
+-			try:
+-				pbx = obj.pbx
+-				c.appendExten(&quot;s&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.phone), context=contextin)
+-			except AttributeError:
+-				pass
+-		if self.contextin == 'ivr' and self.ivr:
+-			c.appendExten(&quot;s&quot;, &quot;Goto(%s,s,1)&quot; % self.ivr, context=contextin)
+-		if self.contextin == 'pbx' and self.pbx:
+-			c.appendExten(&quot;s&quot;, &quot;Goto(%s,s,1)&quot; % self.pbx, context=contextin)
+-
+-		c.appendExten(&quot;_X&quot;,&quot;Set(CDR(intrunk)=%s)&quot; %  self.name, context=contextin)
+-		if self.clid:
+-			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;_X&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, context=contextin)
+-		if self.clidnumin:
+-			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;_X&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin, context=contextin)
+-		if self.contextin == 'phone' and self.phone:
+-			obj = configlet_tree.getConfigletByName(self.phone)
+-			try:
+-				pbx = obj.pbx
+-				c.appendExten(&quot;_X&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.phone), context=contextin)
+-			except AttributeError:
+-				pass
+-		if self.contextin == 'ivr' and self.ivr:
+-			c.appendExten(&quot;_X&quot;, &quot;Goto(%s,s,1)&quot; % self.ivr, context=contextin)
+-		if self.contextin == 'pbx' and self.pbx:
+-			c.appendExten(&quot;_X&quot;, &quot;Goto(%s,${EXTEN},1)&quot; % self.pbx, context=contextin)
+-
+-		c.appendExten(&quot;_X.&quot;,&quot;Set(CDR(intrunk)=%s)&quot; %  self.name, context=contextin)
+-		if self.clid:
+-			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;_X.&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, context=contextin)
+-		if self.clidnumin:
+-			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;_X.&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin, context=contextin)
+-		if self.contextin == 'phone' and self.phone:
+-			obj = configlet_tree.getConfigletByName(self.phone)
+-			try:
+-				pbx = obj.pbx
+-				c.appendExten(&quot;_X.&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.phone), context=contextin)
+-			except AttributeError:
+-				pass
+-		if self.contextin == 'ivr' and self.ivr:
+-			c.appendExten(&quot;_X.&quot;, &quot;Goto(%s,s,1)&quot; % self.ivr, context=contextin)
+-		if self.contextin == 'pbx' and self.pbx:
+-			c.appendExten(&quot;_X.&quot;, &quot;Goto(%s,${EXTEN},1)&quot; % self.pbx, context=contextin)
+-
+-		
+-class CfgPhone(Cfg):
+-	&quot;&quot;&quot;Base class for all phone devices.&quot;&quot;&quot;
+-
+-	groupName = &quot;Phones&quot;
+-
+-
+-	def __init__(self,**kw):
+-		self.did = True
+-		Cfg.__init__(self,**kw)
+-
+-
+-	def head(self):
+-		return (_(&quot;Type&quot;), _(&quot;Extension&quot;), _(&quot;Name&quot;), _(&quot;Virtual PBX&quot;))
+-
+-
+-	def row(self):
+-		try:
+-			ext = self.ext
+-			pbx = self.pbx
+-		except AttributeError:
+-			ext = _('None')
+-			pbx = _('None')
+-		return (self.shortName, ext, self.name, pbx)
+-
+-
+-	def channelString(self):
+-		return &quot;%s/%s&quot; % (self.technology, self.name)
+-
+-
+-	def fixup(self):
+-		Cfg.fixup(self)
+-		self.lookPanel()
+-		global configlet_tree
+-		if configlet_tree.hasConfiglet('CfgPhoneQueue'):
+-			for v in self.variables:
+-				if v.name == &quot;QueueLab&quot; or v.name == &quot;queues&quot;:
+-					v.hide = False
+-
+-	def createDialEntry(self, extensions, exten, pbx, ext):
+-		ret = extensions.appendExten(exten, &quot;Macro(dial-std-exten,%s/%s,out-%s,%s,%s)&quot; % (
+-			self.technology,
+-			self.name,
+-			self.name,
+-			ext,
+-			pbx
+-			), context=pbx)
+-
+-	def createExtensionConfig(self):
+-		needModule(&quot;res_adsi&quot;)
+-		needModule(&quot;app_voicemail&quot;)
+-		extensions = AstConf(&quot;extensions.conf&quot;)
+-                try:
+-                        pbx = self.pbx
+-                except AttributeError:
+-                        pbx = &quot;phones&quot;
+-                extensions.setSection(pbx)
+-	
+-		for tmp_ext in (self.ext, self.name):
+-			extensions.append(&quot;exten=%s,hint,%s/%s&quot; % (tmp_ext, self.technology, self.name))
+-			extensions.appendExten(tmp_ext, &quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name), context=pbx)
+-			if self.monitorinbound:
+-				needModule(&quot;app_mixmonitor&quot;)	
+-				options = &quot;&quot;
+-				if self.monitorappend:
+-					options = 'a' 
+-				if self.monitorwhenbridged:
+-					options = options+'b'
+-				if self.heardvol == self.spokenvol:
+-					options = options+'W(%s)' % (self.heardvol)
+-				else:          
+-					options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+-				if self.monitorfilename:
+-					extensions.appendExten(tmp_ext, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=pbx)
+-				else:
+-					extensions.appendExten(tmp_ext, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options), context=pbx)
+-			self.createDialEntry(extensions, tmp_ext, pbx, self.ext)
+-
+-		for obj in configlet_tree:
+-			if obj.__class__.__name__ == 'CfgAppCallFW':
+-				if obj.devstateprefix:
+-					extensions.append(&quot;exten=%s%s,hint,DS/%s_%s_%s&quot; % (obj.devstateprefix, self.ext, obj.type.lower(), pbx, self.ext))
+-					extensions.appendExten(&quot;%s%s&quot; % (obj.devstateprefix, self.ext), &quot;Goto(%s,%s,1)&quot; % (pbx, obj.set))
+-			if obj.__class__.__name__ == 'CfgAppVoicemailSettings':
+-				if obj.devstateprefix:
+-					extensions.append(&quot;exten=%s%s,hint,DS/%s_%s_%s&quot; % (obj.devstateprefix, self.ext, obj.type.lower(), pbx, self.ext))
+-					extensions.appendExten(&quot;%s%s&quot; % (obj.devstateprefix, self.ext), &quot;Goto(%s,%s,1)&quot; % (pbx, obj.set))
+-			if obj.__class__.__name__ == 'CfgAppPickup':
+-				if obj.prefix:
+-					extensions.append(&quot;exten=%s%s,1,PickupChan(%s/%s)&quot; % (obj.prefix, self.ext, self.technology, self.name))
+-					extensions.append(&quot;exten=%s%s,1,PickupChan(%s/%s)&quot; % (obj.prefix, self.name, self.technology, self.name))
+-
+-	def createVoicemailConfig(self, conf):
+-		vmconfig = False;
+-		for obj in configlet_tree:
+-			if obj.__class__.__name__ == 'CfgOptVoicemail':
+-				if obj.enable:
+-				    vmconfig = True;
+-				break
+-		if vmconfig:
+-			if self.usemwi:
+-				conf.append(&quot;mailbox=%s@%s&quot; % (self.ext,self.pbx))
+-
+-			vm = AstConf(&quot;voicemail.conf&quot;)
+-			vm.setSection(self.pbx)
+-			pin = &quot;&quot;
+-			try:
+-			        if self.pin != None:
+-				        pin = self.pin
+-			except:
+-				pin = &quot;&quot;
+-			#TODO: deal with timezones
+-			#options = &quot;tz=cest&quot;
+-			options = &quot;&quot;
+-			if self.email:
+-				vm.append(&quot;%s=%s,%s,%s,%s&quot; % (self.ext, pin, self.name, self.email, options))
+-			else:
+-				vm.append(&quot;%s=%s,%s,,%s&quot; % (self.ext, pin, self.name, options))
+-	
+-	def createQueuesConfig(self):
+-		try:
+-			if self.queues:
+-				c = AstConf(&quot;queues.conf&quot;)
+-				for queue in self.queues.split(','):
+-					if queue != &quot;&quot;:
+-						c.setSection(queue)
+-						if self.technology == 'SIP' or self.technology == 'IAX2' or self.technology == 'ZAP':
+-							#c.append(&quot;member =&gt; %s/%s,%s&quot; % (self.technology,self.name,self._id))
+-							c.append(&quot;member =&gt; %s/%s&quot; % (self.technology,self.name))
+-						if self.technology == 'AGENT':
+-							#c.append(&quot;member =&gt; %s/%s,%s&quot; % (self.technology,self.numer,self._id))
+-							c.append(&quot;member =&gt; %s/%s&quot; % (self.technology,self.number))
+-		except AttributeError:
+-			pass
+-
+-	def createOutgoingContext(self):
+-		c = AstConf(&quot;extensions.conf&quot;)
+-		contextout = &quot;out-%s&quot; % self.name 
+-		c.setSection(contextout)
+-		try:
+-			pbx = self.pbx
+-		except AttributeError:
+-			pbx = &quot;phones&quot;
+-		c.append(&quot;include=&gt;%s&quot; % pbx)
+-		c.appendExten(&quot;i&quot;,&quot;Playback(invalid)&quot;, context=contextout)
+-		try:
+-			timeoutvalue = not self.timeout and &quot;0&quot; or &quot;1&quot;
+-		except AttributeError:
+-			timeoutvalue=0
+-		global configlet_tree
+-		for obj in configlet_tree:
+-			if obj.__class__.__name__ == 'CfgDialoutNormal':
+-				try:
+-					if self.__getitem__(&quot;dialout_&quot;+obj.name):
+-						c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CDR(pbx)=%s)&quot; % (self.pbx), context=contextout)
+-						c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CDR(userfield)=%s)&quot; % (self.name), context=contextout)
+-						c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CDR(dialout)=%s)&quot; % (obj.name), context=contextout)
+-						if self.calleridnum:
+-							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CALLERID(number)=%s)&quot; % self.calleridnum, context=contextout)
+-							
+-						if self.monitor:
+-							needModule(&quot;app_mixmonitor&quot;)	
+-							options = &quot;&quot;
+-							if self.monitorappend:
+-								options = 'a' 
+-							if self.monitorwhenbridged:
+-								options = options+'b'
+-							if self.heardvol == self.spokenvol:
+-								options = options+'W(%s)' % (self.heardvol)
+-							else:          
+-								options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+-							if self.monitorfilename:
+-								c.appendExten(&quot;%s&quot; % obj.pattern, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=contextout)
+-							else:
+-								c.appendExten(&quot;%s&quot; % obj.pattern, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options), context=contextout)
+-						
+-						secret = self.__getitem__(&quot;dialout_%s_secret&quot; % obj.name)							
+-						if secret:
+-							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Macro(%s,%s${EXTEN:%s},%s,%s)&quot; % (obj.name,obj.addprefix,obj.rmprefix,secret,timeoutvalue), context=contextout)
+-						else:
+-							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Macro(%s,%s${EXTEN:%s},n,%s)&quot; % (obj.name,obj.addprefix,obj.rmprefix,timeoutvalue), context=contextout)
+-				except KeyError:
+-					pass
+-			elif obj.__class__.__name__ == 'CfgAppPhoneQuickDial':
+-				prefix = obj.dialprefix
+-				c.appendExten(&quot;_%sXX&quot; % prefix,&quot;Set(dest=${DB(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d})})&quot; % len(prefix), e=&quot;Playback(invalid)&quot;, context=contextout)
+-				c.appendExten(&quot;_%sXX&quot; % prefix,&quot;Goto(${dest},1)&quot;, context=contextout)
+-	
+-	def createPanelConfig(self):
+-		try:
+-			if panelutils.isConfigured() == 1 and self.panel:
+-				if self.technology == 'AGENT':
+-					panelutils.createAgentButton(self)
+-				else:
+-					panelutils.createExtButton(self)
+-		except AttributeError:
+-			pass
+-
+-class CfgApp(Cfg):
+-	&quot;&quot;&quot;Base class for all applications (an application is a piece
+-	of software that has a number and that you can dial).&quot;&quot;&quot;
+-
+-	groupName =&quot;Applications&quot;
+-
+-	def __init__(self,**kw):
+-		Cfg.__init__(self,**kw)
+-
+-	def fixup(self):
+-		Cfg.fixup(self)
+-
+-	def head(self):
+-		return (_(&quot;Extension&quot;), _(&quot;Type&quot;), _(&quot;Virtual PBX&quot;))
+-
+-	def row(self):
+-		try:
+-			pbx = self.pbx
+-		except AttributeError:
+-			pbx = _('None')
+-		return (self.ext, self.shortName, pbx)
+- 
+-	
+-class CfgDialout(Cfg):
+-	&quot;&quot;&quot;Base class for dialout entries.&quot;&quot;&quot;
+-
+-	groupName = &quot;Dialout&quot;
+-
+-
+-	def __init__(self,**kw):
+-		Cfg.__init__(self,**kw)
+-
+-
+-	def head(self):
+-		return (_(&quot;Extension&quot;), _(&quot;Name&quot;), _(&quot;Type&quot;))
+-
+-
+-	def row(self):
+-		try:
+-			ext = self.pattern
+-		except AttributeError:
+-			ext = _('None')
+-		return (ext, self.name, self.shortName)
+-
+-class CfgIVR(Cfg):
+-	&quot;&quot;&quot;Base class for IVRs.&quot;&quot;&quot;
+-
+-	groupName = &quot;IVRs&quot;
+-
+-
+-	def __init__(self,**kw):
+-		Cfg.__init__(self,**kw)
+-
+-	def head(self):
+-		return (_(&quot;Name&quot;),_(&quot;Info&quot;))
+-
+-
+-	def row(self):
+-		return (self.shortName,self.name)
+-
+
+Copied: branches/santiago/configlets.py (from rev 803, trunk/configlets.py)
+
+Deleted: branches/santiago/page_user_settings.ptl
+===================================================================
+--- trunk/page_user_settings.ptl	2007-08-24 23:26:42 UTC (rev 800)
++++ branches/santiago/page_user_settings.ptl	2007-08-31 22:33:24 UTC (rev 804)
+@@ -1,133 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# Copyright (C) 2005 by Holger Schurig
+-# 
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-#
+-
+-
+-from Templates import *
+-from quixote.form import *
+-from quixote.directory import Directory, AccessControlled
+-from quixote import get_request, get_session, redirect
+-import backend, manager, configlets
+-import time,types
+-
+-def phoneSettingsForm(self, phone, exitPath=&quot;..&quot;):
+-
+-	if self.form.has_key('_cancel'):
+-		return redirect(exitPath)
+-	form = Form()
+-
+-	dnd  = manager.getVar('DND/%s' % phone.pbx,  phone.ext, False)
+-	dsec = int(manager.getVar('DSEC/%s' % phone.pbx, phone.ext, 45))
+-	cfim = manager.getVar('CFIM/%s' % phone.pbx, phone.ext, '')
+-	cfbs = manager.getVar('CFBS/%s' % phone.pbx, phone.ext, '')
+-	cfto = manager.getVar('CFTO/%s' % phone.pbx, phone.ext, '')
+-	vmim = manager.getVar('VMIM/%s' % phone.pbx,  phone.ext, False)
+-	vmbs = manager.getVar('VMBS/%s' % phone.pbx,  phone.ext, False)
+-	vmu  = manager.getVar('VMU/%s' % phone.pbx,  phone.ext, False)
+-
+-	phones = backend.getChoice(&quot;CfgPhone&quot;)
+-	if type(phones) == types.FunctionType:
+-		phones = phones()
+-	phones.remove( (phone.name,phone.name) )
+-	phones.insert(0, ('',''))
+-
+-	form.add(CheckboxWidget,     &quot;dnd&quot;,  dnd,  title=_(&quot;Enable 'do not disturb'&quot;))
+-	form.add(StringWidget, 	     &quot;cfim&quot;, cfim, title=_(&quot;Immediate call forwarding to&quot;))
+-	form.add(StringWidget,       &quot;cfbs&quot;, cfbs, title=_(&quot;Forward call when busy to&quot;))
+-	form.add(StringWidget,       &quot;cfto&quot;, cfto, title=_(&quot;Forward call when timeout/unavailable to&quot;))
+-	form.add(IntWidget,          &quot;dsec&quot;, dsec, title=_(&quot;Seconds of incoming ring time&quot;), maxlength=3, size=3)
+-	form.add(CheckboxWidget,     &quot;vmim&quot;, vmim, title=_(&quot;Immediate voice mailbox&quot;))
+-	form.add(CheckboxWidget,     &quot;vmbs&quot;, vmbs, title=_(&quot;Voice mailbox on busy&quot;))
+-	form.add(CheckboxWidget,     &quot;vmu&quot;,  vmu,  title=_(&quot;Voice mailbox on timeout/unavailable&quot;))
+-	form.add(IntWidget,       &quot;pin&quot;, phone.pin, title=_(&quot;Voicemail pin&quot;), maxlength=10)
+-	try:
+-		if phone.secret:
+-			form.add(StringWidget,  &quot;secret&quot;, phone.secret, title=_(&quot;Extension Password&quot;), maxlength=10)
+-	except AttributeError:
+-		pass
+-	form.add(SubmitWidget, '_submit', _(&quot;Submit&quot;), render_br=False)
+-	form.add(SubmitWidget, '_cancel', _(&quot;Cancel&quot;), render_br=False)
+-
+-	if not form.is_submitted() or form.has_errors():
+-		return form.render()
+-
+-	manager.setVar('DND/%s' % phone.pbx,  phone.ext, form['dnd'])
+-	manager.setVar('DSEC/%s' % phone.pbx, phone.ext, form['dsec'])
+-	manager.setVar('CFIM/%s' % phone.pbx, phone.ext, form['cfim'] or '')
+-	manager.setVar('CFBS/%s' % phone.pbx, phone.ext, form['cfbs'] or '')
+-	manager.setVar('CFTO/%s' % phone.pbx, phone.ext, form['cfto'] or '')
+-	manager.setVar('VMIM/%s' % phone.pbx, phone.ext, form['vmim'])
+-	manager.setVar('VMBS/%s' % phone.pbx, phone.ext, form['vmbs'])
+-	manager.setVar('VMU/%s' % phone.pbx,  phone.ext, form['vmu'])
+-
+-	if form[&quot;pin&quot;]:
+-		phone.pin = form[&quot;pin&quot;]
+-	try:
+-		if form[&quot;secret&quot;]:
+-			phone.secret = form[&quot;secret&quot;]
+-	except KeyError:	
+-		pass
+-	backend.updateConfiglet(phone)
+-	try:
+-		backend.createPythonConfig()
+-	except IOError:
+-		'&lt;p&gt;'
+-		htmltext(_(&quot;Could not create destar configuration file.&quot;))
+-		'.&lt;/p&gt;'
+-
+-	return redirect(exitPath)
+-
+-class Page(AccessControlled, Directory): 
+-
+-	_q_parent  = 'page_user'
+-	_q_title   = _(&quot;Phone Settings&quot;)
+-	_q_desc    = _(&quot;Set your phone settings&quot;)
+-	_q_link    = 'settings'
+-	_q_menupos = 10
+-	_q_level   = 1
+-
+-	_q_exports = ['']
+-
+-	def _q_access(self):
+-		self.session = get_session()
+-		self.request = get_request()
+-		if self.session.level &lt; self._q_level:
+-			cantAccessPage()
+-
+-	def _q_index [plain] (self):
+-		header(self._q_desc)
+-		manager.connect()
+-		if not manager.isConnected():
+-			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			htmltext(_(&quot;Asterisk is not running!&quot;))
+-			'&lt;/span&gt;&lt;/p&gt;'
+-		elif not manager.isLoggedIn():
+-			# TODO: describe how to set this up
+-			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			htmltext(_(&quot;The manager access is not working!&quot;))
+-			'&lt;/span&gt;&lt;/p&gt;'
+-		elif self.session.phone: 
+-			phone = backend.getConfiglet(name=self.session.phone)
+-			phone.fixup()
+-			phoneSettingsForm(self.request, phone)
+-		else:
+-			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			htmltext(_(&quot;You don't have an associated phone&quot;))
+-			'&lt;/span&gt;&lt;/p&gt;'
+-		footer()
+-
+
+Copied: branches/santiago/page_user_settings.ptl (from rev 803, trunk/page_user_settings.ptl)
+
+Deleted: branches/santiago/panelutils.py
+===================================================================
+--- trunk/panelutils.py	2007-08-24 23:26:42 UTC (rev 800)
++++ branches/santiago/panelutils.py	2007-08-31 22:33:24 UTC (rev 804)
+@@ -1,183 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# Copyright (C) 2004 by Holger Schurig
+-#
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-#
+-
+-import os, re, commands, shutil
+-import backend
+-from configlets import *
+-
+-# To use with asternic.org op_panel tarball:
+-#PANEL_CONF_DIR	= &quot;/usr/local/op_panel&quot;
+-#PANEL_HTML_DIR	= &quot;/usr/local/op_panel/html&quot;
+-#PANEL_START_CMD	= &quot;/usr/local/op_panel/op_server.pl -d&quot;
+-#PANEL_STOP_CMD	= &quot;pkill op_server&quot;
+-
+-
+-# Configuration to use with op-panel .deb package:
+-PANEL_CONF_DIR	= &quot;/etc/op-panel&quot;
+-PANEL_HTML_DIR	= &quot;/usr/share/op-panel/flash&quot;
+-PANEL_START_CMD	= &quot;/etc/init.d/op-panel start&quot;
+-PANEL_STOP_CMD	= &quot;/etc/init.d/op-panel stop&quot;
+-PANEL_RESTART_CMD = &quot;/etc/init.d/op-panel restart&quot;
+-
+-def N_(message): return message
+-
+-def isConfigured ():
+-	import configlets
+-	configured=0
+-	for obj in configlets.configlet_tree:
+-		if obj.__class__.__name__ == 'CfgOptOPPanel':                                
+-			configured=1
+-			continue
+-	return configured
+-
+-def createManagerConfig(obj):
+-	c = AstConf(&quot;op_server.cfg&quot;)
+-	c.setSection(&quot;general&quot;)
+-	c.append(&quot;manager_host=127.0.0.1&quot;)
+-	c.append(&quot;manager_user=%s&quot; % obj.manager)
+-	manager = backend.getConfiglet(name=obj.manager)
+-	c.append(&quot;manager_secret=%s&quot; % manager.secret)
+-
+-def createDefaultConfig(c):
+-	c.append(&quot;flash_dir=%s&quot; % PANEL_HTML_DIR)
+-	#TODO: put some of the following on cfg_opt_oppanel.py
+-	c.append(&quot;auth_md5=1&quot;)
+-	c.append(&quot;poll_voicemail=0&quot;)
+-	c.append(&quot;kill_zombies=0&quot;)
+-	c.append(&quot;conference_context=apps&quot;)
+-	c.append(&quot;clid_format=(xxx)xxx-xxxx&quot;)
+-	c.append(&quot;clid_privacy=0&quot;)
+-	c.append(&quot;show_ip=0&quot;)
+-	c.append(&quot;rename_label_agentlogin=0&quot;)
+-	c.append(&quot;rename_label_callbacklogin=0&quot;)
+-	c.append(&quot;rename_label_wildcard=0&quot;)
+-	c.append(&quot;rename_to_agent_name=1&quot;)
+-	c.append(&quot;agent_status=1&quot;)
+-	c.append(&quot;rename_queue_member=0&quot;)
+-	c.append(&quot;change_led_agent=1&quot;)
+-	c.append(&quot;reverse_transfer=0&quot;)
+-	c.append(&quot;clicktodial_insecure=0&quot;)
+-	c.append('transfer_timeout=&quot;%s&quot;' % N_(&quot;0,No timeout|300,5 minutes|600,10 minutes|1200,20 minutes|2400,40 minutes|3000,50 minutes&quot;))
+-	c.append(&quot;enable_restart = 0&quot;)
+-
+-def createDefaultStyle(c):
+-	c.setSection(&quot;general&quot;)
+-	c.append(&quot;shake_pixels=2&quot;)
+-	c.append(&quot;dimm_noregister_by=20&quot;)
+-	c.append(&quot;dimm_lagged_by=60&quot;)
+-	c.append(&quot;enable_label_background=0&quot;)
+-	c.append(&quot;enable_crypto=0&quot;)
+-	c.append(&quot;enable_animation=1&quot;)
+-	c.append(&quot;use_embed_fonts=1&quot;)
+-	c.append(&quot;ledcolor_ready=0x00A000&quot;)
+-	c.append(&quot;ledcolor_busy=0xA01020&quot;)
+-	c.append(&quot;ledcolor_agent=0xD0d020&quot;)
+-	c.append(&quot;label_font_family=Verdana&quot;)
+-	c.append(&quot;label_font_color=000000&quot;)
+-	c.append(&quot;label_shadow_color=dddddd&quot;)
+-	c.append(&quot;label_shadow=1&quot;)
+-	c.append(&quot;clid_font_color=00dd00&quot;)
+-	c.append(&quot;timer_font_color=4000ff&quot;)
+-	c.append(&quot;clid_font_family=Verdana&quot;)
+-	c.append(&quot;clid_margin_top=0&quot;)
+-	c.append(&quot;clid_margin_left=25&quot;)
+-	c.append(&quot;timer_font_family=Courier&quot;)
+-	c.append(&quot;timer_margin_left=6&quot;)
+-	c.append(&quot;btn_padding=4&quot;)
+-	c.append(&quot;btn_line_width=2&quot;)
+-	c.append(&quot;btn_line_color=0x000000&quot;)
+-	c.append(&quot;btn_fadecolor_1=ccccff&quot;)
+-	c.append(&quot;btn_fadecolor_2=ffffff&quot;)
+-	c.append(&quot;btn_highlight_color=ff0000&quot;)
+-	c.append(&quot;arrow_margin_left=15&quot;)
+-	c.append(&quot;show_security_code=1&quot;)
+-	c.append(&quot;show_clid_info=0&quot;)
+-	c.append(&quot;show_btn_help=3&quot;)
+-	c.append(&quot;show_btn_debug=0&quot;)
+-	c.append(&quot;show_btn_reload=2&quot;)
+-	c.append(&quot;show_status=4&quot;)
+-
+-def createExtButton(obj):
+-	p = AstConf(&quot;op_buttons.cfg&quot;)
+-	p.setSection(&quot;%s/%s&quot; % (obj.technology, obj.name) )
+-	p.append(&quot;Position=n&quot;)
+-	p.append(&quot;Icon=1&quot;)
+-	p.append(&quot;Extension=%s&quot; % obj.ext)
+-	p.append('Label=&quot;%s&quot;' % obj.name)
+-	p.append(&quot;Astdbkey=%s/%s&quot; % (obj.pbx, obj.ext))
+-	p.append(&quot;Panel_context=%s&quot; % obj.pbx)
+-
+-def createAgentButton(obj):
+-	p = AstConf(&quot;op_buttons.cfg&quot;)
+-	p.setSection(&quot;%s/%s&quot; % (obj.technology, obj.number) )
+-	p.append(&quot;Position=n&quot;)
+-	p.append(&quot;Icon=6&quot;)
+-	p.append('Label=&quot;%s&quot;' % obj.name)
+-	p.append(&quot;Panel_context=%s&quot; % obj.pbx)
+-
+-def createTrunkButton(obj):
+-	p = AstConf(&quot;op_buttons.cfg&quot;)
+-	p.setSection(&quot;%s/%s&quot; % (obj.technology, obj.name) )
+-	p.append(&quot;Position=n&quot;)
+-	p.append(&quot;Icon=2&quot;)
+-	p.append(&quot;Extension=-1&quot;)
+-	p.append(&quot;Label=%s&quot; % obj.name)
+-	p.append(&quot;Panel_context=*&quot;)
+-
+-def createMeetmeButton(obj):
+-	p = AstConf(&quot;op_buttons.cfg&quot;)
+-	p.setSection(obj.confno)
+-	p.append(&quot;Position=n&quot;)
+-	p.append(&quot;Icon=5&quot;)
+-	p.append('Label=&quot;%s %s&quot;' % (_(&quot;Meetme&quot;),obj.confno))
+-	p.append(&quot;Panel_context=%s&quot; % obj.pbx)
+-
+-def createParkButton(obj):
+-	p = AstConf(&quot;op_buttons.cfg&quot;)
+-	p.setSection(&quot;%s/%s&quot; % (&quot;PARK&quot;,obj.ext))
+-	p.append(&quot;Position=n&quot;)
+-	p.append(&quot;Icon=3&quot;)
+-	p.append(&quot;Extension=%s&quot; % obj.ext)
+-	p.append('Label=&quot;%s %s&quot;' % (_(&quot;Park&quot;),obj.ext))
+-	p.append(&quot;Panel_context=%s&quot; % obj.pbx)
+-
+-def createQueueButton(obj):
+-	p = AstConf(&quot;op_buttons.cfg&quot;)
+-	p.setSection(&quot;%s/%s&quot; % (&quot;QUEUE&quot;,obj.name))
+-	p.append(&quot;Position=n&quot;)
+-	p.append(&quot;Icon=3&quot;)
+-	p.append(&quot;Extension=-1&quot;)
+-	p.append('Label=&quot;%s&quot;' % obj.name)
+-	p.append(&quot;Panel_context=%s&quot; % obj.pbx)
+-
+-def startPanelDaemon():
+-        return commands.getoutput(PANEL_START_CMD)
+-
+-def stopPanelDaemon():
+-        return commands.getoutput(PANEL_STOP_CMD)
+-
+-def restartPanelDaemon():
+-	s = []
+-	s.append(_(&quot;Restarting the panel daemon ...&quot;))
+-        s.append(commands.getoutput(PANEL_RESTART_CMD))
+-	return s
+-
+-if isConfigured():
+-	restartPanelDaemon()
+-
+
+Copied: branches/santiago/panelutils.py (from rev 802, trunk/panelutils.py)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000342.html">[Destar-dev] r805 - branches/santiago
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#341">[ date ]</a>
+              <a href="thread.html#341">[ thread ]</a>
+              <a href="subject.html#341">[ subject ]</a>
+              <a href="author.html#341">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

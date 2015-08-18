@@ -1,0 +1,225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r814 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r814%20-%20trunk&In-Reply-To=%3C200710041426.l94EQcu0027893%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000356.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r814 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r814%20-%20trunk&In-Reply-To=%3C200710041426.l94EQcu0027893%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r814 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Thu Oct  4 16:26:38 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000356.html">[Destar-dev] r815 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#355">[ date ]</a>
+              <a href="thread.html#355">[ thread ]</a>
+              <a href="subject.html#355">[ subject ]</a>
+              <a href="author.html#355">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-10-04 16:26:38 +0200 (Thu, 04 Oct 2007)
+New Revision: 814
+
+Added:
+   trunk/cfg_trunk_sip_spa400.py
+Modified:
+   trunk/CHANGELOG.txt
+Log:
+Added special Trunk for SPA400 gateway
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-09-21 17:10:51 UTC (rev 813)
++++ trunk/CHANGELOG.txt	2007-10-04 14:26:38 UTC (rev 814)
+@@ -1,3 +1,6 @@
++2007-10-04:
++* Added special Trunk for SPA400 gateway
++
+ 2007-09-21:
+ * Added stunnel clues on INSTALL.txt
+ * Started work to release 0.3.0 on Makefile and man page.
+
+Added: trunk/cfg_trunk_sip_spa400.py
+===================================================================
+--- trunk/cfg_trunk_sip_spa400.py	2007-09-21 17:10:51 UTC (rev 813)
++++ trunk/cfg_trunk_sip_spa400.py	2007-10-04 14:26:38 UTC (rev 814)
+@@ -0,0 +1,136 @@
++# -*- coding: iso-latin-1 -*-
++# Copyright (C) 2007 Alejandro Rios P.
++# based on Free World Dialup Module by Hoger Schurig
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++import panelutils
++
++
++class CfgTrunkSipSPA400(CfgTrunk):
++
++	shortName   = _(&quot;SPA400 SIP Trunk&quot;)
++	newObjectTitle  = _(&quot;New SPA400 SIP trunk&quot;)
++	description = _(&quot;&quot;&quot;Used to setup a SIP trunk to a SPA400 gateway.&quot;&quot;&quot;)
++	technology = &quot;SIP&quot;
++	
++	def createVariables(self):
++		self.variables   = [
++			VarType(&quot;name&quot;,
++				title=_(&quot;Name&quot;),
++				len=15,
++				default=&quot;siptrunk&quot;),
++			
++			VarType(&quot;host&quot;,
++				title=_(&quot;SIP host&quot;),
++				len=25),
++
++			VarType(&quot;nat&quot;,
++				title=_(&quot;Is the trunk behind NAT?&quot;),
++				type=&quot;bool&quot;),
++				
++			VarType(&quot;panelLab&quot;,
++				title=_(&quot;Operator Panel&quot;),
++				type=&quot;label&quot;,
++				hide=True),
++				
++			VarType(&quot;panel&quot;,
++				title=_(&quot;Show this trunk in the panel&quot;),
++				type=&quot;bool&quot;,
++				hide=True),
++	
++			VarType(&quot;Inbound&quot;,
++				title=_(&quot;Calls from SIP trunk&quot;),
++				type=&quot;label&quot;),
++				
++			VarType(&quot;clid&quot;,
++				title=_(&quot;Change Caller*Id to:&quot;),
++				len=25,
++				optional=True),
++			
++			VarType(&quot;contextin&quot;,
++				title=_(&quot;Go to&quot;),
++				type=&quot;radio&quot;,
++				default='phone',
++				options=[('phone',_(&quot;Phone&quot;)),('ivr',_(&quot;IVR&quot;)),('pbx',_(&quot;Virtual PBX&quot;))]),
++			
++			VarType(&quot;phone&quot;,
++				title=_(&quot;Extension to ring&quot;),
++				type=&quot;choice&quot;,
++				optional=False,
++				options=getChoice(&quot;CfgPhone&quot;)),
++			
++			VarType(&quot;ivr&quot;,
++				title=_(&quot;IVR to jump to&quot;),
++				type=&quot;choice&quot;,
++				optional=True,
++				options=getChoice(&quot;CfgIVR&quot;)),
++
++			VarType(&quot;pbx&quot;,
++				title=_(&quot;Allow dial extension from which Virtual PBX&quot;),
++				type=&quot;choice&quot;,
++				optional=True,
++				options=getChoice(&quot;CfgOptPBX&quot;)),
++
++			VarType(&quot;dial&quot;,
++				hide=True,
++				len=80),]
++
++		self.dependencies = [
++			DepType(&quot;phone&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;)),
++			DepType(&quot;ivr&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;))
++		]
++
++
++	def checkConfig(self):
++		res = CfgTrunk.checkConfig(self)
++		if res:
++			return res
++                
++	def createAsteriskConfig(self):
++		needModule(&quot;res_crypto&quot;)
++		needModule(&quot;chan_sip&quot;)
++
++		self.dial = &quot;SIP/${ARG1}@%s&quot; % (self.name)
++		
++		#What to do with incoming calls
++		self.createIncomingContext()
++		
++		c = AstConf(&quot;sip.conf&quot;)
++		c.setSection(&quot;general&quot;)
++		c.append(&quot;register=%s@%s/%s&quot; % (self.name, self.host, self.name))
++
++
++		if not c.hasSection(self.name):
++			c.setSection(self.name)
++			c.append(&quot;type=friend&quot;)
++			c.append(&quot;user=%s&quot; % self.name)
++			c.append(&quot;host=%s&quot; % self.host)
++			c.append(&quot;context=in-%s&quot; % self.name)
++			c.append(&quot;canreinvite=no&quot;)
++			c.append(&quot;dtmfmode=rfc2833&quot;)
++			if self.nat:
++				c.append(&quot;nat=yes&quot;)
++			c.append(&quot;insecure=very&quot;)
++
++		if panelutils.isConfigured() == 1 and self.panel:
++			panelutils.createTrunkButton(self)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000356.html">[Destar-dev] r815 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#355">[ date ]</a>
+              <a href="thread.html#355">[ thread ]</a>
+              <a href="subject.html#355">[ subject ]</a>
+              <a href="author.html#355">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

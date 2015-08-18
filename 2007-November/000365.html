@@ -1,0 +1,283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r822 - in branches/0.2.X: . misc/debian
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r822%20-%20in%20branches/0.2.X%3A%20.%20misc/debian&In-Reply-To=%3C200711142046.lAEKkHbP031640%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000364.html">
+   <LINK REL="Next"  HREF="000366.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r822 - in branches/0.2.X: . misc/debian</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r822%20-%20in%20branches/0.2.X%3A%20.%20misc/debian&In-Reply-To=%3C200711142046.lAEKkHbP031640%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r822 - in branches/0.2.X: . misc/debian">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 14 21:46:17 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000364.html">[Destar-dev] r821 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000366.html">[Destar-dev] r823 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#365">[ date ]</a>
+              <a href="thread.html#365">[ thread ]</a>
+              <a href="subject.html#365">[ subject ]</a>
+              <a href="author.html#365">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-11-14 21:46:15 +0100 (Wed, 14 Nov 2007)
+New Revision: 822
+
+Added:
+   branches/0.2.X/misc/debian/README.samba
+   branches/0.2.X/misc/debian/samba.patch
+   branches/0.2.X/misc/debian/sambautils.py
+   branches/0.2.X/misc/debian/sudoers-samba.sample
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+Log:
+* Basic and not very secure samba integration. Debian based. 
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-11-13 22:44:35 UTC (rev 821)
++++ branches/0.2.X/CHANGELOG.txt	2007-11-14 20:46:15 UTC (rev 822)
+@@ -1,3 +1,6 @@
++2007-11-14:
++* Basic and not very secure samba integration. Debian based. 
++
+ 2007-11-13:
+ * Recording capability for conference rooms.
+ * Added 'disallow=all' as an option for the codecs confgiration.
+
+Added: branches/0.2.X/misc/debian/README.samba
+===================================================================
+--- branches/0.2.X/misc/debian/README.samba	2007-11-13 22:44:35 UTC (rev 821)
++++ branches/0.2.X/misc/debian/README.samba	2007-11-14 20:46:15 UTC (rev 822)
+@@ -0,0 +1,16 @@
++To allow a basic and not very secure integration with samba you can follow
++these steps:
++
++* Copy the sambautils.py file from this folder to the destar root folder.
++* Grant write permissions to the users in the asterisk group for the 
++  /etc/samba/smb.conf file and the /usr/share/asterisk/mohmp3/ folder.
++* Configure sudo to allow the asterisk user (the same that should run
++  destar as) to execute the samba init script, adduser, userdel and
++  smbpasswd. See sudoers-samba.sample.
++* Apply the samba.patch to the destar code.
++* Restart destar and have fun! :)
++
++This patch creates a system user without password for each destar one, add
++the user to the smbpasswd database and the same destar password and create
++two shares: one for the mohmp3 and one for the monitor folder. Adding a new
++share is almost trivial.
+
+Added: branches/0.2.X/misc/debian/samba.patch
+===================================================================
+--- branches/0.2.X/misc/debian/samba.patch	2007-11-13 22:44:35 UTC (rev 821)
++++ branches/0.2.X/misc/debian/samba.patch	2007-11-14 20:46:15 UTC (rev 822)
+@@ -0,0 +1,91 @@
++Index: ConfigHelper.ptl
++===================================================================
++--- ConfigHelper.ptl	(revisi&#195;&#179;n: 819)
+++++ ConfigHelper.ptl	(copia de trabajo)
++@@ -23,6 +23,8 @@
++ from quixote.html import htmlescape
++ import backend
++ import types, string
+++import sambautils
+++from cfg_opt_user import CfgOptUser
++ 
++ 
++ class ROStringWidget(StringWidget):
++@@ -249,6 +251,9 @@
++ 		if obj.hasDependencies():
++ 			return showDependencies()
++ 		else:
+++			if isinstance(obj, CfgOptUser):
+++				print &quot;Deleting user %s from samba and from system&quot; % obj.name
+++				sambautils.deleteUser(obj.name)
++ 			backend.deleteConfiglet(obj._id)
++ 			return request.redirect(exitPath)
++ 	if request.form.has_key('_cascade_delete'):
++Index: cfg_opt_user.py
++===================================================================
++--- cfg_opt_user.py	(revisi&#195;&#179;n: 819)
+++++ cfg_opt_user.py	(copia de trabajo)
++@@ -17,7 +17,8 @@
++ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ #
++ 
++-import language
+++import language,sambautils
+++import backend
++ from configlets import *
++ 
++ class CfgOptUser(CfgOpt):
++@@ -68,7 +69,39 @@
++ 				pass
++ 
++ 	def createAsteriskConfig(self):
++-		pass
+++		users = &quot;&quot;
+++		for user in backend.getConfiglets(name=&quot;CfgOptUser&quot;):
+++			if user.level == &quot;3&quot;:
+++				users += &quot;%s, &quot; % user.name
+++		if users:
+++			users = users.strip(', ')
+++			c = AstConf(&quot;smb.conf&quot;)
+++			c.__init__(&quot;smb.conf&quot;)
++ 
+++			c.setSection(&quot;global&quot;)
+++			c.append(&quot;workgroup = DESTAR&quot;)
+++			c.append(&quot;server string = DeStar&quot;)
+++			c.append(&quot;security = user&quot;)
+++			c.append(&quot;socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192&quot;)
+++
+++			c.setSection(&quot;mohmp3&quot;)
+++			c.append(&quot;path = /usr/share/asterisk/mohmp3/&quot;)
+++			c.append(&quot;valid users = %s&quot; % users)
+++			c.append(&quot;public = no&quot;)
+++			c.append(&quot;writable = yes&quot;)
+++			c.append(&quot;printable = no&quot;)
+++			c.append(&quot;create mask = 0770&quot;)
+++
+++			c.setSection(&quot;monitor&quot;)
+++			c.append(&quot;path = /var/spool/asterisk/monitor/&quot;)
+++			c.append(&quot;valid users = %s&quot; % users)
+++			c.append(&quot;public = no&quot;)
+++			c.append(&quot;writable = yes&quot;)
+++			c.append(&quot;printable = no&quot;)
+++			c.append(&quot;create mask = 0770&quot;)
+++
+++			sambautils.setPassword(self.name, self.secret)
+++			sambautils.reloadDaemon()
+++
++ 	def row(self):
++ 		return (self.shortName, self.name)
++Index: configlets.py
++===================================================================
++--- configlets.py	(revisi&#195;&#179;n: 819)
+++++ configlets.py	(copia de trabajo)
++@@ -45,6 +45,8 @@
++ 	def __init__(self, fn):
++ 		if fn == 'zaptel.conf':
++ 			fn = os.path.join(&quot;/etc&quot;, fn)
+++                if fn == 'smb.conf':
+++                        fn = os.path.join(&quot;/etc/samba&quot;, fn)
++ 		if fn == 'op_server.cfg' or \
++ 		   	fn == 'op_buttons.cfg' or\
++ 			fn == 'op_style.cfg' :
+
+Added: branches/0.2.X/misc/debian/sambautils.py
+===================================================================
+--- branches/0.2.X/misc/debian/sambautils.py	2007-11-13 22:44:35 UTC (rev 821)
++++ branches/0.2.X/misc/debian/sambautils.py	2007-11-14 20:46:15 UTC (rev 822)
+@@ -0,0 +1,43 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Copyright (C) 2005 by Diego Andr&#233;s Asenjo
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++import os, commands
++
++SAMBA_RELOAD_CMD = &quot;sudo /etc/init.d/samba reload&quot;
++USERADD_CMD = &quot;sudo adduser&quot;
++USERDEL_CMD = &quot;sudo userdel&quot;
++SMBPASSWD_CMD = &quot;sudo smbpasswd&quot;
++
++def reloadDaemon():
++        return commands.getoutput(SAMBA_RELOAD_CMD)
++
++def setPassword(user, pswd):
++	(stat, out) = commands.getstatusoutput(&quot;id %s&quot; % user)
++	if stat:
++		os.popen(&quot;%s --system %s&quot; % (USERADD_CMD, user) )
++		os.popen(&quot;%s %s asterisk&quot; % (USERADD_CMD, user) )
++			
++	p = os.popen(&quot;%s -s -a %s&quot; % (SMBPASSWD_CMD, user), 'w')
++	p.write(pswd+&quot;\n&quot;)
++	p.write(pswd+&quot;\n&quot;)
++
++def deleteUser(name):
++	os.popen(&quot;%s -x %s&quot; % (SMBPASSWD_CMD, name) )
++	os.popen(&quot;%s %s&quot; % (USERDEL_CMD, name) )
++	
+
+Added: branches/0.2.X/misc/debian/sudoers-samba.sample
+===================================================================
+--- branches/0.2.X/misc/debian/sudoers-samba.sample	2007-11-13 22:44:35 UTC (rev 821)
++++ branches/0.2.X/misc/debian/sudoers-samba.sample	2007-11-14 20:46:15 UTC (rev 822)
+@@ -0,0 +1,20 @@
++# /etc/sudoers
++#
++# This file MUST be edited with the 'visudo' command as root.
++#
++# See the man page for details on how to write a sudoers file.
++#
++
++Defaults	env_reset
++
++# Host alias specification
++
++# User alias specification
++
++# Cmnd alias specification
++#
++Cmnd_Alias 	DESTAR_SAMBA = /etc/init.d/samba reload, /usr/sbin/adduser, /usr/sbin/userdel, /usr/bin/smbpasswd
++
++# User privilege specification
++root	ALL=(ALL) ALL
++asterisk	localhost=NOPASSWD: DESTAR_SAMBA
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000364.html">[Destar-dev] r821 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000366.html">[Destar-dev] r823 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#365">[ date ]</a>
+              <a href="thread.html#365">[ thread ]</a>
+              <a href="subject.html#365">[ subject ]</a>
+              <a href="author.html#365">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

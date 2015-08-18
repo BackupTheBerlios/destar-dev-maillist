@@ -1,0 +1,43 @@
+From admin at berlios.de  Tue Mar 11 16:57:04 2008
+From: admin at berlios.de (admin at berlios.de)
+Date: Tue, 11 Mar 2008 07:57:04 -0800 (AKDT)
+Subject: [Destar-dev] [Feature #4044] Voicemail integration with Email
+Message-ID: <200803111557.m2BFv4C6015802@unicorn.berlios.de>
+
+Feature Request #4044, was updated on 2008-Mar-11 07:57
+You can respond by visiting: 
+http://developer.berlios.de/feature/?func=detailfeature&feature_id=4044&group_id=2112
+
+Category: None
+Status: Open
+Priority: 5
+Summary: Voicemail integration with Email
+
+By: juanmanuel
+Date: 2008-Mar-11 07:57
+
+Message:
+Logged In: YES 
+user_id=16762
+Browser: Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.8.1.12) Gecko/20080129 Iceweasel/2.0.0.12 (Debian-2.0.0.12-1)
+
+
+When one deletes a voice message from the Mail INBOX
+(notification or voicemail attached), it would be
+desirable to have the message deleted also from the
+Voicemail INBOX.
+
+This might be more of an Asterisk issue than Destar's,
+but Destar should support it.
+
+Currently Asterisk 1.4 supports IMAP store for
+voicemail [1]
+
+[1]:
+http://blogs.reucon.com/srt/2007/02/20/asterisk_imap_store_for_voicemail.html
+
+----------------------------------------------------------------------
+You can respond by visiting: 
+http://developer.berlios.de/feature/?func=detailfeature&feature_id=4044&group_id=2112
+
+

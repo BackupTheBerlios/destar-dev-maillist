@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r681 - branches/destar-callweaver
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r681%20-%20branches/destar-callweaver&In-Reply-To=%3C200705112336.l4BNaDcl029290%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000189.html">
+   <LINK REL="Next"  HREF="000191.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r681 - branches/destar-callweaver</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r681%20-%20branches/destar-callweaver&In-Reply-To=%3C200705112336.l4BNaDcl029290%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r681 - branches/destar-callweaver">santiago at mail.berlios.de
+       </A><BR>
+    <I>Sat May 12 01:36:13 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000189.html">[Destar-dev] r680 - branches/destar-callweaver
+</A></li>
+        <LI>Next message: <A HREF="000191.html">[Destar-dev] r682 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#190">[ date ]</a>
+              <a href="thread.html#190">[ thread ]</a>
+              <a href="subject.html#190">[ subject ]</a>
+              <a href="author.html#190">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-05-12 01:36:13 +0200 (Sat, 12 May 2007)
+New Revision: 681
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/backend.py
+   branches/destar-callweaver/cdrutils.py
+   branches/destar-callweaver/configlets.py
+   branches/destar-callweaver/destar
+   branches/destar-callweaver/page_admin_viewconf.ptl
+   branches/destar-callweaver/page_config.ptl
+Log:
+Using /opt/callweaver
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 23:36:13 UTC (rev 681)
+@@ -4,6 +4,7 @@
+ * moving /etc/asterisk to /opt/etc/callweaver
+ * backend.py: Fixed apps names
+ * cfg_phone_sip.py: fixed realm for MD5
++* Using /opt/callweaver, according to FHS
+ 
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+
+Modified: branches/destar-callweaver/backend.py
+===================================================================
+--- branches/destar-callweaver/backend.py	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/backend.py	2007-05-11 23:36:13 UTC (rev 681)
+@@ -26,7 +26,7 @@
+ 
+ DESTAR_CFG = &quot;destar_cfg.py&quot;
+ CONFIGLETS_DIR = os.getenv('CONFIGLETS_DIR', default='.') 
+-CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/usr/lib/callweaver/modules')
++CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/callweaver/usr/lib/callweaver/modules')
+ 
+ 
+ 
+
+Modified: branches/destar-callweaver/cdrutils.py
+===================================================================
+--- branches/destar-callweaver/cdrutils.py	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/cdrutils.py	2007-05-11 23:36:13 UTC (rev 681)
+@@ -28,7 +28,7 @@
+ 	print _(&quot;Note: you should install python-pysqlite2 to have CDR functionality&quot;)
+ 
+ try:
+-	if not  os.access(&quot;/opt/lib/callweaver/modules/cdr_sqlite3_custom.so&quot;, os.F_OK):
++	if not  os.access(&quot;/opt/callweaver/lib/callweaver/modules/cdr_sqlite3_custom.so&quot;, os.F_OK):
+ 		raise ImportError
+ 	needModule(&quot;cdr_sqlite3_custom&quot;)
+ except:
+
+Modified: branches/destar-callweaver/configlets.py
+===================================================================
+--- branches/destar-callweaver/configlets.py	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/configlets.py	2007-05-11 23:36:13 UTC (rev 681)
+@@ -21,10 +21,10 @@
+ import sys, os, types, sha, binascii, time
+ import panelutils
+ 
+-CONF_DIR = &quot;/opt/etc/callweaver&quot;
++CONF_DIR = &quot;/opt/callweaver/etc/callweaver&quot;
+ DOC_DIR = os.getenv('DESTAR_DOC_DIR', default='/tmp/destar-doc')
+ CONF_TAG = &quot;; Automatically created by DESTAR\n&quot;
+-CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/lib/callweaver/modules') 
++CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/callweaver/lib/callweaver/modules') 
+ 
+ 
+ class AsteriskConfigFile:
+
+Modified: branches/destar-callweaver/destar
+===================================================================
+--- branches/destar-callweaver/destar	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/destar	2007-05-11 23:36:13 UTC (rev 681)
+@@ -125,7 +125,7 @@
+ # only daemonize after binding to the port. This makes error handling saner
+ if be_daemon:
+ 	quixote.config.DISPLAY_EXCEPTIONS = 'plain'
+-	daemonize.daemonize(stdout='/var/log/asterisk/destar.log', stderr='/var/log/asterisk/destar.err', pidfile=pid_file)
++	daemonize.daemonize(stdout='/opt/callweaver/var/log/callweaver/destar.log', stderr='/opt/callweaver/var/log/callweaver/destar.err', pidfile=pid_file)
+ 
+ 	if panelutils.isConfigured():
+ 		panelutils.startPanelDaemon()
+
+Modified: branches/destar-callweaver/page_admin_viewconf.ptl
+===================================================================
+--- branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-11 23:36:13 UTC (rev 681)
+@@ -75,7 +75,7 @@
+ 			cantAccessPage()
+ 
+ 	def _q_test(self):
+-		return os.access(&quot;/opt/etc/callweaver&quot;, os.O_RDWR)
++		return os.access(&quot;/opt/callweaver/etc/callweaver&quot;, os.O_RDWR)
+ 
+ 
+ 	def _q_index [plain] (self):
+@@ -126,7 +126,7 @@
+ 	def showMissingModules [plain] (self, missingModules):
+ 		'&lt;div id=&quot;error&quot;&gt;\n'
+ 		'&lt;p&gt;'
+-		htmltext(_(&quot;WARNING: This configuration might experience grave problems because the following asterisk modules are missing on your system:&quot;))
++		htmltext(_(&quot;WARNING: This configuration might experience grave problems because the following callweaver modules are missing on your system:&quot;))
+ 		'&lt;/p&gt;'
+ 		'&lt;ul&gt;'
+ 		for mod in missingModules:
+
+Modified: branches/destar-callweaver/page_config.ptl
+===================================================================
+--- branches/destar-callweaver/page_config.ptl	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/page_config.ptl	2007-05-11 23:36:13 UTC (rev 681)
+@@ -76,9 +76,9 @@
+ 				&quot;add/CfgOptUser&quot;,
+ 				[_(&quot;Configuration&quot;), _(&quot;Options&quot;), _(&quot;DeStar user&quot;)] )
+ 
+-		if not os.access(&quot;/opt/etc/callweaver&quot;, os.O_RDWR):
++		if not os.access(&quot;/opt/callweaver/etc/callweaver&quot;, os.O_RDWR):
+ 			self.configurationTip(
+-				_(&quot;You should enable write access to the directory /opt/etc/callweaver. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'.&quot; % groups),
++				_(&quot;You should enable write access to the directory /opt/callweaver/etc/callweaver. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'.&quot; % groups),
+ 				&quot;&quot;,
+ 				[])
+ 
+@@ -116,7 +116,7 @@
+ 				_(&quot;You should enable write access to the %s directory. Without the ability to modify the Asternic Flash Operator Panel configuration files DeStar won't be integrated whit the panel.&quot; % panelutils.PANEL_CONF_DIR),
+ 				&quot;&quot;,
+ 				[])
+-		db_fn = &quot;/var/log/asterisk/master.db&quot;
++		db_fn = &quot;/opt/callweaver/var/log/callweaver/master.db&quot;
+ 		if not os.access(db_fn, os.O_RDWR):
+ 			self.configurationTip(
+ 				_(&quot;You don't seem to have access to %s yet created by cdr_sqlite3_custom. Without this file CDR reports wont be accesible trough this interface.&quot;),
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000189.html">[Destar-dev] r680 - branches/destar-callweaver
+</A></li>
+	<LI>Next message: <A HREF="000191.html">[Destar-dev] r682 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#190">[ date ]</a>
+              <a href="thread.html#190">[ thread ]</a>
+              <a href="subject.html#190">[ subject ]</a>
+              <a href="author.html#190">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r708 - branches/0.2.X trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r708%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200706122221.l5CMLvYu008608%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000218.html">
+   <LINK REL="Next"  HREF="000220.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r708 - branches/0.2.X trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r708%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200706122221.l5CMLvYu008608%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r708 - branches/0.2.X trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Wed Jun 13 00:21:57 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000218.html">[Destar-dev] r707 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000220.html">[Destar-dev] r709 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#219">[ date ]</a>
+              <a href="thread.html#219">[ thread ]</a>
+              <a href="subject.html#219">[ subject ]</a>
+              <a href="author.html#219">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-06-13 00:21:56 +0200 (Wed, 13 Jun 2007)
+New Revision: 708
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_dialout_normal.py
+   trunk/CHANGELOG.txt
+   trunk/cfg_dialout_normal.py
+Log:
+* Fixed bug in Dialouts. Added fields to change Caller ID.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-06-12 21:28:31 UTC (rev 707)
++++ branches/0.2.X/CHANGELOG.txt	2007-06-12 22:21:56 UTC (rev 708)
+@@ -1,5 +1,6 @@
+ 2007-06-12:
+ * Fixed bug in Zap trunks (clidnumin needed).
++* Fixed bug in Dialouts. Added fields to change Caller ID.
+ 
+ 2007-06-07:
+ * cfg_dialout_normal.py: Moved (reverted) SetVar to Set
+
+Modified: branches/0.2.X/cfg_dialout_normal.py
+===================================================================
+--- branches/0.2.X/cfg_dialout_normal.py	2007-06-12 21:28:31 UTC (rev 707)
++++ branches/0.2.X/cfg_dialout_normal.py	2007-06-12 22:21:56 UTC (rev 708)
+@@ -71,6 +71,20 @@
+ 			type=&quot;bool&quot;, 
+ 			default=False),
+ 
++		VarType(&quot;Outbound&quot;,
++			title=_(&quot;Caller ID for calls established through this dialout&quot;),
++			type=&quot;label&quot;),
++
++		VarType(&quot;clidnameout&quot;,
++			title=_(&quot;Change Caller*Id Name to:&quot;),
++			len=40,
++			optional=True),
++
++		VarType(&quot;clidnumout&quot;,
++			title=_(&quot;Change Caller*Id Number to:&quot;),
++			len=40,
++			optional=True),
++
+ 		VarType(&quot;Trunks&quot;, 
+ 			title=_(&quot;Trunks to use for routing this dialout entry&quot;), 
+ 			type=&quot;label&quot;, 
+@@ -158,10 +172,10 @@
+ 						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=%s)&quot; % self.__getitem__(&quot;trunk_%s_price&quot; % obj.name))
+ 					else:
+ 						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=0)&quot;)
+-					if obj.clidnameout:
+-						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; % obj.clidnameout)
+-					if obj.clidnumout:
+-						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; % obj.clidnumout)
++					if self.clidnameout:
++						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; % self.clidnameout)
++					if self.clidnumout:
++						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; % self.clidnumout)
+ 				        if tapisupport:
+ 					        c.appendExten(&quot;s&quot;,&quot;Set(chan=${CUT(CHANNEL,,1)})&quot;)
+ 					        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${chan})&quot;)
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-12 21:28:31 UTC (rev 707)
++++ trunk/CHANGELOG.txt	2007-06-12 22:21:56 UTC (rev 708)
+@@ -1,3 +1,6 @@
++2007-06-12:
++* Fixed bug in Dialouts. Added fields to change Caller ID.
++
+ 2007-06-08:
+ * Added page_admin_cfwstate.ptl to show CFIM, CFBS and DND state.
+ 
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-06-12 21:28:31 UTC (rev 707)
++++ trunk/cfg_dialout_normal.py	2007-06-12 22:21:56 UTC (rev 708)
+@@ -77,6 +77,20 @@
+ 			type=&quot;bool&quot;, 
+ 			default=False),
+ 
++		VarType(&quot;Outbound&quot;,
++			title=_(&quot;Caller ID for calls established through this dialout&quot;),
++			type=&quot;label&quot;),
++
++		VarType(&quot;clidnameout&quot;,
++			title=_(&quot;Change Caller*Id Name to:&quot;),
++			len=40,
++			optional=True),
++
++		VarType(&quot;clidnumout&quot;,
++			title=_(&quot;Change Caller*Id Number to:&quot;),
++			len=40,
++			optional=True),
++
+ 		VarType(&quot;Trunks&quot;, 
+ 			title=_(&quot;Trunks to use for routing this dialout entry&quot;), 
+ 			type=&quot;label&quot;, 
+@@ -162,10 +176,10 @@
+ 						c.append(&quot;exten=&gt;s,n,Set(CDR(accountcode)=%s)&quot; % self.__getitem__(&quot;trunk_%s_price&quot; % obj.name))
+ 					else:
+ 						c.append(&quot;exten=&gt;s,n,Set(CDR(accountcode)=0)&quot;)
+-					if obj.clidnameout:
+-						c.append(&quot;exten=&gt;s,n,Set(CALLERID(name)=%s)&quot; % obj.clidnameout)
+-					if obj.clidnumout:
+-						c.append(&quot;exten=&gt;s,n,Set(CALLERID(number)=%s)&quot; % obj.clidnumout)
++					if self.clidnameout:
++						c.append(&quot;exten=&gt;s,n,Set(CALLERID(name)=%s)&quot; % self.clidnameout)
++					if self.clidnumout:
++						c.append(&quot;exten=&gt;s,n,Set(CALLERID(number)=%s)&quot; % self.clidnumout)
+ 				        if tapisupport:
+ 						needModule(&quot;app_cut&quot;)
+ 					        c.append(&quot;exten=&gt;s,n,Set(chan=${CUT(CHANNEL,,1)})&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000218.html">[Destar-dev] r707 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000220.html">[Destar-dev] r709 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#219">[ date ]</a>
+              <a href="thread.html#219">[ thread ]</a>
+              <a href="subject.html#219">[ subject ]</a>
+              <a href="author.html#219">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

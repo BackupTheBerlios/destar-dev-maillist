@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r724 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r724%20-%20branches/0.2.X&In-Reply-To=%3C200706152144.l5FLip2I008613%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000234.html">
+   <LINK REL="Next"  HREF="000236.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r724 - branches/0.2.X</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r724%20-%20branches/0.2.X&In-Reply-To=%3C200706152144.l5FLip2I008613%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r724 - branches/0.2.X">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun 15 23:44:51 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000234.html">[Destar-dev] r723 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000236.html">[Destar-dev] r725 - in branches/0.2.X: . lang/es/LC_MESSAGES po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#235">[ date ]</a>
+              <a href="thread.html#235">[ thread ]</a>
+              <a href="subject.html#235">[ subject ]</a>
+              <a href="author.html#235">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-15 23:44:51 +0200 (Fri, 15 Jun 2007)
+New Revision: 724
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_phone_queue.py
+Log:
+cfg_phone_queue.py: queuetimeout works without queuetimeoutext
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-06-15 21:43:00 UTC (rev 723)
++++ branches/0.2.X/CHANGELOG.txt	2007-06-15 21:44:51 UTC (rev 724)
+@@ -2,6 +2,7 @@
+ * destar.pot updated, some spanish translations.
+ * languages Makefile updated, there is no need to install the mo files, just move them.
+ * String translations and adjustments.
++* cfg_phone_queue.py: queuetimeout works without queuetimeoutext
+ 
+ 2007-06-13:
+ * Changed coding header to utf-8 in all files.
+
+Modified: branches/0.2.X/cfg_phone_queue.py
+===================================================================
+--- branches/0.2.X/cfg_phone_queue.py	2007-06-15 21:43:00 UTC (rev 723)
++++ branches/0.2.X/cfg_phone_queue.py	2007-06-15 21:44:51 UTC (rev 724)
+@@ -258,15 +258,16 @@
+ 				extensions.appendExten(qname, &quot;Answer&quot;)
+ 				extensions.appendExten(qname, &quot;SetMusicOnHold(%s)&quot; % self.moh)
+ 
+-			if self.queuetimeout and self.queuetimeoutext:
++			if self.queuetimeout:
+ 				opt = opt + &quot;n&quot;
+ 				extensions.appendExten(qname, &quot;Queue(%s|%s|||%s)&quot; % (self.name, opt, self.queuetimeout))
+-				import configlets
+-				obj = configlets.configlet_tree.getConfigletByName(self.queuetimeoutext)
+-				try:
+-					extensions.appendExten(qname, &quot;Goto(%s,%s,1)&quot; %  (obj.pbx, self.queuetimeoutext))
+-				except AttributeError:
+-					pass
++				if self.queuetimeoutext:
++					import configlets
++					obj = configlets.configlet_tree.getConfigletByName(self.queuetimeoutext)
++					try:
++						extensions.appendExten(qname, &quot;Goto(%s,%s,1)&quot; %  (obj.pbx, self.queuetimeoutext))
++					except AttributeError:
++						pass
+ 			else:
+ 				extensions.appendExten(qname, &quot;Queue(%s|%s)&quot; % (self.name, opt))
+ 		self.createPanelConfig()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000234.html">[Destar-dev] r723 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000236.html">[Destar-dev] r725 - in branches/0.2.X: . lang/es/LC_MESSAGES po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#235">[ date ]</a>
+              <a href="thread.html#235">[ thread ]</a>
+              <a href="subject.html#235">[ subject ]</a>
+              <a href="author.html#235">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

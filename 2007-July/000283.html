@@ -1,0 +1,1146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r763 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r763%20-%20trunk&In-Reply-To=%3C200707261856.l6QIu1Dw017526%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000282.html">
+   <LINK REL="Next"  HREF="000284.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r763 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r763%20-%20trunk&In-Reply-To=%3C200707261856.l6QIu1Dw017526%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r763 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul 26 20:56:01 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000282.html">[Destar-dev] r762 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000284.html">[Destar-dev] r764 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#283">[ date ]</a>
+              <a href="thread.html#283">[ thread ]</a>
+              <a href="subject.html#283">[ subject ]</a>
+              <a href="author.html#283">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-07-26 20:55:56 +0200 (Thu, 26 Jul 2007)
+New Revision: 763
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_app_agentcallbacklogin.py
+   trunk/cfg_app_agentlogin.py
+   trunk/cfg_app_callfw.py
+   trunk/cfg_app_chanspy.py
+   trunk/cfg_app_conference.py
+   trunk/cfg_app_directory.py
+   trunk/cfg_app_disa.py
+   trunk/cfg_app_dnd.py
+   trunk/cfg_app_echo.py
+   trunk/cfg_app_meetme.py
+   trunk/cfg_app_milliwatt.py
+   trunk/cfg_app_music.py
+   trunk/cfg_app_parking.py
+   trunk/cfg_app_play.py
+   trunk/cfg_app_quickdial_global.py
+   trunk/cfg_app_quickdial_phone.py
+   trunk/cfg_app_record.py
+   trunk/cfg_app_saytime.py
+   trunk/cfg_app_voicemail.py
+   trunk/cfg_app_voicemailsettings.py
+   trunk/cfg_dialout_normal.py
+   trunk/cfg_ivr_autoatt.py
+   trunk/cfg_ivr_treenode.py
+   trunk/cfg_opt_did.py
+   trunk/cfg_opt_settings.py
+   trunk/cfg_phone_epygi.py
+   trunk/cfg_phone_ext.py
+   trunk/cfg_phone_queue.py
+   trunk/cfg_phone_zap.py
+   trunk/cfg_trunk_capi.py
+   trunk/cfg_trunk_capimsn.py
+   trunk/cfg_trunk_fwdiax.py
+   trunk/cfg_trunk_iaxtel.py
+   trunk/cfg_trunk_zap.py
+   trunk/cfg_trunk_zappri.py
+Log:
+cfg_*, adding context in appendExten
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/CHANGELOG.txt	2007-07-26 18:55:56 UTC (rev 763)
+@@ -3,7 +3,7 @@
+ * Fixed some int values expected where strings types found.
+ * Added Themes support in Templates.ptl and CfgOptSettings.
+ * Added FileWidgwt to ConfigHelper and option to upload a logo image on CfgOptSettings.
+-* configlets.py: appendExten() uses 'n' priority and doesn't reset the
++* configlets.py, cfg_*: appendExten() uses 'n' priority and doesn't reset the
+   priority when the extension changes.
+ * configlets.py: allows monitoring incoming calls
+ 
+
+Modified: trunk/cfg_app_agentcallbacklogin.py
+===================================================================
+--- trunk/cfg_app_agentcallbacklogin.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_agentcallbacklogin.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -68,12 +68,12 @@
+ 		else:
+ 			opts = &quot;&quot;
+ 		
+-		c.appendExten(self.ext, &quot;AgentCallbackLogin(${CALLERIDNUM}|%s|${CALLERIDNUM}@%s)&quot; % (opts, self.pbx) )
+-		c.appendExten(self.ext, &quot;DBdel(DND/%s/${CALLERIDNUM})&quot;)
+-		c.appendExten(self.ext, &quot;Playback(do-not-disturb)&quot;)
+-		c.appendExten(self.ext, &quot;Playback(cancelled)&quot;)
+-		c.appendExten(self.ext, &quot;Hangup&quot;)
++		c.appendExten(self.ext, &quot;AgentCallbackLogin(${CALLERIDNUM}|%s|${CALLERIDNUM}@%s)&quot; % (opts, self.pbx), self.pbx )
++		c.appendExten(self.ext, &quot;DBdel(DND/%s/${CALLERIDNUM})&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Playback(do-not-disturb)&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Playback(cancelled)&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+ 
+-		c.appendExten(self.changeext, &quot;AgentCallbackLogin(${CALLERIDNUM}|%s|'#')&quot; % (opts) )
+-		c.appendExten(self.logoutext, &quot;Dial(Local/%s@%s/n,,D(#))&quot; % (self.changeext, self.pbx))
++		c.appendExten(self.changeext, &quot;AgentCallbackLogin(${CALLERIDNUM}|%s|'#')&quot; % (opts), self.pbx )
++		c.appendExten(self.logoutext, &quot;Dial(Local/%s@%s/n,,D(#))&quot; % (self.changeext, self.pbx), self.pbx)
+ 
+
+Modified: trunk/cfg_app_agentlogin.py
+===================================================================
+--- trunk/cfg_app_agentlogin.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_agentlogin.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -47,5 +47,5 @@
+ 	
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;AgentLogin()&quot;)
++		c.appendExten(self.ext, &quot;AgentLogin()&quot;, self.pbx)
+ 
+
+Modified: trunk/cfg_app_callfw.py
+===================================================================
+--- trunk/cfg_app_callfw.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_callfw.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -69,36 +69,37 @@
+ 		    needModule(&quot;app_devstate&quot;)
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.set, &quot;Goto(cfw-%s,s,1)&quot; % self.set)
+-		c.appendExten(self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Macro(call-forward,%s,%s,${EXTEN:%d},%s)&quot; % (self.type,self.pbx,len(self.set),msg))
+-		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;Answer()&quot;)
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx))
++		c.appendExten(self.set, &quot;Goto(cfw-%s,s,1)&quot; % self.set, self.pbx)
++		c.appendExten(self.set, &quot;Hangup&quot;, self.pbx)
++		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Macro(call-forward,%s,%s,${EXTEN:%d},%s)&quot; % (self.type,self.pbx,len(self.set),msg), self.pbx)
++		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Hangup&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Answer()&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx), self.pbx)
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;%s&quot; % self.unset, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type, self.pbx))
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;Playback(call-fwd-cancelled)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;Wait(1)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;Hangup&quot;)
++			c.appendExten(&quot;%s&quot; % self.unset, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type, self.pbx), self.pbx)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Playback(call-fwd-cancelled)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Wait(1)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Hangup&quot;, self.pbx)
+ 
+-		c.setSection(&quot;cfw-%s&quot; % self.set)
++		context=&quot;cfw-%s&quot; % self.set
++		c.setSection(context)
+ 		if self.toggle:
+-			c.appendExten(&quot;s&quot;, &quot;Set(testcf=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
+-			c.appendExten(&quot;s&quot;, 'GotoIf($[&quot;${testcf}&quot; != &quot;&quot;]?switchoff)')	
+-		c.appendExten(&quot;s&quot;, &quot;Set(TIMEOUT(digit)=2)&quot;)
+-		c.appendExten(&quot;s&quot;, &quot;Set(lastnum=${DB(%s_LASTNUM/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
+-		c.appendExten(&quot;s&quot;, 'GotoIf($[&quot;${lastnum}&quot; = &quot;&quot;]?nonumber)')
+-		c.appendExten(&quot;s&quot;,&quot;Background(press-1&amp;to-enter-a-number&amp;or&amp;press-2&amp;for&amp;vm-last&amp;number)&quot;)
+-		c.appendExten(&quot;s&quot;,&quot;WaitExten(3)&quot;)
+-		c.appendExten(&quot;s&quot;,&quot;Hangup()&quot;)
+-		c.appendExten(&quot;s&quot;, &quot;Goto(1,1)&quot;, label=&quot;nonumber&quot;)
+-		c.appendExten(&quot;s&quot;, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.unset), label=&quot;switchoff&quot;)
+-		c.appendExten(&quot;2&quot;,&quot;Macro(call-forward,%s,%s,${lastnum},%s)&quot; % (self.type,self.pbx,msg))
++			c.appendExten(&quot;s&quot;, &quot;Set(testcf=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx), context)
++			c.appendExten(&quot;s&quot;, 'GotoIf($[&quot;${testcf}&quot; != &quot;&quot;]?switchoff)', context)	
++		c.appendExten(&quot;s&quot;, &quot;Set(TIMEOUT(digit)=2)&quot;, context)
++		c.appendExten(&quot;s&quot;, &quot;Set(lastnum=${DB(%s_LASTNUM/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx), context)
++		c.appendExten(&quot;s&quot;, 'GotoIf($[&quot;${lastnum}&quot; = &quot;&quot;]?nonumber)', context)
++		c.appendExten(&quot;s&quot;,&quot;Background(press-1&amp;to-enter-a-number&amp;or&amp;press-2&amp;for&amp;vm-last&amp;number)&quot;, context)
++		c.appendExten(&quot;s&quot;,&quot;WaitExten(3)&quot;, context)
++		c.appendExten(&quot;s&quot;,&quot;Hangup()&quot;, context)
++		c.appendExten(&quot;s&quot;, &quot;Goto(1,1)&quot;, context, label=&quot;nonumber&quot;)
++		c.appendExten(&quot;s&quot;, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.unset), context, label=&quot;switchoff&quot;)
++		c.appendExten(&quot;2&quot;,&quot;Macro(call-forward,%s,%s,${lastnum},%s)&quot; % (self.type,self.pbx,msg), context)
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;2&quot;, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx))
+-		c.appendExten(&quot;1&quot;, &quot;Playback(please-enter-the&amp;number&amp;after-the-tone&amp;beep)&quot;)
+-		c.appendExten(&quot;1&quot;,&quot;WaitExten(5)&quot;)
+-		c.appendExten(&quot;_X.&quot;,&quot;Macro(call-forward,%s,%s,${EXTEN},%s)&quot; % (self.type,self.pbx,msg))
++			c.appendExten(&quot;2&quot;, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx), context)
++		c.appendExten(&quot;1&quot;, &quot;Playback(please-enter-the&amp;number&amp;after-the-tone&amp;beep)&quot;, context)
++		c.appendExten(&quot;1&quot;,&quot;WaitExten(5)&quot;, context)
++		c.appendExten(&quot;_X.&quot;,&quot;Macro(call-forward,%s,%s,${EXTEN},%s)&quot; % (self.type,self.pbx,msg), context)
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;_X.&quot;, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx))
++			c.appendExten(&quot;_X.&quot;, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx), context)
+ 
+
+Modified: trunk/cfg_app_chanspy.py
+===================================================================
+--- trunk/cfg_app_chanspy.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_chanspy.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -64,8 +64,8 @@
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+ 		if self.password:
+-			c.appendExten(self.ext, &quot;Authenticate(%s)&quot; % self.password)
++			c.appendExten(self.ext, &quot;Authenticate(%s)&quot; % self.password, self.pbx)
+ 		if self.quiet:
+-			c.appendExten(self.ext, &quot;Chanspy(%s|q)&quot; % self.scanspec)
++			c.appendExten(self.ext, &quot;Chanspy(%s|q)&quot; % self.scanspec, self.pbx)
+ 		else: 
+-			c.appendExten(self.ext, &quot;Chanspy(%s)&quot; % self.scanspec)
++			c.appendExten(self.ext, &quot;Chanspy(%s)&quot; % self.scanspec, self.pbx)
+
+Modified: trunk/cfg_app_conference.py
+===================================================================
+--- trunk/cfg_app_conference.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_conference.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -41,9 +41,9 @@
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Wait(1)&quot;)
+-		c.appendExten(self.ext, &quot;Conference&quot;)
++		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Wait(1)&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Conference&quot;, self.pbx)
+ 
+ 	def isAddable(self):
+ 		# TODO: should only be addable if app_conference.so exists
+
+Modified: trunk/cfg_app_directory.py
+===================================================================
+--- trunk/cfg_app_directory.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_directory.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -41,6 +41,6 @@
+ 	
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Directory(default)&quot;)
+-		c.appendExten(self.ext, &quot;Hangup&quot;)
++		c.appendExten(self.ext, &quot;Directory(default)&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+ 
+
+Modified: trunk/cfg_app_disa.py
+===================================================================
+--- trunk/cfg_app_disa.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_disa.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -81,7 +81,7 @@
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(&quot;%s&quot; % self.pbx)
+ 		needModule(&quot;app_disa&quot;)	
+-		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Set(TIMEOUT(digit)=5)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Set(TIMEOUT(response)=10)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Authenticate(%s)&quot; % self.pin)
+-		c.appendExten(&quot;%s&quot; % self.ext ,&quot;DISA(no-password|out-%s)&quot; % self.name)
++		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Set(TIMEOUT(digit)=5)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Set(TIMEOUT(response)=10)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Authenticate(%s)&quot; % self.pin, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.ext ,&quot;DISA(no-password|out-%s)&quot; % self.name, self.pbx)
+
+Modified: trunk/cfg_app_dnd.py
+===================================================================
+--- trunk/cfg_app_dnd.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_dnd.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -62,20 +62,20 @@
+ 				    tapisupport = True
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Set(DB(DND/%s/${CALLERIDNUM})=True)&quot; % self.pbx)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Set(DB(DND/%s/${CALLERIDNUM})=True)&quot; % self.pbx, self.pbx)
+ 		if tapisupport:
+ 			needModule(&quot;app_cut&quot;)
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Set(CHAN=${CUT(CHANNEL|-|1)})&quot;)
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: True&quot; )
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Set(CHAN=${CUT(CHANNEL|-|1)})&quot;, self.pbx)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: True&quot;, self.pbx )
+ 				
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(do-not-disturb)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Hangup&quot;)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(do-not-disturb)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Hangup&quot;, self.pbx)
+ 
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;DBdel(DND/%s/${CALLERIDNUM})&quot; % self.pbx)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;DBdel(DND/%s/${CALLERIDNUM})&quot; % self.pbx, self.pbx)
+ 		if tapisupport:
+-			c.appendExten(&quot;%s&quot; % self.unset, &quot;Set(CHAN=${CUT(CHANNEL|-|1)})&quot;)
+-			c.appendExten(&quot;%s&quot; % self.unset, &quot;UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: ^&quot; )
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;Playback(do-not-disturb)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;Playback(cancelled)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;Hangup&quot;)
++			c.appendExten(&quot;%s&quot; % self.unset, &quot;Set(CHAN=${CUT(CHANNEL|-|1)})&quot;, self.pbx)
++			c.appendExten(&quot;%s&quot; % self.unset, &quot;UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: ^&quot;, self.pbx )
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Playback(do-not-disturb)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Playback(cancelled)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_echo.py
+===================================================================
+--- trunk/cfg_app_echo.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_echo.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -41,9 +41,9 @@
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Wait(1)&quot;)
+-		c.appendExten(self.ext, &quot;Playback(demo-echotest,skip)&quot;)
+-		c.appendExten(self.ext, &quot;Echo&quot;)
+-		c.appendExten(self.ext, &quot;Playback(demo-echodone,skip)&quot;)
+-		c.appendExten(self.ext, &quot;Hangup&quot;)
++		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Wait(1)&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Playback(demo-echotest,skip)&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Echo&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Playback(demo-echodone,skip)&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_meetme.py
+===================================================================
+--- trunk/cfg_app_meetme.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_meetme.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -82,17 +82,17 @@
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Set(TIMEOUT(absolute)=%d)&quot; % self.timeout)
++		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Set(TIMEOUT(absolute)=%d)&quot; % self.timeout, self.pbx)
+ 		# 'd' -- dynamically add conference
+ 		# 'P' -- always prompt pin
+ 		args=&quot;&quot;
+ 		if self.confno:
+-			args += &quot;%d&quot; % int(self.confno)
++			args += &quot;%d&quot; % self.confno
+ 		args += &quot;|d&quot;
+ 		if self.pin:
+-			args += &quot;P|%d&quot; % int(self.pin)
+-		c.appendExten(self.ext, &quot;MeetMe(%s)&quot; % args)
++			args += &quot;P|%d&quot; % self.pin
++		c.appendExten(self.ext, &quot;MeetMe(%s)&quot; % args, self.pbx)
+ 
+ 		if self.confno:
+ 			c = AstConf(&quot;meetme.conf&quot;)
+
+Modified: trunk/cfg_app_milliwatt.py
+===================================================================
+--- trunk/cfg_app_milliwatt.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_milliwatt.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -42,6 +42,6 @@
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Milliwatt&quot;)
+-		c.appendExten(self.ext, &quot;Hangup&quot;)
++		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Milliwatt&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_music.py
+===================================================================
+--- trunk/cfg_app_music.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_music.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -40,9 +40,9 @@
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Wait(1)&quot;)
++		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Wait(1)&quot;, self.pbx)
+ 		if self.moh:
+-			c.appendExten(self.ext, &quot;MusicOnHold(%s)&quot; % self.moh)
++			c.appendExten(self.ext, &quot;MusicOnHold(%s)&quot; % self.moh, self.pbx)
+ 		else: 
+-			c.appendExten(self.ext, &quot;MusicOnHold&quot;)
++			c.appendExten(self.ext, &quot;MusicOnHold&quot;, self.pbx)
+
+Modified: trunk/cfg_app_parking.py
+===================================================================
+--- trunk/cfg_app_parking.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_parking.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -50,6 +50,6 @@
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Park(%s)&quot; % self.ext)
++		c.appendExten(self.ext, &quot;Park(%s)&quot; % self.ext, self.pbx)
+ 		
+ 		panelutils.createParkButton(self)
+
+Modified: trunk/cfg_app_play.py
+===================================================================
+--- trunk/cfg_app_play.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_play.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -49,7 +49,7 @@
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Wait(1)&quot;)
+-		c.appendExten(self.ext, &quot;Playback(%s,skip)&quot; % self.filename)
+-		c.appendExten(self.ext, &quot;Hangup&quot;)
++		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Wait(1)&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Playback(%s,skip)&quot; % self.filename, self.pbx)
++		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_quickdial_global.py
+===================================================================
+--- trunk/cfg_app_quickdial_global.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_quickdial_global.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -59,8 +59,8 @@
+ 		c.setSection(self.pbx)
+ 		if self.pin:
+ 			needModule(&quot;app_authenticate&quot;)
+-			c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Authenticate(%s)&quot; % self.pin)
+-		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Set(DB(QUICKDIALLIST/GLOBAL/${EXTEN:%d:2})=${EXTEN:%d})&quot; % (len(self.set),len(self.set)+3))
+-		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;DBdel(QUICKDIALLIST/GLOBAL/${EXTEN:%d})&quot; % len(self.unset))
+-		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;Hangup&quot;)
++			c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Authenticate(%s)&quot; % self.pin, self.pbx)
++		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Set(DB(QUICKDIALLIST/GLOBAL/${EXTEN:%d:2})=${EXTEN:%d})&quot; % (len(self.set),len(self.set)+3), self.pbx)
++		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Hangup&quot;, self.pbx)
++		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;DBdel(QUICKDIALLIST/GLOBAL/${EXTEN:%d})&quot; % len(self.unset), self.pbx)
++		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_quickdial_phone.py
+===================================================================
+--- trunk/cfg_app_quickdial_phone.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_quickdial_phone.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -45,7 +45,7 @@
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Set(DB(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d:2})=${EXTEN:%d})&quot; % (len(self.set),len(self.set)+3))
+-		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;DBdel(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d})&quot; % len(self.unset))
+-		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;Hangup&quot;)
++		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Set(DB(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d:2})=${EXTEN:%d})&quot; % (len(self.set),len(self.set)+3), self.pbx)
++		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Hangup&quot;, self.pbx)
++		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;DBdel(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d})&quot; % len(self.unset), self.pbx)
++		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_record.py
+===================================================================
+--- trunk/cfg_app_record.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_record.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -63,8 +63,8 @@
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Goto(record-%s,s,1)&quot; % self.filename)
+-		c.appendExten(self.ext, &quot;Hangup&quot;)
++		c.appendExten(self.ext, &quot;Goto(record-%s,s,1)&quot; % self.filename, self.pbx)
++		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+ 		c.setSection(&quot;record-%s&quot; % self.filename)
+ 		c.append(&quot;exten =&gt; s,1,Macro(record,%s,%s,%s)&quot; % (self.filename, self.format, self.max))
+ 		c.append(&quot;exten =&gt; s,n(menu),Background(press-1&amp;to-listen-to-it&amp;or&amp;press-2&amp;to-rerecord-yr-message)&quot;)
+
+Modified: trunk/cfg_app_saytime.py
+===================================================================
+--- trunk/cfg_app_saytime.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_saytime.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -43,7 +43,7 @@
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Wait(1)&quot;)
+-		c.appendExten(self.ext, &quot;SayUnixTime(,,%s)&quot; % self.what)
+-		c.appendExten(self.ext, &quot;Hangup&quot;)
++		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Wait(1)&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;SayUnixTime(,,%s)&quot; % self.what, self.pbx)
++		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_voicemail.py
+===================================================================
+--- trunk/cfg_app_voicemail.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_voicemail.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -44,10 +44,10 @@
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Wait(1)&quot;)
++		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;Wait(1)&quot;, self.pbx)
+ 		if not self.mailbox:
+-			c.appendExten(self.ext, &quot;VoiceMailMain(${CALLERIDNUM}@%s)&quot; % self.pbx)
++			c.appendExten(self.ext, &quot;VoiceMailMain(${CALLERIDNUM}@%s)&quot; % self.pbx, self.pbx)
+ 		else:
+-			c.appendExten(self.ext, &quot;VoiceMailMain(@%s)&quot; % self.pbx)
+-		c.appendExten(self.ext, &quot;Hangup&quot;)
++			c.appendExten(self.ext, &quot;VoiceMailMain(@%s)&quot; % self.pbx, self.pbx)
++		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_voicemailsettings.py
+===================================================================
+--- trunk/cfg_app_voicemailsettings.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_app_voicemailsettings.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -70,30 +70,30 @@
+ 		    needModule(&quot;app_devstate&quot;)
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Answer()&quot;)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Answer()&quot;, self.pbx)
+ 		if self.toggle:
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Set(togglestate=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
+-			c.appendExten(&quot;%s&quot; % self.set, 'GotoIf($[&quot;${togglestate}&quot; != &quot;&quot;]?switchoff)')
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Set(DB(%s/%s/${CALLERIDNUM})=1)&quot; % (self.type, self.pbx))
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Set(togglestate=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx), self.pbx)
++			c.appendExten(&quot;%s&quot; % self.set, 'GotoIf($[&quot;${togglestate}&quot; != &quot;&quot;]?switchoff)', self.pbx)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Set(DB(%s/%s/${CALLERIDNUM})=1)&quot; % (self.type, self.pbx), self.pbx)
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx))
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx), self.pbx)
+ 		if self.type == &quot;VMIM&quot;:
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(voice-mail-system)&quot;)
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(voice-mail-system)&quot;, self.pbx)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;, self.pbx)
+ 		elif self.type == &quot;VMU&quot;:
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(voice-mail-system)&quot;)
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(voice-mail-system)&quot;, self.pbx)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;, self.pbx)
+ 		else:
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(voice-mail-system)&quot;)
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Wait(1)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;switchoff&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;Answer()&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx))
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(voice-mail-system)&quot;, self.pbx)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Wait(1)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Hangup&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), self.pbx, label=&quot;switchoff&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Answer()&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx), self.pbx)
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;%s&quot; % self.ext, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type.lower(), self.pbx))
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(voice-mail-system)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(cancelled)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;Wait(1)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;Hangup&quot;)
++			c.appendExten(&quot;%s&quot; % self.ext, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type.lower(), self.pbx), self.pbx)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(voice-mail-system)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(cancelled)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Wait(1)&quot;, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_dialout_normal.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -135,7 +135,8 @@
+ 
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;macros.inc&quot;)
+-		c.setSection(&quot;macro-%s&quot; % self.name)
++		context=&quot;macro-%s&quot; % self.name
++		c.setSection(context)
+ 		c.append(&quot;; params: exten,secret,timeout&quot;)
+ 		needModule(&quot;app_authenticate&quot;)
+ 		if self.dis_transfer:
+@@ -196,12 +197,12 @@
+ 		c.append(&quot;exten=&gt;s,n(unavail%s),Playback(all-circuits-busy-now)&quot; % unavail)
+ 		c.append(&quot;exten=&gt;s,n(busy),Busy(5)&quot;)
+ 		c.append(&quot;exten=&gt;s,n,Hangup()&quot;)
+-		c.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;)
+-		c.appendExten(&quot;T&quot;,&quot;NoCDR&quot;)
+-		c.appendExten(&quot;T&quot;,&quot;Hangup&quot;)
+-		c.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;)
+-		c.appendExten(&quot;t&quot;,&quot;NoCDR&quot;)
+-		c.appendExten(&quot;t&quot;,&quot;Hangup&quot;)
++		c.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;, context=context)
++		c.appendExten(&quot;T&quot;,&quot;NoCDR&quot;, context=context)
++		c.appendExten(&quot;T&quot;,&quot;Hangup&quot;, context=context)
++		c.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;, context=context)
++		c.appendExten(&quot;t&quot;,&quot;NoCDR&quot;, context=context)
++		c.appendExten(&quot;t&quot;,&quot;Hangup&quot;, context=context)
+ 		if tapisupport:
+-		        c.appendExten(&quot;h&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;)
++		        c.appendExten(&quot;h&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;, context=context)
+ 
+
+Modified: trunk/cfg_ivr_autoatt.py
+===================================================================
+--- trunk/cfg_ivr_autoatt.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_ivr_autoatt.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -146,35 +146,35 @@
+ 		else:	
+ 			pbx = &quot;phones&quot;
+ 		s.append(&quot;include=%s&quot; % pbx)
+-		s.appendExten(&quot;s&quot;,&quot;Wait(%d)&quot; % self.waittime)
+-		s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(digit)=%d)&quot; % self.digittimeout)
++		s.appendExten(&quot;s&quot;,&quot;Wait(%d)&quot; % self.waittime, context=self.name)
++		s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(digit)=%d)&quot; % self.digittimeout, context=self.name)
+ 		if self.moh:
+-			s.appendExten(&quot;s&quot;,&quot;Setmusiconhold(%s)&quot; % self.moh)
+-			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=m)&quot;)
++			s.appendExten(&quot;s&quot;,&quot;Setmusiconhold(%s)&quot; % self.moh, context=self.name)
++			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=m)&quot;, context=self.name)
+ 		else:
+-			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=r)&quot;)
++			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=r)&quot;, context=self.name)
+ 		if self.ivrtime:
+ 			if self.times:
+ 				times=self.times.split(',')
+ 				for t in times:
+-					s.appendExten(&quot;s&quot;,&quot;GotoIfTime(%s?%s,s,1)&quot; % (t,self.ivrtime))
++					s.appendExten(&quot;s&quot;,&quot;GotoIfTime(%s?%s,s,1)&quot; % (t,self.ivrtime), context=self.name)
+ 		if self.timeout:
+-			s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(absolute)=%s)&quot; % self.timeout)
++			s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(absolute)=%s)&quot; % self.timeout, context=self.name)
+ 		for i in range(self.repeat):
+-			s.appendExten(&quot;s&quot;,&quot;Background(ivr/%s)&quot; % self.backgroundfile)	
++			s.appendExten(&quot;s&quot;,&quot;Background(ivr/%s)&quot; % self.backgroundfile, context=self.name)	
+ 			if self.pause:
+-				s.appendExten(&quot;s&quot;,&quot;WaitExten(%s)&quot; % self.pause)
+-		s.appendExten(&quot;s&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.exten))	
++				s.appendExten(&quot;s&quot;,&quot;WaitExten(%s)&quot; % self.pause, context=self.name)
++		s.appendExten(&quot;s&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.exten), context=self.name)	
+ 		if self.operator:
+-			s.appendExten(&quot;%s&quot; % self.operator, &quot;Goto(%s,%s,1)&quot; % (pbx,self.exten))	
+-		s.appendExten(&quot;i&quot;,&quot;Playback(invalid)&quot;)	
+-		s.appendExten(&quot;i&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.exten))	
+-		s.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;)
+-		s.appendExten(&quot;t&quot;,&quot;NoCDR&quot;)
+-		s.appendExten(&quot;t&quot;,&quot;Hangup&quot;)
+-		s.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;)
+-		s.appendExten(&quot;T&quot;,&quot;NoCDR&quot;)
+-		s.appendExten(&quot;T&quot;,&quot;Hangup&quot;)
++			s.appendExten(&quot;%s&quot; % self.operator, &quot;Goto(%s,%s,1)&quot; % (pbx,self.exten), context=self.name)	
++		s.appendExten(&quot;i&quot;,&quot;Playback(invalid)&quot;, context=self.name)	
++		s.appendExten(&quot;i&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.exten), context=self.name)	
++		s.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;, context=self.name)
++		s.appendExten(&quot;t&quot;,&quot;NoCDR&quot;, context=self.name)
++		s.appendExten(&quot;t&quot;,&quot;Hangup&quot;, context=self.name)
++		s.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;, context=self.name)
++		s.appendExten(&quot;T&quot;,&quot;NoCDR&quot;, context=self.name)
++		s.appendExten(&quot;T&quot;,&quot;Hangup&quot;, context=self.name)
+ 	
+ 
+ 	def row(self):
+
+Modified: trunk/cfg_ivr_treenode.py
+===================================================================
+--- trunk/cfg_ivr_treenode.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_ivr_treenode.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -261,77 +261,77 @@
+ 		else:	
+ 			pbx = &quot;phones&quot;
+ 		s.append(&quot;include=%s&quot; % pbx)
+-		s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(digit)=%d)&quot; % self.digittimeout)
++		s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(digit)=%d)&quot; % self.digittimeout, self.pbx)
+ 		if self.moh:
+-			s.appendExten(&quot;s&quot;,&quot;Setmusiconhold(%s)&quot; % self.moh)
+-			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=m)&quot;)
++			s.appendExten(&quot;s&quot;,&quot;Setmusiconhold(%s)&quot; % self.moh, self.pbx)
++			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=m)&quot;, self.pbx)
+ 		else:
+-			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=r)&quot;)
++			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=r)&quot;, self.pbx)
+ 		if self.ivrtime:
+ 			if self.times:
+ 				times=self.times.split(',')
+ 				for t in times:
+-					s.appendExten(&quot;s&quot;,&quot;GotoIfTime(%s?%s,s,1)&quot; % (t,self.ivrtime))
++					s.appendExten(&quot;s&quot;,&quot;GotoIfTime(%s?%s,s,1)&quot; % (t,self.ivrtime), self.pbx)
+ 		if self.timeout:
+-			s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(absolute)=%s)&quot; % self.timeout)
++			s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(absolute)=%s)&quot; % self.timeout, self.pbx)
+ 		for i in range(self.repeat):
+-			s.appendExten(&quot;s&quot;,&quot;Background(%s)&quot; % self.backgroundfile)	
++			s.appendExten(&quot;s&quot;,&quot;Background(%s)&quot; % self.backgroundfile, self.pbx)	
+ 			if self.pause:
+-				s.appendExten(&quot;s&quot;,&quot;WaitExten(%s)&quot; % self.pause)
+-		s.appendExten(&quot;s&quot;,&quot;WaitExten(%d)&quot; % self.waittime)
+-		s.appendExten(&quot;s&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator))	
++				s.appendExten(&quot;s&quot;,&quot;WaitExten(%s)&quot; % self.pause, self.pbx)
++		s.appendExten(&quot;s&quot;,&quot;WaitExten(%d)&quot; % self.waittime, self.pbx)
++		s.appendExten(&quot;s&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), self.pbx)	
+ 		if self.ivr_1:
+-			s.appendExten(&quot;1&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_1)	
++			s.appendExten(&quot;1&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_1, self.pbx)	
+ 		if self.ivr_2:
+-			s.appendExten(&quot;2&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_2)	
++			s.appendExten(&quot;2&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_2, self.pbx)	
+ 		if self.ivr_3:
+-			s.appendExten(&quot;3&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_3)	
++			s.appendExten(&quot;3&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_3, self.pbx)	
+ 		if self.ivr_4:
+-			s.appendExten(&quot;4&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_4)	
++			s.appendExten(&quot;4&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_4, self.pbx)	
+ 		if self.ivr_5:
+-			s.appendExten(&quot;5&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_5)	
++			s.appendExten(&quot;5&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_5, self.pbx)	
+ 		if self.ivr_6:
+-			s.appendExten(&quot;6&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_6)	
++			s.appendExten(&quot;6&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_6, self.pbx)	
+ 		if self.ivr_7:
+-			s.appendExten(&quot;7&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_7)	
++			s.appendExten(&quot;7&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_7, self.pbx)	
+ 		if self.ivr_8:
+-			s.appendExten(&quot;8&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_8)	
++			s.appendExten(&quot;8&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_8, self.pbx)	
+ 		if self.ivr_9:
+-			s.appendExten(&quot;9&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_9)	
++			s.appendExten(&quot;9&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_9, self.pbx)	
+ 		if self.ivr_ast:
+-			s.appendExten(&quot;*&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_ast)	
++			s.appendExten(&quot;*&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_ast, self.pbx)	
+ 		if self.phone_1:
+-			s.appendExten(&quot;1&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_1))	
++			s.appendExten(&quot;1&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_1), self.pbx)	
+ 		if self.phone_2:
+-			s.appendExten(&quot;2&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_2))	
++			s.appendExten(&quot;2&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_2), self.pbx)	
+ 		if self.phone_3:
+-			s.appendExten(&quot;3&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_3))	
++			s.appendExten(&quot;3&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_3), self.pbx)	
+ 		if self.phone_4:
+-			s.appendExten(&quot;4&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_4))	
++			s.appendExten(&quot;4&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_4), self.pbx)	
+ 		if self.phone_5:
+-			s.appendExten(&quot;5&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_5))	
++			s.appendExten(&quot;5&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_5), self.pbx)	
+ 		if self.phone_6:
+-			s.appendExten(&quot;6&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_6))	
++			s.appendExten(&quot;6&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_6), self.pbx)	
+ 		if self.phone_7:
+-			s.appendExten(&quot;7&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_7))	
++			s.appendExten(&quot;7&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_7), self.pbx)	
+ 		if self.phone_8:
+-			s.appendExten(&quot;8&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_8))	
++			s.appendExten(&quot;8&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_8), self.pbx)	
+ 		if self.phone_9:
+-			s.appendExten(&quot;9&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_9))	
++			s.appendExten(&quot;9&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_9), self.pbx)	
+ 		if self.phone_ast:
+-			s.appendExten(&quot;*&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_ast))	
+-		s.appendExten(&quot;0&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.operator))	
+-		s.appendExten(&quot;i&quot;,&quot;Playback(invalid)&quot;)	
+-		s.appendExten(&quot;i&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator))	
+-		s.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;)
+-		s.appendExten(&quot;t&quot;,&quot;NoCDR&quot;)
+-		s.appendExten(&quot;t&quot;,&quot;Hangup&quot;)
+-		s.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;)
+-		s.appendExten(&quot;T&quot;,&quot;NoCDR&quot;)
+-		s.appendExten(&quot;T&quot;,&quot;Hangup&quot;)
+-		s.appendExten(&quot;#&quot;,&quot;ResetCDR(w)&quot;)
+-		s.appendExten(&quot;#&quot;,&quot;NoCDR&quot;)
+-		s.appendExten(&quot;#&quot;,&quot;Hangup&quot;)
++			s.appendExten(&quot;*&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_ast), self.pbx)	
++		s.appendExten(&quot;0&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), self.pbx)	
++		s.appendExten(&quot;i&quot;,&quot;Playback(invalid)&quot;, self.pbx)	
++		s.appendExten(&quot;i&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), self.pbx)	
++		s.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;, self.pbx)
++		s.appendExten(&quot;t&quot;,&quot;NoCDR&quot;, self.pbx)
++		s.appendExten(&quot;t&quot;,&quot;Hangup&quot;, self.pbx)
++		s.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;, self.pbx)
++		s.appendExten(&quot;T&quot;,&quot;NoCDR&quot;, self.pbx)
++		s.appendExten(&quot;T&quot;,&quot;Hangup&quot;, self.pbx)
++		s.appendExten(&quot;#&quot;,&quot;ResetCDR(w)&quot;, self.pbx)
++		s.appendExten(&quot;#&quot;,&quot;NoCDR&quot;, self.pbx)
++		s.appendExten(&quot;#&quot;,&quot;Hangup&quot;, self.pbx)
+ 	
+ 
+ 	def row(self):
+
+Modified: trunk/cfg_opt_did.py
+===================================================================
+--- trunk/cfg_opt_did.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_opt_did.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -121,21 +121,21 @@
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(&quot;in-%s&quot; % self.trunk)
+-		c.appendExten(self.did,&quot;Set(CDR(intrunk)=%s)&quot; %  self.trunk)
++		c.appendExten(self.did,&quot;Set(CDR(intrunk)=%s)&quot; %  self.trunk, self.pbx)
+ 		if self.clid:
+ 			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(self.did,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid)
++			c.appendExten(self.did,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, self.pbx)
+ 		if self.clidnum:
+ 			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(self.did,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnum)
++			c.appendExten(self.did,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnum, self.pbx)
+ 		if self.contextin == 'phone' and self.phone:
+ 			import configlets
+ 			obj = configlets.configlet_tree.getConfigletByName(self.phone)
+ 			try:
+-				c.appendExten(self.did,&quot;Goto(%s,%s,1)&quot; %  (obj.pbx,self.phone))
++				c.appendExten(self.did,&quot;Goto(%s,%s,1)&quot; %  (obj.pbx,self.phone), self.pbx)
+ 			except AttributeError:
+ 				pass
+ 		elif self.contextin == 'ivr' and self.ivr:
+-			c.appendExten(self.did,&quot;Goto(%s,s,1)&quot; % self.ivr)
++			c.appendExten(self.did,&quot;Goto(%s,s,1)&quot; % self.ivr, self.pbx)
+         	elif self.contextin == 'custommap' and self.custommapdest:
+-        		c.appendExten(self.did,&quot;Goto(%s,%s,1)&quot; % (self.custommappbx, self.custommapdest))
++        		c.appendExten(self.did,&quot;Goto(%s,%s,1)&quot; % (self.custommappbx, self.custommapdest), self.pbx)
+
+Modified: trunk/cfg_opt_settings.py
+===================================================================
+--- trunk/cfg_opt_settings.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_opt_settings.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -20,12 +20,7 @@
+ 
+ from configlets import *
+ 
+-STATIC_DIR = os.getenv('STATICPAGES_DIR','static') 
+-styles = []
+-for f in os.listdir('%s/themes/' % STATIC_DIR):
+-	styles.append((f,f))
+ 
+-
+ countries = {
+ 	&quot;at&quot;: {&quot;description&quot;: _(&quot;Austria&quot;),
+ 		&quot;ringcadence&quot;: &quot;1000,5000&quot;,
+@@ -327,47 +322,16 @@
+ 			type=&quot;choice&quot;,
+ 			options=countries_lookup),
+ 		     VarType(&quot;language&quot;,
+-			title=_(&quot;Language&quot;),
++			title=_(&quot;language&quot;),
+ 			hint=_(&quot;The language is used for voice prompts&quot;),
+ 			len=10,
+ 			type=&quot;string&quot;),
+-		     VarType(&quot;header_text&quot;,
+-			title=_(&quot;Header text&quot;),
+-			len=20,
+-			type=&quot;string&quot;),
+-		     VarType(&quot;style&quot;,
+-			title=_(&quot;Web UI theme to use&quot;),
+-			type=&quot;choice&quot;,
+-			options=styles),
+-		     VarType(&quot;logo&quot;,
+-			title=_(&quot;Web UI logo to use&quot;),
+-			hint=&quot;/static/imgs/logo&quot;,
+-			type=&quot;file&quot;,
+-			optional=True),
+ 		     VarType(&quot;tapi&quot;,
+ 			title=_(&quot;Tapi Support&quot;),
+ 			type=&quot;bool&quot;,
+ 			default = True),
+ 		]
+ 
+-	def checkConfig(self):
+-		res = CfgOpt.checkConfig(self)
+-		if res:
+-			return res
+-		max_size = 2000000
+-		#upload = get_field('filetoupload')
+-		if self.logo:
+-			upload = self.logo
+-			pos = upload.fp.tell()  # Save current position in file.
+-			upload.fp.seek(0, 2)    # Go to end of file.
+-			size = upload.fp.tell() # Get new position (which is the file size).
+-			upload.fp.seek(pos, 0)  # Return to previous position.
+-			upload.size = size
+-			if size &gt; max_size:
+-				msg = &quot;The uploaded file is too big (size=%s, max=%s bytes)&quot;
+-				msg %= (size, max_size)
+-				return _(&quot;File bigger than %s bytes&quot;) % max_size
+-		
+ 	def createAsteriskConfig(self):
+ 		country = countries[self.country]
+ 
+@@ -393,16 +357,3 @@
+ 		if self.tapi:
+ 			needModule(&quot;app_userevent&quot;)
+ 			needModule(&quot;app_cut&quot;)
+-		if self.logo:
+-			upload = self.logo
+-			dest = '%s/imgs/logo' % STATIC_DIR
+-			out = open(dest, 'wb')
+-			# Copy file in chunks to avoid using lots of memory.
+-			while 1:
+-				chunk = upload.read(1024 * 1024)
+-				if not chunk:
+-				   break
+-				out.write(chunk)
+-			out.close()
+-			upload.close()
+-		self.logo = None 
+
+Modified: trunk/cfg_phone_epygi.py
+===================================================================
+--- trunk/cfg_phone_epygi.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_phone_epygi.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -294,7 +294,7 @@
+ 		extensions = AstConf(&quot;extensions.conf&quot;)
+ 		extensions.setSection(self.pbx)
+ 		if self.ext:
+-			extensions.appendExten(self.ext, &quot;Macro(dial-std-exten,%s/%s@%s:5060,out-%s,%s,%s)&quot; % (self.technology,self.name,self.gw,self.name,self.pbx,self.ext))
++			extensions.appendExten(self.ext, &quot;Macro(dial-std-exten,%s/%s@%s:5060,out-%s,%s,%s)&quot; % (self.technology,self.name,self.gw,self.name,self.pbx,self.ext), self.pbx)
+ 
+ 		self.createVoicemailConfig(sip)
+ 		self.createOutgoingContext()
+
+Modified: trunk/cfg_phone_ext.py
+===================================================================
+--- trunk/cfg_phone_ext.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_phone_ext.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -98,9 +98,9 @@
+ 	def createAsteriskConfig(self):
+ 		extensions = AstConf(&quot;extensions.conf&quot;)
+ 		extensions.setSection(self.pbx)
+-		extensions.appendExten(self.ext,&quot;Set(CDR(pbx)=%s,CDR(userfield)=%s,CALLERID(num)=${CALLERIDNUM}-%s)&quot; % (self.pbx,self.name,self.ext))
++		extensions.appendExten(self.ext,&quot;Set(CDR(pbx)=%s,CDR(userfield)=%s,CALLERID(num)=${CALLERIDNUM}-%s)&quot; % (self.pbx,self.name,self.ext), self.pbx)
+ 		self.createDialEntry(extensions, self.ext, self.pbx, self.ext)
+-		extensions.appendExten(self.name,&quot;Set(CDR(pbx)=%s,CDR(userfield)=%s,CALLERID(num)=${CALLERIDNUM}-%s)&quot; % (self.pbx,self.name,self.ext))
++		extensions.appendExten(self.name,&quot;Set(CDR(pbx)=%s,CDR(userfield)=%s,CALLERID(num)=${CALLERIDNUM}-%s)&quot; % (self.pbx,self.name,self.ext), self.pbx)
+ 		self.createDialEntry(extensions, self.name, self.pbx, self.ext)
+ 		self.usemwi = False
+ 		self.createVoicemailConfig(extensions)
+@@ -113,7 +113,7 @@
+ 			self.phone,
+ 			self.phone,
+ 			ext,
+-			pbx
+-			))
++			pbx),
++			self.pbx)
+ 
+ 
+
+Modified: trunk/cfg_phone_queue.py
+===================================================================
+--- trunk/cfg_phone_queue.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_phone_queue.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -255,31 +255,31 @@
+ 		for qname in qnames:
+ 			opt = &quot;Tth&quot;
+ 			if mon_line:
+-				extensions.appendExten(qname, mon_line)
++				extensions.appendExten(qname, mon_line, self.pbx)
+ 
+ 			if self.ring:
+ 				opt = opt + &quot;r&quot;
+ 
+                         if self.clid:
+                                 needModule(&quot;func_callerid&quot;)
+-                                extensions.appendExten(qname,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid)
++                                extensions.appendExten(qname,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, self.pbx)
+ 				
+ 			if self.moh:
+-				extensions.appendExten(qname, &quot;Answer&quot;)
+-				extensions.appendExten(qname, &quot;SetMusicOnHold(%s)&quot; % self.moh)
++				extensions.appendExten(qname, &quot;Answer&quot;, self.pbx)
++				extensions.appendExten(qname, &quot;SetMusicOnHold(%s)&quot; % self.moh, self.pbx)
+ 
+ 			if self.queuetimeout:
+ 				opt = opt + &quot;n&quot;
+-				extensions.appendExten(qname, &quot;Queue(%s|%s|||%s)&quot; % (self.name, opt, self.queuetimeout))
++				extensions.appendExten(qname, &quot;Queue(%s|%s|||%s)&quot; % (self.name, opt, self.queuetimeout), self.pbx)
+ 				if self.queuetimeoutext:
+ 					import configlets
+ 					obj = configlets.configlet_tree.getConfigletByName(self.queuetimeoutext)
+ 					try:
+-						extensions.appendExten(qname, &quot;Goto(%s,%s,1)&quot; %  (obj.pbx, self.queuetimeoutext))
++						extensions.appendExten(qname, &quot;Goto(%s,%s,1)&quot; %  (obj.pbx, self.queuetimeoutext), self.pbx)
+ 					except AttributeError:
+ 						pass
+ 			else:
+-				extensions.appendExten(qname, &quot;Queue(%s|%s)&quot; % (self.name, opt))
++				extensions.appendExten(qname, &quot;Queue(%s|%s)&quot; % (self.name, opt), self.pbx)
+ 		self.createPanelConfig()
+ 
+         def createPanelConfig(self):
+
+Modified: trunk/cfg_phone_zap.py
+===================================================================
+--- trunk/cfg_phone_zap.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_phone_zap.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -294,5 +294,6 @@
+ 			self.channels,
+ 			self.name,
+ 			pbx,
+-			ext)
++			ext), 
++			self.pbx
+ 		      )
+
+Modified: trunk/cfg_trunk_capi.py
+===================================================================
+--- trunk/cfg_trunk_capi.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_trunk_capi.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -75,4 +75,4 @@
+ 		if self.ext:
+ 			c = AstConf(&quot;extensions.conf&quot;)
+ 			c.setSection(&quot;default&quot;)
+-			c.appendExten(&quot;_%s.&quot; % self.ext, &quot;Dial(CAPI/%s:b${EXTEN:%d},90,T)&quot; % (self.msn, len(self.ext)))
++			c.appendExten(&quot;_%s.&quot; % self.ext, &quot;Dial(CAPI/%s:b${EXTEN:%d},90,T)&quot; % (self.msn, len(self.ext)), &quot;default&quot;)
+
+Modified: trunk/cfg_trunk_capimsn.py
+===================================================================
+--- trunk/cfg_trunk_capimsn.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_trunk_capimsn.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -77,5 +77,6 @@
+ 		needModule(&quot;chan_capi&quot;)
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(&quot;in-capi&quot;)
+-		c.appendExten(self.msn, &quot;Goto(phones,%s,1)&quot; % self.phone)
++		context=&quot;in-capi&quot;
++		c.setSection(context)
++		c.appendExten(self.msn, &quot;Goto(phones,%s,1)&quot; % self.phone, context)
+
+Modified: trunk/cfg_trunk_fwdiax.py
+===================================================================
+--- trunk/cfg_trunk_fwdiax.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_trunk_fwdiax.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -116,9 +116,9 @@
+ 			ext = &quot;_%s.&quot; % self.ext
+ 			c.setSection(self.context)
+ 			if self.callerid:
+-				c.appendExten(ext, &quot;Set(CALLERID(name)=%s)&quot; % self.callerid)
+-			c.appendExten(ext, &quot;Set(CALLERID(number)=%s)&quot; % self.fwdid)
+-			c.appendExten(ext, &quot;Dial(IAX2/%s:%<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">s at iax2.fwdnet.net</A>/${EXTEN:%d},60,r)&quot; % (self.fwdid, self.fwdpw, len(self.ext)))
++				c.appendExten(ext, &quot;Set(CALLERID(name)=%s)&quot; % self.callerid, self.context)
++			c.appendExten(ext, &quot;Set(CALLERID(number)=%s)&quot; % self.fwdid, self.context)
++			c.appendExten(ext, &quot;Dial(IAX2/%s:%<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">s at iax2.fwdnet.net</A>/${EXTEN:%d},60,r)&quot; % (self.fwdid, self.fwdpw, len(self.ext)), self.context)
+ 			#c.appendExten(ext, &quot;Busy&quot;)
+ 
+ 		c = AstConf(&quot;iax.conf&quot;)
+@@ -135,5 +135,6 @@
+ 
+ 		if self.phone:
+ 			c = AstConf(&quot;extensions.conf&quot;)
+-			c.setSection(&quot;in-iaxfwd&quot;)
+-			c.appendExten(self.fwdid, &quot;Goto(phones,%s,1)&quot; % self.phone)
++			context=&quot;in-iaxfwd&quot;
++			c.setSection(context)
++			c.appendExten(self.fwdid, &quot;Goto(phones,%s,1)&quot; % self.phone, context)
+
+Modified: trunk/cfg_trunk_iaxtel.py
+===================================================================
+--- trunk/cfg_trunk_iaxtel.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_trunk_iaxtel.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -70,9 +70,9 @@
+ 			ext = &quot;_%s.&quot; % self.ext
+ 			c.setSection(self.context)
+ 			if self.callerid:
+-				c.appendExten(ext, &quot;Set(CALLERID(name)=%s)&quot; % self.callerid)
+-			c.appendExten(ext, &quot;Set(CALLERID(number)=%s)&quot; % self.iaxtelid)
+-			c.appendExten(ext, &quot;Dial(IAX2/%s:%<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">s at iaxtel.com</A>/${EXTEN:%<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">d at iaxtel</A>},60,r)&quot; % (self.iaxtelid, self.iaxtelpw, len(self.ext)))
++				c.appendExten(ext, &quot;Set(CALLERID(name)=%s)&quot; % self.callerid, self.context)
++			c.appendExten(ext, &quot;Set(CALLERID(number)=%s)&quot; % self.iaxtelid, self.context)
++			c.appendExten(ext, &quot;Dial(IAX2/%s:%<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">s at iaxtel.com</A>/${EXTEN:%<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">d at iaxtel</A>},60,r)&quot; % (self.iaxtelid, self.iaxtelpw, len(self.ext)), self.context)
+ 			#c.appendExten(ext, &quot;Busy&quot;)
+ 
+ 		c = AstConf(&quot;iax.conf&quot;)
+@@ -90,6 +90,7 @@
+ 
+ 		if self.phone:
+ 			c = AstConf(&quot;extensions.conf&quot;)
+-			c.setSection(&quot;in-iaxtel&quot;)
++			context = &quot;in-iaxtel&quot;
++			c.setSection(context)
+ 			# TODO: don't hardcode the &quot;SIP/&quot; here:
+-			c.appendExten(self.iaxtelid, &quot;Macro(exten-std,SIP/%s)&quot; % self.phone)
++			c.appendExten(self.iaxtelid, &quot;Macro(exten-std,SIP/%s)&quot; % self.phone, context)
+
+Modified: trunk/cfg_trunk_zap.py
+===================================================================
+--- trunk/cfg_trunk_zap.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_trunk_zap.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -41,8 +41,7 @@
+ 			VarType(&quot;signalling&quot;,
+ 				title=_(&quot;Signalling type&quot;),
+ 				type=&quot;choice&quot;,
+-				options=[('fxs_ls', _('loopstart')),
+-					('fxs_ks', _('kewlstart'))]),
++				options=[('fxs_ls','loopstart'),('fxs_ks', 'kewlstart')]),
+ 
+ 			VarType(&quot;group&quot;,
+ 				title=_(&quot;Callout group&quot;),
+
+Modified: trunk/cfg_trunk_zappri.py
+===================================================================
+--- trunk/cfg_trunk_zappri.py	2007-07-26 17:17:02 UTC (rev 762)
++++ trunk/cfg_trunk_zappri.py	2007-07-26 18:55:56 UTC (rev 763)
+@@ -44,12 +44,12 @@
+ 			VarType(&quot;switchtype&quot;,
+ 				title=_(&quot;Switch type&quot;),
+ 				type=&quot;choice&quot;,
+-			      	options=[('national',_('National ISDN 2')),
+-					('dms100', _('Nortel DMS100')),
+-					('4ess', _('AT&amp;T 4ESS')),
+-					('5ess', _('Lucent 5ESS')),
+-					('euroisdn', _('Euro ISDN')),
+-					('ni1', _('Old National ISDN 1'))],
++			      	options=[('national','National ISDN 2'),
++					('dms100', 'Nortel DMS100'),
++					('4ess', 'AT&amp;T 4ESS'),
++					('5ess', 'Lucent 5ESS'),
++					('euroisdn', 'Euro ISDN'),
++					('ni1', 'Old National ISDN 1')],
+ 				default=&quot;euroisdn&quot;),
+ 				
+ 			VarType(&quot;channels&quot;,
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000282.html">[Destar-dev] r762 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000284.html">[Destar-dev] r764 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#283">[ date ]</a>
+              <a href="thread.html#283">[ thread ]</a>
+              <a href="subject.html#283">[ subject ]</a>
+              <a href="author.html#283">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

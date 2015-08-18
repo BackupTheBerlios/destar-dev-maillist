@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r694 - in trunk: . examples
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r694%20-%20in%20trunk%3A%20.%20examples&In-Reply-To=%3C200706062003.l56K33Sa030436%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000203.html">
+   <LINK REL="Next"  HREF="000205.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r694 - in trunk: . examples</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r694%20-%20in%20trunk%3A%20.%20examples&In-Reply-To=%3C200706062003.l56K33Sa030436%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r694 - in trunk: . examples">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Jun  6 22:03:03 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000203.html">[Destar-dev] r693 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000205.html">[Destar-dev] [Bug #11265] looking for codec_all when selecting &quot;Use	all codecs&quot;
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#204">[ date ]</a>
+              <a href="thread.html#204">[ thread ]</a>
+              <a href="subject.html#204">[ subject ]</a>
+              <a href="author.html#204">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-06 22:03:03 +0200 (Wed, 06 Jun 2007)
+New Revision: 694
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/examples/destar_cfg.py
+Log:
+* Removed default op-panel config in destar_cfg.py sample
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-03 17:12:39 UTC (rev 693)
++++ trunk/CHANGELOG.txt	2007-06-06 20:03:03 UTC (rev 694)
+@@ -1,3 +1,5 @@
++* Removed default op-panel config in destar_cfg.py sample.
++
+ 2007-05-30:
+ * Menu adjustment for other languages, _() is not needed.
+ 
+
+Modified: trunk/examples/destar_cfg.py
+===================================================================
+--- trunk/examples/destar_cfg.py	2007-06-03 17:12:39 UTC (rev 693)
++++ trunk/examples/destar_cfg.py	2007-06-06 20:03:03 UTC (rev 694)
+@@ -34,7 +34,7 @@
+ 	monitor  = True,
+ 	monitorfileformat = &quot;wav49&quot;,
+ 	monitorfilename = &quot;${TIMESTAMP}&quot;,
+-	panel    = True,
++	panel    = False,
+ 	)
+ 
+ CfgPhoneSip(
+@@ -46,7 +46,7 @@
+ 	enablecallgroup = True,
+ 	callgroup = &quot;1&quot;,
+ 	queues   = &quot;queue1&quot;,
+-	panel    = True,
++	panel    = False,
+ 	calleridnum = &quot;2001&quot;,
+ 	calleridname = &quot;Agent 1&quot;,
+ 	dialout_emergency = True,
+@@ -65,7 +65,7 @@
+ 	enablecallgroup = True,
+ 	callgroup = &quot;1&quot;,
+ 	queues   = &quot;queue1&quot;,
+-	panel    = True,
++	panel    = False,
+ 	calleridnum = &quot;2002&quot;,
+ 	calleridname = &quot;Agent 2&quot;,
+ 	dialout_local = True,
+@@ -82,7 +82,7 @@
+ 	enablecallgroup = True,
+ 	callgroup = &quot;1&quot;,
+ 	queues   = &quot;queue1&quot;,
+-	panel    = True,
++	panel    = False,
+ 	calleridnum = &quot;2003&quot;,
+ 	calleridname = &quot;Agent 3&quot;,
+ 	dialout_local = True,
+@@ -98,7 +98,7 @@
+ 	dtmfmode = &quot;rfc2833&quot;,
+ 	enablecallgroup = True,
+ 	callgroup = &quot;2&quot;,
+-	panel    = True,
++	panel    = False,
+ 	calleridnum = &quot;2004&quot;,
+ 	calleridname = &quot;Phone 1&quot;,
+ 	dialout_local = True,
+@@ -114,7 +114,7 @@
+ 	dtmfmode = &quot;rfc2833&quot;,
+ 	enablecallgroup = True,
+ 	callgroup = &quot;2&quot;,
+-	panel    = True,
++	panel    = False,
+ 	calleridnum = &quot;2005&quot;,
+ 	calleridname = &quot;Phone 2&quot;,
+ 	dialout_local = True,
+@@ -130,7 +130,7 @@
+ 	dtmfmode = &quot;rfc2833&quot;,
+ 	enablecallgroup = True,
+ 	callgroup = &quot;3&quot;,
+-	panel    = True,
++	panel    = False,
+ 	calleridnum = &quot;2006&quot;,
+ 	calleridname = &quot;Phone 3&quot;,
+ 	dialout_local = True,
+@@ -146,7 +146,7 @@
+ 	dtmfmode = &quot;rfc2833&quot;,
+ 	enablecallgroup = True,
+ 	callgroup = &quot;3&quot;,
+-	panel    = True,
++	panel    = False,
+ 	calleridnum = &quot;2007&quot;,
+ 	calleridname = &quot;Phone 4&quot;,
+ 	dialout_local = True,
+@@ -306,12 +306,6 @@
+ 	write    = &quot;,system,call,log,verbose,command,agent,user&quot;,
+ 	)
+ 
+-CfgOptOPPanel(
+-	security_code = &quot;op26.&quot;,
+-	manager  = &quot;destarman&quot;,
+-	poll_interval = &quot;8&quot;,
+-	)
+-
+ CfgOptPickup(
+ 	ext      = &quot;*8&quot;,
+ 	)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000203.html">[Destar-dev] r693 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000205.html">[Destar-dev] [Bug #11265] looking for codec_all when selecting &quot;Use	all codecs&quot;
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#204">[ date ]</a>
+              <a href="thread.html#204">[ thread ]</a>
+              <a href="subject.html#204">[ subject ]</a>
+              <a href="author.html#204">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r580 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r580%20-%20branches/0.2.X&In-Reply-To=%3C200701302153.l0ULrIsQ020405%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000061.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r580 - branches/0.2.X</H1>
+    <B>hholzer at mail.berlios.de</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r580%20-%20branches/0.2.X&In-Reply-To=%3C200701302153.l0ULrIsQ020405%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r580 - branches/0.2.X">hholzer at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 30 22:53:18 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000061.html">[Destar-dev] r579 - trunk
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#62">[ date ]</a>
+              <a href="thread.html#62">[ thread ]</a>
+              <a href="subject.html#62">[ subject ]</a>
+              <a href="author.html#62">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: hholzer
+Date: 2007-01-30 22:53:16 +0100 (Tue, 30 Jan 2007)
+New Revision: 580
+
+Modified:
+   branches/0.2.X/backend.py
+   branches/0.2.X/cfg_app_callfw.py
+   branches/0.2.X/cfg_app_voicemailsettings.py
+   branches/0.2.X/configlets.py
+Log:
+fix broken busy dialplan path
+fix for voicemail pin clearing
+make devstate settings optional
+
+
+Modified: branches/0.2.X/backend.py
+===================================================================
+--- branches/0.2.X/backend.py	2007-01-30 06:08:39 UTC (rev 579)
++++ branches/0.2.X/backend.py	2007-01-30 21:53:16 UTC (rev 580)
+@@ -217,13 +217,13 @@
+ 	c.append(&quot;exten=s,n,Set(prng=${DB(PRNG/${ARG4}/${ARG3})})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial&quot;)
+-	c.append(&quot;exten=s,n(MainDial),NoOp()&quot;)
++	c.append(&quot;exten=s,n(dialstart),NoOp()&quot;)
+         if tapisupport:
+                 c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${ARG1})&quot;)
+                 c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)&quot;)
+                 c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: SET CALLERID ${CALLERID})&quot;)
+                 c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)&quot;)
+-	c.append(&quot;exten=s,n,Dial(${ARG1}${prng},${dsec},TtWw${dopt})&quot;)
++	c.append(&quot;exten=s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWw${dopt})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'timeout'&quot;)
+ 	c.append(&quot;exten=s,n(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG4}/${ARG3})})&quot;)
+
+Modified: branches/0.2.X/cfg_app_callfw.py
+===================================================================
+--- branches/0.2.X/cfg_app_callfw.py	2007-01-30 06:08:39 UTC (rev 579)
++++ branches/0.2.X/cfg_app_callfw.py	2007-01-30 21:53:16 UTC (rev 580)
+@@ -35,7 +35,7 @@
+ 			VarType(&quot;set&quot;,      title=_(&quot;Setting preffix&quot;), len=6, default=&quot;*21&quot;),
+ 			VarType(&quot;ext&quot;,   title=_(&quot;Unsetting extension&quot;), len=6, default=&quot;*22&quot;),
+ 			VarType(&quot;toggle&quot;,   title=_(&quot;Set function toggleable&quot;), type=&quot;bool&quot;),
+-			VarType(&quot;devstateprefix&quot;,   title=_(&quot;Create Devstate extension. Devstate Prefix:&quot;), len=8, default=&quot;&quot;)
++			VarType(&quot;devstateprefix&quot;,   title=_(&quot;Create Devstate extension. Devstate Prefix:&quot;), len=8, optional=True, default=&quot;&quot;)
+ 		       	]
+ 
+ 		self.dependencies = [ DepType(&quot;pbx&quot;, 
+
+Modified: branches/0.2.X/cfg_app_voicemailsettings.py
+===================================================================
+--- branches/0.2.X/cfg_app_voicemailsettings.py	2007-01-30 06:08:39 UTC (rev 579)
++++ branches/0.2.X/cfg_app_voicemailsettings.py	2007-01-30 21:53:16 UTC (rev 580)
+@@ -53,6 +53,7 @@
+ 			VarType(&quot;devstateprefix&quot;,
+ 				title=_(&quot;Create Devstate extension. Devstate Prefix:&quot;),
+ 				len=8,
++				optional=True,
+ 				default=&quot;&quot;)
+ 		       	]
+ 
+
+Modified: branches/0.2.X/configlets.py
+===================================================================
+--- branches/0.2.X/configlets.py	2007-01-30 06:08:39 UTC (rev 579)
++++ branches/0.2.X/configlets.py	2007-01-30 21:53:16 UTC (rev 580)
+@@ -1022,8 +1022,10 @@
+ 
+ 			vm = AstConf(&quot;voicemail.conf&quot;)
+ 			vm.setSection(self.pbx)
++			pin = &quot;&quot;
+ 			try:
+-				pin = self.pin
++			        if self.pin != None:
++				        pin = self.pin
+ 			except:
+ 				pin = &quot;&quot;
+ 			#TODO: deal with timezones
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000061.html">[Destar-dev] r579 - trunk
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#62">[ date ]</a>
+              <a href="thread.html#62">[ thread ]</a>
+              <a href="subject.html#62">[ subject ]</a>
+              <a href="author.html#62">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

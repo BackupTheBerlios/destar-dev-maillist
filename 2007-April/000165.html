@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r656 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r656%20-%20branches/0.2.X&In-Reply-To=%3C200704171759.l3HHxiK8007967%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000164.html">
+   <LINK REL="Next"  HREF="000166.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r656 - branches/0.2.X</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r656%20-%20branches/0.2.X&In-Reply-To=%3C200704171759.l3HHxiK8007967%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r656 - branches/0.2.X">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Tue Apr 17 19:59:44 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000164.html">[Destar-dev] r655 - in trunk: . po
+</A></li>
+        <LI>Next message: <A HREF="000166.html">[Destar-dev] r657 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#165">[ date ]</a>
+              <a href="thread.html#165">[ thread ]</a>
+              <a href="subject.html#165">[ subject ]</a>
+              <a href="author.html#165">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-04-17 19:59:42 +0200 (Tue, 17 Apr 2007)
+New Revision: 656
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/page_stats_qcallback.ptl
+   branches/0.2.X/page_stats_queue.ptl
+Log:
+* Added line to call loadQueueLog every time the queues statistics are seen.
+;
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-04-17 03:11:41 UTC (rev 655)
++++ branches/0.2.X/CHANGELOG.txt	2007-04-17 17:59:42 UTC (rev 656)
+@@ -1,4 +1,7 @@
+-2001-04-16:
++2007-04-17:
++* Added line to call loadQueueLog every time the queues statistics are seen.
++
++2007-04-16:
+ * Configlets that extends from CfgOptSingle now can be deleted.
+ * Fixed Bug #8932
+ 
+
+Modified: branches/0.2.X/page_stats_qcallback.ptl
+===================================================================
+--- branches/0.2.X/page_stats_qcallback.ptl	2007-04-17 03:11:41 UTC (rev 655)
++++ branches/0.2.X/page_stats_qcallback.ptl	2007-04-17 17:59:42 UTC (rev 656)
+@@ -224,6 +224,7 @@
+ 	
+ def _q_index [plain] (request):
+ 	header(_q_desc)
++	x = queueutils.loadQueueLog()
+ 	if pychart_exists:
+ 		cdrForm(request)
+ 	else:
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-04-17 03:11:41 UTC (rev 655)
++++ branches/0.2.X/page_stats_queue.ptl	2007-04-17 17:59:42 UTC (rev 656)
+@@ -473,6 +473,7 @@
+ 	
+ def _q_index [plain] (request):
+ 	header(_q_desc)
++	x = queueutils.loadQueueLog()
+ 	if pychart_exists:
+ 		cdrForm(request)
+ 	else:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000164.html">[Destar-dev] r655 - in trunk: . po
+</A></li>
+	<LI>Next message: <A HREF="000166.html">[Destar-dev] r657 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#165">[ date ]</a>
+              <a href="thread.html#165">[ thread ]</a>
+              <a href="subject.html#165">[ subject ]</a>
+              <a href="author.html#165">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r672 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r672%20-%20branches/0.2.X&In-Reply-To=%3C200704252252.l3PMqRVk024506%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000180.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r672 - branches/0.2.X</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r672%20-%20branches/0.2.X&In-Reply-To=%3C200704252252.l3PMqRVk024506%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r672 - branches/0.2.X">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Thu Apr 26 00:52:27 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000180.html">[Destar-dev] r671 - branches/0.2.X trunk
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#181">[ date ]</a>
+              <a href="thread.html#181">[ thread ]</a>
+              <a href="subject.html#181">[ subject ]</a>
+              <a href="author.html#181">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-04-26 00:52:26 +0200 (Thu, 26 Apr 2007)
+New Revision: 672
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_dialout_normal.py
+Log:
+* Fixed incerdible bug in the timelimit settings for a macro.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-04-25 20:12:19 UTC (rev 671)
++++ branches/0.2.X/CHANGELOG.txt	2007-04-25 22:52:26 UTC (rev 672)
+@@ -1,5 +1,6 @@
+ 2007-04-25:
+ * Fixed bug in macro-voicemail: added missing t and T extensions and a priority after calling VoiceMail application.
++* Fixed incerdible bug in the timelimit settings for a macro.
+ 
+ 2007-04-19:
+ * Fixed bug in the login page.
+
+Modified: branches/0.2.X/cfg_dialout_normal.py
+===================================================================
+--- branches/0.2.X/cfg_dialout_normal.py	2007-04-25 20:12:19 UTC (rev 671)
++++ branches/0.2.X/cfg_dialout_normal.py	2007-04-25 22:52:26 UTC (rev 672)
+@@ -139,7 +139,7 @@
+ 			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG3} = 0]?5:8)&quot;)
+ 			c.appendExten(&quot;s&quot;,'Set(timeout=0)')
+ 			c.appendExten(&quot;s&quot;,'Set(options=%s)' % opts)
+-			c.appendExten(&quot;s&quot;,'Goto(9)')
++			c.appendExten(&quot;s&quot;,'Goto(10)')
+ 		c.appendExten(&quot;s&quot;,'Set(timeout=%d)' % self.maxtime)
+ 		c.appendExten(&quot;s&quot;,'Set(options=%sL(%d000:10000))' % (opts,self.maxtime))
+ 		#TODO: add this trunks sorted by price and with a default one.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000180.html">[Destar-dev] r671 - branches/0.2.X trunk
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#181">[ date ]</a>
+              <a href="thread.html#181">[ thread ]</a>
+              <a href="subject.html#181">[ subject ]</a>
+              <a href="author.html#181">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

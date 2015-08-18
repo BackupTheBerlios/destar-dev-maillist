@@ -1,0 +1,127 @@
+From tzafrir.cohen at xorcom.com  Tue Oct  7 21:38:25 2008
+From: tzafrir.cohen at xorcom.com (Tzafrir Cohen)
+Date: Tue, 7 Oct 2008 21:38:25 +0200
+Subject: [Destar-dev] Bug#501207: destar: Fails to run with python2.5
+Message-ID: <20081007193824.GY31838@xorcom.com>
+
+Hi
+
+Want destar 2.2 and python 2.5? http://bugs.debian.org/501207
+
+Credit goes to:
+
+----- Forwarded message from John Wright <jsw at debian.org> -----
+
+Resent-From: John Wright <jsw at debian.org>
+Resent-To: debian-bugs-dist at lists.debian.org
+Resent-CC: Debian VoIP Team <pkg-voip-maintainers at lists.alioth.debian.org>
+Resent-Date: Tue, 07 Oct 2008 00:18:01 +0000
+Resent-Message-ID: <handler.501207.B501207.12233384975060 at bugs.debian.org>
+Date: Mon, 6 Oct 2008 18:14:49 -0600
+From: John Wright <jsw at debian.org>
+To: 501207 at bugs.debian.org
+Resent-Sender: Debian BTS <debbugs at rietz.debian.org>
+Resent-Date: Tue, 07 Oct 2008 00:18:02 +0000
+Subject: Bug#501207: destar: Fails to run with python2.5
+Cc: control at bugs.debian.org
+Reply-To: John Wright <jsw at debian.org>, 501207 at bugs.debian.org
+
+block 501207 by 484360
+tags 501207 + patch
+thanks
+
+The above problem is actually the same as bug 501207.  However, with
+that patch applied, I get the following problem starting destar:
+
+jswright at neptune:~$ destar
+DeStar 0.2.2, Copyright (C) 2005 by Holger Schurig and contributors.
+
+DeStar comes with ABSOLUTELY NO WARRANTY. This is free software,
+you are welcome to redistribute it under certain conditions;
+see the included files GPL-2.txt and COPYRIGHT.txt
+
+Serving application 'page_main' on port 8080
+warning: Computing default hostname
+info: Medusa (V1.11) started at Mon Oct  6 18:08:53 2008
+	Hostname: neptune.jswright
+	Port:8080
+
+Note: you need the cdr_sqlite3_custom module to have CDR and Stats functionalities
+Note: you don't seem to have access to /var/log/asterisk/master.db yet created by cdr_sqlite3_custom. See INSTALL.txt for details.
+Traceback (most recent call last):
+  File "/usr/share/destar/python/destar.py", line 139, in <module>
+    pub.run()
+  File "/usr/share/destar/python/Server.py", line 168, in run
+    publisher = self.publishclass(self.approot)
+  File "/var/lib/python-support/python2.5/quixote/publish.py", line 107, in __init__
+    self.root_namespace = _get_module(root_namespace)
+  File "/var/lib/python-support/python2.5/quixote/publish.py", line 32, in _get_module
+    __import__(name)
+  File "/var/lib/python-support/python2.5/quixote/ptl_import.py", line 127, in find_import_module
+    return self.loader.load_module(fullname, stuff)
+  File "/var/lib/python-support/python2.5/quixote/ptl_import.py", line 107, in load_module
+    return _load_ptl(name, filename, file)
+  File "/var/lib/python-support/python2.5/quixote/ptl_import.py", line 82, in _load_ptl
+    return _exec_module_code(code, name, filename)
+  File "/var/lib/python-support/python2.5/quixote/ptl_import.py", line 35, in _exec_module_code
+    exec code in mod.__dict__
+  File "/usr/share/destar/python/page_main.ptl", line 74, in <module>
+    m = __import__(s)
+  File "/var/lib/python-support/python2.5/quixote/ptl_import.py", line 127, in find_import_module
+    return self.loader.load_module(fullname, stuff)
+  File "/var/lib/python-support/python2.5/quixote/ptl_import.py", line 107, in load_module
+    return _load_ptl(name, filename, file)
+  File "/var/lib/python-support/python2.5/quixote/ptl_import.py", line 72, in _load_ptl
+    code = compile_template(file, filename, output)
+  File "/var/lib/python-support/python2.5/quixote/ptl_compile.py", line 303, in compile_template
+    template.compile()
+  File "/usr/lib/python2.5/compiler/pycodegen.py", line 111, in compile
+    tree = self._get_tree()
+  File "/var/lib/python-support/python2.5/quixote/ptl_compile.py", line 274, in _get_tree
+    tree = parse(self.source, self.filename)
+  File "/var/lib/python-support/python2.5/quixote/ptl_compile.py", line 232, in parse
+    raise SyntaxError(str(e), (filename, e.lineno, e.offset, e.text))
+SyntaxError: non-default argument follows default argument (page_owner_cdr.ptl)
+
+The attached patch fixes the SyntaxError.
+
+-- 
+John Wright <jsw at debian.org>
+
+--- destar-0.2.2.orig/page_owner_cdr.ptl
++++ destar-0.2.2/page_owner_cdr.ptl
+@@ -239,7 +239,7 @@
+ 	
+ 	return render()
+ 
+-def	cdrShowResults [html] (where=[], limit, offset, total = 0, field=_("Time_of_start"), order="DESC"):
++def	cdrShowResults [html] (where, limit, offset, total = 0, field=_("Time_of_start"), order="DESC"):
+ 	if total == 0:
+ 		'<p>'
+ 		'--No records to Show--'
+--- destar-0.2.2.orig/page_stats_cdr.ptl
++++ destar-0.2.2/page_stats_cdr.ptl
+@@ -244,7 +244,7 @@
+ 	
+ 	return render()
+ 
+-def	cdrShowResults [html] (where=[], limit, offset, total = 0, field="start", order="DESC"):
++def	cdrShowResults [html] (where, limit, offset, total = 0, field="start", order="DESC"):
+ 	if total == 0:
+ 		'<p>'
+ 		'--No records to Show--'
+
+_______________________________________________
+Pkg-voip-maintainers mailing list
+Pkg-voip-maintainers at lists.alioth.debian.org
+http://lists.alioth.debian.org/mailman/listinfo/pkg-voip-maintainers
+
+----- End forwarded message -----
+
+-- 
+               Tzafrir Cohen
+icq#16849755              jabber:tzafrir.cohen at xorcom.com
++972-50-7952406           mailto:tzafrir.cohen at xorcom.com
+http://www.xorcom.com  iax:guest at local.xorcom.com/tzafrir
+
+

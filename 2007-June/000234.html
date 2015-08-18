@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r723 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r723%20-%20trunk&In-Reply-To=%3C200706152143.l5FLh1Tf008417%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000233.html">
+   <LINK REL="Next"  HREF="000235.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r723 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r723%20-%20trunk&In-Reply-To=%3C200706152143.l5FLh1Tf008417%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r723 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun 15 23:43:01 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000233.html">[Destar-dev] r722 - in branches/0.2.X: . lang/es/LC_MESSAGES	lang/fr/LC_MESSAGES po
+</A></li>
+        <LI>Next message: <A HREF="000235.html">[Destar-dev] r724 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#234">[ date ]</a>
+              <a href="thread.html#234">[ thread ]</a>
+              <a href="subject.html#234">[ subject ]</a>
+              <a href="author.html#234">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-15 23:43:00 +0200 (Fri, 15 Jun 2007)
+New Revision: 723
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_phone_queue.py
+Log:
+cfg_phone_queue.py: queuetimeout works without queuetimeoutext
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-15 17:41:44 UTC (rev 722)
++++ trunk/CHANGELOG.txt	2007-06-15 21:43:00 UTC (rev 723)
+@@ -1,3 +1,6 @@
++2007-06-15:
++* cfg_phone_queue.py: queuetimeout works without queuetimeoutext
++
+ 2007-06-13:
+ * cfg_phone_queue: string Spanish to English
+ * cfg_trunk_iax.py: added remote port setting
+
+Modified: trunk/cfg_phone_queue.py
+===================================================================
+--- trunk/cfg_phone_queue.py	2007-06-15 17:41:44 UTC (rev 722)
++++ trunk/cfg_phone_queue.py	2007-06-15 21:43:00 UTC (rev 723)
+@@ -51,7 +51,7 @@
+                                         optional = True),
+ 
+ 			VarType(&quot;timeout&quot;,
+-					title=_(&quot;Agent timeout&quot;),
++					title=_(&quot;Agent calling timeout&quot;),
+ 					optional=True,
+ 					len=6),
+ 
+@@ -61,7 +61,7 @@
+ 					len=6),
+ 
+ 	                VarType(&quot;queuetimeout&quot;,
+-        	            		title=_(&quot;Queue Timeout&quot;),
++        	            		title=_(&quot;Queue timeout&quot;),
+                                 	optional=True,
+                                 	len=6),
+ 
+@@ -268,15 +268,16 @@
+ 				extensions.appendExten(qname, &quot;Answer&quot;)
+ 				extensions.appendExten(qname, &quot;SetMusicOnHold(%s)&quot; % self.moh)
+ 
+-			if self.queuetimeout and self.queuetimeoutext:
++			if self.queuetimeout:
+ 				opt = opt + &quot;n&quot;
+ 				extensions.appendExten(qname, &quot;Queue(%s|%s|||%s)&quot; % (self.name, opt, self.queuetimeout))
+-				import configlets
+-				obj = configlets.configlet_tree.getConfigletByName(self.queuetimeoutext)
+-				try:
+-					extensions.appendExten(qname, &quot;Goto(%s,%s,1)&quot; %  (obj.pbx, self.queuetimeoutext))
+-				except AttributeError:
+-					pass
++				if self.queuetimeoutext:
++					import configlets
++					obj = configlets.configlet_tree.getConfigletByName(self.queuetimeoutext)
++					try:
++						extensions.appendExten(qname, &quot;Goto(%s,%s,1)&quot; %  (obj.pbx, self.queuetimeoutext))
++					except AttributeError:
++						pass
+ 			else:
+ 				extensions.appendExten(qname, &quot;Queue(%s|%s)&quot; % (self.name, opt))
+ 		self.createPanelConfig()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000233.html">[Destar-dev] r722 - in branches/0.2.X: . lang/es/LC_MESSAGES	lang/fr/LC_MESSAGES po
+</A></li>
+	<LI>Next message: <A HREF="000235.html">[Destar-dev] r724 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#234">[ date ]</a>
+              <a href="thread.html#234">[ thread ]</a>
+              <a href="subject.html#234">[ subject ]</a>
+              <a href="author.html#234">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

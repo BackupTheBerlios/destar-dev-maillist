@@ -1,0 +1,422 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r853 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r853%20-%20trunk&In-Reply-To=%3C200912201824.nBKIOOWF021121%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000406.html">
+   <LINK REL="Next"  HREF="000408.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r853 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r853%20-%20trunk&In-Reply-To=%3C200912201824.nBKIOOWF021121%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r853 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 20 19:24:24 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000406.html">[Destar-dev] r852 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000408.html">[Destar-dev] r854 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#407">[ date ]</a>
+              <a href="thread.html#407">[ thread ]</a>
+              <a href="subject.html#407">[ subject ]</a>
+              <a href="author.html#407">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-20 19:24:11 +0100 (Sun, 20 Dec 2009)
+New Revision: 853
+
+Added:
+   trunk/config.py
+   trunk/sambautils.py
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/INSTALL.txt
+   trunk/backend.py
+   trunk/cfg_opt_user.py
+Log:
+* Added config.py to put general settings.
+* backend.py:
+ - Use config.py
+ - VoiceMail has new sintax in 1.6
+ - Added VICIDIAL_INTEGRATION option.
+* cfg_opt_user.py: Added SAMBA_ENABLED option.
+* Added sambautils.py
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-20 18:01:22 UTC (rev 852)
++++ trunk/CHANGELOG.txt	2009-12-20 18:24:11 UTC (rev 853)
+@@ -4,6 +4,13 @@
+ * cfg_phone_ext.py: in 1.6, set only accepts one variable at a time.
+ * cfg_opt_voicemail.py: change colon for pipe.
+ * page_user_phonebook.ptl: catch an AttributeException.
++* Added config.py to put general settings.
++* backend.py:
++ - Use config.py
++ - VoiceMail has new sintax in 1.6
++ - Added VICIDIAL_INTEGRATION option.
++* cfg_opt_user.py: Added SAMBA_ENABLED option.
++* Added sambautils.py
+ 
+ 2009-12-16
+ * cfg_opt_pbx.py, cfg_app_*: separate context for all apps.
+
+Modified: trunk/INSTALL.txt
+===================================================================
+--- trunk/INSTALL.txt	2009-12-20 18:01:22 UTC (rev 852)
++++ trunk/INSTALL.txt	2009-12-20 18:24:11 UTC (rev 853)
+@@ -55,7 +55,16 @@
+ 	# dd if=/dev/urandom of=temp_file count=2; openssl dhparam -rand temp_file 512 &gt;&gt; destar.pem
+ 	# ln -sf destar.pem `openssl x509 -noout -hash &lt; destar.pem`.0
+ 
++# Todo, document:
++Optional: Vicidial
++-----------------
++Optional: Samba
++-----------------
++Optional: OP-Panel
++-----------------
+ 
++
++
+ Install Destar
+ --------------
+ 
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2009-12-20 18:01:22 UTC (rev 852)
++++ trunk/backend.py	2009-12-20 18:24:11 UTC (rev 853)
+@@ -19,14 +19,12 @@
+ 
+ 
+ import os
++from config import *
+ import language
+ import configlets
+ import commands
+ import re
+ 
+-DESTAR_CFG = &quot;destar_cfg.py&quot;
+-CONFIGLETS_DIR = os.getenv('CONFIGLETS_DIR', default='.') 
+-ASTERISK_MODULES_DIR = os.getenv('ASTERISK_MODULES_DIR', default='/usr/lib/asterisk/modules')
+ 
+ frontend_sessions = 0
+ 
+@@ -160,9 +158,11 @@
+ 
+ 	c = AstConf(&quot;sip.conf&quot;)
+ 	c.append(&quot;language=%s&quot; % getSetting('language', 'en'))
+-	c.append(&quot;maxexpirey=3600&quot;)
+-	c.append(&quot;defaultexpirey=3600&quot;)
++	c.append(&quot;maxexpiry=3600&quot;)
++	c.append(&quot;defaultexpiry=120&quot;)
+ 	c.append(&quot;disallow=all&quot;)
++	c.append(&quot;limitonpeers=yes&quot;)
++	c.append(&quot;t38pt_udptl = yes&quot;)
+ 
+ 	c = AstConf(&quot;iax.conf&quot;)
+ 	c.append(&quot;language=%s&quot; % getSetting('language', 'en'))
+@@ -238,7 +238,11 @@
+                 c.append(&quot;exten=s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)&quot;)
+                 c.append(&quot;exten=s,n,UserEvent(TAPI,TAPIEVENT: SET CALLERID ${CALLERID})&quot;)
+                 c.append(&quot;exten=s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)&quot;)
+-	c.append(&quot;exten=s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWwr${dopt})&quot;)
++	if VICIDIAL_INTEGRATION:
++		c.append(&quot;exten=s,n(MainDial),AGI(call_inbound.agi,${ARG1}-----${CALLERID}-----${CDR(intrunk)}-----x-----y-----z-----w)&quot;)
++		c.append(&quot;exten=s,n,Dial(${ARG1}${prng},${dsec},TtWwr${dopt})&quot;)
++	else:
++		c.append(&quot;exten=s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWwr${dopt})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'timeout'&quot;)
+ 	c.append(&quot;exten=s,n(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG4}/${ARG3})})&quot;)
+@@ -266,17 +270,18 @@
+ 	c.append('exten=s,n,GotoIf($[&quot;${vmbs}&quot; != &quot;&quot;]?vmbs)')
+ 	c.append(&quot;exten=s,n,Answer()&quot;)
+ 	c.append(&quot;exten=s,n,PlayTones(busy)&quot;)
+-	c.append(&quot;exten=s,n,Busy()&quot;)
++	#c.append(&quot;exten=s,n,Busy()&quot;)
++	c.append(&quot;exten=s,n,Hangup()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=s,n(fw),Set(cf_count=$[${cf_count} + 1])&quot;)
+ 	c.append(&quot;exten=s,n,Set(CALLERID(num)=${CALLERID(num)}-${ARG3})&quot;)
+ 	c.append(&quot;exten=s,n,Goto(real-${ARG2},${fw_ext},1)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append('exten=s,n(vmu),Set(vmopt=u)')
+-	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
++	c.append(&quot;exten=s,n,Macro(voicemail,${ARG3},${ARG4},${vmopt})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append('exten=s,n(vmbs),Set(vmopt=b)')
+-	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
++	c.append(&quot;exten=s,n,Macro(voicemail,${ARG3},${ARG4},${vmopt})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=s,n(hangup),Hangup()&quot;)
+ 	c.append(&quot;;&quot;)
+@@ -297,9 +302,9 @@
+ 	c.append(&quot;exten =&gt; t,1,Hangup()&quot;)
+ 	c.append(&quot;exten =&gt; T,1,Hangup()&quot;)
+ 	c.append(&quot;exten =&gt; s,1,Answer&quot;)
+-	c.append(&quot;exten =&gt; s,2,Set(TIMEOUT(absolute)=240)&quot;)
++	c.append(&quot;exten =&gt; s,2,Set(TIMEOUT(absolute)=7200)&quot;)
+ 	c.append(&quot;exten =&gt; s,3,Wait(1)&quot;)
+-	c.append(&quot;exten =&gt; s,4,VoiceMail(${ARG1}@${ARG2})&quot;)
++	c.append(&quot;exten =&gt; s,4,VoiceMail(${ARG1}@${ARG2},${ARG3})&quot;)
+ 	c.append(&quot;exten =&gt; s,5,Hangup()&quot;)
+ 
+ 	c.append(&quot;;&quot;)
+@@ -307,23 +312,25 @@
+ 	c.append(&quot;;&quot;)
+ 	needModule(&quot;app_fax&quot;)
+ 	context=&quot;macro-sendfax&quot;
++	context=&quot;faxout&quot;
+ 	c.setSection(context)
+ 	c.appendExten(&quot;s&quot;, &quot;Answer()&quot;, context)
+ 	c.appendExten(&quot;s&quot;, &quot;Wait(${ARG2})&quot;, context)
+-        c.appendExten(&quot;s&quot;, &quot;Set(LOCALSTATIONID=%s)&quot; getSetting('header_text', 'DeStar PBX'), context)
+-        c.appendExten(&quot;s&quot;, &quot;SendFAX(${FAXFILE})&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Set(LOCALSTATIONID=%s)&quot; getSetting('header_text', 'DeStar PBX'), context)
++	c.appendExten(&quot;s&quot;, &quot;SendFAX(${FAXFILE})&quot;, context)
+ 	c.appendExten(&quot;s&quot;, &quot;Hangup&quot;, context)
+-        c.appendExten(&quot;h&quot;, &quot;NoOp(TX: REMOTESTATIONID is ${REMOTESTATIONID})&quot;, context)
++	c.appendExten(&quot;h&quot;, &quot;NoOp(TX: REMOTESTATIONID is ${REMOTESTATIONID})&quot;, context)
+ 	c.appendExten(&quot;h&quot;, &quot;UserEvent(FAX|SEND: Call ended normally)&quot;, context)
+ 
++
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; format: Macro(call-forward,type,pbx,destination,message-to-play)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	context=&quot;macro-call-forward&quot;
+ 	c.setSection(context)
+ 	c.appendExten(&quot;s&quot;, &quot;Answer()&quot;, context)
+-	c.appendExten(&quot;s&quot;, &quot;Set(DB(${ARG1}/${ARG2}/${CALLERIDNUM})=${ARG3})&quot;, context)
+-	c.appendExten(&quot;s&quot;, &quot;Set(DB(${ARG1}_LASTNUM/${ARG2}/${CALLERIDNUM})=${ARG3})&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Set(DB(${ARG1}/${ARG2}/${CALLERID(num)})=${ARG3})&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Set(DB(${ARG1}_LASTNUM/${ARG2}/${CALLERID(num)})=${ARG3})&quot;, context)
+ 	c.appendExten(&quot;s&quot;, &quot;Playback(${ARG4})&quot;, context)
+ 	c.appendExten(&quot;s&quot;, &quot;Playback(has-been-set-to)&quot;, context)
+ 	c.appendExten(&quot;s&quot;, &quot;SayDigits(${ARG3})&quot;, context)
+@@ -437,7 +444,16 @@
+ 	c.append(&quot;exten =&gt; T,2,Wait(5)&quot;)
+ 	c.append(&quot;exten =&gt; T,3,Hangup&quot;)
+ 
++	if SAMBA_ENABLED:
++		c = AstConf(&quot;smb.conf&quot;)
++		c.setSection(&quot;global&quot;)
++		c.append(&quot;workgroup = DeStarPBX&quot;)
++		c.append(&quot;server string = DeStarPBX&quot;)
++		c.append(&quot;log file = /var/log/samba/log.%m&quot;)
++		c.append(&quot;security = user&quot;)
++		c.append(&quot;socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192&quot;)
+ 
++
+ def createAsteriskConfig():
+ 	&quot;&quot;&quot;This creates all the Asterisk config files in /etc/asterisk.
+ 
+
+Modified: trunk/cfg_opt_user.py
+===================================================================
+--- trunk/cfg_opt_user.py	2009-12-20 18:01:22 UTC (rev 852)
++++ trunk/cfg_opt_user.py	2009-12-20 18:24:11 UTC (rev 853)
+@@ -17,7 +17,9 @@
+ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ #
+ 
++from config import *
+ import language
++import sambautils
+ from configlets import *
+ 
+ class CfgOptUser(CfgOpt):
+@@ -30,14 +32,13 @@
+ 		self.variables = [
+ 		VarType(&quot;name&quot;,   title=_(&quot;Name&quot;), len=15),
+ 		VarType(&quot;secret&quot;, title=_(&quot;Password&quot;), len=15),
+-		VarType(&quot;pc&quot;,     title=_(&quot;Associated IP address of PC&quot;), hint=_(&quot;Trusted for auto-login&quot;), len=15, optional=True),
+ 		VarType(&quot;phone&quot;,  title=_(&quot;Associated phone&quot;), type=&quot;choice&quot;, optional=True,
+ 		                  options=getChoice(&quot;CfgPhone&quot;)),
+ 		VarType(&quot;pbx&quot;,	  title=_(&quot;Associated Virtual PBX&quot;), type=&quot;choice&quot;, optional=True, options=getChoice(&quot;CfgOptPBX&quot;)),
+ 		VarType(&quot;level&quot;,  title=_(&quot;Type&quot;), type=&quot;choice&quot;,
+ 		                  options=( (&quot;0&quot;,_(&quot;disabled&quot;)),
+ 		                            (&quot;1&quot;,_(&quot;User&quot;)),
+-		                            (&quot;2&quot;,_(&quot;Virtual PBX Administrator&quot;)),
++		                            (&quot;2&quot;,_(&quot;Report Manager&quot;)),
+ 		                            (&quot;3&quot;,_(&quot;Configurator&quot;)) )),
+ 		VarType(&quot;language&quot;, title=_(&quot;Language&quot;), type=&quot;choice&quot;,
+ 				    options=( (&quot;en&quot;,&quot;en&quot;),
+@@ -60,14 +61,30 @@
+ 		for obj in configlets.configlet_tree:
+ 			if obj==self: 
+ 				continue
+-			try:
+-				if self.level == &quot;2&quot; and not self.pbx:
+-					return (&quot;pbx&quot;, _(&quot;Please choose a Virtual PBX for this user.&quot;))
+-			except AttributeError:
+-				pass
++			#try:
++			#	if self.level == &quot;2&quot; and not self.pbx:
++			#		return (&quot;pbx&quot;, _(&quot;Please choose a Virtual PBX for this user.&quot;))
++			#except AttributeError:
++			#	pass
+ 
+ 	def createAsteriskConfig(self):
+ 		pass
++		if int(self.level) == 3 and config.SAMBA_ENABLED:
++			c = AstConf(&quot;smb.conf&quot;)
++			c.setSection(&quot;%s-spool&quot; % self.name)
++			c.append(&quot;path = /var/spool/asterisk/&quot;)
++			c.append(&quot;valid users = %s&quot; % self.name)
++			c.append(&quot;force user = root&quot;)
++                        c.append(&quot;read only = no&quot;)
+ 
++			c.setSection(&quot;%s-share&quot; % self.name)
++			c.append(&quot;path = /usr/share/asterisk/&quot;)
++			c.append(&quot;valid users = %s&quot; % self.name)
++			c.append(&quot;force user = root&quot;)
++                        c.append(&quot;read only = no&quot;)
++
++			sambautils.setPassword(self.name, self.secret)
++			sambautils.restartDaemon()
++
+ 	def row(self):
+ 		return (self.shortName, self.name)
+
+Added: trunk/config.py
+===================================================================
+--- trunk/config.py	2009-12-20 18:01:22 UTC (rev 852)
++++ trunk/config.py	2009-12-20 18:24:11 UTC (rev 853)
+@@ -0,0 +1,50 @@
++#!/usr/bin/python
++#-*- coding: utf-8 -*-
++#
++# Global variables used by destar
++#
++import os
++
++# - DESTAR SETTINGS
++
++DESTAR_CFG = &quot;destar_cfg.py&quot;
++
++CONFIGLETS_DIR = os.getenv('CONFIGLETS_DIR', default='.') 
++
++DOC_DIR = os.getenv('DESTAR_DOC_DIR', default='/tmp/destar-doc')
++
++CONF_TAG = &quot;; Automatically created by DESTAR\n&quot;
++
++MAXSECRETLENGTH = 45
++
++# -  ASTERISK PATHS
++
++CONF_DIR = &quot;/etc/asterisk&quot;
++
++ASTERISK_MODULES_DIR = os.getenv('ASTERISK_MODULES_DIR', default='/usr/lib/asterisk/modules') 
++
++# - MYSQL INFO
++
++DBHOST = &quot;172.30.0.4&quot;
++DBNAME = &quot;asterisk&quot;
++DBUSER = &quot;root&quot;
++DBPASSWD = &quot;q931avt+-&quot;
++
++# - FLASH OPERATOR PANEL SETTINGS
++
++# Uncomment to use with asternic.org op_panel tarball:
++#PANEL_CONF_DIR	= &quot;/usr/local/op_panel&quot;
++#PANEL_HTML_DIR	= &quot;/usr/local/op_panel/flash&quot;
++#PANEL_RESTART_CMD = &quot;killall -HUP op_server.pl&quot;
++
++# Uncomment to use with op-panel .deb package:
++PANEL_CONF_DIR	= &quot;/etc/op-panel&quot;
++PANEL_HTML_DIR	= &quot;/usr/share/op-panel/flash&quot;
++PANEL_RESTART_CMD = &quot;killall -HUP op_server&quot;
++
++
++# - OTHER APPS INTEGRATION
++
++VICIDIAL_INTEGRATION = 0
++SAMBA_ENABLED = 0
++SAMBA_RESTART_CMD = &quot;/etc/init.d/samba reload&quot;
+
+Added: trunk/sambautils.py
+===================================================================
+--- trunk/sambautils.py	2009-12-20 18:01:22 UTC (rev 852)
++++ trunk/sambautils.py	2009-12-20 18:24:11 UTC (rev 853)
+@@ -0,0 +1,38 @@
++# -*- coding: utf-8 -*-
++#
++# Copyright (C) 2005 by Diego Andr?s Asenjo
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++import os, commands
++from config import *
++
++def restartDaemon():
++        return commands.getoutput(SAMBA_RESTART_CMD)
++
++def setPassword(user, pswd):
++	(stat, out) = commands.getstatusoutput(&quot;id %s&quot; % user)
++	if stat:
++		os.popen(&quot;useradd %s&quot; % user)
++			
++	p = os.popen(&quot;smbpasswd -s -a %s&quot; % user, 'w')
++	p.write(pswd+&quot;\n&quot;)
++	p.write(pswd+&quot;\n&quot;)
++
++def deleteUser(name):
++	os.popen(&quot;smbpasswd -x %s&quot; % name)
++	os.popen(&quot;userdel %s&quot; % name)
++	
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000406.html">[Destar-dev] r852 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000408.html">[Destar-dev] r854 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#407">[ date ]</a>
+              <a href="thread.html#407">[ thread ]</a>
+              <a href="subject.html#407">[ subject ]</a>
+              <a href="author.html#407">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

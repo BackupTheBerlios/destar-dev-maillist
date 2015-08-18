@@ -1,0 +1,805 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r720 - in branches/0.2.X: . po
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r720%20-%20in%20branches/0.2.X%3A%20.%20po&In-Reply-To=%3C200706151538.l5FFc0i2001923%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000228.html">
+   <LINK REL="Next"  HREF="000232.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r720 - in branches/0.2.X: . po</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r720%20-%20in%20branches/0.2.X%3A%20.%20po&In-Reply-To=%3C200706151538.l5FFc0i2001923%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r720 - in branches/0.2.X: . po">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun 15 17:38:00 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000228.html">[Destar-dev] r719 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000232.html">[Destar-dev] r721 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#231">[ date ]</a>
+              <a href="thread.html#231">[ thread ]</a>
+              <a href="subject.html#231">[ subject ]</a>
+              <a href="author.html#231">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-06-15 17:37:59 +0200 (Fri, 15 Jun 2007)
+New Revision: 720
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_phone_queue.py
+   branches/0.2.X/po/destar.pot
+   branches/0.2.X/po/es.po
+Log:
+* destar.pot updated, some spanish translations.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-06-13 22:29:32 UTC (rev 719)
++++ branches/0.2.X/CHANGELOG.txt	2007-06-15 15:37:59 UTC (rev 720)
+@@ -1,3 +1,6 @@
++2007-06-15:
++* destar.pot updated, some spanish translations.
++
+ 2007-06-13:
+ * Changed coding header to utf-8 in all files.
+ * cfg_trunk_iax.py: added remote port setting
+
+Modified: branches/0.2.X/cfg_phone_queue.py
+===================================================================
+--- branches/0.2.X/cfg_phone_queue.py	2007-06-13 22:29:32 UTC (rev 719)
++++ branches/0.2.X/cfg_phone_queue.py	2007-06-15 15:37:59 UTC (rev 720)
+@@ -45,12 +45,12 @@
+ 					len=6),
+ 
+ 			VarType(&quot;timeout&quot;,
+-					title=_(&quot;Phone timeout&quot;),
++					title=_(&quot;Agent calling timeout&quot;),
+ 					optional=True,
+ 					len=6),
+ 
+ 	                VarType(&quot;queuetimeout&quot;,
+-        	            		title=_(&quot;Queue Timeout&quot;),
++        	            		title=_(&quot;Queue timeout&quot;),
+                                 	optional=True,
+                                 	len=6),
+ 
+
+Modified: branches/0.2.X/po/destar.pot
+===================================================================
+--- branches/0.2.X/po/destar.pot	2007-06-13 22:29:32 UTC (rev 719)
++++ branches/0.2.X/po/destar.pot	2007-06-15 15:37:59 UTC (rev 720)
+@@ -8,7 +8,7 @@
+ msgstr &quot;&quot;
+ &quot;Project-Id-Version: PACKAGE VERSION\n&quot;
+ &quot;Report-Msgid-Bugs-To: \n&quot;
+-&quot;POT-Creation-Date: 2007-06-13 17:02-0500\n&quot;
++&quot;POT-Creation-Date: 2007-06-15 10:30-0500\n&quot;
+ &quot;PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n&quot;
+ &quot;Last-Translator: FULL NAME &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">EMAIL at ADDRESS</A>&gt;\n&quot;
+ &quot;Language-Team: LANGUAGE &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">LL at li.org</A>&gt;\n&quot;
+@@ -137,7 +137,7 @@
+ #: ../cfg_app_voicemailsettings.py:33 ../cfg_opt_pbx.py:27
+ #: ../cfg_phone_epygi.py:36 ../cfg_phone_ext.py:34 ../cfg_phone_iax.py:33
+ #: ../cfg_phone_mgcp.py:33 ../cfg_phone_queue.py:34 ../cfg_phone_sip.py:36
+-#: ../cfg_phone_zap.py:34 ../cfg_trunk_iax.py:121 ../cfg_trunk_sip.py:106
++#: ../cfg_phone_zap.py:34 ../cfg_trunk_iax.py:125 ../cfg_trunk_sip.py:106
+ #: ../cfg_trunk_zappbx.py:103 ../cfg_trunk_zappri.py:111
+ #: ../cfg_trunk_zap.py:96 ../configlets.py:959 ../configlets.py:1128
+ #: ../page_config_pbx.ptl:27 ../page_config_pbx.ptl:28
+@@ -195,7 +195,7 @@
+ #: ../cfg_phone_mgcp.py:227 ../cfg_phone_mgcp.py:234 ../cfg_phone_queue.py:181
+ #: ../cfg_phone_queue.py:184 ../cfg_phone_sip.py:229 ../cfg_phone_sip.py:236
+ #: ../cfg_phone_zap.py:226 ../cfg_phone_zap.py:233 ../cfg_trunk_capimsn.py:42
+-#: ../cfg_trunk_fwdiax.py:57 ../cfg_trunk_iax.py:163 ../cfg_trunk_iax.py:166
++#: ../cfg_trunk_fwdiax.py:57 ../cfg_trunk_iax.py:167 ../cfg_trunk_iax.py:170
+ #: ../cfg_trunk_iaxtel.py:56 ../cfg_trunk_sip.py:148 ../cfg_trunk_sip.py:151
+ #: ../cfg_trunk_zappbx.py:130 ../cfg_trunk_zappbx.py:133
+ #: ../cfg_trunk_zappri.py:137 ../cfg_trunk_zappri.py:140
+@@ -231,7 +231,7 @@
+ 
+ #: ../cfg_app_chanspy.py:43 ../cfg_app_quickdial_global.py:33
+ #: ../cfg_opt_user.py:32 ../cfg_phone_epygi.py:45 ../cfg_phone_iax.py:42
+-#: ../cfg_phone_mgcp.py:42 ../cfg_phone_sip.py:45 ../cfg_trunk_iax.py:70
++#: ../cfg_phone_mgcp.py:42 ../cfg_phone_sip.py:45 ../cfg_trunk_iax.py:74
+ msgid &quot;Password&quot;
+ msgstr &quot;&quot;
+ 
+@@ -319,13 +319,13 @@
+ 
+ #: ../cfg_app_meetme.py:60 ../cfg_opt_oppanel.py:27 ../cfg_opt_oppanel.py:28
+ #: ../cfg_phone_epygi.py:96 ../cfg_phone_iax.py:89 ../cfg_phone_queue.py:168
+-#: ../cfg_phone_sip.py:97 ../cfg_phone_zap.py:95 ../cfg_trunk_iax.py:93
++#: ../cfg_phone_sip.py:97 ../cfg_phone_zap.py:95 ../cfg_trunk_iax.py:97
+ #: ../cfg_trunk_sip.py:74 ../cfg_trunk_zappbx.py:53 ../cfg_trunk_zappri.py:67
+ #: ../cfg_trunk_zap.py:52 ../page_admin_panel.ptl:26
+ msgid &quot;Operator Panel&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_app_meetme.py:65 ../cfg_trunk_iax.py:98 ../cfg_trunk_sip.py:79
++#: ../cfg_app_meetme.py:65 ../cfg_trunk_iax.py:102 ../cfg_trunk_sip.py:79
+ #: ../cfg_trunk_zappbx.py:58 ../cfg_trunk_zappri.py:72 ../cfg_trunk_zap.py:57
+ msgid &quot;Show this trunk in the panel&quot;
+ msgstr &quot;&quot;
+@@ -602,13 +602,13 @@
+ msgid &quot;Caller ID for calls established through this dialout&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_dialout_normal.py:79 ../cfg_opt_did.py:78 ../cfg_trunk_iax.py:146
++#: ../cfg_dialout_normal.py:79 ../cfg_opt_did.py:78 ../cfg_trunk_iax.py:150
+ #: ../cfg_trunk_sip.py:131
+ msgid &quot;Change Caller*Id Name to:&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_dialout_normal.py:84 ../cfg_opt_did.py:83 ../cfg_trunk_iax.py:113
+-#: ../cfg_trunk_iax.py:151 ../cfg_trunk_sip.py:98 ../cfg_trunk_sip.py:136
++#: ../cfg_dialout_normal.py:84 ../cfg_opt_did.py:83 ../cfg_trunk_iax.py:117
++#: ../cfg_trunk_iax.py:155 ../cfg_trunk_sip.py:98 ../cfg_trunk_sip.py:136
+ #: ../cfg_trunk_zappbx.py:95 ../cfg_trunk_zappri.py:103 ../cfg_trunk_zap.py:88
+ msgid &quot;Change Caller*Id Number to:&quot;
+ msgstr &quot;&quot;
+@@ -773,19 +773,19 @@
+ msgid &quot;From Trunk:&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_opt_did.py:45 ../cfg_trunk_iax.py:118 ../cfg_trunk_sip.py:103
++#: ../cfg_opt_did.py:45 ../cfg_trunk_iax.py:122 ../cfg_trunk_sip.py:103
+ #: ../cfg_trunk_zappbx.py:100 ../cfg_trunk_zappri.py:108
+ #: ../cfg_trunk_zap.py:93
+ msgid &quot;Go to&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_opt_did.py:48 ../cfg_trunk_iax.py:121 ../cfg_trunk_sip.py:106
++#: ../cfg_opt_did.py:48 ../cfg_trunk_iax.py:125 ../cfg_trunk_sip.py:106
+ #: ../cfg_trunk_zappbx.py:103 ../cfg_trunk_zappri.py:111
+ #: ../cfg_trunk_zap.py:96
+ msgid &quot;Phone&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_opt_did.py:48 ../cfg_trunk_iax.py:121 ../cfg_trunk_sip.py:106
++#: ../cfg_opt_did.py:48 ../cfg_trunk_iax.py:125 ../cfg_trunk_sip.py:106
+ #: ../cfg_trunk_zappbx.py:103 ../cfg_trunk_zappri.py:111
+ #: ../cfg_trunk_zap.py:96
+ msgid &quot;IVR&quot;
+@@ -800,7 +800,7 @@
+ msgid &quot;Phone to ring&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_opt_did.py:57 ../cfg_trunk_iax.py:130 ../cfg_trunk_sip.py:115
++#: ../cfg_opt_did.py:57 ../cfg_trunk_iax.py:134 ../cfg_trunk_sip.py:115
+ #: ../cfg_trunk_zappbx.py:112 ../cfg_trunk_zappri.py:120
+ #: ../cfg_trunk_zap.py:105
+ msgid &quot;IVR to jump to&quot;
+@@ -1898,11 +1898,11 @@
+ msgstr &quot;&quot;
+ 
+ #: ../cfg_phone_queue.py:48
+-msgid &quot;Phone timeout&quot;
++msgid &quot;Agent calling timeout&quot;
+ msgstr &quot;&quot;
+ 
+ #: ../cfg_phone_queue.py:53
+-msgid &quot;Queue Timeout&quot;
++msgid &quot;Queue timeout&quot;
+ msgstr &quot;&quot;
+ 
+ #: ../cfg_phone_queue.py:58
+@@ -2109,89 +2109,93 @@
+ msgstr &quot;&quot;
+ 
+ #: ../cfg_trunk_iax.py:40
++msgid &quot;IAX username&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:44
+ msgid &quot;IAX host&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:44
++#: ../cfg_trunk_iax.py:48
+ msgid &quot;IAX2 remote port&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:50
++#: ../cfg_trunk_iax.py:54
+ msgid &quot;Bandwith&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:53
++#: ../cfg_trunk_iax.py:57
+ msgid &quot;Low&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:53
++#: ../cfg_trunk_iax.py:57
+ msgid &quot;High&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:56 ../cfg_trunk_sip.py:58
++#: ../cfg_trunk_iax.py:60 ../cfg_trunk_sip.py:58
+ msgid &quot;Register with remote host?&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:60
++#: ../cfg_trunk_iax.py:64
+ msgid &quot;Authentication&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:64
++#: ../cfg_trunk_iax.py:68
+ msgid &quot;Authentication Method&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:67
++#: ../cfg_trunk_iax.py:71
+ msgid &quot;Plain text&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:67
++#: ../cfg_trunk_iax.py:71
+ msgid &quot;RSA&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:67
++#: ../cfg_trunk_iax.py:71
+ msgid &quot;MD5&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:71
++#: ../cfg_trunk_iax.py:75
+ msgid &quot;For 'Plain' or 'MD5' only&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:76
++#: ../cfg_trunk_iax.py:80
+ msgid &quot;Public key from remote server&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:77 ../cfg_trunk_iax.py:83
++#: ../cfg_trunk_iax.py:81 ../cfg_trunk_iax.py:87
+ msgid &quot;For 'RSA' only&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:82
++#: ../cfg_trunk_iax.py:86
+ msgid &quot;Private local key&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:88
++#: ../cfg_trunk_iax.py:92
+ msgid &quot;Enable trunking?&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:104
++#: ../cfg_trunk_iax.py:108
+ msgid &quot;Calls from IAX trunk&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:108 ../cfg_trunk_sip.py:93 ../cfg_trunk_zappbx.py:90
++#: ../cfg_trunk_iax.py:112 ../cfg_trunk_sip.py:93 ../cfg_trunk_zappbx.py:90
+ #: ../cfg_trunk_zappri.py:98 ../cfg_trunk_zap.py:83
+ msgid &quot;Change Caller*Id to:&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:124 ../cfg_trunk_sip.py:109 ../cfg_trunk_zappbx.py:106
++#: ../cfg_trunk_iax.py:128 ../cfg_trunk_sip.py:109 ../cfg_trunk_zappbx.py:106
+ #: ../cfg_trunk_zappri.py:114 ../cfg_trunk_zap.py:99
+ msgid &quot;Extension to ring&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:136 ../cfg_trunk_sip.py:121 ../cfg_trunk_zappbx.py:118
++#: ../cfg_trunk_iax.py:140 ../cfg_trunk_sip.py:121 ../cfg_trunk_zappbx.py:118
+ #: ../cfg_trunk_zappri.py:126
+ msgid &quot;Allow dial extension from which Virtual PBX&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:142 ../cfg_trunk_sip.py:127
++#: ../cfg_trunk_iax.py:146 ../cfg_trunk_sip.py:127
+ msgid &quot;Outgoing calls to IAX trunk&quot;
+ msgstr &quot;&quot;
+ 
+
+Modified: branches/0.2.X/po/es.po
+===================================================================
+--- branches/0.2.X/po/es.po	2007-06-13 22:29:32 UTC (rev 719)
++++ branches/0.2.X/po/es.po	2007-06-15 15:37:59 UTC (rev 720)
+@@ -7,13 +7,13 @@
+ msgstr &quot;&quot;
+ &quot;Project-Id-Version: DeStar 0.2beta\n&quot;
+ &quot;Report-Msgid-Bugs-To: \n&quot;
+-&quot;POT-Creation-Date: 2007-06-13 16:53-0500\n&quot;
+-&quot;PO-Revision-Date: 2006-09-19 16:31-0500\n&quot;
++&quot;POT-Creation-Date: 2007-06-15 10:30-0500\n&quot;
++&quot;PO-Revision-Date: 2007-06-15 10:34-0500\n&quot;
+ &quot;Last-Translator: dasenjo &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">dasenjo at avatar.com.co</A>&gt;\n&quot;
+ &quot;Language-Team: Spanish &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">es at li.org</A>&gt;\n&quot;
+ &quot;MIME-Version: 1.0\n&quot;
+ &quot;Content-Type: text/plain; charset=UTF-8\n&quot;
+-&quot;Content-Transfer-Encoding: 8bit\n&quot;
++&quot;Content-Transfer-Encoding: 8bit&quot;
+ 
+ #: ../destar:43
+ #, python-format
+@@ -115,13 +115,12 @@
+ &quot;funcionalidad de CDR&quot;
+ 
+ #: ../cdrutils.py:35
+-#, fuzzy
+ msgid &quot;&quot;
+ &quot;Note: you need the cdr_sqlite3_custom module to have CDR and Stats &quot;
+ &quot;functionalities&quot;
+ msgstr &quot;&quot;
+-&quot;Nota: usted debe instalar python-pysqlite2 para hacer uso de la &quot;
+-&quot;funcionalidad de CDR&quot;
++&quot;Nota: usted necesita instalar el m&#243;dulo cdr_sqlite3_custom para hacer uso de las &quot;
++&quot;funcionalidades estad&#237;sticas y de CDR&quot;
+ 
+ #: ../cdrutils.py:44
+ #, python-format
+@@ -154,7 +153,7 @@
+ #: ../cfg_app_voicemailsettings.py:33 ../cfg_opt_pbx.py:27
+ #: ../cfg_phone_epygi.py:36 ../cfg_phone_ext.py:34 ../cfg_phone_iax.py:33
+ #: ../cfg_phone_mgcp.py:33 ../cfg_phone_queue.py:34 ../cfg_phone_sip.py:36
+-#: ../cfg_phone_zap.py:34 ../cfg_trunk_iax.py:121 ../cfg_trunk_sip.py:106
++#: ../cfg_phone_zap.py:34 ../cfg_trunk_iax.py:125 ../cfg_trunk_sip.py:106
+ #: ../cfg_trunk_zappbx.py:103 ../cfg_trunk_zappri.py:111
+ #: ../cfg_trunk_zap.py:96 ../configlets.py:959 ../configlets.py:1128
+ #: ../page_config_pbx.ptl:27 ../page_config_pbx.ptl:28
+@@ -212,7 +211,7 @@
+ #: ../cfg_phone_mgcp.py:227 ../cfg_phone_mgcp.py:234 ../cfg_phone_queue.py:181
+ #: ../cfg_phone_queue.py:184 ../cfg_phone_sip.py:229 ../cfg_phone_sip.py:236
+ #: ../cfg_phone_zap.py:226 ../cfg_phone_zap.py:233 ../cfg_trunk_capimsn.py:42
+-#: ../cfg_trunk_fwdiax.py:57 ../cfg_trunk_iax.py:163 ../cfg_trunk_iax.py:166
++#: ../cfg_trunk_fwdiax.py:57 ../cfg_trunk_iax.py:167 ../cfg_trunk_iax.py:170
+ #: ../cfg_trunk_iaxtel.py:56 ../cfg_trunk_sip.py:148 ../cfg_trunk_sip.py:151
+ #: ../cfg_trunk_zappbx.py:130 ../cfg_trunk_zappbx.py:133
+ #: ../cfg_trunk_zappri.py:137 ../cfg_trunk_zappri.py:140
+@@ -221,14 +220,12 @@
+ msgstr &quot;&#201;sta es una dependencia&quot;
+ 
+ #: ../cfg_app_chanspy.py:26
+-#, fuzzy
+ msgid &quot;Listen calls&quot;
+-msgstr &quot;Otras llamadas&quot;
++msgstr &quot;Escuchar llamadas&quot;
+ 
+ #: ../cfg_app_chanspy.py:27
+-#, fuzzy
+ msgid &quot;New spy extension&quot;
+-msgstr &quot;Nueva extensi&#243;n&quot;
++msgstr &quot;Nueva extensi&#243;n para escuchar llamadas&quot;
+ 
+ #: ../cfg_app_chanspy.py:28
+ msgid &quot;Listen all calls on the Asterisk server. Jump through calls pressing *.&quot;
+@@ -250,7 +247,7 @@
+ 
+ #: ../cfg_app_chanspy.py:43 ../cfg_app_quickdial_global.py:33
+ #: ../cfg_opt_user.py:32 ../cfg_phone_epygi.py:45 ../cfg_phone_iax.py:42
+-#: ../cfg_phone_mgcp.py:42 ../cfg_phone_sip.py:45 ../cfg_trunk_iax.py:70
++#: ../cfg_phone_mgcp.py:42 ../cfg_phone_sip.py:45 ../cfg_trunk_iax.py:74
+ msgid &quot;Password&quot;
+ msgstr &quot;Contrase&#241;a&quot;
+ 
+@@ -332,9 +329,8 @@
+ msgstr &quot;&quot;
+ 
+ #: ../cfg_app_meetme.py:42
+-#, fuzzy
+ msgid &quot;Maximun duration in seconds?&quot;
+-msgstr &quot;Tama&#241;o m&#225;ximo de las llamadas en segundos&quot;
++msgstr &quot;Duraci&#243;n m&#225;xima de las llamadas en segundos?&quot;
+ 
+ #: ../cfg_app_meetme.py:54
+ msgid &quot;PIN&quot;
+@@ -342,13 +338,13 @@
+ 
+ #: ../cfg_app_meetme.py:60 ../cfg_opt_oppanel.py:27 ../cfg_opt_oppanel.py:28
+ #: ../cfg_phone_epygi.py:96 ../cfg_phone_iax.py:89 ../cfg_phone_queue.py:168
+-#: ../cfg_phone_sip.py:97 ../cfg_phone_zap.py:95 ../cfg_trunk_iax.py:93
++#: ../cfg_phone_sip.py:97 ../cfg_phone_zap.py:95 ../cfg_trunk_iax.py:97
+ #: ../cfg_trunk_sip.py:74 ../cfg_trunk_zappbx.py:53 ../cfg_trunk_zappri.py:67
+ #: ../cfg_trunk_zap.py:52 ../page_admin_panel.ptl:26
+ msgid &quot;Operator Panel&quot;
+ msgstr &quot;P&#225;nel de Operadora&quot;
+ 
+-#: ../cfg_app_meetme.py:65 ../cfg_trunk_iax.py:98 ../cfg_trunk_sip.py:79
++#: ../cfg_app_meetme.py:65 ../cfg_trunk_iax.py:102 ../cfg_trunk_sip.py:79
+ #: ../cfg_trunk_zappbx.py:58 ../cfg_trunk_zappri.py:72 ../cfg_trunk_zap.py:57
+ msgid &quot;Show this trunk in the panel&quot;
+ msgstr &quot;Mostrar esta troncal en el p&#225;nel de operadora&quot;
+@@ -577,9 +573,8 @@
+ &quot;Nuevas extensiones para programar/desprogramar la redirecci&#243;n de llamadas&quot;
+ 
+ #: ../cfg_app_voicemailsettings.py:39
+-#, fuzzy
+ msgid &quot;Voicemail Unconditional&quot;
+-msgstr &quot;Di&#225;logo de correo de voz&quot;
++msgstr &quot;Di&#225;logo de correo de voz inmediato&quot;
+ 
+ #: ../cfg_app_voicemailsettings.py:40
+ #, fuzzy
+@@ -649,18 +644,16 @@
+ msgid &quot;Caller ID for calls established through this dialout&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_dialout_normal.py:79 ../cfg_opt_did.py:78 ../cfg_trunk_iax.py:146
++#: ../cfg_dialout_normal.py:79 ../cfg_opt_did.py:78 ../cfg_trunk_iax.py:150
+ #: ../cfg_trunk_sip.py:131
+-#, fuzzy
+ msgid &quot;Change Caller*Id Name to:&quot;
+-msgstr &quot;Cambiar el Identificador de llamante a:&quot;
++msgstr &quot;Cambiar el nombre del Identificador de llamante a:&quot;
+ 
+-#: ../cfg_dialout_normal.py:84 ../cfg_opt_did.py:83 ../cfg_trunk_iax.py:113
+-#: ../cfg_trunk_iax.py:151 ../cfg_trunk_sip.py:98 ../cfg_trunk_sip.py:136
++#: ../cfg_dialout_normal.py:84 ../cfg_opt_did.py:83 ../cfg_trunk_iax.py:117
++#: ../cfg_trunk_iax.py:155 ../cfg_trunk_sip.py:98 ../cfg_trunk_sip.py:136
+ #: ../cfg_trunk_zappbx.py:95 ../cfg_trunk_zappri.py:103 ../cfg_trunk_zap.py:88
+-#, fuzzy
+ msgid &quot;Change Caller*Id Number to:&quot;
+-msgstr &quot;Cambiar el Identificador de llamante a:&quot;
++msgstr &quot;Cambiar n&#250;mero del Identificador de llamante a:&quot;
+ 
+ #: ../cfg_dialout_normal.py:89
+ msgid &quot;Trunks to use for routing this dialout entry&quot;
+@@ -824,19 +817,19 @@
+ msgid &quot;From Trunk:&quot;
+ msgstr &quot;De la troncal:&quot;
+ 
+-#: ../cfg_opt_did.py:45 ../cfg_trunk_iax.py:118 ../cfg_trunk_sip.py:103
++#: ../cfg_opt_did.py:45 ../cfg_trunk_iax.py:122 ../cfg_trunk_sip.py:103
+ #: ../cfg_trunk_zappbx.py:100 ../cfg_trunk_zappri.py:108
+ #: ../cfg_trunk_zap.py:93
+ msgid &quot;Go to&quot;
+ msgstr &quot;Ir a&quot;
+ 
+-#: ../cfg_opt_did.py:48 ../cfg_trunk_iax.py:121 ../cfg_trunk_sip.py:106
++#: ../cfg_opt_did.py:48 ../cfg_trunk_iax.py:125 ../cfg_trunk_sip.py:106
+ #: ../cfg_trunk_zappbx.py:103 ../cfg_trunk_zappri.py:111
+ #: ../cfg_trunk_zap.py:96
+ msgid &quot;Phone&quot;
+ msgstr &quot;Tel&#233;fono&quot;
+ 
+-#: ../cfg_opt_did.py:48 ../cfg_trunk_iax.py:121 ../cfg_trunk_sip.py:106
++#: ../cfg_opt_did.py:48 ../cfg_trunk_iax.py:125 ../cfg_trunk_sip.py:106
+ #: ../cfg_trunk_zappbx.py:103 ../cfg_trunk_zappri.py:111
+ #: ../cfg_trunk_zap.py:96
+ msgid &quot;IVR&quot;
+@@ -851,7 +844,7 @@
+ msgid &quot;Phone to ring&quot;
+ msgstr &quot;Tel&#233;fono a timbrar&quot;
+ 
+-#: ../cfg_opt_did.py:57 ../cfg_trunk_iax.py:130 ../cfg_trunk_sip.py:115
++#: ../cfg_opt_did.py:57 ../cfg_trunk_iax.py:134 ../cfg_trunk_sip.py:115
+ #: ../cfg_trunk_zappbx.py:112 ../cfg_trunk_zappri.py:120
+ #: ../cfg_trunk_zap.py:105
+ msgid &quot;IVR to jump to&quot;
+@@ -1242,9 +1235,8 @@
+ msgstr &quot;S&#237;&quot;
+ 
+ #: ../cfg_opt_sip_network.py:47
+-#, fuzzy
+ msgid &quot;Always&quot;
+-msgstr &quot;D&#237;as&quot;
++msgstr &quot;Siempre&quot;
+ 
+ #: ../cfg_opt_sip_network.py:48
+ msgid &quot;Route&quot;
+@@ -1980,12 +1972,12 @@
+ 
+ #: ../cfg_phone_queue.py:48
+ #, fuzzy
+-msgid &quot;Phone timeout&quot;
+-msgstr &quot;Estado del Tel&#233;fono&quot;
++msgid &quot;Agent calling timeout&quot;
++msgstr &quot;Tipo de se&#241;alizaci&#243;n&quot;
+ 
+ #: ../cfg_phone_queue.py:53
+ #, fuzzy
+-msgid &quot;Queue Timeout&quot;
++msgid &quot;Queue timeout&quot;
+ msgstr &quot;Tiempo l&#237;mite&quot;
+ 
+ #: ../cfg_phone_queue.py:58
+@@ -2208,90 +2200,95 @@
+ &quot;terminaci&#243;n IAX.&quot;
+ 
+ #: ../cfg_trunk_iax.py:40
++#, fuzzy
++msgid &quot;IAX username&quot;
++msgstr &quot;Nombre de Usuario SIP&quot;
++
++#: ../cfg_trunk_iax.py:44
+ msgid &quot;IAX host&quot;
+ msgstr &quot;Equipo IAX&quot;
+ 
+-#: ../cfg_trunk_iax.py:44
++#: ../cfg_trunk_iax.py:48
+ msgid &quot;IAX2 remote port&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:50
++#: ../cfg_trunk_iax.py:54
+ msgid &quot;Bandwith&quot;
+ msgstr &quot;Ancho de banda&quot;
+ 
+-#: ../cfg_trunk_iax.py:53
++#: ../cfg_trunk_iax.py:57
+ msgid &quot;Low&quot;
+ msgstr &quot;Bajo&quot;
+ 
+-#: ../cfg_trunk_iax.py:53
++#: ../cfg_trunk_iax.py:57
+ msgid &quot;High&quot;
+ msgstr &quot;Alto&quot;
+ 
+-#: ../cfg_trunk_iax.py:56 ../cfg_trunk_sip.py:58
++#: ../cfg_trunk_iax.py:60 ../cfg_trunk_sip.py:58
+ msgid &quot;Register with remote host?&quot;
+ msgstr &quot;&#191;Registrar con el equipo remoto?&quot;
+ 
+-#: ../cfg_trunk_iax.py:60
++#: ../cfg_trunk_iax.py:64
+ msgid &quot;Authentication&quot;
+ msgstr &quot;Autenticaci&#243;n&quot;
+ 
+-#: ../cfg_trunk_iax.py:64
++#: ../cfg_trunk_iax.py:68
+ msgid &quot;Authentication Method&quot;
+ msgstr &quot;M&#233;todo de autenticaci&#243;n&quot;
+ 
+-#: ../cfg_trunk_iax.py:67
++#: ../cfg_trunk_iax.py:71
+ msgid &quot;Plain text&quot;
+ msgstr &quot;Texto plano&quot;
+ 
+-#: ../cfg_trunk_iax.py:67
++#: ../cfg_trunk_iax.py:71
+ msgid &quot;RSA&quot;
+ msgstr &quot;RSA&quot;
+ 
+-#: ../cfg_trunk_iax.py:67
++#: ../cfg_trunk_iax.py:71
+ msgid &quot;MD5&quot;
+ msgstr &quot;MD5&quot;
+ 
+-#: ../cfg_trunk_iax.py:71
++#: ../cfg_trunk_iax.py:75
+ msgid &quot;For 'Plain' or 'MD5' only&quot;
+ msgstr &quot;S&#243;lo para \&quot;Texto plano\&quot; o \&quot;RSA\&quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:76
++#: ../cfg_trunk_iax.py:80
+ msgid &quot;Public key from remote server&quot;
+ msgstr &quot;Llave p&#250;blica del servidor remoto&quot;
+ 
+-#: ../cfg_trunk_iax.py:77 ../cfg_trunk_iax.py:83
++#: ../cfg_trunk_iax.py:81 ../cfg_trunk_iax.py:87
+ msgid &quot;For 'RSA' only&quot;
+ msgstr &quot;S&#243;lo para \&quot;RSA\&quot;&quot;
+ 
+-#: ../cfg_trunk_iax.py:82
++#: ../cfg_trunk_iax.py:86
+ msgid &quot;Private local key&quot;
+ msgstr &quot;Llave privada local&quot;
+ 
+-#: ../cfg_trunk_iax.py:88
++#: ../cfg_trunk_iax.py:92
+ msgid &quot;Enable trunking?&quot;
+ msgstr &quot;&#191;Habilitar trunking?&quot;
+ 
+-#: ../cfg_trunk_iax.py:104
++#: ../cfg_trunk_iax.py:108
+ msgid &quot;Calls from IAX trunk&quot;
+ msgstr &quot;Llamadas desde troncal IAX&quot;
+ 
+-#: ../cfg_trunk_iax.py:108 ../cfg_trunk_sip.py:93 ../cfg_trunk_zappbx.py:90
++#: ../cfg_trunk_iax.py:112 ../cfg_trunk_sip.py:93 ../cfg_trunk_zappbx.py:90
+ #: ../cfg_trunk_zappri.py:98 ../cfg_trunk_zap.py:83
+ msgid &quot;Change Caller*Id to:&quot;
+ msgstr &quot;Cambiar el Identificador de llamante a:&quot;
+ 
+-#: ../cfg_trunk_iax.py:124 ../cfg_trunk_sip.py:109 ../cfg_trunk_zappbx.py:106
++#: ../cfg_trunk_iax.py:128 ../cfg_trunk_sip.py:109 ../cfg_trunk_zappbx.py:106
+ #: ../cfg_trunk_zappri.py:114 ../cfg_trunk_zap.py:99
+ msgid &quot;Extension to ring&quot;
+ msgstr &quot;Extensi&#243;n a timbrar&quot;
+ 
+-#: ../cfg_trunk_iax.py:136 ../cfg_trunk_sip.py:121 ../cfg_trunk_zappbx.py:118
++#: ../cfg_trunk_iax.py:140 ../cfg_trunk_sip.py:121 ../cfg_trunk_zappbx.py:118
+ #: ../cfg_trunk_zappri.py:126
+ #, fuzzy
+ msgid &quot;Allow dial extension from which Virtual PBX&quot;
+ msgstr &quot;Permitir la marcaci&#243;n a todas las extensiones de la PBX&quot;
+ 
+-#: ../cfg_trunk_iax.py:142 ../cfg_trunk_sip.py:127
++#: ../cfg_trunk_iax.py:146 ../cfg_trunk_sip.py:127
+ #, fuzzy
+ msgid &quot;Outgoing calls to IAX trunk&quot;
+ msgstr &quot;Llamadas salientes por troncal&quot;
+@@ -2358,9 +2355,8 @@
+ msgstr &quot;Equipo SIP&quot;
+ 
+ #: ../cfg_trunk_sip.py:52
+-#, fuzzy
+ msgid &quot;SIP port&quot;
+-msgstr &quot;Equipo SIP&quot;
++msgstr &quot;Puerto SIP&quot;
+ 
+ #: ../cfg_trunk_sip.py:62
+ msgid &quot;Enable forward address type?&quot;
+@@ -2375,9 +2371,8 @@
+ msgstr &quot;&#191;Omitir autenticaci&#243;n para llamadas entrantes?&quot;
+ 
+ #: ../cfg_trunk_sip.py:84
+-#, fuzzy
+ msgid &quot;Sip domain:&quot;
+-msgstr &quot;Espa&#241;a&quot;
++msgstr &quot;Dominio SIP:&quot;
+ 
+ #: ../cfg_trunk_sip.py:89 ../cfg_trunk_zappbx.py:86
+ msgid &quot;Calls from SIP trunk&quot;
+@@ -3157,12 +3152,14 @@
+ #: ../page_owner_cdr.ptl:300 ../page_stats_cdr.ptl:302
+ #, fuzzy, python-format
+ msgid &quot;Showing records from %(offset)s to %(f)s of %(total)s&quot;
+-msgstr &quot;Mostrando los registros del %(offset)s al %(f)s de un total de %(total)s&quot;
++msgstr &quot;&quot;
++&quot;Mostrando los registros del %(offset)s al %(f)s de un total de %(total)s&quot;
+ 
+ #: ../page_owner_cdr.ptl:302 ../page_stats_cdr.ptl:304
+ #, fuzzy, python-format
+ msgid &quot;Showing records from %(offset)s to %(total)s of %(total)s&quot;
+-msgstr &quot;Mostrando los registros del %(offset)s al %(total)s de un total de %(total)s&quot;
++msgstr &quot;&quot;
++&quot;Mostrando los registros del %(offset)s al %(total)s de un total de %(total)s&quot;
+ 
+ #: ../page_owner_cdr.ptl:305 ../page_stats_cdr.ptl:307
+ #, python-format
+@@ -3385,34 +3382,29 @@
+ msgstr &quot;&quot;
+ 
+ #: ../page_stats_qcallback.ptl:175 ../page_stats_queue.ptl:241
+-#, fuzzy
+ msgid &quot;All Years&quot;
+-msgstr &quot;A&#241;os&quot;
++msgstr &quot;Todos los a&#241;os&quot;
+ 
+ #: ../page_stats_qcallback.ptl:198
+-#, fuzzy
+ msgid &quot;Caller&quot;
+-msgstr &quot;Identificador de llamante&quot;
++msgstr &quot;Llamante&quot;
+ 
+ #: ../page_stats_qcallback.ptl:217
+ msgid &quot;List of calls that entered a Queue but where not completed, by date:&quot;
+ msgstr &quot;&quot;
+ 
+ #: ../page_stats_queue.ptl:35
+-#, fuzzy
+ msgid &quot;Queue Statistics&quot;
+-msgstr &quot;Estad&#237;sticas&quot;
++msgstr &quot;Estad&#237;sticas de colas&quot;
+ 
+ #: ../page_stats_queue.ptl:36
+-#, fuzzy
+ msgid &quot;Incoming Call Statistics by Queue&quot;
+-msgstr &quot;Estad&#237;sticas de Llamadas&quot;
++msgstr &quot;Estad&#237;sticas de llamadas entrantes por cola&quot;
+ 
+ #: ../page_stats_queue.ptl:117 ../page_stats_queue.ptl:160
+ #: ../page_stats_queue.ptl:203 ../page_stats_queue.ptl:243
+-#, fuzzy
+ msgid &quot;Completed Calls&quot;
+-msgstr &quot;Llamadas fallidas&quot;
++msgstr &quot;Llamadas completadas&quot;
+ 
+ #: ../page_stats_queue.ptl:120 ../page_stats_queue.ptl:163
+ #: ../page_stats_queue.ptl:206 ../page_stats_queue.ptl:246
+@@ -3421,9 +3413,8 @@
+ 
+ #: ../page_stats_queue.ptl:123 ../page_stats_queue.ptl:166
+ #: ../page_stats_queue.ptl:209 ../page_stats_queue.ptl:249
+-#, fuzzy
+ msgid &quot;Uncompleted Calls&quot;
+-msgstr &quot;Llamadas contestadas&quot;
++msgstr &quot;Llamadas no completadas&quot;
+ 
+ #: ../page_stats_queue.ptl:126 ../page_stats_queue.ptl:169
+ #: ../page_stats_queue.ptl:212 ../page_stats_queue.ptl:252
+@@ -3440,9 +3431,8 @@
+ msgstr &quot;&quot;
+ 
+ #: ../page_stats_queue.ptl:131
+-#, fuzzy
+ msgid &quot;Hour&quot;
+-msgstr &quot;Horas&quot;
++msgstr &quot;Hora&quot;
+ 
+ #: ../page_stats_queue.ptl:173
+ msgid &quot;Distribution by Days&quot;
+@@ -3485,9 +3475,8 @@
+ msgstr &quot;&quot;
+ 
+ #: ../page_stats_queue.ptl:421
+-#, fuzzy
+ msgid &quot;Calls dumped by agents&quot;
+-msgstr &quot;Llamadas por d&#237;a en un mes&quot;
++msgstr &quot;Llamadas abandonadas por los agentes&quot;
+ 
+ #: ../page_stats_queue.ptl:423
+ msgid &quot;Calls abandoned by caller&quot;
+@@ -3506,9 +3495,8 @@
+ msgstr &quot;&quot;
+ 
+ #: ../page_stats_queue.ptl:436
+-#, fuzzy
+ msgid &quot;Time of answer&quot;
+-msgstr &quot;Hora_de_la_respuesta&quot;
++msgstr &quot;Hora de respuesta&quot;
+ 
+ #: ../page_stats_queue.ptl:437 ../page_stats_queue.ptl:445
+ #: ../StatsHelper.ptl:171
+@@ -3531,9 +3519,8 @@
+ msgstr &quot;Hora_de_la_respuesta&quot;
+ 
+ #: ../page_stats_queue.ptl:466
+-#, fuzzy
+ msgid &quot;Statistics for a Queue by Date:&quot;
+-msgstr &quot;Estad&#237;sticas de las llamadas por fecha:&quot;
++msgstr &quot;Estad&#237;sticas para una cola por fecha:&quot;
+ 
+ #: ../page_stats_trunks.ptl:34
+ msgid &quot;Trunk Statistics&quot;
+@@ -3816,6 +3803,10 @@
+ msgid &quot;You don't have access to this page&quot;
+ msgstr &quot;Usted no tiene acceso a esta ubicaci&#243;n&quot;
+ 
++#, fuzzy
++#~ msgid &quot;Phone timeout&quot;
++#~ msgstr &quot;Estado del Tel&#233;fono&quot;
++
+ #~ msgid &quot;Warning: There is no %s or %s file yet.&quot;
+ #~ msgstr &quot;Advertencia: A&#250;n no existe el archivo %s o %s.&quot;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000228.html">[Destar-dev] r719 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000232.html">[Destar-dev] r721 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#231">[ date ]</a>
+              <a href="thread.html#231">[ thread ]</a>
+              <a href="subject.html#231">[ subject ]</a>
+              <a href="author.html#231">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

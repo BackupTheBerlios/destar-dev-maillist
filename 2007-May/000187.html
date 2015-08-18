@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r678 - branches/destar-callweaver
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r678%20-%20branches/destar-callweaver&In-Reply-To=%3C200705112110.l4BLAbhp002502%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000186.html">
+   <LINK REL="Next"  HREF="000188.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r678 - branches/destar-callweaver</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r678%20-%20branches/destar-callweaver&In-Reply-To=%3C200705112110.l4BLAbhp002502%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r678 - branches/destar-callweaver">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri May 11 23:10:37 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000186.html">[Destar-dev] r677 - branches/destar-callweaver
+</A></li>
+        <LI>Next message: <A HREF="000188.html">[Destar-dev] r679 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#187">[ date ]</a>
+              <a href="thread.html#187">[ thread ]</a>
+              <a href="subject.html#187">[ subject ]</a>
+              <a href="author.html#187">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-05-11 23:10:37 +0200 (Fri, 11 May 2007)
+New Revision: 678
+
+Modified:
+   branches/destar-callweaver/cdrutils.py
+   branches/destar-callweaver/cfg_opt_logger.py
+   branches/destar-callweaver/cfg_opt_sipnotify.py
+   branches/destar-callweaver/cfg_phone_iax.py
+   branches/destar-callweaver/cfg_phone_sip.py
+Log:
+modules and log dirs moved to callweaver
+
+
+
+Modified: branches/destar-callweaver/cdrutils.py
+===================================================================
+--- branches/destar-callweaver/cdrutils.py	2007-05-11 16:50:15 UTC (rev 677)
++++ branches/destar-callweaver/cdrutils.py	2007-05-11 21:10:37 UTC (rev 678)
+@@ -28,7 +28,7 @@
+ 	print _(&quot;Note: you should install python-pysqlite2 to have CDR functionality&quot;)
+ 
+ try:
+-	if not  os.access(&quot;/usr/lib/asterisk/modules/cdr_sqlite3_custom.so&quot;, os.F_OK):
++	if not  os.access(&quot;/opt/lib/callweaver/modules/cdr_sqlite3_custom.so&quot;, os.F_OK):
+ 		raise ImportError
+ 	needModule(&quot;cdr_sqlite3_custom&quot;)
+ except:
+@@ -36,7 +36,7 @@
+ 	
+ 
+ try:
+-	db_fn = &quot;/var/log/asterisk/master.db&quot;
++	db_fn = &quot;/var/log/callweaver/master.db&quot;
+ 	if not os.access(db_fn, os.O_RDWR):
+ 		raise ImportError
+ 	db = sqlite.connect(db_fn, isolation_level=&quot;IMMEDIATE&quot;)
+
+Modified: branches/destar-callweaver/cfg_opt_logger.py
+===================================================================
+--- branches/destar-callweaver/cfg_opt_logger.py	2007-05-11 16:50:15 UTC (rev 677)
++++ branches/destar-callweaver/cfg_opt_logger.py	2007-05-11 21:10:37 UTC (rev 678)
+@@ -47,7 +47,7 @@
+ 				optional=True,
+ 				default=&quot;error,warning,notice,verbose&quot;),
+ 		       VarType(&quot;messages&quot;,
+-				title=_(&quot;Output in /var/log/asterisk/messages&quot;),
++				title=_(&quot;Output in /var/log/callweaver/messages&quot;),
+ 				type=&quot;mchoice&quot;,
+ 				options=_opt,
+ 				optional=True,
+
+Modified: branches/destar-callweaver/cfg_opt_sipnotify.py
+===================================================================
+--- branches/destar-callweaver/cfg_opt_sipnotify.py	2007-05-11 16:50:15 UTC (rev 677)
++++ branches/destar-callweaver/cfg_opt_sipnotify.py	2007-05-11 21:10:37 UTC (rev 678)
+@@ -29,7 +29,7 @@
+ 	def createVariables(self):
+ 		self.variables = [
+ 			VarType(&quot;info&quot;,
+-			    title=_(&quot;Enables the sip notify command to reboot or sync phones on asterisk commanline.&quot;),
++			    title=_(&quot;Enables the sip notify command to reboot or sync phones on callweaver commanline.&quot;),
+ 			    type=&quot;label&quot;,
+ 			    )]
+ 
+
+Modified: branches/destar-callweaver/cfg_phone_iax.py
+===================================================================
+--- branches/destar-callweaver/cfg_phone_iax.py	2007-05-11 16:50:15 UTC (rev 677)
++++ branches/destar-callweaver/cfg_phone_iax.py	2007-05-11 21:10:37 UTC (rev 678)
+@@ -123,7 +123,7 @@
+ 			
+ 
+ 			VarType(&quot;notransfer&quot;,
+-					title=_(&quot;Skip asterisk media path?&quot;),
++					title=_(&quot;Skip callweaver media path?&quot;),
+ 					type=&quot;bool&quot;),
+ 	
+ 			VarType(&quot;Outbound&quot;,
+
+Modified: branches/destar-callweaver/cfg_phone_sip.py
+===================================================================
+--- branches/destar-callweaver/cfg_phone_sip.py	2007-05-11 16:50:15 UTC (rev 677)
++++ branches/destar-callweaver/cfg_phone_sip.py	2007-05-11 21:10:37 UTC (rev 678)
+@@ -269,7 +269,7 @@
+ 		sip.append(&quot;type=friend&quot;)
+ 		sip.append(&quot;qualify=yes&quot;)
+ 		m = md5.new()
+-		m.update('%s:asterisk:%s' % (self.name,self.secret))
++		m.update('%s:callweaver:%s' % (self.name,self.secret))
+ 		sip.append(&quot;md5secret=%s&quot; % m.hexdigest())
+ 		sip.append(&quot;host=dynamic&quot;)
+ 		if self.host:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000186.html">[Destar-dev] r677 - branches/destar-callweaver
+</A></li>
+	<LI>Next message: <A HREF="000188.html">[Destar-dev] r679 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#187">[ date ]</a>
+              <a href="thread.html#187">[ thread ]</a>
+              <a href="subject.html#187">[ subject ]</a>
+              <a href="author.html#187">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

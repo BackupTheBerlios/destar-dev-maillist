@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r626 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r626%20-%20trunk&In-Reply-To=%3C200703060528.l265S1Ox024083%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000120.html">
+   <LINK REL="Next"  HREF="000122.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r626 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r626%20-%20trunk&In-Reply-To=%3C200703060528.l265S1Ox024083%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r626 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Tue Mar  6 06:28:01 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000120.html">[Destar-dev] r625 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000122.html">[Destar-dev] r627 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#121">[ date ]</a>
+              <a href="thread.html#121">[ thread ]</a>
+              <a href="subject.html#121">[ subject ]</a>
+              <a href="author.html#121">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-03-06 06:28:00 +0100 (Tue, 06 Mar 2007)
+New Revision: 626
+
+Modified:
+   trunk/ConfigHelper.ptl
+   trunk/StatsHelper.ptl
+   trunk/Templates.ptl
+   trunk/backend.py
+   trunk/page_main.ptl
+   trunk/panelutils.py
+Log:
+more unicode transition-related bugs fixed 
+
+
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/ConfigHelper.ptl	2007-03-06 05:28:00 UTC (rev 626)
+@@ -31,7 +31,7 @@
+ 	&quot;&quot;&quot;
+ 
+ 	def render_content(self):
+-		return htmltext(self.value)
++		return _(self.value)
+ 
+ 
+ class LabelWidget(Widget):
+@@ -267,7 +267,7 @@
+ 		except:
+ 			_v = ''
+ 		if _v: do_update = True
+-		t = htmltext(v.title)
++		t = _(v.title)
+ 		r = not v.optional
+ 		if v.type==&quot;string&quot;:
+ 			form.add(StringWidget, v.name, _v, t, v.hint, r, render_br=v.render_br, maxlength=v.len, size=min(v.size,56) )
+@@ -281,6 +281,8 @@
+ 				opts.insert(0, ('',''))
+ 			elif not opts:
+ 				return errorpage(_(&quot;Required '%s' not found&quot;) % v.name)
++			for a in opts:
++				a = (a[0], _(a[1]))
+ 			form.add(SingleSelectWidget, v.name, _v, title=t, hint=v.hint, required=r, options=opts,render_br=v.render_br)
+ 		elif v.type==&quot;mchoice&quot;:
+ 			# TODO: much of this code should NOT by in a *.ptl file
+
+Modified: trunk/StatsHelper.ptl
+===================================================================
+--- trunk/StatsHelper.ptl	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/StatsHelper.ptl	2007-03-06 05:28:00 UTC (rev 626)
+@@ -159,13 +159,13 @@
+ 								width = 15,
+ 								data = data)
+ 	
+-	ar = area.T(x_axis=axis.X(label=unicode(_(labelx), 'utf-8') ),
+-				y_axis=axis.Y(label=unicode(_('Calls'), 'utf-8'), tic_interval=interval))
++	ar = area.T(x_axis=axis.X(label=labelx),
++				y_axis=axis.Y(label=_('Calls'), tic_interval=interval))
+ 	
+-	plot1=bar_plot.T(label=unicode(_('Answered'), 'utf-8'), hcol=1, fill_style=fill_style.goldenrod)
+-	plot2=bar_plot.T(label=unicode(_('Not Answered'), 'utf-8'), hcol=2, stack_on = plot1, fill_style=fill_style.gray70)
+-	plot3=bar_plot.T(label=unicode(_('Busy'), 'utf-8'), hcol=3, stack_on = plot2, fill_style=fill_style.gray50)
+-	plot4=bar_plot.T(label=unicode(_('Failed'), 'utf-8'), hcol=4, stack_on = plot3, fill_style=fill_style.darkseagreen)
++	plot1=bar_plot.T(label=_('Answered'), hcol=1, fill_style=fill_style.goldenrod)
++	plot2=bar_plot.T(label=_('Not Answered'), hcol=2, stack_on = plot1, fill_style=fill_style.gray70)
++	plot3=bar_plot.T(label=_('Busy'), hcol=3, stack_on = plot2, fill_style=fill_style.gray50)
++	plot4=bar_plot.T(label=_('Failed'), hcol=4, stack_on = plot3, fill_style=fill_style.darkseagreen)
+ 	ar.add_plot(plot1,plot2,plot3,plot4)
+ 	ar.draw(can)
+ 	can.close()
+@@ -198,10 +198,10 @@
+ 								width = 15,
+ 								data = data)
+ 	
+-	ar = area.T(x_axis=axis.X(label=unicode(_(labelx), 'utf-8') ),
+-				y_axis=axis.Y(label=unicode(_(labely), 'utf-8'), tic_interval=interval))
++	ar = area.T(x_axis=axis.X(label=_(labelx)),
++				y_axis=axis.Y(label=_(labely), tic_interval=interval))
+ 	
+-	plot1=bar_plot.T(label=unicode(_(labely), 'utf-8'), hcol=1, fill_style=fill_style.darkseagreen)
++	plot1=bar_plot.T(label=_(labely), hcol=1, fill_style=fill_style.darkseagreen)
+ 	ar.add_plot(plot1)
+ 	ar.draw(can)
+ 	can.close()
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/Templates.ptl	2007-03-06 05:28:00 UTC (rev 626)
+@@ -158,7 +158,7 @@
+    	'&lt;head&gt;\n'
+    	if refresh:
+    		'&lt;meta http-equiv=&quot;Refresh&quot; content=&quot;%d;&quot; /&gt;\n' % refresh
+-  	'&lt;title&gt;Asterisk/DeStar PBX :: %s&lt;/title&gt;\n' % _(str(title))
++  	'&lt;title&gt;Asterisk/DeStar PBX :: %s&lt;/title&gt;\n' % title
+   	'&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;\n'
+   	'&lt;style type=&quot;text/css&quot; media=&quot;screen, tv, projection&quot;&gt;\n'
+   	'	@import url(&quot;/static/css/general.css&quot;);\n' 
+@@ -221,7 +221,7 @@
+  	'			&lt;/div&gt;\n'
+ 
+ 	if title:
+-		'&lt;h2 id=&quot;contentHeading&quot;&gt;%s&lt;/h2&gt;\n' % _(str(title))
++		'&lt;h2 id=&quot;contentHeading&quot;&gt;%s&lt;/h2&gt;\n' % _(title)
+ 
+ 	
+ def footer [html] ():
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/backend.py	2007-03-06 05:28:00 UTC (rev 626)
+@@ -824,7 +824,7 @@
+ 		s += manager.reloadMoH()
+ 	if panelutils.isConfigured():
+ 		s += panelutils.restartPanelDaemon()
+-	return &quot;&lt;br/&gt;&quot;.join(s)
++	return &quot;&quot;.join(s)
+ 
+ def createDocs():
+ 	for c in configletsList():
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/page_main.ptl	2007-03-06 05:28:00 UTC (rev 626)
+@@ -149,13 +149,13 @@
+         def _q_exception_handler [plain] (self, exc):
+                 if isinstance(exc, quixote.errors.AccessError) or isinstance(exc, quixote.errors.PublishError):
+                         if (exc.title == &quot;Access denied&quot;):
+-                                #header(htmltext(_('Access Denied')))
++                                header(_('Access Denied'))
+                                 '&lt;p&gt;'
+                                 htmltext(_(&quot;You don't have access to this page.&quot;))
+                                 '&lt;/p&gt;'
+                                 footer()
+                         else:
+-                                #header(_(exc.title))
++                                header(_(exc.title))
+                                 '&lt;p&gt;'
+                                 _(exc.public_msg)
+                                 '&lt;/p&gt;'
+
+Modified: trunk/panelutils.py
+===================================================================
+--- trunk/panelutils.py	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/panelutils.py	2007-03-06 05:28:00 UTC (rev 626)
+@@ -35,6 +35,8 @@
+ PANEL_STOP_CMD	= &quot;/etc/init.d/op-panel stop&quot;
+ PANEL_RESTART_CMD = &quot;/etc/init.d/op-panel restart&quot;
+ 
++def N_(message): return message
++
+ def isConfigured ():
+ 	import configlets
+ 	configured=0
+@@ -72,7 +74,7 @@
+ 	c.append(&quot;change_led_agent=1&quot;)
+ 	c.append(&quot;reverse_transfer=0&quot;)
+ 	c.append(&quot;clicktodial_insecure=0&quot;)
+-	c.append('transfer_timeout=&quot;%s&quot;' % _(&quot;0,No timeout|300,5 minutes|600,10 minutes|1200,20 minutes|2400,40 minutes|3000,50 minutes&quot;))
++	c.append('transfer_timeout=&quot;%s&quot;' % N_(&quot;0,No timeout|300,5 minutes|600,10 minutes|1200,20 minutes|2400,40 minutes|3000,50 minutes&quot;))
+ 	c.append(&quot;enable_restart = 0&quot;)
+ 
+ def createDefaultStyle(c):
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000120.html">[Destar-dev] r625 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000122.html">[Destar-dev] r627 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#121">[ date ]</a>
+              <a href="thread.html#121">[ thread ]</a>
+              <a href="subject.html#121">[ subject ]</a>
+              <a href="author.html#121">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

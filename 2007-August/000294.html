@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r775 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r775%20-%20trunk&In-Reply-To=%3C200708011843.l71IhIGQ025420%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000293.html">
+   <LINK REL="Next"  HREF="000295.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r775 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r775%20-%20trunk&In-Reply-To=%3C200708011843.l71IhIGQ025420%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r775 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Aug  1 20:43:18 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000293.html">[Destar-dev] r774 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000295.html">[Destar-dev] r776 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#294">[ date ]</a>
+              <a href="thread.html#294">[ thread ]</a>
+              <a href="subject.html#294">[ subject ]</a>
+              <a href="author.html#294">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-01 20:43:17 +0200 (Wed, 01 Aug 2007)
+New Revision: 775
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_config.ptl
+   trunk/page_main.ptl
+   trunk/page_user.ptl
+Log:
+Some gettext related fixes
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-01 16:39:44 UTC (rev 774)
++++ trunk/CHANGELOG.txt	2007-08-01 18:43:17 UTC (rev 775)
+@@ -1,6 +1,7 @@
+ 2007-08-01:
+ * Updated es.po
+ * Added all: target in Makefile
++* Some gettext related fixes
+ 
+ 2007-07-31:
+ * configlets.py: fixed bug in appendExten
+
+Modified: trunk/page_config.ptl
+===================================================================
+--- trunk/page_config.ptl	2007-08-01 16:39:44 UTC (rev 774)
++++ trunk/page_config.ptl	2007-08-01 18:43:17 UTC (rev 775)
+@@ -78,7 +78,7 @@
+ 
+ 		if not os.access(&quot;/etc/asterisk&quot;, os.O_RDWR):
+ 			self.configurationTip(
+-				_(&quot;You should enable write access to the directory /etc/asterisk. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'.&quot; % groups),
++				_(&quot;You should enable write access to the directory /etc/asterisk. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'.&quot;) % groups,
+ 				&quot;&quot;,
+ 				[])
+ 
+@@ -108,18 +108,18 @@
+ 
+ 		if not os.access(&quot;/etc/zaptel.conf&quot;, os.O_RDWR):
+ 			self.configurationTip(
+-				_(&quot;You should enable write access to /etc/zaptel.conf. Without write access to this file you cannot configure Zaptel devices, e.g. FXO/FXS cards, T1/E1 cards, ZapHFC ISDN cards, etc. You should 'chmod g+rw' this file and set it's group to one of '%s'.&quot; % groups),
++				_(&quot;You should enable write access to /etc/zaptel.conf. Without write access to this file you cannot configure Zaptel devices, e.g. FXO/FXS cards, T1/E1 cards, ZapHFC ISDN cards, etc. You should 'chmod g+rw' this file and set it's group to one of '%s'.&quot;) % groups,
+ 				&quot;&quot;,
+ 				[])
+ 		if not os.access(panelutils.PANEL_CONF_DIR, os.O_RDWR):
+ 			self.configurationTip(
+-				_(&quot;You should enable write access to the %s directory. Without the ability to modify the Asternic Flash Operator Panel configuration files DeStar won't be integrated whit the panel.&quot; % panelutils.PANEL_CONF_DIR),
++				_(&quot;You should enable write access to the %s directory. Without the ability to modify the Asternic Flash Operator Panel configuration files DeStar won't be integrated whit the panel.&quot;) % panelutils.PANEL_CONF_DIR,
+ 				&quot;&quot;,
+ 				[])
+ 		db_fn = &quot;/var/log/asterisk/master.db&quot;
+ 		if not os.access(db_fn, os.O_RDWR):
+ 			self.configurationTip(
+-				_(&quot;You don't seem to have access to %s yet created by cdr_sqlite3_custom. Without this file CDR reports wont be accesible trough this interface.&quot;),
++				_(&quot;You don't seem to have access to %s yet created by cdr_sqlite3_custom. Without this file CDR reports wont be accesible trough this interface.&quot;) % db_fn,
+ 				&quot;&quot;,
+ 				[])
+ 
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2007-08-01 16:39:44 UTC (rev 774)
++++ trunk/page_main.ptl	2007-08-01 18:43:17 UTC (rev 775)
+@@ -136,7 +136,7 @@
+ 			return redirect(str('/login'))
+ 		header(self._q_desc)
+ 		'&lt;p&gt;'
+-		'This page is empty. Please select one option from the menu on the left side.'
++		htmltext(_('This page is empty. Please select one option from the menu.'))
+ 		'&lt;/p&gt;'
+ 		footer()
+ 		#import configlets
+
+Modified: trunk/page_user.ptl
+===================================================================
+--- trunk/page_user.ptl	2007-08-01 16:39:44 UTC (rev 774)
++++ trunk/page_user.ptl	2007-08-01 18:43:17 UTC (rev 775)
+@@ -47,8 +47,8 @@
+ 
+ 		for e in self._q_menu:
+ 			'&lt;tr&gt;'
+-			'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (e._q_link,e._q_title)
+-			'&lt;td&gt;%s&lt;/td&gt;' % e._q_desc
++			'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (e._q_link, _(e._q_title))
++			'&lt;td&gt;%s&lt;/td&gt;' % _(e._q_desc)
+ 			'&lt;/tr&gt;'
+ 		'&lt;/table&gt;'
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000293.html">[Destar-dev] r774 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000295.html">[Destar-dev] r776 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#294">[ date ]</a>
+              <a href="thread.html#294">[ thread ]</a>
+              <a href="subject.html#294">[ subject ]</a>
+              <a href="author.html#294">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

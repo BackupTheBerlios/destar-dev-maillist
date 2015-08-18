@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r844 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r844%20-%20trunk&In-Reply-To=%3C200912150302.nBF32Cpl020213%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000397.html">
+   <LINK REL="Next"  HREF="000399.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r844 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r844%20-%20trunk&In-Reply-To=%3C200912150302.nBF32Cpl020213%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r844 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec 15 04:02:12 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000397.html">[Destar-dev] r843 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000399.html">[Destar-dev] r845 - in trunk: . static/themes/avatar	static/themes/avatar/css static/themes/avatar/imgs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#398">[ date ]</a>
+              <a href="thread.html#398">[ thread ]</a>
+              <a href="subject.html#398">[ subject ]</a>
+              <a href="author.html#398">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-15 04:02:12 +0100 (Tue, 15 Dec 2009)
+New Revision: 844
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_app_disa.py
+Log:
+* Added AtributeException catch on cfg_app_disa.py
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-15 02:45:04 UTC (rev 843)
++++ trunk/CHANGELOG.txt	2009-12-15 03:02:12 UTC (rev 844)
+@@ -13,6 +13,7 @@
+   - Added extension to test IVR from the inside.
+   - Admin may change incoming callerID.
+   - Choose if jump to operator or head of IVR by default.
++* Added AtributeException catch on cfg_app_disa.py
+ 
+ 2009-04-16
+ * Zap -&gt; DAHDI changes from branch icom-avatar
+
+Modified: trunk/cfg_app_disa.py
+===================================================================
+--- trunk/cfg_app_disa.py	2009-12-15 02:45:04 UTC (rev 843)
++++ trunk/cfg_app_disa.py	2009-12-15 03:02:12 UTC (rev 844)
+@@ -46,23 +46,26 @@
+ 				len=6,
+ 				default=&quot;*171&quot;),
+ 
+-			VarType(&quot;Dialout&quot;,
+-				title=_(&quot;Allowed dialout-entries&quot;),
+-				type=&quot;label&quot;,
+-				hide=True),
++			VarType(&quot;phone&quot;,
++					title=_(&quot;Log into phone&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;))
++				]
++	def isAddable(self):
++		&quot;We can only add this object if we have at least one other phone defined.&quot;
+ 
+-			VarType(&quot;timeout&quot;,
+-				title=_(&quot;Enable time restriction?&quot;),
+-				type=&quot;bool&quot;,
+-				optional=True,
+-				hide=True),]
+-		if varlist_manager.hasDialouts():
+-                        self.variables += varlist_manager.getDialouts()
+-                        for v in self.variables:
+-                                if v.name == &quot;Dialout&quot; or v.name==&quot;timeout&quot;:
+-                                        v.hide = False
++		# BUG: it does somehow not work to simply write for obj in config_entries,
++		# despite the &quot;from configlets import *&quot; above
++		import configlets
++		if len(configlets.configlet_tree.getConfigletsByName('CfgOptPBX')) &gt; 0:
++			for obj in configlets.configlet_tree:
++				if obj.groupName == 'Phones':
++					return True
++		return False
++	isAddable = classmethod(isAddable)
++
++
+ 	
+-	
+ 	def row(self):
+ 		return (&quot;%s&quot; % (self.ext),self.shortName)
+ 
+@@ -81,7 +84,20 @@
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(&quot;%s&quot; % self.pbx)
+ 		needModule(&quot;app_disa&quot;)	
+-		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Set(TIMEOUT(digit)=5)&quot;, self.pbx)
+-		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Set(TIMEOUT(response)=10)&quot;, self.pbx)
+-		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Authenticate(%s)&quot; % self.pin, self.pbx)
+-		c.appendExten(&quot;%s&quot; % self.ext ,&quot;DISA(no-password,out-%s)&quot; % self.name, self.pbx)
++		import configlets
++		obj = configlets.configlet_tree.getConfigletByName(self.phone)
++                try:
++                        if obj.calleridname:
++                                cidname=obj.calleridname
++                        else:
++                                cidname=obj.name
++                        if obj.calleridnum:
++                                cidnum=obj.calleridnum
++                        else:
++                                cidnum=obj.ext
++                        c.appendExten(&quot;%s&quot; % self.ext ,&quot;Set(TIMEOUT(digit)=5)&quot;, self.pbx)
++                        c.appendExten(&quot;%s&quot; % self.ext ,&quot;Set(TIMEOUT(response)=10)&quot;, self.pbx)
++                        c.appendExten(&quot;%s&quot; % self.ext ,&quot;Authenticate(%s)&quot; % self.pin, self.pbx)
++                        c.appendExten(&quot;%s&quot; % self.ext ,'DISA(no-password,real-out-%s,&quot;%s&quot; &lt;%s&gt;' % (obj.name, cidname, cidnum), self.pbx)
++                except AttributeError:
++                        pass
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000397.html">[Destar-dev] r843 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000399.html">[Destar-dev] r845 - in trunk: . static/themes/avatar	static/themes/avatar/css static/themes/avatar/imgs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#398">[ date ]</a>
+              <a href="thread.html#398">[ thread ]</a>
+              <a href="subject.html#398">[ subject ]</a>
+              <a href="author.html#398">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r597 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r597%20-%20trunk&In-Reply-To=%3C200702262113.l1QLDdrv025611%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000085.html">
+   <LINK REL="Next"  HREF="000087.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r597 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r597%20-%20trunk&In-Reply-To=%3C200702262113.l1QLDdrv025611%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r597 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Mon Feb 26 22:13:39 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000085.html">[Destar-dev] r596 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000087.html">[Destar-dev] r598 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#86">[ date ]</a>
+              <a href="thread.html#86">[ thread ]</a>
+              <a href="subject.html#86">[ subject ]</a>
+              <a href="author.html#86">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-02-26 22:13:39 +0100 (Mon, 26 Feb 2007)
+New Revision: 597
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_dialout_normal.py
+Log:
+cfg_dialout_normal: adding r Dial option if no Authenticate() is used
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-02-26 16:59:07 UTC (rev 596)
++++ trunk/CHANGELOG.txt	2007-02-26 21:13:39 UTC (rev 597)
+@@ -1,5 +1,6 @@
+ 2007-02-26:
+ * Fixed &quot;cancel&quot; option in page_login
++* cfg_dialout_normal: adding r Dial option if no Authenticate() is used
+ 
+ 2007-02-22:
+ * Fixed statistics displaying
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-02-26 16:59:07 UTC (rev 596)
++++ trunk/cfg_dialout_normal.py	2007-02-26 21:13:39 UTC (rev 597)
+@@ -31,16 +31,51 @@
+ 					
+ 	def createVariables(self):
+ 		self.variables = [
+-		VarType(&quot;name&quot;,   title=_(&quot;Name&quot;), len=15),
+-		VarType(&quot;pattern&quot;, title=_(&quot;Pattern&quot;), len=55),
+-		VarType(&quot;rmprefix&quot;, title=_(&quot;Remove Prefix of length&quot;), len=10, default=&quot;0&quot;),
+-		VarType(&quot;addprefix&quot;, title=_(&quot;Add Prefix&quot;), len=10, optional=True, default=&quot;&quot;),
+-		VarType(&quot;maxtime&quot;, title=_(&quot;Maximum call time in seconds&quot;), type=&quot;int&quot;, len=15, default=6000),
+-		VarType(&quot;ringtime&quot;, title=_(&quot;Ringing time in seconds&quot;), type=&quot;int&quot;, len=15, default=300),
+-		VarType(&quot;qlookup&quot;, title=_(&quot;Search on quick dial list?&quot;), type=&quot;bool&quot;),
++		VarType(&quot;name&quot;,   
++			title=_(&quot;Name&quot;), 
++			len=15),
+ 
+-		VarType(&quot;dis_transfer&quot;, title=_(&quot;Disallow calling user transfer?&quot;), type=&quot;bool&quot;),
+-		VarType(&quot;Trunks&quot;, title=_(&quot;Trunks to use for routing this dialout entry&quot;), type=&quot;label&quot;, len=15, hide=True)
++		VarType(&quot;pattern&quot;, 
++			title=_(&quot;Pattern&quot;), 
++			len=55),
++
++		VarType(&quot;rmprefix&quot;, 
++			title=_(&quot;Remove Prefix of length&quot;), 
++			len=10, 
++			default=&quot;0&quot;),
++
++		VarType(&quot;addprefix&quot;, 
++			title=_(&quot;Add Prefix&quot;), 
++			len=10, 
++			optional=True, 
++			default=&quot;&quot;),
++
++		VarType(&quot;maxtime&quot;, 
++			title=_(&quot;Maximum call time in seconds&quot;), 
++			type=&quot;int&quot;, 
++			len=15, 
++			default=6000),
++
++		VarType(&quot;ringtime&quot;, 
++			title=_(&quot;Ringing time in seconds&quot;), 
++			type=&quot;int&quot;, 
++			len=15, 
++			default=30),
++
++		VarType(&quot;qlookup&quot;, 
++			title=_(&quot;Search on quick dial list?&quot;), 
++			type=&quot;bool&quot;),
++
++		VarType(&quot;dis_transfer&quot;, 
++			title=_(&quot;Disable transfer to the calling party?&quot;), 
++			type=&quot;bool&quot;, 
++			default=False),
++
++		VarType(&quot;Trunks&quot;, 
++			title=_(&quot;Trunks to use for routing this dialout entry&quot;), 
++			type=&quot;label&quot;, 
++			len=15, 
++			hide=True)
+ 		]
+ 
+ 		Cfg.fixup(self)
+@@ -88,18 +123,20 @@
+ 		else:
+ 		       opts=&quot;TtW&quot;
+ 		if self.qlookup:
++			c.appendExten(&quot;s&quot;,'SetVar(options=%sr)' % opts)
+ 			c.appendExten(&quot;s&quot;,&quot;Set(dest=${DB(QUICKDIALLIST/GLOBAL/${ARG1})})&quot;,e=&quot;Goto(3)&quot;)
+ 			c.appendExten(&quot;s&quot;,'Set(ARG1=${dest})')
+-			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG2} = n]?5:4)&quot;)
++			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG2} = n]?6:5)&quot;)
+ 			c.appendExten(&quot;s&quot;,&quot;Authenticate(${ARG2})&quot;)
+-			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG3} = 0]?6:9)&quot;)
++			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG3} = 0]?7:10)&quot;)
+ 			c.appendExten(&quot;s&quot;,'Set(timeout=0)')
+ 			c.appendExten(&quot;s&quot;,'Set(options=%s)' % opts)
+ 			c.appendExten(&quot;s&quot;,'Goto(11)')
+ 		else:
+-			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG2} = n]?3:2)&quot;)
++			c.appendExten(&quot;s&quot;,'SetVar(options=%sr)' % opts)
++			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG2} = n]?4:3)&quot;)
+ 			c.appendExten(&quot;s&quot;,&quot;Authenticate(${ARG2})&quot;)
+-			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG3} = 0]?4:7)&quot;)
++			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG3} = 0]?5:8)&quot;)
+ 			c.appendExten(&quot;s&quot;,'Set(timeout=0)')
+ 			c.appendExten(&quot;s&quot;,'Set(options=%s)' % opts)
+ 			c.appendExten(&quot;s&quot;,'Goto(9)')
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000085.html">[Destar-dev] r596 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000087.html">[Destar-dev] r598 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#86">[ date ]</a>
+              <a href="thread.html#86">[ thread ]</a>
+              <a href="subject.html#86">[ subject ]</a>
+              <a href="author.html#86">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

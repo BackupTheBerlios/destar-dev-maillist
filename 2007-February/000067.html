@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r585 - trunk/misc/redhat
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r585%20-%20trunk/misc/redhat&In-Reply-To=%3C200702042352.l14Nqv8e003924%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000066.html">
+   <LINK REL="Next"  HREF="000068.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r585 - trunk/misc/redhat</H1>
+    <B>hholzer at mail.berlios.de</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r585%20-%20trunk/misc/redhat&In-Reply-To=%3C200702042352.l14Nqv8e003924%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r585 - trunk/misc/redhat">hholzer at mail.berlios.de
+       </A><BR>
+    <I>Mon Feb  5 00:52:57 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000066.html">[Destar-dev] r584 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000068.html">[Destar-dev] r586 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#67">[ date ]</a>
+              <a href="thread.html#67">[ thread ]</a>
+              <a href="subject.html#67">[ subject ]</a>
+              <a href="author.html#67">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: hholzer
+Date: 2007-02-05 00:52:48 +0100 (Mon, 05 Feb 2007)
+New Revision: 585
+
+Added:
+   trunk/misc/redhat/destar.spec
+Modified:
+   trunk/misc/redhat/init.d
+Log:
+* redhat/fedora: changed init file, added rpm spec file
+
+
+Added: trunk/misc/redhat/destar.spec
+===================================================================
+--- trunk/misc/redhat/destar.spec	2007-02-04 22:37:36 UTC (rev 584)
++++ trunk/misc/redhat/destar.spec	2007-02-04 23:52:48 UTC (rev 585)
+@@ -0,0 +1,56 @@
++Summary: Management Interface for the Asterisk PBX
++Name: destar
++Version: 0.3.0
++Release: 1
++License: GPL
++Group: System Environment/Daemons
++Source: %{name}-%{version}.tar.gz
++URL: <A HREF="http://destar.berlios.de/">http://destar.berlios.de/</A>
++Buildroot: %{_tmppath}/%{name}-root
++Requires: python python-quixote
++
++%description
++DeStar is a Web-based management and configuration tool for the Asterisk PBX.
++DeStar's main features include hosted PBX and virtual PBX features which allow
++you to have several PBXs on a single machine. Extensions can be managed for
++SIP, IAX, Zap, and more.
++
++%prep
++%setup -q
++
++%build
++
++%install
++rm -rf %{buildroot}
++make install DESTDIR=%{buildroot}
++mkdir -p %{buildroot}%{_initrddir}
++cp misc/redhat/init.d %{buildroot}%{_initrddir}/destar
++
++%post
++# This adds the proper /etc/rc*.d links for the script
++/sbin/chkconfig --add destar
++
++%preun
++if [ $1 = 0 ]; then
++        /sbin/service destar stop &gt;/dev/null 2&gt;&amp;1 || :
++        /sbin/chkconfig --del destar
++fi
++
++%postun
++if [ &quot;$1&quot; -ge &quot;1&quot; ]; then
++        /sbin/service destar condrestart &gt;/dev/null 2&gt;&amp;1 || :
++fi
++
++%clean
++rm -rf %{buildroot}
++
++%files
++%defattr(-, root, root)
++%doc README.txt CHANGELOG.txt
++/usr/sbin/*
++/usr/share/*
++%config(noreplace) /etc/*
++
++%changelog
++* Mon Feb 5 2007 Harald Holzer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">harald at hholzer.at</A>&gt;
++- initial spec.
+
+Modified: trunk/misc/redhat/init.d
+===================================================================
+--- trunk/misc/redhat/init.d	2007-02-04 22:37:36 UTC (rev 584)
++++ trunk/misc/redhat/init.d	2007-02-04 23:52:48 UTC (rev 585)
+@@ -9,20 +9,50 @@
+ PIDFILE=&quot;/var/run/destar.pid&quot;
+ RETVAL=0
+ 
++start() {
++        # Start daemons.
++        echo -n $&quot;Starting destar: &quot;
++        /usr/sbin/destar &gt; /dev/null 2&gt;&amp;1 &amp;
++        RETVAL=$?
++        echo $! &gt; $PIDFILE
++        echo
++        [ $RETVAL = 0 ] &amp;&amp; touch /var/lock/subsys/destar
++}
++
++stop() {
++        # Stop daemons.
++        echo -n $&quot;Shutting down destar: &quot;
++	PID=`cat $PIDFILE`
++	kill $PID
++        RETVAL=$?
++        echo
++        [ $RETVAL = 0 ] &amp;&amp; rm -f /var/lock/subsys/destar
++}
++
++restart() {
++        stop
++        start
++}
++
+ # See how we were called.
+ case &quot;$1&quot; in
+   start)
+-	/usr/sbin/destar &gt; /dev/null 2&gt;&amp;1 &amp;
+-	echo $! &gt; $PIDFILE
+-	RETVAL=0
+-	;;
++        start
++        ;;
+   stop)
+-	PID=`cat $PIDFILE`
+-	kill $PID
+-	;;
++        stop
++        ;;
++  restart)
++        restart
++        ;;
++  condrestart)
++        [ -f /var/lock/subsys/destar ] &amp;&amp; restart || :
++        ;;
++  status)
++        ;;
+   *)
+-	echo $&quot;Usage: $0 {start|stop}&quot;
+-	RETVAL=1
++        echo $&quot;Usage: exim {start|stop|restart|status|condrestart}&quot;
++        exit 1
+ esac
+ 
+ exit $RETVAL
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000066.html">[Destar-dev] r584 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000068.html">[Destar-dev] r586 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#67">[ date ]</a>
+              <a href="thread.html#67">[ thread ]</a>
+              <a href="subject.html#67">[ subject ]</a>
+              <a href="author.html#67">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

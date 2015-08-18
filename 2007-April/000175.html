@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r666 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r666%20-%20trunk&In-Reply-To=%3C200704200514.l3K5ElvL028516%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000174.html">
+   <LINK REL="Next"  HREF="000176.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r666 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r666%20-%20trunk&In-Reply-To=%3C200704200514.l3K5ElvL028516%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r666 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Apr 20 07:14:47 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000174.html">[Destar-dev] r665 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000176.html">[Destar-dev] r667 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#175">[ date ]</a>
+              <a href="thread.html#175">[ thread ]</a>
+              <a href="subject.html#175">[ subject ]</a>
+              <a href="author.html#175">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-04-20 07:14:41 +0200 (Fri, 20 Apr 2007)
+New Revision: 666
+
+Added:
+   trunk/cfg_opt_queuesagents.py
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/configlets.py
+Log:
+queues and agents general settings in cfg_opt_queuesagents.py
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-04-20 04:44:27 UTC (rev 665)
++++ trunk/CHANGELOG.txt	2007-04-20 05:14:41 UTC (rev 666)
+@@ -1,3 +1,6 @@
++2007-04-20:
++* queues and agents general settings in cfg_opt_queuesagents.py.  
++
+ 2007-04-19:
+ * configlets.py: fixed technologies for agents, persistent queues members
+ * cfg_phone_agent.py: allow agents with no password
+
+Added: trunk/cfg_opt_queuesagents.py
+===================================================================
+--- trunk/cfg_opt_queuesagents.py	2007-04-20 04:44:27 UTC (rev 665)
++++ trunk/cfg_opt_queuesagents.py	2007-04-20 05:14:41 UTC (rev 666)
+@@ -0,0 +1,69 @@
++# -*- coding: utf-8 -*-
++#
++# Destar has Copyright (C) 2007 by Holger Schurig
++# This file has Copyright (C) 2007 by Santiago Ruano Rinc&#243;n
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++from configlets import *
++
++
++class CfgOptOQueuesAgents(CfgOptSingle):
++
++	shortName = _(&quot;Queues and Agents&quot;)
++	newObjectTitle= _(&quot;Queues and Agents&quot;)
++	description = _(&quot;General settings for Queues and Agents&quot;)
++	groupName = 'Options'
++	 
++	def createVariables(self):
++		self.variables = [
++			VarType(&quot;labelqueues&quot;,
++				title=_(&quot;Queues settings&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;persistentmembers&quot;,
++				title=_(&quot;Queues persistent members:&quot;),
++				type=&quot;bool&quot;,
++				default=True,
++				optional=True),
++
++			VarType(&quot;labelagents&quot;,
++				title=_(&quot;Agents settings&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;persistentagents&quot;,
++				title=_(&quot;Persistent agents:&quot;),
++				type=&quot;bool&quot;,
++				default=True,
++				optional=True),
++
++			]
++
++	def createAsteriskConfig(self):
++		c = AstConf(&quot;queues.conf&quot;)
++                c.setSection(&quot;general&quot;)
++		if self.persistentmembers:
++			c.append(&quot;persistentmembers = yes&quot;)	
++		else:
++			c.append(&quot;persistentmembers = no&quot;)	
++
++		c = AstConf(&quot;agents.conf&quot;)
++                c.setSection(&quot;general&quot;)
++		if self.persistentagents:
++			c.append(&quot;persistentagents = yes&quot;)	
++		else:
++			c.append(&quot;persistentagents = no&quot;)	
++
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-04-20 04:44:27 UTC (rev 665)
++++ trunk/configlets.py	2007-04-20 05:14:41 UTC (rev 666)
+@@ -1051,8 +1051,6 @@
+ 		try:
+ 			if self.queues:
+ 				c = AstConf(&quot;queues.conf&quot;)
+-				c.setSection(&quot;general&quot;)
+-				c.append(&quot;persistentmembers = yes&quot;)
+ 				for queue in self.queues.split(','):
+ 					c.setSection(queue)
+ 					if self.technology == 'SIP' or self.technology == 'IAX2' or self.technology == 'ZAP':
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000174.html">[Destar-dev] r665 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000176.html">[Destar-dev] r667 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#175">[ date ]</a>
+              <a href="thread.html#175">[ thread ]</a>
+              <a href="subject.html#175">[ subject ]</a>
+              <a href="author.html#175">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

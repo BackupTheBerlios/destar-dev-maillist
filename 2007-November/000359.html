@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r817 - branches/0.2.X trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r817%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C1193954817.3816.4.camel%40localhost%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000358.html">
+   <LINK REL="Next"  HREF="000360.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r817 - branches/0.2.X trunk</H1>
+    <B>Diego Andr&#233;s Asenjo G.</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r817%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C1193954817.3816.4.camel%40localhost%3E"
+       TITLE="[Destar-dev] r817 - branches/0.2.X trunk">dasenjo at unicauca.edu.co
+       </A><BR>
+    <I>Thu Nov  1 23:06:57 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000358.html">[Destar-dev] r817 - branches/0.2.X trunk
+</A></li>
+        <LI>Next message: <A HREF="000360.html">[Destar-dev] DeStar finalist in Les Troph&#233;es du Libre 2007
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#359">[ date ]</a>
+              <a href="thread.html#359">[ thread ]</a>
+              <a href="subject.html#359">[ subject ]</a>
+              <a href="author.html#359">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi!
+
+As you can see, I have removed the startPanelDaemon and startPanelDaemon
+methods as thier variables. My point is that DeStar should not &quot;deal&quot;
+with the panel process at all in thi level. We just need to send a
+message (kill -HUP) to make it know (the panel) that the configuration
+files have changed and it must reload them. So, in this way, we are
+still but less OS dependant I think that the integration can be easier.
+
+What do you think about?
+
+
+Diego Andr&#233;s.
+
+El jue, 01-11-2007 a las 22:21 +0100, dasenjo at BerliOS escribi&#243;:
+&gt;<i> Author: dasenjo
+</I>&gt;<i> Date: 2007-11-01 22:21:43 +0100 (Thu, 01 Nov 2007)
+</I>&gt;<i> New Revision: 817
+</I>&gt;<i> 
+</I>&gt;<i> Modified:
+</I>&gt;<i>    branches/0.2.X/CHANGELOG.txt
+</I>&gt;<i>    branches/0.2.X/panelutils.py
+</I>&gt;<i>    trunk/CHANGELOG.txt
+</I>&gt;<i>    trunk/panelutils.py
+</I>&gt;<i> Log:
+</I>&gt;<i> * New way to restart panel daemon. 
+</I>&gt;<i> * Fixed tarball html directory in panelutils.
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> Modified: branches/0.2.X/CHANGELOG.txt
+</I>&gt;<i> ===================================================================
+</I>&gt;<i> --- branches/0.2.X/CHANGELOG.txt	2007-10-25 17:25:02 UTC (rev 816)
+</I>&gt;<i> +++ branches/0.2.X/CHANGELOG.txt	2007-11-01 21:21:43 UTC (rev 817)
+</I>&gt;<i> @@ -1,3 +1,7 @@
+</I>&gt;<i> +2007-11-01:
+</I>&gt;<i> +* New way to restart panel daemon. 
+</I>&gt;<i> +* Fixed tarball html directory in panelutils.
+</I>&gt;<i> +
+</I>&gt;<i>  2007-10-25:
+</I>&gt;<i>  * cfg_opt_sip_network.py: added progressinband option, tos default changed to 0x18
+</I>&gt;<i>  
+</I>&gt;<i> 
+</I>&gt;<i> Modified: branches/0.2.X/panelutils.py
+</I>&gt;<i> ===================================================================
+</I>&gt;<i> --- branches/0.2.X/panelutils.py	2007-10-25 17:25:02 UTC (rev 816)
+</I>&gt;<i> +++ branches/0.2.X/panelutils.py	2007-11-01 21:21:43 UTC (rev 817)
+</I>&gt;<i> @@ -23,17 +23,14 @@
+</I>&gt;<i>  
+</I>&gt;<i>  # To use with asternic.org op_panel tarball:
+</I>&gt;<i>  #PANEL_CONF_DIR	= &quot;/usr/local/op_panel&quot;
+</I>&gt;<i> -#PANEL_HTML_DIR	= &quot;/usr/local/op_panel/html&quot;
+</I>&gt;<i> -#PANEL_START_CMD	= &quot;/usr/local/op_panel/op_server.pl -d&quot;
+</I>&gt;<i> -#PANEL_STOP_CMD	= &quot;pkill op_server&quot;
+</I>&gt;<i> +#PANEL_HTML_DIR	= &quot;/usr/local/op_panel/flash&quot;
+</I>&gt;<i> +#PANEL_RESTART_CMD = &quot;killall -HUP op_server.pl&quot;
+</I>&gt;<i>  
+</I>&gt;<i> 
+</I>&gt;<i>  # Configuration to use with op-panel .deb package:
+</I>&gt;<i>  PANEL_CONF_DIR	= &quot;/etc/op-panel&quot;
+</I>&gt;<i>  PANEL_HTML_DIR	= &quot;/usr/share/op-panel/flash&quot;
+</I>&gt;<i> -PANEL_START_CMD	= &quot;/etc/init.d/op-panel start&quot;
+</I>&gt;<i> -PANEL_STOP_CMD	= &quot;/etc/init.d/op-panel stop&quot;
+</I>&gt;<i> -PANEL_RESTART_CMD = &quot;/etc/init.d/op-panel restart&quot;
+</I>&gt;<i> +PANEL_RESTART_CMD = &quot;killall -HUP op_server&quot;
+</I>&gt;<i>  
+</I>&gt;<i>  def isConfigured ():
+</I>&gt;<i>  	import configlets
+</I>&gt;<i> @@ -154,12 +151,6 @@
+</I>&gt;<i>  	p.append(&quot;Extension=-1&quot;)
+</I>&gt;<i>  	p.append(&quot;Label=%s&quot; % obj.name)
+</I>&gt;<i>  
+</I>&gt;<i> -def startPanelDaemon():
+</I>&gt;<i> -        return commands.getoutput(PANEL_START_CMD)
+</I>&gt;<i> -
+</I>&gt;<i> -def stopPanelDaemon():
+</I>&gt;<i> -        return commands.getoutput(PANEL_STOP_CMD)
+</I>&gt;<i> -
+</I>&gt;<i>  def restartPanelDaemon():
+</I>&gt;<i>  	s = []
+</I>&gt;<i>  	s.append(_(&quot;Restarting the panel daemon ...&quot;))
+</I>&gt;<i> 
+</I>&gt;<i> Modified: trunk/CHANGELOG.txt
+</I>&gt;<i> ===================================================================
+</I>&gt;<i> --- trunk/CHANGELOG.txt	2007-10-25 17:25:02 UTC (rev 816)
+</I>&gt;<i> +++ trunk/CHANGELOG.txt	2007-11-01 21:21:43 UTC (rev 817)
+</I>&gt;<i> @@ -1,3 +1,7 @@
+</I>&gt;<i> +2007-11-01:
+</I>&gt;<i> +* New way to restart panel daemon. 
+</I>&gt;<i> +* Fixed tarball html directory in panelutils.
+</I>&gt;<i> +
+</I>&gt;<i>  2007-10-04:
+</I>&gt;<i>  * Added special Trunk for Linksys SPA400 gateway
+</I>&gt;<i>  * Added special Trunk for Suncomm SC-375 Voip-GSM gateway
+</I>&gt;<i> 
+</I>&gt;<i> Modified: trunk/panelutils.py
+</I>&gt;<i> ===================================================================
+</I>&gt;<i> --- trunk/panelutils.py	2007-10-25 17:25:02 UTC (rev 816)
+</I>&gt;<i> +++ trunk/panelutils.py	2007-11-01 21:21:43 UTC (rev 817)
+</I>&gt;<i> @@ -23,17 +23,14 @@
+</I>&gt;<i>  
+</I>&gt;<i>  # To use with asternic.org op_panel tarball:
+</I>&gt;<i>  #PANEL_CONF_DIR	= &quot;/usr/local/op_panel&quot;
+</I>&gt;<i> -#PANEL_HTML_DIR	= &quot;/usr/local/op_panel/html&quot;
+</I>&gt;<i> -#PANEL_START_CMD	= &quot;/usr/local/op_panel/op_server.pl -d&quot;
+</I>&gt;<i> -#PANEL_STOP_CMD	= &quot;pkill op_server&quot;
+</I>&gt;<i> +#PANEL_HTML_DIR	= &quot;/usr/local/op_panel/flash&quot;
+</I>&gt;<i> +#PANEL_RESTART_CMD = &quot;killall -HUP op_server.pl&quot;
+</I>&gt;<i>  
+</I>&gt;<i> 
+</I>&gt;<i>  # Configuration to use with op-panel .deb package:
+</I>&gt;<i>  PANEL_CONF_DIR	= &quot;/etc/op-panel&quot;
+</I>&gt;<i>  PANEL_HTML_DIR	= &quot;/usr/share/op-panel/flash&quot;
+</I>&gt;<i> -PANEL_START_CMD	= &quot;/etc/init.d/op-panel start&quot;
+</I>&gt;<i> -PANEL_STOP_CMD	= &quot;/etc/init.d/op-panel stop&quot;
+</I>&gt;<i> -PANEL_RESTART_CMD = &quot;/etc/init.d/op-panel restart&quot;
+</I>&gt;<i> +PANEL_RESTART_CMD = &quot;killall -HUP op_server&quot;
+</I>&gt;<i>  
+</I>&gt;<i>  def N_(message): return message
+</I>&gt;<i>  
+</I>&gt;<i> @@ -170,12 +167,6 @@
+</I>&gt;<i>  	p.append('Label=&quot;%s&quot;' % obj.name)
+</I>&gt;<i>  	p.append(&quot;Panel_context=%s&quot; % obj.pbx)
+</I>&gt;<i>  
+</I>&gt;<i> -def startPanelDaemon():
+</I>&gt;<i> -        return commands.getoutput(PANEL_START_CMD)
+</I>&gt;<i> -
+</I>&gt;<i> -def stopPanelDaemon():
+</I>&gt;<i> -        return commands.getoutput(PANEL_STOP_CMD)
+</I>&gt;<i> -
+</I>&gt;<i>  def restartPanelDaemon():
+</I>&gt;<i>  	s = []
+</I>&gt;<i>  	s.append(_(&quot;Restarting the panel daemon ...&quot;))
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Destar-dev mailing list
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">Destar-dev at lists.berlios.de</A>
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">https://lists.berlios.de/mailman/listinfo/destar-dev</A>
+</I>
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000358.html">[Destar-dev] r817 - branches/0.2.X trunk
+</A></li>
+	<LI>Next message: <A HREF="000360.html">[Destar-dev] DeStar finalist in Les Troph&#233;es du Libre 2007
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#359">[ date ]</a>
+              <a href="thread.html#359">[ thread ]</a>
+              <a href="subject.html#359">[ subject ]</a>
+              <a href="author.html#359">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

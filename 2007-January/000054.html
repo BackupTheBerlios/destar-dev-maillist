@@ -1,0 +1,4106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r577 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r577%20-%20trunk&In-Reply-To=%3C200701230002.l0N022D3004065%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000053.html">
+   <LINK REL="Next"  HREF="000055.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r577 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r577%20-%20trunk&In-Reply-To=%3C200701230002.l0N022D3004065%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r577 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 23 01:02:02 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000053.html">[Destar-dev] r576 - branches
+</A></li>
+        <LI>Next message: <A HREF="000055.html">[Destar-dev] [Bug #10100] optional is not working
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#54">[ date ]</a>
+              <a href="thread.html#54">[ thread ]</a>
+              <a href="subject.html#54">[ subject ]</a>
+              <a href="author.html#54">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-01-23 01:01:51 +0100 (Tue, 23 Jan 2007)
+New Revision: 577
+
+Added:
+   trunk/session.py
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+   trunk/Publisher.py
+   trunk/Server.py
+   trunk/StatsHelper.ptl
+   trunk/Templates.ptl
+   trunk/destar
+   trunk/page_admin.ptl
+   trunk/page_admin_backup.ptl
+   trunk/page_admin_panel.ptl
+   trunk/page_admin_pbxstate.ptl
+   trunk/page_admin_reload.ptl
+   trunk/page_admin_viewconf.ptl
+   trunk/page_config.ptl
+   trunk/page_config_add.ptl
+   trunk/page_config_applications.ptl
+   trunk/page_config_codecs.ptl
+   trunk/page_config_dialout.ptl
+   trunk/page_config_dids.ptl
+   trunk/page_config_down.ptl
+   trunk/page_config_edit.ptl
+   trunk/page_config_ivrs.ptl
+   trunk/page_config_options.ptl
+   trunk/page_config_pbx.ptl
+   trunk/page_config_phones.ptl
+   trunk/page_config_trunks.ptl
+   trunk/page_config_up.ptl
+   trunk/page_config_users.ptl
+   trunk/page_debug.ptl
+   trunk/page_debug_values.ptl
+   trunk/page_login.ptl
+   trunk/page_logout.ptl
+   trunk/page_main.ptl
+   trunk/page_owner.ptl
+   trunk/page_owner_cdr.ptl
+   trunk/page_stats.ptl
+   trunk/page_stats_calls.ptl
+   trunk/page_stats_cdr.ptl
+   trunk/page_stats_dialouts.ptl
+   trunk/page_stats_phone.ptl
+   trunk/page_stats_trunks.ptl
+   trunk/page_user.ptl
+   trunk/page_user_info.ptl
+   trunk/page_user_quickdiallist.ptl
+   trunk/page_user_settings.ptl
+   trunk/page_user_state.ptl
+Log:
+Merged quixote2 branch into trunk
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/CHANGELOG.txt	2007-01-23 00:01:51 UTC (rev 577)
+@@ -1,3 +1,6 @@
++2007-01-22:
++* Merged last changes from quixote2 branch into trunk
++
+ 2007-01-21:
+ * added tapi support
+ * Releasing and taging 0.2.2 version
+@@ -5,6 +8,9 @@
+ 2007-01-19:
+ * Fixed hungup typo
+ 
++2007-01-16:
++* Merging quixote2 branch and trunk 
++
+ 2007-01-15:
+ * Fixed recording. Patch by Harald Holzer
+ * dont add modules to modules.conf, if they does not exists (Bug #9708). Patch by Harald Holzer
+@@ -20,6 +26,16 @@
+ - add call forward only on trunk support in dialmacro
+ * added sip pedantic option. Patch by Harald Holzer
+ 
++2007-01-13:
++* Deleted some debug prints.
++
++2006-12-28:
++* page_main and Templates: fixed menus displaying.
++* page_config_trunks.ptl: fixed typo.
++* page_logout.ptl: fixed redirect.
++* page_user*.ptl and page_admin*.ptl: corrected some 
++  function's &quot;position&quot;
++
+ 2006-12-29:
+ * &quot;updated&quot; version
+ * First attempt to detect if cdr_sqlite3_custom.so exists
+@@ -40,6 +56,20 @@
+ * Added queues web form variables for iax, zap ad mgcp phones 
+ * Fixed some html warnings.
+ 
++2006-12-02:
++* All missing page_* &quot;upgraded&quot;, but there is still work to do.
++
++2006-12-01:
++* All page_config files upgraded
++* page_main: removed a surplus and wrong _q_exports
++
++2006-11-30:
++* All page_admin and page_user files upgraded
++
++2006-11-29:
++* Renamed PageMain to Page
++* Upgraded page_user, page_user_info and page_logout
++
+ 2006-11-21
+ * Configlet to listen active calls with ChanSpy
+ 
+@@ -64,8 +94,9 @@
+ * page_stats_cdr.ptl: display records in DESC order.
+ * page_stats_phone.ptl, page_stats_trunks.ptl, page_stats_dialouts.ptl:
+   Fixed current month
+-  
+-2006-10-31
++ 
++2006-10-31:
++* A test with page_main and page_login.
+ * Simple and ugly bug fix for #9281.
+ 
+ 2006-10-30:
+@@ -73,9 +104,22 @@
+   cause ./destar was using the last one.
+ * destar: starts panel when destar begins
+ 
+-2006-10-26:
+-* destar: updated VERSION variable
++2006-10-28:
++* Updated Version. TODO: Define it in only one place
++* Template.ptl: importing get_directory_path to replace 
++  Publisher's namespace_stack
++* session.py: New (draft) class for managing Destar's sessions
++* Publisher.py: -taken off all session management related stuff
++  - publishing PageMain from page_main
++* page_main.ptl: PageMain: Directory class-based
+ 
++2006-10-25:
++* First attempt to upgrade publisher 
++
++2006-10-24:
++* New branch for quixote2 transition
++* Moved every form2 to form
++
+ 2006-10-17:
+ * Display op-panel restarting result
+ * cfg_opt_oppanel: deleted duplicate and wrong variables
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/ConfigHelper.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,7 +19,7 @@
+ 
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
+ from quixote.html import htmlescape
+ import backend
+ import types, string
+
+Modified: trunk/Publisher.py
+===================================================================
+--- trunk/Publisher.py	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/Publisher.py	2007-01-23 00:01:51 UTC (rev 577)
+@@ -52,64 +52,28 @@
+ &quot;&quot;&quot;
+ 
+ 
++from quixote import enable_ptl, get_request
+ from quixote.publish import Publisher
++from quixote.session import SessionManager
+ import configlets, backend, language
++from session import DestarSession
+ import time
++enable_ptl()
+ 
+-sessions = {}
+-
+ class DeStarPublisher(Publisher):
+ 
+-	def start_request (self, request):
+-		t = time.time()
+ 
+-		# Determine IP of originator, keep Squid in mind :-)
+-		try:
+-			ip = request.environ['HTTP_X_FORWARDED_FOR']
+-		except:
+-			ip = request.environ['REMOTE_ADDR']
+-
+-		# Search session object, if none found, create one with default values
+-		global sessions
+-		session = sessions.setdefault(ip,
+-			configlets.Holder(
+-				firstaccess=t,
+-				user=None,
+-				phone='',
+-				language='en',
+-				level=-1,		# Try to auto-login, based on IP
+-			))
+-
+-		# level==-1 means we should auto-login
+-		# This works by searching for the first CfgOptUser configlet where
+-		# the 'pc' variable matches the request originating IP:
+-		if session.level == -1:
+-			# Only try auto-login once, so set it to lowest level
+-			session.level = 0
+-
+-			users = backend.getConfiglets(name=&quot;CfgOptUser&quot;)
+-			if len(users) == 0:
+-				# be Admin if there are no users configured
+-				session.user  = &quot;programmer&quot;
+-				session.level = 4
+-				session.language = 'en'
+-			else:
+-				for user in users:
+-					if user.pc == ip:
+-						session.user = user.name
+-						session.level = int(user.level)
+-						session.phone = user.phone
+-						session.language = user.language
+-						break
+-						
+-		language.setLanguage(session.language)				
+-		session.lastaccess = t
+-		request.session = session
+-
+-
+ 	def filter_output(self, request, output):
+ 		output = Publisher.filter_output(self, request, output)
+ 		resp = request.response
+ 		if resp.get_header('Content-Type') in (None, 'text/html'):
+ 			resp.set_header('Content-Type','text/html; charset=%s' % language.encoding() )
+ 		return output
++
++
++def create_publisher():
++	from page_main import Page
++	return DeStarPublisher(Page(),
++		session_manager=SessionManager(session_class=DestarSession),
++		display_exceptions='plain')
++
+
+Modified: trunk/Server.py
+===================================================================
+--- trunk/Server.py	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/Server.py	2007-01-23 00:01:51 UTC (rev 577)
+@@ -112,19 +112,20 @@
+ 		environ[k] = ''
+ 
+ 	stdin = StringIO(data)
+-	qreq = self.publisher.create_request(stdin, environ)
+-	try:
+-	    self.publisher.parse_request(qreq)
+-	    output = self.publisher.process_request(qreq, environ)
+-	except PublishError, err:
+-	    output = self.publisher.finish_interrupted_request(qreq, err)
+-	except:
+-	    output = self.publisher.finish_failed_request(qreq)
++	#qreq = self.publisher.create_request(stdin, environ)
++	qresponse = self.publisher.process(stdin, environ)
++#	try:
++#	    self.publisher.parse_request(qreq)
++#	    output = self.publisher.process_request(qreq, environ)
++#	except PublishError, err:
++#	    output = self.publisher.finish_interrupted_request(qreq, err)
++#	except:
++#	    output = self.publisher.finish_failed_request(qreq)
++#
++#	qresponse = qreq.response
++#	if output:
++#	    qresponse.set_body(output)
+ 
+-	qresponse = qreq.response
+-	if output:
+-	    qresponse.set_body(output)
+-
+ 	# Copy headers from Quixote's HTTP response
+ 	for name, value in qresponse.generate_headers():
+ 	    # XXX Medusa's HTTP request is buggy, and only allows unique
+@@ -132,13 +133,14 @@
+ 	    request[name] = value
+ 
+ 	request.response(qresponse.status_code)
++	request.push(StreamProducer(qresponse.generate_body_chunks()))
+ 
+-	# XXX should we set a default Last-Modified time?
+-	if qresponse.body is not None:
+-	    if isinstance(qresponse.body, Stream):
+-		request.push(StreamProducer(qresponse.body))
+-	    else:
+-		request.push(qresponse.body)
++#	# XXX should we set a default Last-Modified time?
++#	if qresponse.body is not None:
++#	    if isinstance(qresponse.body, Stream):
++#		request.push(StreamProducer(qresponse.body))
++#	    else:
++#		request.push(qresponse.body)
+ 
+ 	request.done()
+ 
+@@ -152,12 +154,13 @@
+     enable_ptl: ensure that PTL mechanism is started (default: true)
+     &quot;&quot;&quot;
+ 
+-    def __init__(self, approot, config_file=None, port=80,
+-	       enable_ptl=True, publisher=Publisher):
++    def __init__(self, approot, create_publisher, config_file=None, port=80,
++	       enable_ptl=True):
+ 	self.approot = approot
+ 	self.config_file = config_file
+ 	self.port = port
+-	self.publishclass = publisher
++	#self.publishclass = publisher
++	self.publisher = create_publisher()
+ 	if enable_ptl:
+ 	    from quixote import enable_ptl
+ 	    enable_ptl()
+@@ -165,11 +168,11 @@
+     def run(self):
+ 	print 'Serving application %r on port %d' % (self.approot, self.port)
+ 	server = http_server.http_server('', self.port)
+-	publisher = self.publishclass(self.approot)
+-	if self.config_file:
+-	    publisher.read_config(self.config_file)
+-	publisher.setup_logs()
+-	dh = QuixoteHandler(publisher, self.approot, server)
++#	publisher = self.publishclass(self.approot)
++#	if self.config_file:
++#	    publisher.read_config(self.config_file)
++#	publisher.setup_logs()
++	dh = QuixoteHandler(self.publisher, self.approot, server)
+ 	server.install_handler(dh)
+ 	asyncore.loop()
+ 
+
+Modified: trunk/StatsHelper.ptl
+===================================================================
+--- trunk/StatsHelper.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/StatsHelper.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -18,7 +18,7 @@
+ #
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
+ try:
+         from pychart import *
+ except ImportError:
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/Templates.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -20,11 +20,13 @@
+ 
+ from quixote.html import htmltext, htmlescape
+ from quixote.publish import get_publisher, get_request
++from quixote import get_session
++from quixote.util import get_directory_path
+ from quixote.errors import AccessError
+ import os, sys, copy
+ 
+ 
+-VERSION = '0.2.2'
++VERSION = 'DEVELOPMENT SNAPSHOT'
+ 
+ 
+ class HtmlTable:
+@@ -104,7 +106,6 @@
+ 			attr = self.attrs.get(x,y)
+ 			hide = False
+ 			elem = 'td'
+-			#print &quot;attr:&quot;, attr
+ 			if attr:
+ 				for k in attr:
+ 					if k == '__hide':
+@@ -238,10 +239,12 @@
+ 
+ def getMenu():
+ 	request = get_request()
++	session = get_session()
+ 	path = request.environ['PATH_INFO']
+ 	path = path[1:].split('/')
+ 
+-	stack = get_publisher().get_namespace_stack()
++	#stack = get_publisher().get_namespace_stack()
++	stack = get_directory_path()
+ 
+ 	def calcMenu(root='', n=0):
+ 		m = []
+@@ -254,18 +257,19 @@
+ 		except AttributeError:
+ 			return
+ 		for e in obj._q_menu:
+-			if e._q_level&gt;request.session.level:
++			if e._q_level &gt; session.level:
+ 				continue
+ 			if e._q_level&lt;0:
+-				if e._q_title == _(&quot;Logout&quot;) and request.session.level == 4:
++				if e._q_title == _(&quot;Logout&quot;) and session.level == 4:
+ 	                                continue
+ 				if e._q_level&lt;0:
+-	                                if abs(e._q_level) &lt;= request.session.level:			
++	                                if abs(e._q_level) &lt;= session.level:			
+ 	                                	continue
+ 			submenu = []
+-			if e._q_parent == sys.modules['page_main']:
++			#if e._q_parent == sys.modules['page_main']:
++			if e._q_parent == 'page_main':
+ 				for sub in e._q_menu:
+-					parent_name = sub._q_parent.__name__[5:]
++					parent_name = sub._q_parent[5:]
+ 					submenu.append( (sub._q_menupos, '/'.join([root,parent_name,sub._q_link]), sub._q_title, []) )
+ 			submenu.sort()
+ 
+
+Modified: trunk/destar
+===================================================================
+--- trunk/destar	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/destar	2007-01-23 00:01:51 UTC (rev 577)
+@@ -36,9 +36,8 @@
+ be_daemon = False
+ rport = 8080
+ pid_file = '/var/run/destar.pid'
+-VERSION = '0.2.2'
++VERSION = 'DEVELOPMENT SNAPSHOT'
+ 
+-
+ def print_version():
+ 	print _(&quot;DeStar %s, Copyright (C) 2005 by Holger Schurig and contributors.\n\n&quot;\
+ 	&quot;DeStar comes with ABSOLUTELY NO WARRANTY. This is free software,\n&quot;\
+@@ -108,21 +107,17 @@
+ # 'quixote' is a web application framework
+ try:
+ 	import quixote
+-	if sys.version[:3] &lt; &quot;2.4&quot;:
+-		if quixote.__version__ &lt; &quot;1.0&quot; or quixote.__version__ &gt;= &quot;2.0&quot;:
+-			raise ImportError
+-	else:
+-		if quixote.__version__ &lt; &quot;1.2&quot; or quixote.__version__ &gt;= &quot;2.0&quot;:
+-			raise ImportError
++	if quixote.__version__ &lt; &quot;2.0&quot;:
++		raise ImportError
+ except ImportError:
+-	print _(&quot;Error:&quot;), _(&quot;please install Quixote &gt; 1.2  and &lt; 2.0&quot;)
++	print _(&quot;Error:&quot;), _(&quot;please install Quixote &gt;= 2.0&quot;)
+ 	import sys
+ 	sys.exit(1)
+ 
+ # 'Publisher.py' contains our session management, 'page_main' contains
+ # the start page.
+ import Server, Publisher
+-pub = Server.Server(&quot;page_main&quot;, port=int(rport), publisher=Publisher.DeStarPublisher)
++pub = Server.Server(&quot;page_main&quot;, Publisher.create_publisher, port=int(rport))
+ 
+ 
+ 
+
+Modified: trunk/page_admin.ptl
+===================================================================
+--- trunk/page_admin.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_admin.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,34 +19,40 @@
+ 
+ 
+ from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_main'
+-_q_title   = _(&quot;Administration&quot;)
+-_q_desc    = _(&quot;Perform administrative actions to PBX&quot;)
+-_q_menupos = 20
+-_q_level   = 3
++	_q_parent  = 'page_main'
++	_q_title   = _(&quot;Administration&quot;)
++	_q_desc    = _(&quot;Perform administrative actions to PBX&quot;)
++	_q_menupos = 20
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-def showMenu [plain] ():
+-	'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+-	'&lt;tr&gt;'
+-	for s in (htmltext(_('Action')), htmltext(_('Description'))):
+-		'&lt;th&gt;%s&lt;/th&gt;' % s
+-	'&lt;/tr&gt;&lt;/thead&gt;'
+-
+-	for e in _q_menu:
++	def showMenu [plain] (self):
++		'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+ 		'&lt;tr&gt;'
+-		'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (e._q_link,_(e._q_title))
+-		'&lt;td&gt;%s&lt;/td&gt;' % _(e._q_desc)
+-		'&lt;/tr&gt;'
+-	'&lt;/table&gt;'
++		for s in (htmltext(_('Action')), htmltext(_('Description'))):
++			'&lt;th&gt;%s&lt;/th&gt;' % s
++		'&lt;/thead&gt;&lt;/tr&gt;'
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	showMenu()
+-	footer()
++		for e in self._q_menu:
++			'&lt;tr&gt;'
++			'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (e._q_link,_(e._q_title))
++			'&lt;td&gt;%s&lt;/td&gt;' % _(e._q_desc)
++			'&lt;/tr&gt;'
++		'&lt;/table&gt;'
++
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		self.showMenu()
++		footer()
+
+Modified: trunk/page_admin_backup.ptl
+===================================================================
+--- trunk/page_admin_backup.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_admin_backup.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,27 +19,31 @@
+ 
+ 
+ from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ import os, backend
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent = 'page_admin'
+-_q_title  = ''
+-_q_desc   = _(&quot;Backup a config file&quot;)
+-_q_link   = 'backup'
+-_q_level  = 3
++	_q_parent = 'page_admin'
++	_q_title  = ''
++	_q_desc   = _(&quot;Backup a config file&quot;)
++	_q_link   = 'backup'
++	_q_level  = 3
+ 
++	_q_exports = ['']
+ 
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-
+-def _q_lookup(request, component):
+-         try:
+-                 res = backend.backupAsteriskConfig(component)
+-         except OSError:
+-                 res = None
+-         if not res:
+-                 return errorpage(htmltext(_(&quot;I had a problem backing up %s&quot;)) % component)
+-         return request.redirect(&quot;../write&quot;)
++	def _q_lookup(self, component):
++		 try:
++			 res = backend.backupAsteriskConfig(component)
++		 except OSError:
++			 res = None
++		 if not res:
++			 return errorpage(htmltext(_(&quot;I had a problem backing up %s&quot;)) % component)
++		 return redirect(&quot;../write&quot;)
+
+Modified: trunk/page_admin_panel.ptl
+===================================================================
+--- trunk/page_admin_panel.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_admin_panel.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,34 +19,39 @@
+ 
+ 
+ from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ import panelutils
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_admin'
+-_q_title   = _(&quot;Operator Panel&quot;)
+-_q_desc    = _(&quot;Asternic Flash Operator Panel&quot;)
+-_q_link    = 'panel'
+-_q_menupos = 90
+-_q_level   = 3
++	_q_parent  = 'page_admin'
++	_q_title   = _(&quot;Operator Panel&quot;)
++	_q_desc    = _(&quot;Asternic Flash Operator Panel&quot;)
++	_q_link    = 'panel'
++	_q_menupos = 90
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		if panelutils.isConfigured() != 1:
++			'&lt;p&gt;'
++			htmltext(_(&quot;You don't have a panel configured yet&quot;))
++			'&lt;/p&gt;'
++		else:
++			'&lt;p&gt;'
++			htmltext(_('You have a panel configured '))
++			'&lt;a href=&quot;/static/panel/index.html&quot;&gt;'
++			htmltext(_('here'))
++			'&lt;/a&gt;'
++			'&lt;/p&gt;'
++		footer()
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	if panelutils.isConfigured() != 1:
+-		'&lt;p&gt;'
+-		htmltext(_(&quot;You don't have a panel configured yet&quot;))
+-		'&lt;/p&gt;'
+-	else:
+-		'&lt;p&gt;'
+-		htmltext(_('You have a panel configured '))
+-		'&lt;a href=&quot;/static/panel/index.html&quot;&gt;'
+-		htmltext(_('here'))
+-		'&lt;/a&gt;'
+-		'&lt;/p&gt;'
+-	footer()
+-
+
+Modified: trunk/page_admin_pbxstate.ptl
+===================================================================
+--- trunk/page_admin_pbxstate.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_admin_pbxstate.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -21,21 +21,9 @@
+ from Templates import *
+ import backend, manager
+ import time
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
+-_q_parent  = 'page_admin'
+-_q_title   = _(&quot;PBX State&quot;)
+-_q_desc    = _(&quot;Status of Asterisk/DeStar PBX&quot;)
+-_q_link    = 'pbxstate'
+-_q_menupos = 10
+-_q_level   = 3
+-
+-
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-
+-
+ def formatChannel(obj, now):
+ 
+ 	# +------------------------------+
+@@ -70,42 +58,58 @@
+ 
+ 	return htmltext('&lt;span id=&quot;phonename&quot;&gt;%s&lt;/span&gt;&lt;br /&gt;%s&lt;br /&gt;%s&nbsp;&lt;span id=&quot;phonestate&quot;&gt;%s&lt;/span&gt;' % (id, number, ti, _(obj._state.State)))
+ 
++class Page(AccessControlled, Directory): 
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc,refresh=10)
++	_q_parent  = 'page_admin'
++	_q_title   = _(&quot;PBX State&quot;)
++	_q_desc    = _(&quot;Status of Asterisk/DeStar PBX&quot;)
++	_q_link    = 'pbxstate'
++	_q_menupos = 10
++	_q_level   = 3
+ 
+-	manager.connect()
+-	if not manager.isConnected():
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;Asterisk is not running!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	elif not manager.isLoggedIn():
+-		# TODO: describe how to set this up
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;The manager access is not working!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
++	_q_exports = ['']
+ 
+-	(phones,other) = backend.determineStateOfPhones()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-	maxy = 8
+-	h = HtmlTable(1,1)
+-	now = time.time()
++	def _q_index [plain] (self):
++		header(self._q_desc,refresh=10)
+ 
+-	x = y = 0
+-	for obj in phones:
+-		#print obj.name
+-		if obj.technology == &quot;virtual&quot; or obj.technology == &quot;QUEUE&quot;:
+-			continue
++		manager.connect()
++		if not manager.isConnected():
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;Asterisk is not running!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif not manager.isLoggedIn():
++			# TODO: describe how to set this up
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;The manager access is not working!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
+ 
+-		#id = '&lt;a href=&quot;%d/state&quot;&gt;%s&lt;/a&gt;' % (obj._id, ' '.join(obj.row()[1:]) )
++		(phones,other) = backend.determineStateOfPhones()
+ 
+-		h.setCell(x,y, formatChannel(obj, now) )
+-		h.setAttr(x,y, id=&quot;phone&quot;)
++		maxy = 8
++		h = HtmlTable(1,1)
++		now = time.time()
+ 
+-		y = y + 1
+-		if y&gt;=maxy:
+-			x = x + 1
+-			y = 0
++		x = y = 0
++		for obj in phones:
++			#print obj.name
++			if obj.technology == &quot;virtual&quot; or obj.technology == &quot;QUEUE&quot;:
++				continue
+ 
+-	h.getHtml(id='state', border=1)
+-	footer()
++			#id = '&lt;a href=&quot;%d/state&quot;&gt;%s&lt;/a&gt;' % (obj._id, ' '.join(obj.row()[1:]) )
++
++			h.setCell(x,y, formatChannel(obj, now) )
++			h.setAttr(x,y, id=&quot;phone&quot;)
++
++			y = y + 1
++			if y&gt;=maxy:
++				x = x + 1
++				y = 0
++
++		h.getHtml(id='state', border=1)
++		footer()
+
+Modified: trunk/page_admin_reload.ptl
+===================================================================
+--- trunk/page_admin_reload.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_admin_reload.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -21,40 +21,46 @@
+ from Templates import *
+ import backend
+ import manager
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_admin'
+-_q_title   = _(&quot;Apply Changes&quot;)
+-_q_desc    = _(&quot;Reload Asterisk/DeStar PBX&quot;)
+-_q_link    = 'reload'
+-_q_menupos = 90
+-_q_level   = 3
+ 
++	_q_parent  = 'page_admin'
++	_q_title   = _(&quot;Apply Changes&quot;)
++	_q_desc    = _(&quot;Reload Asterisk/DeStar PBX&quot;)
++	_q_link    = 'reload'
++	_q_menupos = 90
++	_q_level   = 3
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	_q_exports = ['']
+ 
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	manager.connect()
+-	if not manager.isConnected():
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;Asterisk is not running!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	elif not manager.isLoggedIn():
+-		# TODO: describe how to set this up
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;The manager access is not working!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	else:
+-		'&lt;p&gt;'
+-		htmltext(_('Doing a reload, result is:'))
+-		'&lt;/p&gt;'
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		manager.connect()
++		if not manager.isConnected():
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;Asterisk is not running!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif not manager.isLoggedIn():
++			# TODO: describe how to set this up
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;The manager access is not working!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		else:
++			'&lt;p&gt;'
++			htmltext(_('Doing a reload, result is:'))
++			'&lt;/p&gt;'
+ 
+-		'&lt;tt&gt;&lt;p&gt;'
+-		backend.reloadAsterisk()
+-		'&lt;/p&gt;&lt;/tt&gt;'
++			'&lt;tt&gt;&lt;p&gt;'
++			backend.reloadAsterisk()
++			'&lt;/p&gt;&lt;/tt&gt;'
+ 
+-	footer()
++		footer()
+
+Modified: trunk/page_admin_viewconf.ptl
+===================================================================
+--- trunk/page_admin_viewconf.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_admin_viewconf.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -20,28 +20,12 @@
+ 
+ from Templates import *
+ from ConfigHelper import LabelWidget
+-from quixote.form2 import *
++from quixote.form import *
+ from quixote.html import htmlescape
+ import os, backend, configlets, panelutils
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
+-
+-_q_parent  = 'page_admin'
+-_q_title   = _(&quot;View/Save Configuration&quot;)
+-_q_desc    = _(&quot;Show and Save Asterisk configuration files&quot;)
+-_q_link    = 'viewconf'
+-_q_menupos = 90
+-_q_level   = 3
+-
+-
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-
+-def _q_test():
+-	return os.access(&quot;/etc/asterisk&quot;, os.O_RDWR)
+-
+-
+ def showHtmlConfig [plain] (configEntries):
+ 	'&lt;div id=&quot;config&quot;&gt;\n'
+ 	for file, cfg in configEntries:
+@@ -72,64 +56,83 @@
+ 		'&lt;/div&gt;\n'
+ 	'&lt;/div&gt;\n'
+ 
++class Page(AccessControlled, Directory): 
+ 
+ 
++	_q_parent  = 'page_admin'
++	_q_title   = _(&quot;View/Save Configuration&quot;)
++	_q_desc    = _(&quot;Show and Save Asterisk configuration files&quot;)
++	_q_link    = 'viewconf'
++	_q_menupos = 90
++	_q_level   = 3
+ 
+-def _q_index [plain] (request):
++	_q_exports = ['']
+ 
+-	res = backend.createAsteriskConfig()
+-	configEntries = res[0]
+-	missingModules = res[1]
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-	if not configEntries == []:
+-		configEntries.sort()
++	def _q_test(self):
++		return os.access(&quot;/etc/asterisk&quot;, os.O_RDWR)
+ 
+-		showForm = Form(attrs={&quot;id&quot;:&quot;showForm&quot;})
+-		for file,cnf in configEntries:
+-			showForm.add(CheckboxWidget, file, False, title=file)
+-		showForm.add(SubmitWidget, '_show', _(&quot;Show selected files&quot;), render_br=False)
+-		showForm.add(SubmitWidget, '_write', _(&quot;Save all changes&quot;))
+ 
+-		if not showForm.is_submitted():
+-			header(_(_q_desc))
+-			if not missingModules == []: showMissingModules(missingModules)
+-			showForm.render()
++	def _q_index [plain] (self):
+ 
+-		elif showForm['_show']:
+-			header(_(&quot;Asterisk configuration files&quot;))
+-			if not missingModules == []: showMissingModules(missingModules)
+-			entries = []
++		res = backend.createAsteriskConfig()
++		configEntries = res[0]
++		missingModules = res[1]
++
++		if not configEntries == []:
++			configEntries.sort()
++
++			showForm = Form(attrs={&quot;id&quot;:&quot;showForm&quot;})
+ 			for file,cnf in configEntries:
+-				if showForm[file]:
+-					entries.append( (file,cnf) )
+-			showHtmlConfig(entries)
+-			showForm.render()
+-		elif showForm['_write']:
+-			header(_(&quot;Save changes results&quot;))
+-			'&lt;p&gt;'
+-			if backend.writeAsteriskConfig():
+-				_(&quot;Configuration files saved&quot;)
+-			else:
+-				_(&quot;There were problems writing the configuration. Please take a look at the error logs.&quot;)
+-			'&lt;/p&gt;'
++				showForm.add(CheckboxWidget, file, False, title=file)
++			showForm.add(SubmitWidget, '_show', _(&quot;Show selected files&quot;), render_br=False)
++			showForm.add(SubmitWidget, '_write', _(&quot;Save all changes&quot;))
+ 
+-	else:
+-			header(_(&quot;Nothing to Show&quot;))
+-			'&lt;p&gt;'
+-			_(&quot;There is nothing configured yet.&quot;)
+-			'&lt;/p&gt;'
+-	footer()
++			if not showForm.is_submitted():
++				header(_(self._q_desc))
++				if not missingModules == []: showMissingModules(missingModules)
++				showForm.render()
+ 
+-def showMissingModules [plain] (missingModules):
+-	'&lt;div id=&quot;error&quot;&gt;\n'
+-	'&lt;p&gt;'
+-	htmltext(_(&quot;WARNING: This configuration might experience grave problems because the following asterisk modules are missing on your system:&quot;))
+-	'&lt;/p&gt;'
+-	'&lt;ul&gt;'
+-	for mod in missingModules:
+-		'&lt;li&gt;'
+-		mod
+-		'&lt;/li&gt;'
+-	'&lt;/ul&gt;'
+-	'&lt;/div&gt;\n'
++			elif showForm['_show']:
++				header(_(&quot;Asterisk configuration files&quot;))
++				if not missingModules == []: showMissingModules(missingModules)
++				entries = []
++				for file,cnf in configEntries:
++					if showForm[file]:
++						entries.append( (file,cnf) )
++				showHtmlConfig(entries)
++				showForm.render()
++			elif showForm['_write']:
++				header(_(&quot;Save changes results&quot;))
++				'&lt;p&gt;'
++				if backend.writeAsteriskConfig():
++					_(&quot;Configuration files saved&quot;)
++				else:
++					_(&quot;There were problems writing the configuration. Please take a look at the error logs.&quot;)
++				'&lt;/p&gt;'
+ 
++		else:
++				header(_(&quot;Nothing to Show&quot;))
++				'&lt;p&gt;'
++				_(&quot;There is nothing configured yet.&quot;)
++				'&lt;/p&gt;'
++		footer()
++
++	def showMissingModules [plain] (missingModules):
++		'&lt;div id=&quot;error&quot;&gt;\n'
++		'&lt;p&gt;'
++		htmltext(_(&quot;WARNING: This configuration might experience grave problems because the following asterisk modules are missing on your system:&quot;))
++		'&lt;/p&gt;'
++		'&lt;ul&gt;'
++		for mod in missingModules:
++			'&lt;li&gt;'
++			mod
++			'&lt;/li&gt;'
++		'&lt;/ul&gt;'
++		'&lt;/div&gt;\n'
++
+
+Modified: trunk/page_config.ptl
+===================================================================
+--- trunk/page_config.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -21,119 +21,127 @@
+ from Templates import *
+ import os, grp, backend, string
+ import panelutils
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
+-_q_parent  = 'page_main'
+-_q_title   = _(&quot;Configuration&quot;)
+-_q_desc    = _(&quot;Modify Asterisk configuration&quot;)
+-_q_menupos = 30
+-_q_level   = 3
++class Page(AccessControlled, Directory): 
+ 
++	_q_parent  = 'page_main'
++	_q_title   = _(&quot;Configuration&quot;)
++	_q_desc    = _(&quot;Modify Asterisk configuration&quot;)
++	_q_menupos = 30
++	_q_level   = 3
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	_q_exports = ['']
+ 
++	tipped = False
+ 
+-tipped = False
+-def configurationTip [plain] (tip, url, label):
+-	global tipped
+-	if not tipped:
+-		'&lt;p&gt;'
+-		htmltext(_('Configuration tips'))
+-		'&lt;/p&gt;'
+-		'&lt;ul&gt;'
+-	tipped = True
+-	'&lt;li&gt;'
+-	htmltext(_(tip))
+-	if url:
+-		'You can do it in the &lt;a href=&quot;%s&quot;&gt;' % url
+-		' -&gt; '.join(label)
+-		'&lt;/a&gt; form.'	
+-	'&lt;/li&gt;'
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
++	def configurationTip [plain] (self, tip, url, label):
++		tipped = self.tipped
++		global tipped
++		if not tipped:
++			'&lt;p&gt;'
++			htmltext(_('Configuration tips'))
++			'&lt;/p&gt;'
++			'&lt;ul&gt;'
++		self.tipped = True
++		'&lt;li&gt;'
++		htmltext(_(tip))
++		if url:
++			'You can do it in the &lt;a href=&quot;%s&quot;&gt;' % url
++			' -&gt; '.join(label)
++			'&lt;/a&gt; form.'	
++		'&lt;/li&gt;'
+ 
+-def configurationTips [plain] (request):
+-	global tipped
+-	tipped = False
+ 
+-	groups = []
+-	for gid in os.getgroups():
+-		groups.append(grp.getgrgid(gid)[0])
+-	groups = &quot;, &quot;.join(groups)
++	def configurationTips [plain] (self):
++		tipped = self.tipped
++		global tipped
++		tipped = False
+ 
+-	if request.session.user=='programmer':
+-		configurationTip(
+-			_(&quot;You should create a user with type 'Configurator'. Without this user, everyone connecting to DeStar can configure everything.&quot;),
+-			&quot;add/CfgOptUser&quot;,
+-			[_(&quot;Configuration&quot;), _(&quot;Options&quot;), _(&quot;DeStar user&quot;)] )
++		groups = []
++		for gid in os.getgroups():
++			groups.append(grp.getgrgid(gid)[0])
++		groups = &quot;, &quot;.join(groups)
+ 
+-	if not os.access(&quot;/etc/asterisk&quot;, os.O_RDWR):
+-		configurationTip(
+-			_(&quot;You should enable write access to the directory /etc/asterisk. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'.&quot; % groups),
+-			&quot;&quot;,
+-			[])
++		if self.session.user=='programmer':
++			configurationTip(
++				_(&quot;You should create a user with type 'Configurator'. Without this user, everyone connecting to DeStar can configure everything.&quot;),
++				&quot;add/CfgOptUser&quot;,
++				[_(&quot;Configuration&quot;), _(&quot;Options&quot;), _(&quot;DeStar user&quot;)] )
+ 
+-	if not backend.countConfiglets(clazz=&quot;CfgOptManager&quot;):
+-		configurationTip(
+-			_(&quot;You should create a management API entry. Without this entry, DeStar can't control the Asterisk PBX software.&quot;),
+-			&quot;add/CfgOptManager&quot;,
+-			[_(&quot;Configuration&quot;), _(&quot;Options&quot;), _(&quot;Management API access&quot;)] )
++		if not os.access(&quot;/etc/asterisk&quot;, os.O_RDWR):
++			configurationTip(
++				_(&quot;You should enable write access to the directory /etc/asterisk. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'.&quot; % groups),
++				&quot;&quot;,
++				[])
+ 
+-	if not backend.countConfiglets(&quot;Phones&quot;):
+-		configurationTip(
+-			_(&quot;You should create a phone. Without defined phones you can't make and receive calls.&quot;),
+-			&quot;phones/&quot;,
+-			[_(&quot;Configuration&quot;), _(&quot;Phones&quot;)] )
++		if not backend.countConfiglets(clazz=&quot;CfgOptManager&quot;):
++			self.configurationTip(
++				_(&quot;You should create a management API entry. Without this entry, DeStar can't control the Asterisk PBX software.&quot;),
++				&quot;add/CfgOptManager&quot;,
++				[_(&quot;Configuration&quot;), _(&quot;Options&quot;), _(&quot;Management API access&quot;)] )
+ 
+-	if not backend.countConfiglets(&quot;Trunks&quot;):
+-		configurationTip(
+-			_(&quot;You should create a trunk (connection to a Phone company or VOIP Provider). Without a trunk you can only make calls between local phones.&quot;),
+-			&quot;trunks/&quot;,
+-			[_(&quot;Configuration&quot;), _(&quot;Trunks&quot;)] )
++		if not backend.countConfiglets(&quot;Phones&quot;):
++			self.configurationTip(
++				_(&quot;You should create a phone. Without defined phones you can't make and receive calls.&quot;),
++				&quot;phones/&quot;,
++				[_(&quot;Configuration&quot;), _(&quot;Phones&quot;)] )
+ 
+-	if not os.access(&quot;/etc/zaptel.conf&quot;, os.O_RDWR):
+-		configurationTip(
+-			_(&quot;You should enable write access to /etc/zaptel.conf. Without write access to this file you cannot configure Zaptel devices, e.g. FXO/FXS cards, T1/E1 cards, ZapHFC ISDN cards, etc. You should 'chmod g+rw' this file and set it's group to one of '%s'.&quot; % groups),
+-			&quot;&quot;,
+-			[])
+-	if not os.access(panelutils.PANEL_CONF_DIR, os.O_RDWR):
+-		configurationTip(
+-			_(&quot;You should enable write access to the %s directory. Without the ability to modify the Asternic Flash Operator Panel configuration files DeStar won't be integrated whit the panel.&quot; % panelutils.PANEL_CONF_DIR),
+-			&quot;&quot;,
+-			[])
+-	db_fn = &quot;/var/log/asterisk/master.db&quot;
+-	if not os.access(db_fn, os.O_RDWR):
+-		configurationTip(
+-			_(&quot;You don't seem to have access to %s yet created by cdr_sqlite3_custom. Without this file CDR reports wont be accesible trough this interface.&quot;),
+-			&quot;&quot;,
+-			[])
++		if not backend.countConfiglets(&quot;Trunks&quot;):
++			self.configurationTip(
++				_(&quot;You should create a trunk (connection to a Phone company or VOIP Provider). Without a trunk you can only make calls between local phones.&quot;),
++				&quot;trunks/&quot;,
++				[_(&quot;Configuration&quot;), _(&quot;Trunks&quot;)] )
+ 
+-	if tipped:
+-		'&lt;/ul&gt;'
++		if not os.access(&quot;/etc/zaptel.conf&quot;, os.O_RDWR):
++			self.configurationTip(
++				_(&quot;You should enable write access to /etc/zaptel.conf. Without write access to this file you cannot configure Zaptel devices, e.g. FXO/FXS cards, T1/E1 cards, ZapHFC ISDN cards, etc. You should 'chmod g+rw' this file and set it's group to one of '%s'.&quot; % groups),
++				&quot;&quot;,
++				[])
++		if not os.access(panelutils.PANEL_CONF_DIR, os.O_RDWR):
++			self.configurationTip(
++				_(&quot;You should enable write access to the %s directory. Without the ability to modify the Asternic Flash Operator Panel configuration files DeStar won't be integrated whit the panel.&quot; % panelutils.PANEL_CONF_DIR),
++				&quot;&quot;,
++				[])
++		db_fn = &quot;/var/log/asterisk/master.db&quot;
++		if not os.access(db_fn, os.O_RDWR):
++			configurationTip(
++				_(&quot;You don't seem to have access to %s yet created by cdr_sqlite3_custom. Without this file CDR reports wont be accesible trough this interface.&quot;),
++				&quot;&quot;,
++				[])
+ 
++		if self.tipped:
++			'&lt;/ul&gt;'
+ 
+-def showConfigurables [plain] (head):
+-	'&lt;p&gt;'
+-	head
+-	':&lt;/p&gt;&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+-	'&lt;tr&gt;'
+-	for s in (htmltext(_('Configured')), htmltext(_('Category'))):
+-		'&lt;th&gt;%s&lt;/th&gt;' % s
+-	'&lt;/tr&gt;&lt;/thead&gt;'
+-
+-	for group in backend.configletsGrouped():
++	def showConfigurables [plain] (sefl, head):
++		'&lt;p&gt;'
++		head
++		':&lt;/p&gt;&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+ 		'&lt;tr&gt;'
+-		'&lt;td&gt;%s&lt;/td&gt;' % backend.countConfiglets(group)
+-		'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (group.lower(), _(group))
+-		'&lt;/tr&gt;'
+-	'&lt;/table&gt;'
++		for s in (htmltext(_('Configured')), htmltext(_('Category'))):
++			'&lt;th&gt;%s&lt;/th&gt;' % s
++		'&lt;/thead&gt;&lt;/tr&gt;'
+ 
++		for group in backend.configletsGrouped():
++			'&lt;tr&gt;'
++			'&lt;td&gt;%s&lt;/td&gt;' % backend.countConfiglets(group)
++			'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (group.lower(), _(group))
++			'&lt;/tr&gt;'
++		'&lt;/table&gt;'
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	configurationTips(request)
+-	if tipped:
+-		showConfigurables(htmltext(_('Other things you can configure:')))
+-	else:
+-		showConfigurables(htmltext(_('You can configure the following things')))
+-	footer()
++
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		self.configurationTips()
++		if self.tipped:
++			self.showConfigurables(htmltext(_('Other things you can configure:')))
++		else:
++			self.showConfigurables(htmltext(_('You can configure the following things')))
++		footer()
+
+Modified: trunk/page_config_add.ptl
+===================================================================
+--- trunk/page_config_add.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_add.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,18 +19,23 @@
+ 
+ 
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent = 'page_config'
+-_q_title  = ''
+-_q_desc   = _(&quot;Add a new configlet&quot;)
+-_q_link   = 'add'
+-_q_level  = 3
++	_q_parent = 'page_config'
++	_q_title  = ''
++	_q_desc   = _(&quot;Add a new configlet&quot;)
++	_q_link   = 'add'
++	_q_level  = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-_q_lookup = lookupConfiglets
++	_q_lookup = lookupConfiglets
+
+Modified: trunk/page_config_applications.ptl
+===================================================================
+--- trunk/page_config_applications.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_applications.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -20,22 +20,27 @@
+ 
+ from Templates import *
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_config'
+-_q_title   = _(&quot;Applications&quot;)
+-_q_desc    = _(&quot;Special Asterisk Applications&quot;)
+-_q_link    = 'applications'
+-_q_menupos = 50
+-_q_level   = 3
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;Applications&quot;)
++	_q_desc    = _(&quot;Special Asterisk Applications&quot;)
++	_q_link    = 'applications'
++	_q_menupos = 50
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	presentConfiglets('Applications')
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		presentConfiglets('Applications')
++		footer()
+
+Modified: trunk/page_config_codecs.ptl
+===================================================================
+--- trunk/page_config_codecs.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_codecs.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -21,22 +21,27 @@
+ 
+ from Templates import *
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_config'
+-_q_title   = _(&quot;Codecs&quot;)
+-_q_desc    = _(&quot;Audio codecs to use on SIP and IAX channels.&quot;)
+-_q_link    = 'codecs'
+-_q_menupos = 80
+-_q_level   = 3
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;Codecs&quot;)
++	_q_desc    = _(&quot;Audio codecs to use on SIP and IAX channels.&quot;)
++	_q_link    = 'codecs'
++	_q_menupos = 80
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	presentConfiglets('Codecs')
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		presentConfiglets('Codecs')
++		footer()
+
+Modified: trunk/page_config_dialout.ptl
+===================================================================
+--- trunk/page_config_dialout.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_dialout.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -21,22 +21,27 @@
+ 
+ from Templates import *
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_config'
+-_q_title   = _(&quot;Dialout&quot;)
+-_q_desc    = _(&quot;Dialout entries for outgoing calls&quot;)
+-_q_link    = 'dialout'
+-_q_menupos = 40
+-_q_level   = 3
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;Dialout&quot;)
++	_q_desc    = _(&quot;Dialout entries for outgoing calls&quot;)
++	_q_link    = 'dialout'
++	_q_menupos = 40
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	presentConfiglets('Dialout')
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		presentConfiglets('Dialout')
++		footer()
+
+Modified: trunk/page_config_dids.ptl
+===================================================================
+--- trunk/page_config_dids.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_dids.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -21,22 +21,27 @@
+ 
+ from Templates import *
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_config'
+-_q_title   = _(&quot;DIDs&quot;)
+-_q_desc    = _(&quot;Direct Inward Dialing.&quot;)
+-_q_link    = 'dids'
+-_q_menupos = 70
+-_q_level   = 3
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;DIDs&quot;)
++	_q_desc    = _(&quot;Direct Inward Dialing.&quot;)
++	_q_link    = 'dids'
++	_q_menupos = 70
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	presentConfiglets('DIDs')
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		presentConfiglets('DIDs')
++		footer()
+
+Modified: trunk/page_config_down.ptl
+===================================================================
+--- trunk/page_config_down.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_down.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,23 +19,28 @@
+ 
+ 
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent = 'page_config'
+-_q_title  = ''
+-_q_desc   = _(&quot;Moves a configlet one position down&quot;)
+-_q_link   = 'down'
+-_q_level  = 3
++	_q_parent = 'page_config'
++	_q_title  = ''
++	_q_desc   = _(&quot;Moves a configlet one position down&quot;)
++	_q_link   = 'down'
++	_q_level  = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_lookup(request, component):
+-	obj = backend.moveConfigletDown(component)
+-	if obj:
+-		return request.redirect(&quot;../&quot; + obj.groupName.lower())
+-	else:
+-		return errorpage(_(&quot;Could not swap id's %s and %s&quot;) % (self._id-1,self._id))
++	def _q_lookup(self, component):
++		obj = backend.moveConfigletDown(component)
++		if obj:
++			return redirect(&quot;../&quot; + obj.groupName.lower())
++		else:
++			return errorpage(_(&quot;Could not swap id's %s and %s&quot;) % (self._id-1,self._id))
+
+Modified: trunk/page_config_edit.ptl
+===================================================================
+--- trunk/page_config_edit.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_edit.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -20,25 +20,30 @@
+ 
+ from ConfigHelper import *
+ import backend
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent = 'page_config'
+-_q_title  = ''
+-_q_desc   = _(&quot;Edit a configlet&quot;)
+-_q_link   = 'edit'
+-_q_level  = 3
++	_q_parent = 'page_config'
++	_q_title  = ''
++	_q_desc   = _(&quot;Edit a configlet&quot;)
++	_q_link   = 'edit'
++	_q_level  = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
++	def _q_lookup(self, component):
++		obj = backend.getConfiglet(component)
++		if obj is not None:
++			obj.fixup()
++			return configletsForm(request, obj, _(obj.shortName), exitPath = &quot;../&quot; + obj.groupName.lower())
++		else:
++			return errorpage(_(&quot;Object does not exist&quot;))
+ 
+-def _q_lookup(request, component):
+-	obj = backend.getConfiglet(component)
+-	if obj is not None:
+-		obj.fixup()
+-		return configletsForm(request, obj, _(obj.shortName), exitPath = &quot;../&quot; + obj.groupName.lower())
+-	else:
+-		return errorpage(_(&quot;Object does not exist&quot;))
+-
+
+Modified: trunk/page_config_ivrs.ptl
+===================================================================
+--- trunk/page_config_ivrs.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_ivrs.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -21,22 +21,27 @@
+ 
+ from Templates import *
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_config'
+-_q_title   = _(&quot;IVRs&quot;)
+-_q_desc    = _(&quot;Interactive Voice Response menus for the PBX.&quot;)
+-_q_link    = 'ivrs'
+-_q_menupos = 60
+-_q_level   = 3
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;IVRs&quot;)
++	_q_desc    = _(&quot;Interactive Voice Response menus for the PBX.&quot;)
++	_q_link    = 'ivrs'
++	_q_menupos = 60
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	presentConfiglets('IVRs')
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		presentConfiglets('IVRs')
++		footer()
+
+Modified: trunk/page_config_options.ptl
+===================================================================
+--- trunk/page_config_options.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_options.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -20,22 +20,27 @@
+ 
+ from Templates import *
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_config'
+-_q_title   = _(&quot;Options&quot;)
+-_q_desc    = _(&quot;DeStar and Asterisk options and parameters&quot;)
+-_q_link    = 'options'
+-_q_menupos = 999
+-_q_level   = 3
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;Options&quot;)
++	_q_desc    = _(&quot;DeStar and Asterisk options and parameters&quot;)
++	_q_link    = 'options'
++	_q_menupos = 999
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	presentConfiglets('Options')
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		presentConfiglets('Options')
++		footer()
+
+Modified: trunk/page_config_pbx.ptl
+===================================================================
+--- trunk/page_config_pbx.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_pbx.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -21,22 +21,27 @@
+ 
+ from Templates import *
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_config'
+-_q_title   = _(&quot;Virtual PBX&quot;)
+-_q_desc    = _(&quot;Virtual PBX&quot;)
+-_q_link    = 'pbx'
+-_q_menupos = 05
+-_q_level   = 3
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;Virtual PBX&quot;)
++	_q_desc    = _(&quot;Virtual PBX&quot;)
++	_q_link    = 'pbx'
++	_q_menupos = 05
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	presentConfiglets('PBX')
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		presentConfiglets('PBX')
++		footer()
+
+Modified: trunk/page_config_phones.ptl
+===================================================================
+--- trunk/page_config_phones.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_phones.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -20,22 +20,27 @@
+ 
+ from Templates import *
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_config'
+-_q_title   = _(&quot;Phones&quot;)
+-_q_desc    = _(&quot;Phones and their settings&quot;)
+-_q_link    = 'phones'
+-_q_menupos = 20
+-_q_level   = 3
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;Phones&quot;)
++	_q_desc    = _(&quot;Phones and their settings&quot;)
++	_q_link    = 'phones'
++	_q_menupos = 20
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	presentConfiglets('Phones')
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		presentConfiglets('Phones')
++		footer()
+
+Modified: trunk/page_config_trunks.ptl
+===================================================================
+--- trunk/page_config_trunks.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_trunks.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -20,29 +20,34 @@
+ 
+ from Templates import *
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_config'
+-_q_title   = _(&quot;Trunks&quot;)
+-_q_desc    = _(&quot;Telephone company lines and VoIP-Trunks&quot;)
+-_q_link    = 'trunks'
+-_q_menupos = 30
+-_q_level   = 3
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;Trunks&quot;)
++	_q_desc    = _(&quot;Telephone company lines and VoIP-Trunks&quot;)
++	_q_link    = 'trunks'
++	_q_menupos = 30
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	import configlets
+-	phones = False
+-	for obj in configlets.configlet_tree:
+-		if obj.groupName == 'Phones':
+-			phones = True
+-	if not phones:
+-		_('You should add at least one phone to configure trunks')
+-	presentConfiglets('Trunks')
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		import configlets
++		phones = False
++		for obj in configlets.configlet_tree:
++			if obj.groupName == 'Phones':
++				phones = True
++		if not phones:
++			_('You should add at least one phone to configure trunks')
++		presentConfiglets('Trunks')
++		footer()
+
+Modified: trunk/page_config_up.ptl
+===================================================================
+--- trunk/page_config_up.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_up.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,23 +19,28 @@
+ 
+ 
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent = 'page_config'
+-_q_title  = ''
+-_q_desc   = _(&quot;Moves a configlet one position up&quot;)
+-_q_link   = 'up'
+-_q_level  = 3
++	_q_parent = 'page_config'
++	_q_title  = ''
++	_q_desc   = _(&quot;Moves a configlet one position up&quot;)
++	_q_link   = 'up'
++	_q_level  = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_lookup(request, component):
+-	obj = backend.moveConfigletUp(component)
+-	if obj:
+-		return request.redirect(&quot;../&quot; + obj.groupName.lower())
+-	else:
+-		return errorpage(_(&quot;Could not swap id's %s and %s&quot;) % (self._id-1,self._id))
++	def _q_lookup(self, component):
++		obj = backend.moveConfigletUp(component)
++		if obj:
++			return redirect(&quot;../&quot; + obj.groupName.lower())
++		else:
++			return errorpage(_(&quot;Could not swap id's %s and %s&quot;) % (self._id-1,self._id))
+
+Modified: trunk/page_config_users.ptl
+===================================================================
+--- trunk/page_config_users.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_config_users.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -20,22 +20,27 @@
+ 
+ from Templates import *
+ from ConfigHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_config'
+-_q_title   = _(&quot;Users&quot;)
+-_q_desc    = _(&quot;Users and Mailboxes&quot;)
+-_q_link    = 'users'
+-_q_menupos = 10
+-_q_level   = 3
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;Users&quot;)
++	_q_desc    = _(&quot;Users and Mailboxes&quot;)
++	_q_link    = 'users'
++	_q_menupos = 10
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	presentConfiglets('Users')
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		presentConfiglets('Users')
++		footer()
+
+Modified: trunk/page_debug.ptl
+===================================================================
+--- trunk/page_debug.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_debug.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,23 +19,28 @@
+ 
+ 
+ from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_main'
+-_q_title   = _(&quot;Debug&quot;)
+-_q_desc    = _(&quot;Various functions to debug DeStar, mostly useful for programmers&quot;)
+-_q_menupos = 99
+-_q_level   = 4	# Programmer only
++	_q_parent  = 'page_main'
++	_q_title   = _(&quot;Debug&quot;)
++	_q_desc    = _(&quot;Various functions to debug DeStar, mostly useful for programmers&quot;)
++	_q_menupos = 99
++	_q_level   = 4	# Programmer only
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	'&lt;p&gt;'
+-	htmltext(_q_desc)
+-	'.&lt;/p&gt;'
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		'&lt;p&gt;'
++		htmltext(self._q_desc)
++		'.&lt;/p&gt;'
++		footer()
+
+Modified: trunk/page_debug_values.ptl
+===================================================================
+--- trunk/page_debug_values.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_debug_values.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,21 +19,26 @@
+ 
+ 
+ from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent = 'page_debug'
+-_q_title  = _(&quot;Values&quot;)
+-_q_desc   = _(&quot;Dumps all values in the HTTP request&quot;)
++	_q_parent = 'page_debug'
++	_q_title  = _(&quot;Values&quot;)
++	_q_desc   = _(&quot;Dumps all values in the HTTP request&quot;)
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	'&lt;div id=&quot;dump&quot;&gt;'
+-	request.dump_html()
+-	'&lt;/div&gt;'
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		'&lt;div id=&quot;dump&quot;&gt;'
++		request.dump_html()
++		'&lt;/div&gt;'
++		footer()
+
+Modified: trunk/page_login.ptl
+===================================================================
+--- trunk/page_login.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_login.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,69 +19,79 @@
+ 
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
++from quixote import get_request, get_session, redirect
++from quixote.directory import Directory, AccessControlled
+ import types, backend
+ 
+-_q_parent  = 'page_main'
+-_q_title   = _(&quot;Login&quot;)
+-_q_desc    = _(&quot;Login into DeStar&quot;)
+-_q_menupos = 90
+-_q_level   = -1
++class Page(AccessControlled, Directory): 
+ 
++	_q_parent  = 'page_main'
++	_q_title   = _(&quot;Login&quot;)
++	_q_desc    = _(&quot;Login into DeStar&quot;)
++	_q_menupos = 90
++	_q_level   = -1
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	_q_exports = ['']
+ 
+-def loginForm(request, exitPath=&quot;.&quot;, render=0):
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-	if request.form.has_key('_cancel'):
+-		return request.redirect(exitPath)
+-	form = Form()
++	def loginForm(self, exitPath=&quot;.&quot;, render=0):
+ 
+-	form.add(StringWidget, &quot;name&quot;,  &quot;&quot;,  title=htmltext(_(&quot;User or phone name/number&quot;)), required=True)
+-	form.add(PasswordWidget, &quot;pw&quot;,    &quot;&quot;,  title=htmltext(_(&quot;Password or PIN&quot;)),           required=True)
+-	form.add(SubmitWidget, '_submit', _(&quot;Submit&quot;), render_br=False)
+-	form.add(SubmitWidget, '_cancel', _(&quot;Cancel&quot;), render_br=False)
++		if self.request.form.has_key('_cancel'):
++			return self.request.redirect(exitPath)
++		form = Form()
+ 
+-	if not form.is_submitted() or form.has_errors() or render == 1:
+-		return form.render()
++		form.add(StringWidget, &quot;name&quot;,  &quot;&quot;,  title=htmltext(_(&quot;User or phone name/number&quot;)), required=True)
++		form.add(PasswordWidget, &quot;pw&quot;,    &quot;&quot;,  title=htmltext(_(&quot;Password or PIN&quot;)),           required=True)
++		form.add(SubmitWidget, '_submit', _(&quot;Submit&quot;), render_br=False)
++		form.add(SubmitWidget, '_cancel', _(&quot;Cancel&quot;), render_br=False)
+ 
+-	return (form['name'], form['pw'])
++		if not form.is_submitted() or form.has_errors() or render == 1:
++			return form.render()
+ 
++		return (form['name'], form['pw'])
+ 
+-def notLoggedIn [plain] (request):
+-	'&lt;p&gt;'
+-	htmltext(_('Invalid username or password'))
+-	loginForm(request, render=1)
+-	'.&lt;/p&gt;'
+ 
++	def notLoggedIn [plain] (self):
++		'&lt;p&gt;'
++		htmltext(_('Invalid username or password'))
++		self.loginForm(self.request, render=1)
++		'.&lt;/p&gt;'
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	res = loginForm(request)
+ 
+-	if type(res) != types.TupleType:
+-		res
+-	else:
+-		# First search for a user entry
+-		for obj in backend.getConfiglets(name=&quot;CfgOptUser&quot;):
+-			if obj.name==res[0] and obj.secret==res[1]:
+-				request.session.user  = obj.name
+-				request.session.level = int(obj.level)
+-				request.session.phone = obj.phone
+-				request.session.language = obj.language
+-				request.session.pbx = obj.pbx
+-				return request.redirect(str('../user/info'))
++	def _q_index [plain] (self):
++		self.session = get_session()
++		self.request = get_request()
+ 
+-		# Now search for a phone entry with proper extension/voicemail pin
+-		for obj in backend.getConfiglets(group=&quot;Phones&quot;):
+-			if (obj.ext==res[0] or obj.name==res[0]) and (obj.secret==res[1] or obj.pin==res[1]):
+-				request.session.user  = obj.name
+-				request.session.level = 1
+-				request.session.phone = obj.name
+-				request.session.language = 'en'
+-				request.session.pbx = obj.pbx
+-				return request.redirect(str('../user/info'))
+-		notLoggedIn(request)
+-	footer()
++		header(self._q_desc)
++		res = self.loginForm(self.request)
++
++		if type(res) != types.TupleType:
++			res
++		else:
++			# First search for a user entry
++			for obj in backend.getConfiglets(name=&quot;CfgOptUser&quot;):
++				if obj.name==res[0] and obj.secret==res[1]:
++					self.session.user  = obj.name
++					self.session.level = int(obj.level)
++					self.session.phone = obj.phone
++					self.session.language = obj.language
++					self.session.pbx = obj.pbx
++					return redirect(str('../user/info'))
++
++			# Now search for a phone entry with proper extension/voicemail pin
++			for obj in backend.getConfiglets(group=&quot;Phones&quot;):
++				if (obj.ext==res[0] or obj.name==res[0]) and (obj.secret==res[1] or obj.pin==res[1]):
++					self.session.user  = obj.name
++					self.session.level = 1
++					self.session.phone = obj.name
++					self.session.language = 'en'
++					self.session.pbx = obj.pbx
++					return redirect(str('../user/info'))
++			self.notLoggedIn()
++		footer()
+
+Modified: trunk/page_logout.ptl
+===================================================================
+--- trunk/page_logout.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_logout.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,24 +19,30 @@
+ 
+ 
+ from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_main'
+-_q_title   = _(&quot;Logout&quot;)
+-_q_desc    = _(&quot;Logout and become a guest user&quot;)
+-_q_menupos = 90
+-_q_level   = 1
++	_q_parent  = 'page_main'
++	_q_title   = _(&quot;Logout&quot;)
++	_q_desc    = _(&quot;Logout and become a guest user&quot;)
++	_q_menupos = 90
++	_q_level   = 1
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-	if request.session.level == 4:
+-		return request.redirect('/user/info/')
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++		if self.session.level == 4:
++			return redirect('/user/info/')
+ 
+-def _q_index(request):
+-	# TODO: move this into Publisher.py
+-	request.session.user = ''
+-	request.session.phone = ''
+-	request.session.level = -1
+-	return request.redirect('/user/info/')
++	def _q_index(self):
++		# TODO: move this into Publisher.py
++		self.session.user = ''
++		self.session.phone = ''
++		self.session.level = -1
++		return redirect('/')
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_main.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -20,22 +20,11 @@
+ 
+ from Templates import *
+ import sys, os, quixote, backend
++from quixote import get_session, get_session_manager
+ from quixote.util import StaticDirectory
++from quixote.directory import Directory, AccessControlled
+ 
+ 
+-_q_exports = ['static', 'graphs']
+-_q_parent  = ''
+-_q_title   = _(&quot;Main menu&quot;)
+-_q_desc    = _(&quot;DeStar main page&quot;)
+-_q_level   = 0
+-
+-
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-
+-
+ #######################################################################
+ #
+ # This boilerplate is only in main_page.ptl. It automatically loads
+@@ -60,120 +49,128 @@
+ #######################################################################
+ 
+ 
++class Page(AccessControlled, Directory): #order matters
+ 
++        # Our main page
+ 
++	_q_exports = ['', 'static', 'graphs']
++        _q_parent  = ''
++        _q_title   = _(&quot;Main menu&quot;)
++        _q_desc    = _(&quot;DeStar main page&quot;)
++        _q_level   = 0
+ 
+-# Import all cfg_*.py files once when the module loads.
+-for s in os.listdir(backend.CONFIGLETS_DIR):
+-        if not s.startswith('page_'):
+-		continue
+-	m = None
+-        if s.endswith('.ptl'):
+-		s= s[:-4]
+-		#print &quot;Importing&quot;, s
+-		m = __import__(s)
+-        elif s.endswith('.py'):
+-		s = s[:-3]
+-		#print &quot;Importing&quot;, s
+-		m =  __import__(s)
+-	if m:
+-		for a in ('_q_parent', '_q_title', '_q_access'):
+-			if not m.__dict__.has_key(a):
+-				print &quot;Error: '%s' doesn't define %s&quot; % (s,a)
+-				sys.exit(1)
++	def __init__(self):
+ 
+-		# instantiate eventually missing variables
+-		if not m.__dict__.has_key('_q_menu'):
+-			m.__dict__['_q_menu'] = []
+-		if not m.__dict__.has_key('_q_menupos'):
+-			m.__dict__['_q_menupos'] = 0
+-		if not m.__dict__.has_key('_q_exports'):
+-			m.__dict__['_q_exports'] = []
+-		if not m.__dict__.has_key('_q_desc'):
+-			m.__dict__['_q_desc'] = ''
+-		if not m.__dict__.has_key('_q_level'):
+-			m.__dict__['_q_level'] = 4
+-		if not m.__dict__.has_key('_q_link'):
+-			m.__dict__['_q_link'] = s[5:]
+-		
+-# Build the menu structure for all page modules
+-for s in sys.modules:
+-	if not s.startswith('page_'):
+-		continue
+-	if s == 'page_main':
+-		continue
+-	
+-	this_mod = sys.modules[s]
+-	if this_mod.__dict__.has_key('_q_test') and not this_mod._q_test():
+-		continue
++		# Import all cfg_*.py files once when the module loads.
++		for s in os.listdir(backend.CONFIGLETS_DIR):
++			#continue
++			if not s.startswith('page_main') and not s.startswith('page_user') \
++			and not s.startswith('page_login') and not s.startswith('page_admin') \
++			and not s.startswith('page_logout') and not s.startswith('page_config') :
++				continue
++			m = None
++			if s.endswith('.ptl'):
++				s= s[:-4]
++				m = __import__(s)
++			elif s.endswith('.py'):
++				s = s[:-3]
++				m =  __import__(s)
++			if m:
++				for a in ('_q_parent', '_q_title', '_q_access'):
++					if not m.Page.__dict__.has_key(a):
++						print &quot;Error: '%s' doesn't define %s&quot; % (s,a)
++						sys.exit(1)
+ 
++				# instantiate eventually missing variables
++				if not m.Page.__dict__.has_key('_q_menu'):
++					m.Page._q_menu = []
++				if not m.Page.__dict__.has_key('_q_menupos'):
++					m.Page._q_menupos = 0
++				if not m.Page.__dict__.has_key('_q_exports'):
++					m.Page._q_exports = []
++				if not m.Page.__dict__.has_key('_q_desc'):
++					m.Page._q_desc = ''
++				if not m.Page.__dict__.has_key('_q_level'):
++					m.Page._q_level = 4
++				if not m.Page.__dict__.has_key('_q_link'):
++					m.Page._q_link = s[5:]
++				
++		# Build the menu structure for all page modules
+ 
+-	try:
+-		parent_mod = sys.modules[this_mod._q_parent]
+-	except KeyError:
+-		print &quot;Note: %s does not exist, menu is now garbled&quot; % this_mod._q_parent
+-		parent_mod = sys.modules['page_main']
+-	s = s[5:]	# strip 'page_'
++		for s in sys.modules:
++			if not s.startswith('page_'):
++				continue
++			if s == 'page_main':
++				continue
++			
++			this_mod = sys.modules[s].Page
++			if this_mod.__dict__.has_key('_q_test') and not this_mod()._q_test():
++				continue
+ 
+-	#print s
+-	#print &quot;this:&quot;, this_mod
+-	#print &quot;parent:&quot;, parent_mod
++			try:
++				parent_mod = sys.modules[this_mod._q_parent].Page
++			except KeyError:
++				print &quot;Note: %s does not exist, menu is now garbled&quot; % this_mod._q_parent
++				parent_mod = sys.modules['page_main'].Page
++			s = s[5:]	# strip 'page_'
+ 
+-	# Append module to parent's menu and export-list
+-	link = this_mod._q_link
+-	#parent_mod._q_menu.append( (link, this_mod._q_title, this_mod._q_desc, this_mod._q_level, this_mod))
+-	if this_mod._q_title:
+-		parent_mod._q_menu.append( this_mod )
+-	parent_mod._q_exports.append( link )
+-	# Make this module known in the parent's module namespace
+-	parent_mod.__dict__[link] = this_mod
+-	# 'Convert' the _q_parent from type String to type Module
+-	this_mod.__dict__['_q_parent'] = parent_mod
++			# Append module to parent's menu and export-list
++			link = this_mod._q_link
++			#parent_mod._q_menu.append( (link, this_mod._q_title, this_mod._q_desc, this_mod._q_level, this_mod))
++			if this_mod._q_title:
++				parent_mod._q_menu.append( this_mod )
++			parent_mod._q_exports.append( link )
++			# Make this module known in the parent's module namespace
++			#parent_mod.__dict__[link] = this_mod
++			#import pdb; pdb.set_trace()
++			setattr(parent_mod, link, this_mod())
++			# 'Convert' the _q_parent from type String to type Module
++			#this_mod._q_parent = parent_mod
+ 
+-
+-def _q_exception_handler [plain] (request, exc):
+-        if isinstance(exc, quixote.errors.AccessError) or isinstance(exc, quixote.errors.PublishError):
+-	        if (exc.title == &quot;Access denied&quot;):
+-			header(htmltext(_('Access Denied')))
+-			'&lt;p&gt;'
+-			htmltext(_(&quot;You don't have access to this page.&quot;))
+-			'&lt;/p&gt;'
+-			footer()
+-		else:
+-			header(_(exc.title))
+-			'&lt;p&gt;'
+-			_(exc.public_msg)
+-			'&lt;/p&gt;'
+-			footer()
+-        else:
+-		raise exc
+-
+-
+-
+-
+ #######################################################################
+ #
+ # End of boilerplate, now comes the contents of 'page_main':
+ #
+ #######################################################################
+ 
++	def _q_index [plain] (self):
++                #session = get_session()
++		#if session.level &lt; 1:
++		#	return get_request().redirect(str('/login'))
++		header(self._q_desc)
++		'&lt;p&gt;'
++		'This page is empty. Please select one option from the menu on the left side.'
++		'&lt;/p&gt;'
++		footer()
++		#import configlets
+ 
++        def _q_access(self):
++                if get_session().level &lt; self._q_level:
++                        cantAccessPage()
++	                #raise AccessError(htmltext(_(&quot;You don't have access to this page&quot;)))
+ 
++        def _q_exception_handler [plain] (self, exc):
++                if isinstance(exc, quixote.errors.AccessError) or isinstance(exc, quixote.errors.PublishError):
++                        if (exc.title == &quot;Access denied&quot;):
++                                #header(htmltext(_('Access Denied')))
++                                '&lt;p&gt;'
++                                htmltext(_(&quot;You don't have access to this page.&quot;))
++                                '&lt;/p&gt;'
++                                footer()
++                        else:
++                                #header(_(exc.title))
++                                '&lt;p&gt;'
++                                _(exc.public_msg)
++                                '&lt;/p&gt;'
++                                footer()
++                else:
++                        raise exc
+ 
+-# Our main page
+-def _q_index [plain] (request):
+-	if request.session.level &lt; 1:
+-		return request.redirect(str('/login'))
+-	header(_q_desc)
+-	'&lt;p&gt;'
+-	'This page is empty. Please select one option from the menu on the left side.'
+-	'&lt;/p&gt;'
+-	footer()
+-	import configlets
+-	print len(configlets.configlet_tree)
+ 
++	#from page_login import Page as Page
++	#login = Page()
++	#login = __import__(&quot;page_main&quot;, &quot;&quot;, &quot;&quot;, &quot;Page&quot;)
+ 
+ # Out static things like images and style-sheets:
+-static = StaticDirectory(os.path.abspath(os.getenv('STATICPAGES_DIR','static')), list_directory=1, follow_symlinks=1)
+-graphs = StaticDirectory(os.path.abspath('/tmp'), list_directory=1, follow_symlinks=1)
+-# pages = StaticDirectory(os.path.abspath(os.getenv('STATICPAGES_DIR','static')), list_directory=1, cache_time=60*60)
++	static = StaticDirectory(os.path.abspath(os.getenv('STATICPAGES_DIR','static')), list_directory=1, follow_symlinks=1)
++	graphs = StaticDirectory(os.path.abspath('/tmp'), list_directory=1, follow_symlinks=1)
+
+Modified: trunk/page_owner.ptl
+===================================================================
+--- trunk/page_owner.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_owner.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,40 +19,46 @@
+ 
+ 
+ from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ import backend
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_main'
+-_q_title   = _(&quot;Virtual PBX Owner&quot;)
+-_q_desc    = _(&quot;Perform administrative actions to PBX and extensions&quot;)
+-_q_menupos = 20
+-_q_level   = 2
++	_q_parent  = 'page_main'
++	_q_title   = _(&quot;Virtual PBX Owner&quot;)
++	_q_desc    = _(&quot;Perform administrative actions to PBX and extensions&quot;)
++	_q_menupos = 20
++	_q_level   = 2
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-	if not backend.getConfiglets(name='CfgOptPbx'):
+-		cantAccessPage()
+-        if not request.session.pbx:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++		if not backend.getConfiglets(name='CfgOptPbx'):
++			cantAccessPage()
++		if not request.session.pbx:
++			cantAccessPage()
+ 
+-def showMenu [plain] ():
+-	'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+-	'&lt;tr&gt;'
+-	for s in (htmltext(_('Action')), htmltext(_('Description'))):
+-		'&lt;th&gt;%s&lt;/th&gt;' % s
+-	'&lt;/tr&gt;&lt;/thead&gt;'
+-
+-	for e in _q_menu:
++	def showMenu [plain] (self):
++		'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+ 		'&lt;tr&gt;'
+-		'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (e._q_link,_(e._q_title))
+-		'&lt;td&gt;%s&lt;/td&gt;' % _(e._q_desc)
+-		'&lt;/tr&gt;'
+-	'&lt;/table&gt;'
++		for s in (htmltext(_('Action')), htmltext(_('Description'))):
++			'&lt;th&gt;%s&lt;/th&gt;' % s
++		'&lt;/thead&gt;&lt;/tr&gt;'
+ 
++		for e in self._q_menu:
++			'&lt;tr&gt;'
++			'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (e._q_link,_(e._q_title))
++			'&lt;td&gt;%s&lt;/td&gt;' % _(e._q_desc)
++			'&lt;/tr&gt;'
++		'&lt;/table&gt;'
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	showMenu()
+-	footer()
++
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		showMenu()
++		footer()
+
+Modified: trunk/page_owner_cdr.ptl
+===================================================================
+--- trunk/page_owner_cdr.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_owner_cdr.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -29,67 +29,17 @@
+ 
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ import cdrutils
+ import time
+ 
+-
+-_q_parent = 'page_owner'
+-_q_title  = _(&quot;Call Details For Virtual PBX&quot;)
+-_q_desc   = _(&quot;Get statistics about made and received calls&quot;)
+-_q_level  = 2
+-
+-
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-
+-def _q_test():
+-	return cdrutils.db
+-
+ def N_(message): return message
+ 
+-def formScript [html] ():
+-	'&lt;script language=&quot;JavaScript&quot; type=&quot;text/javascript&quot;&gt; \n'
+-	'&lt;!-- \n'
+-	'function gotopage ( page ) \n'
+-	'{ \n'
+-	'  document.searchform.pagenumber.value = page; \n'
+-	'  document.searchform.submit() ; \n'
+-	'} \n'
+-	'function orderby ( column, order ) \n'
+-	'{ \n'
+-	'  document.searchform.orderby.value = column; \n'
+-	'  document.searchform.order.value = order; \n'
+-	'  document.searchform.submit() ; \n'
+-	'} \n'
+-	'--&gt; \n'
+-	'&lt;/script&gt; \n'
+-
+-def pageIndex [html] (pagenum, total, limit):
+-	&quot;&lt;p&gt;&quot;
+-	lastpage = total/limit
+-	if pagenum &gt; 1:
+-		&quot;&lt;a href='javascript:gotopage(\&quot;_newest\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % _(str(&quot;First&quot;))
+-		&quot;&lt;a href='javascript:gotopage(\&quot;_newer\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % _(str(&quot;Previous&quot;))
+-	
+-	pagelist = [i for i in range(pagenum-10, pagenum+10) if i &gt;= 0 and  i &lt; lastpage]
+-
+-	for i in pagelist:
+-		if pagenum != (i+1):
+-			&quot;&lt;a href='javascript:gotopage(\&quot;%d\&quot;)'&gt;%d&lt;/a&gt; &nbsp; \n&quot; % (i+1, i+1)
+-		else:
+-			&quot;%d &nbsp; \n&quot; % (i+1)
+-
+-	if pagenum &lt; lastpage:
+-		&quot;&lt;a href='javascript:gotopage(\&quot;_older\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % _(str(&quot;Next&quot;))
+-		&quot;&lt;a href='javascript:gotopage(\&quot;_oldest\&quot;)'&gt;%s&lt;/a&gt; \n&quot; % _(str(&quot;Last&quot;))
+-	&quot;&lt;/p&gt;\n &lt;br /&gt;&quot;
+-
+ def     generateYearsNumbers():
+-        years = range(2004,time.localtime()[0]+1)
+-        return years
++	years = range(2004,time.localtime()[0]+1)
++	return years
+ 
+ def	generateMonthsNumbers():
+ 	months = range(1,13)
+@@ -111,199 +61,254 @@
+ 
+ 	
+ operands=['=','&lt;&gt;','&lt;=','&lt;','&gt;=','&gt;']
+-	
+-def cdrForm [plain] (request, srcextension=&quot;&quot;, dstextension=&quot;&quot;, mincost=&quot;&quot;, duration=&quot;&quot;, clid=&quot;&quot;):
++		
++class Page(AccessControlled, Directory): 
+ 
+-	monthsnumbers = [ '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12' ]
+-	monthsnames = [ _('January'), _('February'), _('March'), _('April'), _('May'), _('June'), _('July'), _('August'), _('September'), _('October'), _('November'), _('December') ]
++	_q_parent = 'page_owner'
++	_q_title  = _(&quot;Call Details For Virtual PBX&quot;)
++	_q_desc   = _(&quot;Get statistics about made and received calls&quot;)
++	_q_level  = 2
+ 
+-	localtime = time.localtime()
+-	
+-	localyear = localtime[0]
+-	
+-	# fix the month value for those smaller than 10 (january ... september) 1 -&gt; 01, 2 -&gt;02 
+-	if localtime[1] &lt; 10:
+-		localmonth = '0%s' % localtime[1] 
+-	else:
+-		localmonth = localtime[1]
+-	
+-	#the same for the day
+-	if localtime[2] &lt; 10:
+-		localday = '0%s' % localtime[2]
+-	else:
+-		localday = localtime[2]
++	_q_exports = ['']
+ 
+-	form = Form()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-	form.name = &quot;searchform&quot;
+-	
+-	form.add(StringWidget, &quot;srcextension&quot;,  &quot;%s&quot; % srcextension, title=htmltext(_(&quot;Source &quot;)),hint=htmltext(_(&quot;Wildcards: % is the 'zero or more characters' wildcard, and _ is the 'exactly one character' wildcard&quot;)), render_br=True )
+-	form.add(StringWidget, &quot;clid&quot;,  &quot;%s&quot; % clid, title=htmltext(_(&quot;Caller ID&quot;)),hint=htmltext(_(&quot;Wildcards: % is the 'zero or more characters' wildcard, and _ is the 'exactly one character' wildcard&quot;)), render_br=True )
+-	form.add(StringWidget, &quot;dstextension&quot;,  &quot;%s&quot; % dstextension, title=htmltext(_(&quot;Destination&quot;)),hint=htmltext(_(&quot;You can use the same wildcards as above&quot;)), render_br=True)
+-	form.add(OptionSelectWidget, &quot;durationoperand&quot;,  &quot;%s&quot; % duration, title=htmltext(_(&quot;Duration&quot;)), options=zip(operands,operands,operands),render_br=False)
+-	form.add(StringWidget, &quot;duration&quot;,  &quot;%s&quot; % duration, hint=htmltext(_(&quot;In seconds&quot;)),render_br=True)
+-	form.add(OptionSelectWidget,'linesToShow', title=_('Number of records to show:'),options=zip( generateOptionSelect(), generateOptionSelect(text=True), generateOptionSelect() ), value=20)	
+-	form.add_checkbox('searchBetweenDates',title= _(&quot;Search between the following dates&quot;), render_br=True)
+-	form.add_single_select('fromyear', title=htmltext(_('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Start:')), value=&quot;&quot;, options=zip( generateYearsNumbers(), generateYearsNumbers() ), render_br=False )
+-	form.add_single_select('frommonth', options=zip( generateMonthsNumbers(), monthsnames, generateMonthsNumbers() ), render_br=False )
+-	form.add_single_select('fromday', options=zip( generateDaysNumbers() , range(1,32), generateDaysNumbers() ), render_br=True )
+-	form.add_single_select('toyear', value=localyear, title=htmltext(_('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;End:')), options=zip( generateYearsNumbers(), generateYearsNumbers() ), render_br=False)
+-	form.add_single_select('tomonth', value=localmonth, options=zip( generateMonthsNumbers(), monthsnames, generateMonthsNumbers() ), render_br=False)
+-	form.add_single_select('today', value=localday, options=zip( generateDaysNumbers() , range(1,32), generateDaysNumbers()  ), render_br=True)
+-		
+-	form.add(HiddenWidget, 'pagenumber', value='_newest')
+-	form.add(HiddenWidget, 'order', value='ASC')
+-	form.add(HiddenWidget, 'orderby', value=_('Time_of_start'))
++	def _q_test(self):
++		return cdrutils.db
+ 
+-	form.add(SubmitWidget, '_submit', _(&quot;Search&quot;), render_br=True)
++	def formScript [html] (self):
++		'&lt;script language=&quot;JavaScript&quot; type=&quot;text/javascript&quot;&gt; \n'
++		'&lt;!-- \n'
++		'function gotopage ( page ) \n'
++		'{ \n'
++		'  document.searchform.pagenumber.value = page; \n'
++		'  document.searchform.submit() ; \n'
++		'} \n'
++		'function orderby ( column, order ) \n'
++		'{ \n'
++		'  document.searchform.orderby.value = column; \n'
++		'  document.searchform.order.value = order; \n'
++		'  document.searchform.submit() ; \n'
++		'} \n'
++		'--&gt; \n'
++		'&lt;/script&gt; \n'
+ 
+-	where = []
+-	where.append(&quot;pbx like '%s%%'&quot; % request.session.pbx)
+-	
+-	def render [html] ():
+-
+-		name = form['pagenumber']
++	def pageIndex [html] (self, pagenum, total, limit):
++		&quot;&lt;p&gt;&quot;
++		lastpage = total/limit
++		if pagenum &gt; 1:
++			&quot;&lt;a href='javascript:gotopage(\&quot;_newest\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % _(str(&quot;First&quot;))
++			&quot;&lt;a href='javascript:gotopage(\&quot;_newer\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % _(str(&quot;Previous&quot;))
+ 		
+-		global pagenum
++		pagelist = [i for i in range(pagenum-10, pagenum+10) if i &gt;= 0 and  i &lt; lastpage]
+ 
+-		if not name in ['_newest','_newer', '_older', '_oldest']:
+-			pagenum = int(name)
++		for i in pagelist:
++			if pagenum != (i+1):
++				&quot;&lt;a href='javascript:gotopage(\&quot;%d\&quot;)'&gt;%d&lt;/a&gt; &nbsp; \n&quot; % (i+1, i+1)
++			else:
++				&quot;%d &nbsp; \n&quot; % (i+1)
+ 
+-		cursor = cdrutils.count(where = where)
+-		total = cursor
++		if pagenum &lt; lastpage:
++			&quot;&lt;a href='javascript:gotopage(\&quot;_older\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % _(str(&quot;Next&quot;))
++			&quot;&lt;a href='javascript:gotopage(\&quot;_oldest\&quot;)'&gt;%s&lt;/a&gt; \n&quot; % _(str(&quot;Last&quot;))
++		&quot;&lt;/p&gt;\n &lt;br /&gt;&quot;
+ 
+-		global q
+-		global p
++	def cdrForm [plain] (self, request, srcextension=&quot;&quot;, dstextension=&quot;&quot;, mincost=&quot;&quot;, duration=&quot;&quot;, clid=&quot;&quot;):
+ 
+-		p = form[&quot;linesToShow&quot;]
++		monthsnumbers = [ '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12' ]
++		monthsnames = [ _('January'), _('February'), _('March'), _('April'), _('May'), _('June'), _('July'), _('August'), _('September'), _('October'), _('November'), _('December') ]
+ 
+-		if p == 0:
+-			p = total
++		localtime = time.localtime()
+ 		
+-		if (name == True or name == '1' or name == '_newest'):
+-			pagenum = 1
+-			q = 0
+-	
+-		elif name == '_newer': 
+-			pagenum -= 1
+-			q = q-form[&quot;linesToShow&quot;]
+-			if q &lt; 0:
+-				q=0
+-							
+-					
+-		elif name == '_older': 
+-			pagenum += 1
+-			q += p
+-			if q &gt;= total:
+-				q = total - total % p
++		localyear = localtime[0]
+ 		
+-		elif name == '_oldest':
+-			q = total - total % p
+-			pagenum = total / p
++		# fix the month value for those smaller than 10 (january ... september) 1 -&gt; 01, 2 -&gt;02 
++		if localtime[1] &lt; 10:
++			localmonth = '0%s' % localtime[1] 
++		else:
++			localmonth = localtime[1]
++		
++		#the same for the day
++		if localtime[2] &lt; 10:
++			localday = '0%s' % localtime[2]
++		else:
++			localday = localtime[2]
+ 
+-		elif name in [str(x+1) for x in range(total/p)]:
+-			q = int(name) * p
++		form = Form()
++
++		form.name = &quot;searchform&quot;
++		
++		form.add(StringWidget, &quot;srcextension&quot;,  &quot;%s&quot; % srcextension, title=htmltext(_(&quot;Source &quot;)),hint=htmltext(_(&quot;Wildcards: % is the 'zero or more characters' wildcard, and _ is the 'exactly one character' wildcard&quot;)), render_br=True )
++		form.add(StringWidget, &quot;clid&quot;,  &quot;%s&quot; % clid, title=htmltext(_(&quot;Caller ID&quot;)),hint=htmltext(_(&quot;Wildcards: % is the 'zero or more characters' wildcard, and _ is the 'exactly one character' wildcard&quot;)), render_br=True )
++		form.add(StringWidget, &quot;dstextension&quot;,  &quot;%s&quot; % dstextension, title=htmltext(_(&quot;Destination&quot;)),hint=htmltext(_(&quot;You can use the same wildcards as above&quot;)), render_br=True)
++		form.add(OptionSelectWidget, &quot;durationoperand&quot;,  &quot;%s&quot; % duration, title=htmltext(_(&quot;Duration&quot;)), options=zip(operands,operands,operands),render_br=False)
++		form.add(StringWidget, &quot;duration&quot;,  &quot;%s&quot; % duration, hint=htmltext(_(&quot;In seconds&quot;)),render_br=True)
++		form.add(OptionSelectWidget,'linesToShow', title=_('Number of records to show:'),options=zip( generateOptionSelect(), generateOptionSelect(text=True), generateOptionSelect() ), value=20)	
++		form.add_checkbox('searchBetweenDates',title= _(&quot;Search between the following dates&quot;), render_br=True)
++		form.add_single_select('fromyear', title=htmltext(_('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Start:')), value=&quot;&quot;, options=zip( generateYearsNumbers(), generateYearsNumbers() ), render_br=False )
++		form.add_single_select('frommonth', options=zip( generateMonthsNumbers(), monthsnames, generateMonthsNumbers() ), render_br=False )
++		form.add_single_select('fromday', options=zip( generateDaysNumbers() , range(1,32), generateDaysNumbers() ), render_br=True )
++		form.add_single_select('toyear', value=localyear, title=htmltext(_('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;End:')), options=zip( generateYearsNumbers(), generateYearsNumbers() ), render_br=False)
++		form.add_single_select('tomonth', value=localmonth, options=zip( generateMonthsNumbers(), monthsnames, generateMonthsNumbers() ), render_br=False)
++		form.add_single_select('today', value=localday, options=zip( generateDaysNumbers() , range(1,32), generateDaysNumbers()  ), render_br=True)
+ 			
+-			if q &gt;= total:
+-				q = total - total % p
++		form.add(HiddenWidget, 'pagenumber', value='_newest')
++		form.add(HiddenWidget, 'order', value='ASC')
++		form.add(HiddenWidget, 'orderby', value=_('Time_of_start'))
++
++		form.add(SubmitWidget, '_submit', _(&quot;Search&quot;), render_br=True)
++
++		where = []
++		where.append(&quot;pbx like '%s%%'&quot; % request.session.pbx)
++		
++		def render [html] ():
++
++			name = form['pagenumber']
+ 			
+-		elif p == total:
+-			q = 0
+-		else : 
+-			p = 20
+-			q = 0
+-				
+-		form.render()
+-		pageIndex(pagenum, total, p)
+-		cdrShowResults(where, p, q, total,form[&quot;orderby&quot;],form[&quot;order&quot;])
++			global pagenum
+ 
+-	if not form.is_submitted() or form.has_errors():
+-		return render()
+-	
+-	if form[&quot;srcextension&quot;]:
+-		where.append(&quot;src like '%s'&quot; % form[&quot;srcextension&quot;])
+-	if form[&quot;clid&quot;]:
+-		where.append(&quot;clid like '%s'&quot; % form[&quot;clid&quot;])
+-	if form[&quot;dstextension&quot;]:
+-		where.append(&quot;dst like '%s'&quot; % form[&quot;dstextension&quot;])
+-	if form[&quot;duration&quot;]:
+-		where.append(&quot;billsec %s '%s'&quot; % (form[&quot;durationoperand&quot;],form[&quot;duration&quot;]))
++			if not name in ['_newest','_newer', '_older', '_oldest']:
++				pagenum = int(name)
++
++			cursor = cdrutils.count(where = where)
++			total = cursor
++
++			global q
++			global p
++
++			p = form[&quot;linesToShow&quot;]
++
++			if p == 0:
++				p = total
+ 			
+-	if form[&quot;searchBetweenDates&quot;]:
+-	
+-		fromdate = &quot;%s-%s-%s&quot; % (form[&quot;fromyear&quot;], form[&quot;frommonth&quot;], form[&quot;fromday&quot;])
+-		where.append (&quot;date(start) &gt;= date('%s')&quot; % fromdate )
+-	
+-		todate = &quot;%s-%s-%s&quot; % (form[&quot;toyear&quot;], form[&quot;tomonth&quot;], form[&quot;today&quot;])
+-		where.append (&quot;date(end) &lt;= date('%s')&quot; % todate)
+-	
+-	return render()
++			if (name == True or name == '1' or name == '_newest'):
++				pagenum = 1
++				q = 0
++		
++			elif name == '_newer': 
++				pagenum -= 1
++				q = q-form[&quot;linesToShow&quot;]
++				if q &lt; 0:
++					q=0
++								
++						
++			elif name == '_older': 
++				pagenum += 1
++				q += p
++				if q &gt;= total:
++					q = total - total % p
++			
++			elif name == '_oldest':
++				q = total - total % p
++				pagenum = total / p
+ 
+-def	cdrShowResults [html] (where=[], limit, offset, total = 0, field=_(&quot;Time_of_start&quot;), order=&quot;DESC&quot;):
+-	if total == 0:
+-		'&lt;p&gt;'
+-		'--No records to Show--'
+-		'&lt;/p&gt;'
+-	else:
+-		orderby = '%s %s' % (N_(field), order)	
+-		cursor = cdrutils.select(order=[str(orderby)], where = where, limit = limit, offset = offset)
++			elif name in [str(x+1) for x in range(total/p)]:
++				q = int(name) * p
++				
++				if q &gt;= total:
++					q = total - total % p
++				
++			elif p == total:
++				q = 0
++			else : 
++				p = 20
++				q = 0
++					
++			form.render()
++			pageIndex(pagenum, total, p)
++			cdrShowResults(where, p, q, total,form[&quot;orderby&quot;],form[&quot;order&quot;])
++
++		if not form.is_submitted() or form.has_errors():
++			return render()
+ 		
+-		totalcost = 0
+-		totalmin = 0
++		if form[&quot;srcextension&quot;]:
++			where.append(&quot;src like '%s'&quot; % form[&quot;srcextension&quot;])
++		if form[&quot;clid&quot;]:
++			where.append(&quot;clid like '%s'&quot; % form[&quot;clid&quot;])
++		if form[&quot;dstextension&quot;]:
++			where.append(&quot;dst like '%s'&quot; % form[&quot;dstextension&quot;])
++		if form[&quot;duration&quot;]:
++			where.append(&quot;billsec %s '%s'&quot; % (form[&quot;durationoperand&quot;],form[&quot;duration&quot;]))
++				
++		if form[&quot;searchBetweenDates&quot;]:
+ 		
+-		row = cursor.fetchone()
+-		if row and int(offset) &gt;= 0 and int(offset) &lt;= total and cursor.description:
++			fromdate = &quot;%s-%s-%s&quot; % (form[&quot;fromyear&quot;], form[&quot;frommonth&quot;], form[&quot;fromday&quot;])
++			where.append (&quot;date(start) &gt;= date('%s')&quot; % fromdate )
+ 		
+-			'&lt;table border=&quot;1&quot;&gt;&lt;thead&gt;&lt;tr&gt;'
+-                	for s in cursor.description:
+-				'&lt;th&gt;'
+-				if s[0] == field:
+-					neworder = (order=='ASC' and 'DESC') or 'ASC'
+-					&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], neworder, _(str(s[0])))
+-					if order=='ASC':
+-						&quot; &lt;img src='/static/down.gif' border='0' alt='%s'&gt;\n&quot; % _(str('Asc. Order'))
+-					else:
+-						&quot; &lt;img src='/static/up.gif' border='0' alt='%s'&gt;\n&quot; % _(str('Desc. Order'))
+-				else:
+-					&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], order, _(str(s[0])))
+-				'&lt;/th&gt;'
+-                	'&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;'
++			todate = &quot;%s-%s-%s&quot; % (form[&quot;toyear&quot;], form[&quot;tomonth&quot;], form[&quot;today&quot;])
++			where.append (&quot;date(end) &lt;= date('%s')&quot; % todate)
+ 		
+-			if cursor.description:
+-				fieldIndices = range(len(cursor.description))
+-			else:
+-				fieldIndices = []
++		return render()
+ 
+-                	while row:
+-	                	'&lt;tr&gt;'
+-				for fieldIndex in fieldIndices:
+-					'&lt;td&gt;&lt;center&gt;'
+-					if row[fieldIndex] == &quot;1969-12-31 19:00:00&quot;:
+-						'-'
+-					elif cursor.description[fieldIndex][0] == _(str(&quot;Duration&quot;)):
+-						s = int(row[fieldIndex])
+-						min = (s % 60) and ((s / 60) + 1) or (s / 60)
+-                                               	totalmin += min
+-						min
+-					else: 
+-						row[fieldIndex]
+-        	                       	'&lt;/center&gt;&lt;/td&gt;'
+-				'&lt;/tr&gt;'
+-				row = cursor.fetchone()
+-                	'&lt;/tbody&gt;&lt;/table&gt;&lt;br/&gt;'
++	def	cdrShowResults [html] (where=[], limit, offset, total = 0, field=_(&quot;Time_of_start&quot;), order=&quot;DESC&quot;):
++		if total == 0:
+ 			'&lt;p&gt;'
++			'--No records to Show--'
++			'&lt;/p&gt;'
++		else:
++			orderby = '%s %s' % (N_(field), order)	
++			cursor = cdrutils.select(order=[str(orderby)], where = where, limit = limit, offset = offset)
++			
++			totalcost = 0
++			totalmin = 0
++			
++			row = cursor.fetchone()
++			if row and int(offset) &gt;= 0 and int(offset) &lt;= total and cursor.description:
++			
++				'&lt;table border=&quot;1&quot;&gt;&lt;thead&gt;&lt;tr&gt;'
++				for s in cursor.description:
++					'&lt;th&gt;'
++					if s[0] == field:
++						neworder = (order=='ASC' and 'DESC') or 'ASC'
++						&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], neworder, _(str(s[0])))
++						if order=='ASC':
++							&quot; &lt;img src='/static/down.gif' border='0' alt='%s'&gt;\n&quot; % _(str('Asc. Order'))
++						else:
++							&quot; &lt;img src='/static/up.gif' border='0' alt='%s'&gt;\n&quot; % _(str('Desc. Order'))
++					else:
++						&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], order, _(str(s[0])))
++					'&lt;/th&gt;'
++				'&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;'
++			
++				if cursor.description:
++					fieldIndices = range(len(cursor.description))
++				else:
++					fieldIndices = []
+ 
+-			f = offset + limit
+-			if total &gt;= f:			
+-				_(str('Showing records from %s to %s of %s &lt;br /&gt;&lt;br /&gt;')) % (offset+1, f, total)
+-			else:
+-				_(str('Showing records from %s to %s of %s &lt;br /&gt;&lt;br /&gt;')) % (offset+1, total, total)
++				while row:
++					'&lt;tr&gt;'
++					for fieldIndex in fieldIndices:
++						'&lt;td&gt;&lt;center&gt;'
++						if row[fieldIndex] == &quot;1969-12-31 19:00:00&quot;:
++							'-'
++						elif cursor.description[fieldIndex][0] == _(str(&quot;Duration&quot;)):
++							s = int(row[fieldIndex])
++							min = (s % 60) and ((s / 60) + 1) or (s / 60)
++							totalmin += min
++							min
++						else: 
++							row[fieldIndex]
++						'&lt;/center&gt;&lt;/td&gt;'
++					'&lt;/tr&gt;'
++					row = cursor.fetchone()
++				'&lt;/tbody&gt;&lt;/table&gt;&lt;br/&gt;'
++				'&lt;p&gt;'
+ 
+-		_(str('Total Duration of shown calls: %s min.' % totalmin))
+-		'&lt;/p&gt;'
++				f = offset + limit
++				if total &gt;= f:			
++					_(str('Showing records from %s to %s of %s &lt;br /&gt;&lt;br /&gt;')) % (offset+1, f, total)
++				else:
++					_(str('Showing records from %s to %s of %s &lt;br /&gt;&lt;br /&gt;')) % (offset+1, total, total)
+ 
++			_(str('Total Duration of shown calls: %s min.' % totalmin))
++			'&lt;/p&gt;'
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc, scripts=[formScript])
+-	cdrForm(request)
+-	footer()
++
++	def _q_index [plain] (self):
++		header(self._q_desc, scripts=[formScript])
++		cdrForm()
++		footer()
+
+Modified: trunk/page_stats.ptl
+===================================================================
+--- trunk/page_stats.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_stats.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,36 +19,40 @@
+ 
+ 
+ from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_main'
+-_q_title   = _(&quot;Statistics&quot;)
+-_q_desc    = _(&quot;Global PBX statistics and CDR&quot;)
+-_q_menupos = 20
+-_q_level   = 3
++	_q_parent  = 'page_main'
++	_q_title   = _(&quot;Statistics&quot;)
++	_q_desc    = _(&quot;Global PBX statistics and CDR&quot;)
++	_q_menupos = 20
++	_q_level   = 3
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-def showMenu [plain] ():
+-	'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+-	'&lt;tr&gt;'
+-	for s in (htmltext(_('Statistics')), htmltext(_('Description'))):
+-		'&lt;th&gt;%s&lt;/th&gt;' % s
+-	'&lt;/tr&gt;&lt;/thead&gt;'
+-
+-	for e in _q_menu:
++	def showMenu [plain] (self):
++		'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+ 		'&lt;tr&gt;'
+-		'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (e._q_link,_(e._q_title))
+-		'&lt;td&gt;%s&lt;/td&gt;' % _(e._q_desc)
+-		'&lt;/tr&gt;'
+-	'&lt;/table&gt;'
++		for s in (htmltext(_('Statistics')), htmltext(_('Description'))):
++			'&lt;th&gt;%s&lt;/th&gt;' % s
++		'&lt;/thead&gt;&lt;/tr&gt;'
+ 
++		for e in self._q_menu:
++			'&lt;tr&gt;'
++			'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (e._q_link,_(e._q_title))
++			'&lt;td&gt;%s&lt;/td&gt;' % _(e._q_desc)
++			'&lt;/tr&gt;'
++		'&lt;/table&gt;'
+ 
+-
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	showMenu()
+-	footer()
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		self.showMenu()
++		footer()
+
+Modified: trunk/page_stats_calls.ptl
+===================================================================
+--- trunk/page_stats_calls.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_stats_calls.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -23,31 +23,19 @@
+ #	- Delete graphic files after it use
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
+ import cdrutils
+ import time
+ from StatsHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
+ pychart_exists = True
+ try:	
+ 	from pychart import *
+ except ImportError:
+ 	pychart_exists = False
+-	
+ 
+-_q_parent = 'page_stats'
+-_q_title  = _(&quot;Calls Statistics&quot;)
+-_q_desc   = _(&quot;Calls Statistics&quot;)
+-_q_level  = 3
+-_q_menupos = 30
+-
+-def _q_access(request):
+-	if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-def _q_test():
+-	return cdrutils.db
+-
+ def N_(message): return message
+ 
+ def makeForm():
+@@ -77,7 +65,7 @@
+ 	form.add(SubmitWidget, '_submit', _(&quot;Submit&quot;), render_br=True)
+ 	
+ 	return form
+-		
++
+ def perHourInDay [plain] (day, month, year):
+ 	
+ 	date = &quot;%s-%s-%s&quot; % (year, month, day)
+@@ -230,7 +218,7 @@
+ 		htmltext(&quot;%s&quot; % _(&quot;Sorry, this kind of query is not supported yet&quot;))
+ 		htmltext(&quot;&lt;/p&gt;&quot;)
+ 
+-def cdrForm [plain] (request):
++def cdrForm [plain] ():
+ 	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Statistics of Calls by Date:&quot;))
+ 	form = makeForm()
+ 	form.render()
+@@ -238,12 +226,31 @@
+ 	if form.is_submitted() and not form.has_errors():
+ 		htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Results&quot;))
+ 		showResults(form[&quot;day&quot;], form[&quot;month&quot;], form[&quot;year&quot;])
+-	
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	if pychart_exists:
+-		cdrForm(request)
+-	else:
+-		_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
+-	footer()
+-	
++		
++class Page(AccessControlled, Directory): 
++
++	_q_parent = 'page_stats'
++	_q_title  = _(&quot;Calls Statistics&quot;)
++	_q_desc   = _(&quot;Calls Statistics&quot;)
++	_q_level  = 3
++	_q_menupos = 30
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	def _q_test(self):
++		return cdrutils.db
++
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		if pychart_exists:
++			cdrForm()
++		else:
++			_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
++		footer()
++		
+
+Modified: trunk/page_stats_cdr.ptl
+===================================================================
+--- trunk/page_stats_cdr.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_stats_cdr.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -29,26 +29,12 @@
+ 
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ import cdrutils
+ import time
+ 
+-
+-_q_parent = 'page_stats'
+-_q_title  = _(&quot;Call Details&quot;)
+-_q_desc   = _(&quot;Get statistics about made and received calls&quot;)
+-_q_level  = 3
+-_q_menupos = 20
+-
+-
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-
+-def _q_test():
+-	return cdrutils.db
+-
+ def M_(message): return _(str(message))
+ 
+ def N_(message): return message
+@@ -308,7 +294,26 @@
+ 		'&lt;/p&gt;'
+ 
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc, scripts=[formScript])
+-	cdrForm(request)
+-	footer()
++class Page(AccessControlled, Directory): 
++
++	_q_parent = 'page_stats'
++	_q_title  = _(&quot;Call Details&quot;)
++	_q_desc   = _(&quot;Get statistics about made and received calls&quot;)
++	_q_level  = 3
++	_q_menupos = 20
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	def _q_test(self):
++		return cdrutils.db
++
++	def _q_index [plain] (self):
++		header(self._q_desc, scripts=[formScript])
++		cdrForm(request)
++		footer()
+
+Modified: trunk/page_stats_dialouts.ptl
+===================================================================
+--- trunk/page_stats_dialouts.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_stats_dialouts.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -18,11 +18,13 @@
+ #
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
+ import cdrutils
+ import time
+ import backend
+ from StatsHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
+ pychart_exists = True
+ try:	
+@@ -30,19 +32,6 @@
+ except ImportError:
+ 	pychart_exists = False
+ 
+-_q_parent = 'page_stats'
+-_q_title  = _(&quot;Dialout Statistics&quot;)
+-_q_desc   = _(&quot;Statistics for Dialout Entries&quot;)
+-_q_level  = 3
+-_q_menupos = 32
+-
+-def _q_access(request):
+-	if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-def _q_test():
+-	return cdrutils.db
+-
+ def makeForm():
+ 	localtime = time.localtime()
+ 	
+@@ -175,12 +164,32 @@
+ 	if form.is_submitted() and not form.has_errors():
+ 		htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Results&quot;))
+ 		showResults(form[&quot;day1&quot;], form[&quot;month1&quot;], form[&quot;year1&quot;], form[&quot;day2&quot;], form[&quot;month2&quot;], form[&quot;year2&quot;])
++
+ 	
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	if pychart_exists:
+-		cdrForm(request)
+-	else:
+-		_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
+-	footer()
+-	
++class Page(AccessControlled, Directory): 
++
++	_q_parent = 'page_stats'
++	_q_title  = _(&quot;Dialout Statistics&quot;)
++	_q_desc   = _(&quot;Statistics for Dialout Entries&quot;)
++	_q_level  = 3
++	_q_menupos = 32
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	def _q_test(self):
++		return cdrutils.db
++
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		if pychart_exists:
++			cdrForm(request)
++		else:
++			_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
++		footer()
++		
+
+Modified: trunk/page_stats_phone.ptl
+===================================================================
+--- trunk/page_stats_phone.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_stats_phone.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -18,11 +18,13 @@
+ #
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
+ import cdrutils
+ import time
+ import backend
+ from StatsHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ 
+ pychart_exists = True
+ try:	
+@@ -30,19 +32,6 @@
+ except ImportError:
+ 	pychart_exists = False
+ 
+-_q_parent = 'page_stats'
+-_q_title  = _(&quot;Extension Statistics&quot;)
+-_q_desc   = _(&quot;Statistics for an Extension&quot;)
+-_q_level  = 3
+-_q_menupos = 32
+-
+-def _q_access(request):
+-	if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-def _q_test():
+-	return cdrutils.db
+-
+ def makeForm():
+ 	localtime = time.localtime()
+ 	
+@@ -174,7 +163,7 @@
+ 	htmltext('&lt;br/&gt;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;' % _('Outgoing Calls per Dialout Entry'))
+ 	makeCallsTable(_(&quot;Dialout Name&quot;), out_calls_per_dialout, dialout_names)
+ 	
+-def cdrForm [plain] (request):
++def cdrForm [plain] ():
+ 	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Statistics of Calls by Dialout Entry:&quot;))
+ 	form = makeForm()
+ 	form.render()
+@@ -182,12 +171,31 @@
+ 	if form.is_submitted() and not form.has_errors():
+ 		htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Results&quot;))
+ 		showResults(form[&quot;day1&quot;], form[&quot;month1&quot;], form[&quot;year1&quot;], form[&quot;day2&quot;], form[&quot;month2&quot;], form[&quot;year2&quot;], form[&quot;ext&quot;], form[&quot;clid&quot;])
++
++
++class Page(AccessControlled, Directory): 
++		
++	_q_parent = 'page_stats'
++	_q_title  = _(&quot;Extension Statistics&quot;)
++	_q_desc   = _(&quot;Statistics for an Extension&quot;)
++	_q_level  = 3
++	_q_menupos = 32
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++	def _q_test(self):
++		return cdrutils.db
++
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		if pychart_exists:
++			cdrForm()
++		else:
++			_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
++		footer()
+ 	
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	if pychart_exists:
+-		cdrForm(request)
+-	else:
+-		_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
+-	footer()
+-	
+
+Modified: trunk/page_stats_trunks.ptl
+===================================================================
+--- trunk/page_stats_trunks.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_stats_trunks.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -18,11 +18,13 @@
+ #
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
+ import cdrutils
+ import time
+ import backend
+ from StatsHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
+ 
+ pychart_exists = True
+ try:	
+@@ -30,19 +32,6 @@
+ except ImportError:
+ 	pychart_exists = False
+ 
+-_q_parent = 'page_stats'
+-_q_title  = _(&quot;Trunk Statistics&quot;)
+-_q_desc   = _(&quot;Statistics for Trunks&quot;)
+-_q_level  = 3
+-_q_menupos = 32
+-
+-def _q_access(request):
+-	if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-def _q_test():
+-	return cdrutils.db
+-
+ def makeForm():
+ 	localtime = time.localtime()
+ 	
+@@ -181,7 +170,7 @@
+ 	htmltext('&lt;br/&gt;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;' % _('Outgoing Calls per Trunk'))
+ 	makeCallsTable(_(&quot;Trunk Name&quot;), out_calls_per_trunk, trunk_names)
+ 	
+-def cdrForm [plain] (request):
++def cdrForm [plain] ():
+ 	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Statistics of Calls by Trunk:&quot;))
+ 	form = makeForm()
+ 	form.render()
+@@ -190,11 +179,29 @@
+ 		htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Results&quot;))
+ 		showResults(form[&quot;day1&quot;], form[&quot;month1&quot;], form[&quot;year1&quot;], form[&quot;day2&quot;], form[&quot;month2&quot;], form[&quot;year2&quot;])
+ 	
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	if pychart_exists:
+-		cdrForm(request)
+-	else:
+-		_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
+-	footer()
+-	
++class Page(AccessControlled, Directory): 
++
++	_q_parent = 'page_stats'
++	_q_title  = _(&quot;Trunk Statistics&quot;)
++	_q_desc   = _(&quot;Statistics for Trunks&quot;)
++	_q_level  = 3
++	_q_menupos = 32
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++	def _q_test(self):
++		return cdrutils.db
++
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		if pychart_exists:
++			cdrForm()
++		else:
++			_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
++		footer()
++		
+
+Modified: trunk/page_user.ptl
+===================================================================
+--- trunk/page_user.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_user.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,35 +19,41 @@
+ 
+ 
+ from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ 
++class Page(AccessControlled, Directory): 
+ 
+-_q_parent  = 'page_main'
+-_q_title   = _(&quot;User&quot;)
+-_q_desc    = _(&quot;Perform tasks allowed by users&quot;)
+-_q_menupos = 10
+-_q_level   = 1
++	_q_parent  = 'page_main'
++	_q_title   = _(&quot;User&quot;)
++	_q_desc    = _(&quot;Perform tasks allowed by users&quot;)
++	_q_menupos = 10
++	_q_level   = 1
+ 
++	_q_exports = ['']
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-def showMenu [plain] ():
+-	'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+-	'&lt;tr&gt;'
+-	for s in (htmltext(_('Available actions')), htmltext(_('Description'))):
+-		'&lt;th&gt;%s&lt;/th&gt;' % s
+-	'&lt;/tr&gt;&lt;/thead&gt;'
+-
+-	for e in _q_menu:
++	def showMenu [plain] (self):
++		'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+ 		'&lt;tr&gt;'
+-		'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (e._q_link,e._q_title)
+-		'&lt;td&gt;%s&lt;/td&gt;' % e._q_desc
+-		'&lt;/tr&gt;'
+-	'&lt;/table&gt;'
++		for s in (htmltext(_('Available actions')), htmltext(_('Description'))):
++			'&lt;th&gt;%s&lt;/th&gt;' % s
++		'&lt;/thead&gt;&lt;/tr&gt;'
+ 
++		for e in self._q_menu:
++			'&lt;tr&gt;'
++			'&lt;td&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (e._q_link,e._q_title)
++			'&lt;td&gt;%s&lt;/td&gt;' % e._q_desc
++			'&lt;/tr&gt;'
++		'&lt;/table&gt;'
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	showMenu()
+-	footer()
++
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		self.showMenu()
++		footer()
+
+Modified: trunk/page_user_info.ptl
+===================================================================
+--- trunk/page_user_info.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_user_info.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,68 +19,75 @@
+ 
+ 
+ from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ import backend, manager
+ import time
+ 
+-_q_parent  = 'page_user'
+-_q_title   = _(&quot;User Info&quot;)
+-_q_desc    = _(&quot;Your access rights in DeStar&quot;)
+-_q_link    = 'info'
+-_q_menupos = 10
+-_q_level   = 0
++class Page(AccessControlled, Directory): 
+ 
++	_q_parent  = 'page_user'
++	_q_title   = _(&quot;User Info&quot;)
++	_q_desc    = _(&quot;Your access rights in DeStar&quot;)
++	_q_link    = 'info'
++	_q_menupos = 10
++	_q_level   = 0
+ 
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
++	_q_exports = ['']
+ 
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc)
+ 
+-	'&lt;p&gt;'
+-	if request.session.user:
+-		htmltext(_('You are now logged in as user'))
+-		&quot; '&lt;b&gt;&quot;
+-		request.session.user
+-		&quot;&lt;/b&gt;'. &quot;
+-		if request.session.level:
+-			htmltext(_(&quot;Your access level is &quot;))
+-			levels=[_(&quot;disabled&quot;),
+-				_(&quot;User&quot;),
+-				_(&quot;Administrator&quot;),
+-				_(&quot;Configurator&quot;),
+-				_(&quot;Programmer&quot;)]
+-			&quot;'%s'. &quot; % levels[request.session.level]
++	def _q_index [plain] (self):
++		header(self._q_desc)
++
++		'&lt;p&gt;'
++		if self.session.user:
++			htmltext(_('You are now logged in as user'))
++			&quot; '&lt;b&gt;&quot;
++			self.session.user
++			&quot;&lt;/b&gt;'. &quot;
++			if self.session.level:
++				htmltext(_(&quot;Your access level is &quot;))
++				levels=[_(&quot;disabled&quot;),
++					_(&quot;User&quot;),
++					_(&quot;Administrator&quot;),
++					_(&quot;Configurator&quot;),
++					_(&quot;Programmer&quot;)]
++				&quot;'%s'. &quot; % levels[self.session.level]
++			else:
++				htmltext(_(&quot;Your account is disabled. &quot;))
+ 		else:
+-			htmltext(_(&quot;Your account is disabled. &quot;))
+-	else:
+-		htmltext(_(&quot;You are not logged in.&quot;))
+-	' '
+-	htmltext(_('You can do'))
+-	&quot;:&lt;/p&gt;&lt;ul&gt;&quot;
+-	if request.session.level &gt;= 0:
+-		&quot;&lt;li&gt;&quot;
+-		htmltext(_('Access all public accessible info pages'))
+-		&quot;&lt;/li&gt;&quot;
+-	if request.session.level &gt;= 1 and request.session.phone:
+-		&quot;&lt;li&gt;&quot;
+-		htmltext(_('Change your personal phone settings'))
+-		&quot;&lt;/li&gt;&quot;
+-	if request.session.level &gt;= 2:
+-		&quot;&lt;li&gt;&quot;
+-		htmltext(_('Change phone settings of other people'))
+-		&quot;&lt;/li&gt;&quot;
+-	if request.session.level &gt;= 3:
+-		&quot;&lt;li&gt;&quot;
+-		htmltext(_('Configure the PBX'))
+-		&quot;&lt;/li&gt;&quot;
+-	if request.session.level &gt;= 4:
+-		&quot;&lt;li&gt;&quot;
+-		htmltext(_('Access debug pages to help program DeStar'))
+-		&quot;&lt;/li&gt;&quot;
+-	&quot;&lt;/ul&gt;&lt;p&gt;&quot;
+-	htmltext(_(&quot;Have fun!&quot;))
+-	&quot;&lt;/p&gt;&quot;
++			htmltext(_(&quot;You are not logged in.&quot;))
++		' '
++		htmltext(_('You can do'))
++		&quot;:&lt;/p&gt;&lt;ul&gt;&quot;
++		if self.session.level &gt;= 0:
++			&quot;&lt;li&gt;&quot;
++			htmltext(_('Access all public accessible info pages'))
++			&quot;&lt;/li&gt;&quot;
++		if self.session.level &gt;= 1 and self.session.phone:
++			&quot;&lt;li&gt;&quot;
++			htmltext(_('Change your personal phone settings'))
++			&quot;&lt;/li&gt;&quot;
++		if self.session.level &gt;= 2:
++			&quot;&lt;li&gt;&quot;
++			htmltext(_('Change phone settings of other people'))
++			&quot;&lt;/li&gt;&quot;
++		if self.session.level &gt;= 3:
++			&quot;&lt;li&gt;&quot;
++			htmltext(_('Configure the PBX'))
++			&quot;&lt;/li&gt;&quot;
++		if self.session.level &gt;= 4:
++			&quot;&lt;li&gt;&quot;
++			htmltext(_('Access debug pages to help program DeStar'))
++			&quot;&lt;/li&gt;&quot;
++		&quot;&lt;/ul&gt;&lt;p&gt;&quot;
++		htmltext(_(&quot;Have fun!&quot;))
++		&quot;&lt;/p&gt;&quot;
+ 
+-	footer()
++		footer()
+
+Modified: trunk/page_user_quickdiallist.ptl
+===================================================================
+--- trunk/page_user_quickdiallist.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_user_quickdiallist.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -20,22 +20,12 @@
+ 
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ import backend, manager, configlets
+ import time,types
+ 
+-_q_parent  = 'page_user'
+-_q_title   = _(&quot;Quick Dial List&quot;)
+-_q_desc    = _(&quot;Quick Dial List&quot;)
+-_q_link    = 'quickdiallist'
+-_q_menupos = 10
+-_q_level   = 1
+-
+-
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+ def QDList [plain] (obj):
+ 	global_qdlist = manager.getVarFamily(&quot;QUICKDIALLIST/GLOBAL&quot;)
+ 	private_qdlist = manager.getVarFamily(&quot;QUICKDIALLIST/%s&quot; % obj.ext)
+@@ -68,24 +58,42 @@
+ 		htmltext(_(&quot;No Private Shorcuts Found on Database&quot;))
+ 		'&lt;/span&gt;&lt;/p&gt;'
+ 	
+-def _q_index [plain] (request):
+-	header(_q_desc,refresh=10)
+-	manager.connect()
+-	if not manager.isConnected():
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;Asterisk is not running!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	elif not manager.isLoggedIn():
+-		# TODO: describe how to set this up
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;The manager access is not working!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	elif request.session.phone: 
+-		phone = backend.getConfiglet(name=request.session.phone)
+-		QDList(phone)
+-	else:
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;You don't have an associated phone&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	footer()
++class Page(AccessControlled, Directory): 
+ 
++	_q_parent  = 'page_user'
++	_q_title   = _(&quot;Quick Dial List&quot;)
++	_q_desc    = _(&quot;Quick Dial List&quot;)
++	_q_link    = 'quickdiallist'
++	_q_menupos = 10
++	_q_level   = 1
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	
++	def _q_index [plain] (self):
++		header(self._q_desc, refresh=10)
++		manager.connect()
++		if not manager.isConnected():
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;Asterisk is not running!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif not manager.isLoggedIn():
++			# TODO: describe how to set this up
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;The manager access is not working!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif self.session.phone: 
++			phone = backend.getConfiglet(name=self.session.phone)
++			QDList(phone)
++		else:
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;You don't have an associated phone&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		footer()
++
+
+Modified: trunk/page_user_settings.ptl
+===================================================================
+--- trunk/page_user_settings.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_user_settings.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,25 +19,15 @@
+ 
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ import backend, manager, configlets
+ import time,types
+ 
+-_q_parent  = 'page_user'
+-_q_title   = _(&quot;Phone Settings&quot;)
+-_q_desc    = _(&quot;Set your phone settings&quot;)
+-_q_link    = 'settings'
+-_q_menupos = 10
+-_q_level   = 1
++def phoneSettingsForm(self, phone, exitPath=&quot;..&quot;):
+ 
+-
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-def phoneSettingsForm(request, phone, exitPath=&quot;..&quot;):
+-
+-	if request.form.has_key('_cancel'):
++	if self.form.has_key('_cancel'):
+ 		return request.redirect(exitPath)
+ 	form = Form()
+ 
+@@ -100,27 +90,44 @@
+ 		htmltext(_(&quot;Could not create destar configuration file.&quot;))
+ 		'.&lt;/p&gt;'
+ 
+-	return request.redirect(exitPath)
++	return redirect(exitPath)
+ 
+-def _q_index [plain] (request):
+-	header(_q_desc)
+-	manager.connect()
+-	if not manager.isConnected():
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;Asterisk is not running!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	elif not manager.isLoggedIn():
+-		# TODO: describe how to set this up
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;The manager access is not working!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	elif request.session.phone: 
+-		phone = backend.getConfiglet(name=request.session.phone)
+-		phone.fixup()
+-		phoneSettingsForm(request,phone)
+-	else:
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;You don't have an associated phone&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	footer()
++class Page(AccessControlled, Directory): 
+ 
++	_q_parent  = 'page_user'
++	_q_title   = _(&quot;Phone Settings&quot;)
++	_q_desc    = _(&quot;Set your phone settings&quot;)
++	_q_link    = 'settings'
++	_q_menupos = 10
++	_q_level   = 1
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		manager.connect()
++		if not manager.isConnected():
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;Asterisk is not running!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif not manager.isLoggedIn():
++			# TODO: describe how to set this up
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;The manager access is not working!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif self.session.phone: 
++			phone = backend.getConfiglet(name=self.session.phone)
++			phone.fixup()
++			phoneSettingsForm(self.request, phone)
++		else:
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;You don't have an associated phone&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		footer()
++
+
+Modified: trunk/page_user_state.ptl
+===================================================================
+--- trunk/page_user_state.ptl	2007-01-22 21:27:23 UTC (rev 576)
++++ trunk/page_user_state.ptl	2007-01-23 00:01:51 UTC (rev 577)
+@@ -19,22 +19,12 @@
+ 
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ import backend, manager, configlets
+ import time,types
+ 
+-_q_parent  = 'page_user'
+-_q_title   = _(&quot;Phone State&quot;)
+-_q_desc    = _(&quot;Status of your phone&quot;)
+-_q_link    = 'state'
+-_q_menupos = 10
+-_q_level   = 1
+-
+-
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+ def phoneState [plain] (obj):
+ 	(phones, other) = backend.determineStateOfPhones()
+ 	
+@@ -128,27 +118,43 @@
+ 	'&lt;/tbody&gt;'
+ 	'&lt;/table&gt;'
+ 
+-		
+-	
+-def _q_index [plain] (request):
+-	header(_q_desc,refresh=10)
+-	manager.connect()
+-	if not manager.isConnected():
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;Asterisk is not running!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	elif not manager.isLoggedIn():
+-		# TODO: describe how to set this up
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;The manager access is not working!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	elif request.session.phone: 
+-		phone = backend.getConfiglet(name=request.session.phone)
+-		phone.fixup()
+-		phoneState(phone)
+-	else:
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;You don't have an associated phone&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	footer()
+ 
++class Page(AccessControlled, Directory): 
++
++	_q_parent  = 'page_user'
++	_q_title   = _(&quot;Phone State&quot;)
++	_q_desc    = _(&quot;Status of your phone&quot;)
++	_q_link    = 'state'
++	_q_menupos = 10
++	_q_level   = 1
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	def _q_index [plain] (self):
++		header(self._q_desc,refresh=10)
++		manager.connect()
++		if not manager.isConnected():
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;Asterisk is not running!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif not manager.isLoggedIn():
++			# TODO: describe how to set this up
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;The manager access is not working!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif self.session.phone: 
++			phone = backend.getConfiglet(name=self.session.phone)
++			phone.fixup()
++			phoneState(phone)
++		else:
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;You don't have an associated phone&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		footer()
++
+
+Copied: trunk/session.py (from rev 576, branches/quixote2/session.py)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000053.html">[Destar-dev] r576 - branches
+</A></li>
+	<LI>Next message: <A HREF="000055.html">[Destar-dev] [Bug #10100] optional is not working
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#54">[ date ]</a>
+              <a href="thread.html#54">[ thread ]</a>
+              <a href="subject.html#54">[ subject ]</a>
+              <a href="author.html#54">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

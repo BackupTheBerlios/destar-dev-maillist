@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r570 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r570%20-%20trunk&In-Reply-To=%3C200701212153.l0LLrs8w002716%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000050.html">
+   <LINK REL="Next"  HREF="000051.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r570 - trunk</H1>
+    <B>hholzer at mail.berlios.de</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r570%20-%20trunk&In-Reply-To=%3C200701212153.l0LLrs8w002716%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r570 - trunk">hholzer at mail.berlios.de
+       </A><BR>
+    <I>Sun Jan 21 22:53:54 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000050.html">[Destar-dev] [Feature #2406] Hint support
+</A></li>
+        <LI>Next message: <A HREF="000051.html">[Destar-dev] [Feature #3050] TAPI Support
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#40">[ date ]</a>
+              <a href="thread.html#40">[ thread ]</a>
+              <a href="subject.html#40">[ subject ]</a>
+              <a href="author.html#40">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: hholzer
+Date: 2007-01-21 22:53:52 +0100 (Sun, 21 Jan 2007)
+New Revision: 570
+
+Modified:
+   trunk/backend.py
+   trunk/cfg_dialout_normal.py
+   trunk/cfg_opt_settings.py
+Log:
+added tapi support
+
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-01-19 22:23:18 UTC (rev 569)
++++ trunk/backend.py	2007-01-21 21:53:52 UTC (rev 570)
+@@ -116,6 +116,11 @@
+ 	* macros.inc
+ 	&quot;&quot;&quot;
+ 
++	tapisupport = False
++        for obj in configlets.configlet_tree:
++	        if obj.__class__.__name__ == 'CfgOptSettings':
++		        if obj.tapi:
++			        tapisupport = True
+ 
+ 	# Start with empty config files
+ 	configlets.asterisk_configfiles = []
+@@ -198,9 +203,8 @@
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get global dial options&quot;)
+ 	c.append(&quot;exten=s,n,Set(dopt=${DIAL_OPTIONS})&quot;)
+-	#c.append('exten=s,n,GotoIf($[&quot;${dopt}&quot; != &quot;&quot;]?doptEnd)')
+-	#c.append(&quot;exten=s,n,Set(dopt=r)&quot;)
+-	#c.append(&quot;exten=s,n(doptEnd),NoOp()&quot;)
++        if tapisupport:
++	        c.append(&quot;exten=s,n,Set(dopt=${dopt}M(tapi^${UNIQUEID}|${ARG1}))&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get early media&quot;)
+ 	c.append(&quot;exten=s,n,Set(emedia=${DB(EMEDIA/${ARG4}/${ARG3})})&quot;)
+@@ -213,7 +217,13 @@
+ 	c.append(&quot;exten=s,n,Set(prng=${DB(PRNG/${ARG4}/${ARG3})})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial&quot;)
+-	c.append(&quot;exten=s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWw${dopt})&quot;)
++	c.append(&quot;exten=s,n(MainDial),NoOp()&quot;)
++        if tapisupport:
++                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${ARG1})&quot;)
++                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)&quot;)
++                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: SET CALLERID ${CALLERID})&quot;)
++                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)&quot;)
++	c.append(&quot;exten=s,n,Dial(${ARG1}${prng},${dsec},TtWw${dopt})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'timeout'&quot;)
+ 	c.append(&quot;exten=s,n(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG4}/${ARG3})})&quot;)
+@@ -254,7 +264,13 @@
+ 	c.append(&quot;exten=s,n(hangup),Hangup()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=i,0,Hangup&quot;)
++        if tapisupport:
++                c.append(&quot;exten=h,1,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;)
+ 
++                c.append(&quot;[macro-tapi];&quot;)
++                c.append(&quot;exten=s,1,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;${ARG2}] LINE_CALLSTATE LINECALLSTATE_CONNECTED)&quot;)
++                c.append(&quot;exten=s,2,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)&quot;)
++
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; format: Macro(voicemail,&lt;VoiceMail arguments&gt;)&quot;)
+ 	c.append(&quot;;&quot;)
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-01-19 22:23:18 UTC (rev 569)
++++ trunk/cfg_dialout_normal.py	2007-01-21 21:53:52 UTC (rev 570)
+@@ -107,6 +107,11 @@
+ 		c.appendExten(&quot;s&quot;,'Set(options=%sL(%d000:10000))' % (opts,self.maxtime))
+ 		#TODO: add this trunks sorted by price and with a default one.
+ 		import configlets
++		tapisupport = False
++		for obj in configlets.configlet_tree:
++			if obj.__class__.__name__ == 'CfgOptSettings':
++				if obj.tapi:
++				    tapisupport = True
+ 		for obj in configlets.configlet_tree['Trunks']:
+ 			try:
+ 				if self.__getitem__(&quot;trunk_&quot;+obj.name):
+@@ -120,6 +125,12 @@
+ 						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; % obj.clidnameout)
+ 					if obj.clidnumout:
+ 						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; % obj.clidnumout)
++				        if tapisupport:
++					        c.appendExten(&quot;s&quot;,&quot;Set(chan=${CUT(CHANNEL,,1)})&quot;)
++					        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${chan})&quot;)
++	    				        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALTONE)&quot;)
++					        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALING)&quot;)
++					        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_PROCEEDING)&quot;)
+ 					c.appendExten(&quot;s&quot;,&quot;Dial(%s,%d|${options})&quot; % (obj.dial,self.ringtime))
+ 			except KeyError:
+ 				pass
+@@ -131,4 +142,6 @@
+ 		c.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;)
+ 		c.appendExten(&quot;t&quot;,&quot;NoCDR&quot;)
+ 		c.appendExten(&quot;t&quot;,&quot;Hangup&quot;)
++		if tapisupport:
++		        c.appendExten(&quot;h&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;)
+ 
+
+Modified: trunk/cfg_opt_settings.py
+===================================================================
+--- trunk/cfg_opt_settings.py	2007-01-19 22:23:18 UTC (rev 569)
++++ trunk/cfg_opt_settings.py	2007-01-21 21:53:52 UTC (rev 570)
+@@ -326,6 +326,10 @@
+ 			hint=_(&quot;The language is used for voice prompts&quot;),
+ 			len=10,
+ 			type=&quot;string&quot;),
++		     VarType(&quot;tapi&quot;,
++			title=_(&quot;Tapi Support&quot;),
++			type=&quot;bool&quot;,
++			default = True),
+ 		]
+ 
+ 	def createAsteriskConfig(self):
+@@ -350,3 +354,6 @@
+ 		c.append(&quot;loadzone = %s&quot; % zapcountry)
+ 		if self.country != 'us':
+ 			c.append(&quot;defaultzone = %s&quot; % zapcountry)
++		if self.tapi:
++			needModule(&quot;app_userevent&quot;)
++			needModule(&quot;app_cut&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000050.html">[Destar-dev] [Feature #2406] Hint support
+</A></li>
+	<LI>Next message: <A HREF="000051.html">[Destar-dev] [Feature #3050] TAPI Support
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#40">[ date ]</a>
+              <a href="thread.html#40">[ thread ]</a>
+              <a href="subject.html#40">[ subject ]</a>
+              <a href="author.html#40">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

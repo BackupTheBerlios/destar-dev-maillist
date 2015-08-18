@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r792 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r792%20-%20trunk&In-Reply-To=%3C200708210338.l7L3cF3E019382%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000328.html">
+   <LINK REL="Next"  HREF="000330.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r792 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r792%20-%20trunk&In-Reply-To=%3C200708210338.l7L3cF3E019382%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r792 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug 21 05:38:15 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000328.html">[Destar-dev] r791 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000330.html">[Destar-dev] r793 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#329">[ date ]</a>
+              <a href="thread.html#329">[ thread ]</a>
+              <a href="subject.html#329">[ subject ]</a>
+              <a href="author.html#329">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-21 05:38:14 +0200 (Tue, 21 Aug 2007)
+New Revision: 792
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_opt_sipnotify.py
+Log:
+cfg_opt_sipnotify.py: fixed class name. Thanks to Joan-Carles Samaranch
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-21 03:34:17 UTC (rev 791)
++++ trunk/CHANGELOG.txt	2007-08-21 03:38:14 UTC (rev 792)
+@@ -1,5 +1,6 @@
+ 2007-08-20:
+-confilets.py: fixed typo. Thanks to Joan-Carles Samaranch
++* confilets.py: fixed typo. Thanks to Joan-Carles Samaranch
++* cfg_opt_sipnotify.py: fixed class name. Thanks to Joan-Carles Samaranch
+ 
+ 2007-08-16:
+ * Added phone_user_dial.ptl: Initial work to click-to-dial from user's phone book.
+
+Modified: trunk/cfg_opt_sipnotify.py
+===================================================================
+--- trunk/cfg_opt_sipnotify.py	2007-08-21 03:34:17 UTC (rev 791)
++++ trunk/cfg_opt_sipnotify.py	2007-08-21 03:38:14 UTC (rev 792)
+@@ -21,7 +21,7 @@
+ from configlets import *
+ 
+ 
+-class CfgOptEnum(CfgOpt):
++class CfgOptSipNotify(CfgOpt):
+ 
+ 	shortName = _(&quot;Sip notify&quot;)
+ 	newObjectTitle= _(&quot;Sip notify&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000328.html">[Destar-dev] r791 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000330.html">[Destar-dev] r793 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#329">[ date ]</a>
+              <a href="thread.html#329">[ thread ]</a>
+              <a href="subject.html#329">[ subject ]</a>
+              <a href="author.html#329">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

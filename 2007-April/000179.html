@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r670 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r670%20-%20trunk&In-Reply-To=%3C200704252002.l3PK2jWK010340%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000178.html">
+   <LINK REL="Next"  HREF="000180.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r670 - trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r670%20-%20trunk&In-Reply-To=%3C200704252002.l3PK2jWK010340%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r670 - trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Wed Apr 25 22:02:45 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000178.html">[Destar-dev] r669 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000180.html">[Destar-dev] r671 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#179">[ date ]</a>
+              <a href="thread.html#179">[ thread ]</a>
+              <a href="subject.html#179">[ subject ]</a>
+              <a href="author.html#179">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-04-25 22:02:44 +0200 (Wed, 25 Apr 2007)
+New Revision: 670
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/Makefile
+   trunk/cfg_opt_oppanel.py
+   trunk/cfg_phone_agent.py
+   trunk/configlets.py
+   trunk/panelutils.py
+Log:
+* Added panel buttons for agents. (still does not work at all)
+* Allow configuring op_server debug level.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-04-25 04:29:36 UTC (rev 669)
++++ trunk/CHANGELOG.txt	2007-04-25 20:02:44 UTC (rev 670)
+@@ -1,3 +1,7 @@
++2007-04-25
++* Added panel buttons for agents. (still does not work at all)
++* Allow configuring op_server debug level.
++
+ 2007-04-24:
+ * Use actual pbx instead pbx1 in cfg_app_agentcallbacklogin
+ * cfg_phone_queue: a few more order in the form variables.
+
+Modified: trunk/Makefile
+===================================================================
+--- trunk/Makefile	2007-04-25 04:29:36 UTC (rev 669)
++++ trunk/Makefile	2007-04-25 20:02:44 UTC (rev 670)
+@@ -7,7 +7,7 @@
+ MANDIR=$(DESTDIR)/usr/share/man/man8
+ 
+ # To use with asternic.org op_panel tarball:
+-#PANEL_HTML_DIR=/usr/local/op_panel/html
++#PANEL_HTML_DIR=/usr/local/op_panel-0.27/flash
+ 
+ # To use with op-panel .deb package:
+ PANEL_HTML_DIR=/usr/share/op-panel/flash
+
+Modified: trunk/cfg_opt_oppanel.py
+===================================================================
+--- trunk/cfg_opt_oppanel.py	2007-04-25 04:29:36 UTC (rev 669)
++++ trunk/cfg_opt_oppanel.py	2007-04-25 20:02:44 UTC (rev 670)
+@@ -68,8 +68,14 @@
+ 				title=_(&quot;Frequency in seconds to poll for sip and iax status&quot;),
+ 				len=10,
+ 				default=&quot;60&quot;),
+-		]
+ 
++			VarType(&quot;debug&quot;,
++				title=_(&quot;Debug level&quot;),
++				len=3,
++				type=&quot;int&quot;,
++				default=0)]
++
++
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;op_server.cfg&quot;)
+                 c.setSection(&quot;general&quot;)
+@@ -78,6 +84,7 @@
+ 
+ 		c.appendValue(self, &quot;security_code&quot;)	
+ 		c.appendValue(self, &quot;poll_interval&quot;)	
++		c.appendValue(self, &quot;debug&quot;)	
+ 		panelutils.createManagerConfig(self)
+ 		panelutils.createDefaultConfig(c)	
+ 
+
+Modified: trunk/cfg_phone_agent.py
+===================================================================
+--- trunk/cfg_phone_agent.py	2007-04-25 04:29:36 UTC (rev 669)
++++ trunk/cfg_phone_agent.py	2007-04-25 20:02:44 UTC (rev 670)
+@@ -61,8 +61,19 @@
+ 					type=&quot;mchoice&quot;,
+ 					optional=True,
+ 					options=getChoice(&quot;CfgPhoneQueue&quot;),
+-					hide=True)]
++					hide=True),
+ 					
++			VarType(&quot;panelLab&quot;,
++				title=_(&quot;Operator Panel&quot;),
++				type=&quot;label&quot;,
++				hide=True),
++
++			VarType(&quot;panel&quot;,
++				title=_(&quot;Show this phone in the panel&quot;),
++				type=&quot;bool&quot;,
++				hide=True,
++				optional=True)]
++					
+ 		queues = len(configlet_tree.getConfigletsByName('CfgPhoneQueue'))
+ 		if queues &gt; 0:
+ 			for v in self.variables:
+@@ -76,7 +87,7 @@
+ 		]
+ 
+ 	def createAsteriskConfig(self):
+-
++		needModule('chan_agent')
+ 		ag = AstConf(&quot;agents.conf&quot;)
+ 		ag.setSection(&quot;agents&quot;)
+ 		if self.secret:
+@@ -87,3 +98,4 @@
+ 
+ 
+ 		self.createQueuesConfig()
++		self.createPanelConfig()
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-04-25 04:29:36 UTC (rev 669)
++++ trunk/configlets.py	2007-04-25 20:02:44 UTC (rev 670)
+@@ -1115,7 +1115,10 @@
+ 	def createPanelConfig(self):
+ 		try:
+ 			if panelutils.isConfigured() == 1 and self.panel:
+-				panelutils.createExtButton(self)
++				if self.technology == 'AGENT':
++					panelutils.createAgentButton(self)
++				else:
++					panelutils.createExtButton(self)
+ 		except AttributeError:
+ 			pass
+ 
+
+Modified: trunk/panelutils.py
+===================================================================
+--- trunk/panelutils.py	2007-04-25 04:29:36 UTC (rev 669)
++++ trunk/panelutils.py	2007-04-25 20:02:44 UTC (rev 670)
+@@ -60,7 +60,6 @@
+ 	c.append(&quot;auth_md5=1&quot;)
+ 	c.append(&quot;poll_voicemail=0&quot;)
+ 	c.append(&quot;kill_zombies=0&quot;)
+-	c.append(&quot;debug=0&quot;)
+ 	c.append(&quot;conference_context=apps&quot;)
+ 	c.append(&quot;clid_format=(xxx)xxx-xxxx&quot;)
+ 	c.append(&quot;clid_privacy=0&quot;)
+@@ -122,6 +121,13 @@
+ 	p.append(&quot;Extension=%s&quot; % obj.ext)
+ 	p.append(&quot;Label=%s&quot; % obj.name)
+ 
++def createAgentButton(obj):
++	p = AstConf(&quot;op_buttons.cfg&quot;)
++	p.setSection(&quot;%s/%s&quot; % (obj.technology, obj.number) )
++	p.append(&quot;Position=n&quot;)
++	p.append(&quot;Icon=6&quot;)
++	p.append(&quot;Label=%s&quot; % obj.name)
++
+ def createTrunkButton(obj):
+ 	p = AstConf(&quot;op_buttons.cfg&quot;)
+ 	p.setSection(&quot;%s/%s&quot; % (obj.technology, obj.name) )
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000178.html">[Destar-dev] r669 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000180.html">[Destar-dev] r671 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#179">[ date ]</a>
+              <a href="thread.html#179">[ thread ]</a>
+              <a href="subject.html#179">[ subject ]</a>
+              <a href="author.html#179">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

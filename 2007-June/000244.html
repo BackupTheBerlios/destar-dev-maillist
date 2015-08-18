@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r733 - in trunk: . misc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r733%20-%20in%20trunk%3A%20.%20misc&In-Reply-To=%3C200706290104.l5T14M9H023297%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000243.html">
+   <LINK REL="Next"  HREF="000245.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r733 - in trunk: . misc</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r733%20-%20in%20trunk%3A%20.%20misc&In-Reply-To=%3C200706290104.l5T14M9H023297%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r733 - in trunk: . misc">alerios at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun 29 03:04:22 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000243.html">[Destar-dev] r732 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000245.html">[Destar-dev] r734 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#244">[ date ]</a>
+              <a href="thread.html#244">[ thread ]</a>
+              <a href="subject.html#244">[ subject ]</a>
+              <a href="author.html#244">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-06-29 03:04:20 +0200 (Fri, 29 Jun 2007)
+New Revision: 733
+
+Added:
+   trunk/page_admin_systemstate.ptl
+Removed:
+   trunk/misc/page_admin_systemstate.ptl
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_main.ptl
+Log:
+* Moved misc/page_admin_systemstate to / and added more info.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-29 00:57:59 UTC (rev 732)
++++ trunk/CHANGELOG.txt	2007-06-29 01:04:20 UTC (rev 733)
+@@ -3,6 +3,7 @@
+ * page_user_info.ptl: _q_level should be 1.
+ * Added logging information for destar's users sessions.
+ * Added logging information for configlets edition.
++* Moved misc/page_admin_systemstate to / and added more info.
+ 
+ 2007-06-27:
+ * Added zaptel dynamic spans support (TDMoE)
+
+Deleted: trunk/misc/page_admin_systemstate.ptl
+===================================================================
+--- trunk/misc/page_admin_systemstate.ptl	2007-06-29 00:57:59 UTC (rev 732)
++++ trunk/misc/page_admin_systemstate.ptl	2007-06-29 01:04:20 UTC (rev 733)
+@@ -1,97 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# This file has Copyright (C) 2005 by Alejandro Rios P.
+-# Destar has Copyright (C) 2005 by Holger Schurig
+-# 
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-#
+-
+-
+-from Templates import *
+-import os, commands
+-
+-_q_parent  = 'page_admin'
+-_q_title   = _(&quot;System Status&quot;)
+-_q_desc    = _(&quot;System information of your machine&quot;)
+-_q_link    = 'systemstatus'
+-_q_menupos = 10
+-_q_level   = 3
+-
+-
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+-def systemState [plain] ():
+-	# TODO: use CSS
+-	'&lt;table border=1 cellpadding=2 cellspacing=0&gt;'
+-	try:
+-		'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('System')), &quot; &quot;. join(os.uname()) )
+-	except OSError:
+-		pass
+-	try:
+-		'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Load Average in the last minute')), os.getloadavg()[0] )
+-		'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Load Average in the last 5 minutes')), os.getloadavg()[1] )
+-	except OSError:
+-		pass
+-	try:
+-		cpuinfo = commands.getoutput('cat /proc/cpuinfo').split(&quot;\n&quot;)
+-		cpus=0
+-		for s in cpuinfo:
+-			if s.startswith('model name'):
+-				cpus += 1
+-				'&lt;tr&gt;&lt;td&gt;%s # %d:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Processor')), cpus, s[13:] )
+-			if s.startswith('cpu MHz'):
+-				'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s MHz&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Frequency')), s[11:] )
+-		
+-		meminfo = commands.getoutput('cat /proc/meminfo').split(&quot;\n&quot;)
+-		for s in meminfo:
+-			if s.startswith('MemTotal:'):
+-				'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Total Memory')), s[9:] )
+-			if s.startswith('MemFree:'):
+-				'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Free Memory')), s[8:] )
+-
+-		diskinfo = commands.getoutput('df -hT').split(&quot;\n&quot;)
+-		diskinfo.remove(diskinfo[0])
+-		'&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%s:&lt;br/&gt;&lt;br/&gt;' % htmltext(_('Disk Usage'))
+-		'&lt;table border=0 align=&quot;center&quot;&gt;'
+-		'&lt;tr&gt;'
+-		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Device'))
+-		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('FileSystem type'))
+-		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Total Size'))
+-		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Used'))
+-		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Available'))
+-		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Use percentage'))
+-		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Mount point'))
+-		'&lt;/tr&gt;'
+-		for s in diskinfo:
+-			'&lt;tr&gt;'
+-			for a in s.split():
+-				'&lt;td&gt;%s&lt;/td&gt;' % a
+-			'&lt;/tr&gt;'
+-		'&lt;/table&gt;'
+-	except:
+-		pass
+-
+-
+-	'&lt;/table&gt;'
+-
+-		
+-	
+-def _q_index [plain] (request):
+-	header(_q_desc,refresh=10)
+-	systemState()	
+-	footer()
+-
+
+Added: trunk/page_admin_systemstate.ptl
+===================================================================
+--- trunk/page_admin_systemstate.ptl	2007-06-29 00:57:59 UTC (rev 732)
++++ trunk/page_admin_systemstate.ptl	2007-06-29 01:04:20 UTC (rev 733)
+@@ -0,0 +1,106 @@
++# -*- coding: utf-8 -*-
++#
++# This file has Copyright (C) 2005 by Alejandro Rios P.
++# Destar has Copyright (C) 2005 by Holger Schurig
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from Templates import *
++import os, commands, backend
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
++
++class Page(AccessControlled, Directory): 
++	_q_parent  = 'page_admin'
++	_q_title   = _(&quot;System Status&quot;)
++	_q_desc    = _(&quot;System information of your machine&quot;)
++	_q_link    = 'systemstatus'
++	_q_menupos = 10
++	_q_level   = 3
++	_q_exports = ['']
++
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++	
++	def _q_index [plain] (self):
++		header(self._q_desc,refresh=10)
++		systemState()	
++		footer()
++
++def systemState [plain] ():
++	# TODO: use CSS
++	'&lt;table border=1 cellpadding=2 cellspacing=0&gt;'
++	try:
++		'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('System')), &quot; &quot;. join(os.uname()) )
++	except OSError:
++		pass
++	import configlets
++	'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Number of DeStar Configlets')), len(configlets.configlet_tree))
++	'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_(&quot;DeStar users logged in&quot;)), backend.frontend_sessions)
++	try:
++		'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Load Average in the last minute')), os.getloadavg()[0] )
++		'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Load Average in the last 5 minutes')), os.getloadavg()[1] )
++	except OSError:
++		pass
++	try:
++		cpuinfo = commands.getoutput('cat /proc/cpuinfo').split(&quot;\n&quot;)
++		cpus=0
++		for s in cpuinfo:
++			if s.startswith('model name'):
++				cpus += 1
++				'&lt;tr&gt;&lt;td&gt;%s # %d:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Processor')), cpus, s[13:] )
++			if s.startswith('cpu MHz'):
++				'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s MHz&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Frequency')), s[11:] )
++		
++		meminfo = commands.getoutput('cat /proc/meminfo').split(&quot;\n&quot;)
++		for s in meminfo:
++			if s.startswith('MemTotal:'):
++				'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Total Memory')), s[9:] )
++			if s.startswith('MemFree:'):
++				'&lt;tr&gt;&lt;td&gt;%s:&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % ( htmltext(_('Free Memory')), s[8:] )
++
++		diskinfo = commands.getoutput('df -hT').split(&quot;\n&quot;)
++		diskinfo.remove(diskinfo[0])
++		'&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%s:&lt;br/&gt;&lt;br/&gt;' % htmltext(_('Disk Usage'))
++		'&lt;table border=0 align=&quot;center&quot;&gt;'
++		'&lt;tr&gt;'
++		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Device'))
++		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('FileSystem type'))
++		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Total Size'))
++		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Used'))
++		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Available'))
++		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Use percentage'))
++		'&lt;td&gt;%s&lt;/td&gt;' % htmltext(_('Mount point'))
++		'&lt;/tr&gt;'
++		for s in diskinfo:
++			'&lt;tr&gt;'
++			for a in s.split():
++				'&lt;td&gt;%s&lt;/td&gt;' % a
++			'&lt;/tr&gt;'
++		'&lt;/table&gt;'
++	except:
++		pass
++
++
++	'&lt;/table&gt;'
++
++		
++
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2007-06-29 00:57:59 UTC (rev 732)
++++ trunk/page_main.ptl	2007-06-29 01:04:20 UTC (rev 733)
+@@ -64,7 +64,6 @@
+ 
+ 		# Import all cfg_*.py files once when the module loads.
+ 		for s in os.listdir(backend.CONFIGLETS_DIR):
+-			#continue
+ 			if not s.startswith('page_'):
+ 				continue
+ 			m = None
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000243.html">[Destar-dev] r732 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000245.html">[Destar-dev] r734 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#244">[ date ]</a>
+              <a href="thread.html#244">[ thread ]</a>
+              <a href="subject.html#244">[ subject ]</a>
+              <a href="author.html#244">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

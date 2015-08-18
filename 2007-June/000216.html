@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r705 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r705%20-%20trunk&In-Reply-To=%3C200706072302.l57N2BbV001585%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000215.html">
+   <LINK REL="Next"  HREF="000217.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r705 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r705%20-%20trunk&In-Reply-To=%3C200706072302.l57N2BbV001585%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r705 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun  8 01:02:11 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000215.html">[Destar-dev] r704 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000217.html">[Destar-dev] r706 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#216">[ date ]</a>
+              <a href="thread.html#216">[ thread ]</a>
+              <a href="subject.html#216">[ subject ]</a>
+              <a href="author.html#216">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-08 01:02:10 +0200 (Fri, 08 Jun 2007)
+New Revision: 705
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_dialout_normal.py
+Log:
+cfg_dialout_normal.py: Better call handling when channels are unavailable
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-07 22:45:29 UTC (rev 704)
++++ trunk/CHANGELOG.txt	2007-06-07 23:02:10 UTC (rev 705)
+@@ -1,5 +1,6 @@
+ 2007-06-07:
+ * cfg_trunk_sip.py: Some changes in register and cmd lines to be compatible with budgetone.nl
++* cfg_dialout_normal.py: Better call handling when channels are unavailable
+ 
+ 2007-06-06:
+ * Removed default op-panel config in destar_cfg.py sample.
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-06-07 22:45:29 UTC (rev 704)
++++ trunk/cfg_dialout_normal.py	2007-06-07 23:02:10 UTC (rev 705)
+@@ -50,6 +50,12 @@
+ 			optional=True, 
+ 			default=&quot;&quot;),
+ 
++		VarType(&quot;otheropts&quot;, 
++			title=_(&quot;Other Options for Dial Application&quot;), 
++			len=10, 
++			optional=True, 
++			default=&quot;&quot;),
++
+ 		VarType(&quot;maxtime&quot;, 
+ 			title=_(&quot;Maximum call time in seconds&quot;), 
+ 			type=&quot;int&quot;, 
+@@ -119,9 +125,12 @@
+ 		c.append(&quot;; params: exten,secret,timeout&quot;)
+ 		needModule(&quot;app_authenticate&quot;)
+ 		if self.dis_transfer:
+-		       opts=&quot;tW&quot;
++			opts=&quot;tW&quot;
+ 		else:
+-		       opts=&quot;TtW&quot;
++			opts=&quot;TtW&quot;
++		if self.otheropts:
++			opts += self.otheropts
++			c.append(&quot;exten=&gt;s,n,Playback(llamadasiendotransferida)&quot;)
+ 		c.append(&quot;exten=&gt;s,1,SetVar(options=%s)&quot; % opts)
+ 		if self.qlookup:
+ 			c.append(&quot;exten=&gt;s,n(quickd),Set(dest=${DB(QUICKDIALLIST/GLOBAL/${ARG1})})&quot;)
+@@ -138,6 +147,8 @@
+ 		#TODO: add this trunks sorted by price and with a default one.
+ 
+ 		import configlets
++		unavail=1
++		c.append(&quot;exten=&gt;s,n,Set(TIMEOUT(absolute)=${timeout})&quot;)
+ 		tapisupport = False
+ 		for obj in configlets.configlet_tree:
+ 			if obj.__class__.__name__ == 'CfgOptSettings':
+@@ -146,8 +157,7 @@
+ 		for obj in configlets.configlet_tree['Trunks']:
+ 			try:
+ 				if self.__getitem__(&quot;trunk_&quot;+obj.name):
+-					c.append(&quot;exten=&gt;s,n,Set(TIMEOUT(absolute)=${timeout})&quot;)
+-					c.append(&quot;exten=&gt;s,n,Set(CDR(outtrunk)=%s)&quot; % obj.name)
++					c.append(&quot;exten=&gt;s,n(unavail%s),Set(CDR(outtrunk)=%s)&quot; % (unavail, obj.name) )
+ 					if self.__getitem__(&quot;trunk_%s_price&quot; % obj.name):
+ 						c.append(&quot;exten=&gt;s,n,Set(CDR(accountcode)=%s)&quot; % self.__getitem__(&quot;trunk_%s_price&quot; % obj.name))
+ 					else:
+@@ -164,11 +174,14 @@
+ 					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALING)&quot;)
+ 					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_PROCEEDING)&quot;)
+ 					c.append(&quot;exten=&gt;s,n,Dial(%s,%d|${options})&quot; % (obj.dial,self.ringtime))
++					unavail+=1
++					c.append('exten=&gt;s,n,GotoIf($[&quot;${DIALSTATUS}&quot; = &quot;CHANUNAVAIL&quot;]?unavail%s)' % unavail)
+ 			except KeyError:
+ 				pass
+-		c.append(&quot;exten=&gt;s,n,Congestion(5)&quot;)
+-		#c.append(&quot;exten=&gt;s,n,Goto(9)&quot;)
+-		c.append(&quot;exten=&gt;s,n,Goto(CallLimit)&quot;)
++		c.append(&quot;exten=&gt;s,n,Goto(busy)&quot;)
++		c.append(&quot;exten=&gt;s,n(unavail%s),Playback(all-circuits-busy-now)&quot; % unavail)
++		c.append(&quot;exten=&gt;s,n(busy),Busy(5)&quot;)
++		c.append(&quot;exten=&gt;s,n,Hangup()&quot;)
+ 		c.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;)
+ 		c.appendExten(&quot;T&quot;,&quot;NoCDR&quot;)
+ 		c.appendExten(&quot;T&quot;,&quot;Hangup&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000215.html">[Destar-dev] r704 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000217.html">[Destar-dev] r706 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#216">[ date ]</a>
+              <a href="thread.html#216">[ thread ]</a>
+              <a href="subject.html#216">[ subject ]</a>
+              <a href="author.html#216">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r849 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r849%20-%20trunk&In-Reply-To=%3C200912201628.nBKGSMqW028497%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000402.html">
+   <LINK REL="Next"  HREF="000404.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r849 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r849%20-%20trunk&In-Reply-To=%3C200912201628.nBKGSMqW028497%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r849 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 20 17:28:22 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000402.html">[Destar-dev] r848 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000404.html">[Destar-dev] r850 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#403">[ date ]</a>
+              <a href="thread.html#403">[ thread ]</a>
+              <a href="subject.html#403">[ subject ]</a>
+              <a href="author.html#403">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-20 17:28:21 +0100 (Sun, 20 Dec 2009)
+New Revision: 849
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_admin_pbxstate.ptl
+Log:
+* page_admin_pbxstate.ptl: changed table distribution
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-20 16:25:46 UTC (rev 848)
++++ trunk/CHANGELOG.txt	2009-12-20 16:28:21 UTC (rev 849)
+@@ -1,5 +1,6 @@
+ 2009-12-20
+ * page_admin_cfwstate.ptl: Added CFTO, VMU and VMBS.
++* page_admin_pbxstate.ptl: changed table distribution.
+ 
+ 2009-12-16
+ * cfg_opt_pbx.py, cfg_app_*: separate context for all apps.
+
+Modified: trunk/page_admin_pbxstate.ptl
+===================================================================
+--- trunk/page_admin_pbxstate.ptl	2009-12-20 16:25:46 UTC (rev 848)
++++ trunk/page_admin_pbxstate.ptl	2009-12-20 16:28:21 UTC (rev 849)
+@@ -106,10 +106,11 @@
+ 			h.setCell(x,y, formatChannel(obj, now) )
+ 			h.setAttr(x,y, id=&quot;phone&quot;)
+ 
+-			y = y + 1
+-			if y&gt;=maxy:
+-				x = x + 1
+-				y = 0
++			x = x + 1
++			if x&gt;=maxy:
++				y = y + 1
++				x = 0
+ 
+ 		h.getHtml(id='state', border=1)
++		#manager.getSIPPeers()
+ 		footer()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000402.html">[Destar-dev] r848 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000404.html">[Destar-dev] r850 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#403">[ date ]</a>
+              <a href="thread.html#403">[ thread ]</a>
+              <a href="subject.html#403">[ subject ]</a>
+              <a href="author.html#403">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

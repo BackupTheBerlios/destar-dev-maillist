@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r774 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r774%20-%20trunk&In-Reply-To=%3C200708011639.l71Gdo7w016620%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000297.html">
+   <LINK REL="Next"  HREF="000294.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r774 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r774%20-%20trunk&In-Reply-To=%3C200708011639.l71Gdo7w016620%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r774 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Aug  1 18:39:50 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000297.html">[Destar-dev] r773 - in trunk: . po
+</A></li>
+        <LI>Next message: <A HREF="000294.html">[Destar-dev] r775 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#293">[ date ]</a>
+              <a href="thread.html#293">[ thread ]</a>
+              <a href="subject.html#293">[ subject ]</a>
+              <a href="author.html#293">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-01 18:39:44 +0200 (Wed, 01 Aug 2007)
+New Revision: 774
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/Makefile
+Log:
+Added all: target in Makefile
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-01 16:35:56 UTC (rev 773)
++++ trunk/CHANGELOG.txt	2007-08-01 16:39:44 UTC (rev 774)
+@@ -1,5 +1,6 @@
+ 2007-08-01:
+ * Updated es.po
++* Added all: target in Makefile
+ 
+ 2007-07-31:
+ * configlets.py: fixed bug in appendExten
+
+Modified: trunk/Makefile
+===================================================================
+--- trunk/Makefile	2007-08-01 16:35:56 UTC (rev 773)
++++ trunk/Makefile	2007-08-01 16:39:44 UTC (rev 774)
+@@ -16,6 +16,8 @@
+ # set SYS_MEDUSA to 1 to use system copy of medusa
+ SYS_MEDUSA=0
+ 
++all: languages install install-panel
++
+ clean:
+ 	(find -name &quot;*.pyc&quot; ; \
+ 	 find -name &quot;*.ptlc&quot; ; \
+@@ -38,7 +40,7 @@
+ 
+ 
+ install-panel:
+-	ln -s $(PANEL_HTML_DIR) $(PAGES_DIR)/panel
++	ln -sf $(PANEL_HTML_DIR) $(PAGES_DIR)/panel
+ 
+ languages: 
+ 	cd po &amp;&amp; $(MAKE)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000297.html">[Destar-dev] r773 - in trunk: . po
+</A></li>
+	<LI>Next message: <A HREF="000294.html">[Destar-dev] r775 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#293">[ date ]</a>
+              <a href="thread.html#293">[ thread ]</a>
+              <a href="subject.html#293">[ subject ]</a>
+              <a href="author.html#293">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

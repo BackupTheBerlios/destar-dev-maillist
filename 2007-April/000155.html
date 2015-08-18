@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r651 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r651%20-%20trunk&In-Reply-To=%3C200704112037.l3BKbeN6003110%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000154.html">
+   <LINK REL="Next"  HREF="000156.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r651 - trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r651%20-%20trunk&In-Reply-To=%3C200704112037.l3BKbeN6003110%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r651 - trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Wed Apr 11 22:37:40 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000154.html">[Destar-dev] [Feature #2813] port field in trunk menu
+</A></li>
+        <LI>Next message: <A HREF="000156.html">[Destar-dev] r652 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#155">[ date ]</a>
+              <a href="thread.html#155">[ thread ]</a>
+              <a href="subject.html#155">[ subject ]</a>
+              <a href="author.html#155">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-04-11 22:37:40 +0200 (Wed, 11 Apr 2007)
+New Revision: 651
+
+Modified:
+   trunk/cfg_app_callfw.py
+   trunk/cfg_app_dnd.py
+   trunk/cfg_app_quickdial_global.py
+   trunk/cfg_app_quickdial_phone.py
+Log:
+* Fixed extension configuration checking.
+
+
+
+Modified: trunk/cfg_app_callfw.py
+===================================================================
+--- trunk/cfg_app_callfw.py	2007-04-10 23:59:34 UTC (rev 650)
++++ trunk/cfg_app_callfw.py	2007-04-11 20:37:40 UTC (rev 651)
+@@ -33,7 +33,7 @@
+ 			VarType(&quot;type&quot;, title=_(&quot;Type&quot;), type=&quot;choice&quot;, options=( (&quot;CFIM&quot;, _(&quot;Call Forwarding Unconditional&quot;)), \
+ 			(&quot;CFBS&quot;, _(&quot;Call Forwarding if Busy&quot;)), (&quot;CFTO&quot;, _(&quot;Call Forwarding if Timeout/Unavailable&quot;)) )),
+ 			VarType(&quot;set&quot;,      title=_(&quot;Setting preffix&quot;), len=6, default=&quot;*21&quot;),
+-			VarType(&quot;ext&quot;,   title=_(&quot;Unsetting extension&quot;), len=6, default=&quot;*22&quot;),
++			VarType(&quot;unset&quot;,   title=_(&quot;Unsetting extension&quot;), len=6, default=&quot;*22&quot;),
+ 			VarType(&quot;toggle&quot;,   title=_(&quot;Set function toggleable&quot;), type=&quot;bool&quot;),
+ 			VarType(&quot;devstateprefix&quot;,   title=_(&quot;Create Devstate extension. Devstate Prefix:&quot;), len=8, optional=True, default=&quot;&quot;)
+ 		       	]
+@@ -44,8 +44,20 @@
+ 					]
+ 	
+ 	def row(self):
+-		return (&quot;%s / %s&quot; % (self.set,self.ext),&quot;%s %s&quot; % (self.shortName, self.type), self.pbx)
++		return (&quot;%s / %s&quot; % (self.set,self.unset),&quot;%s %s&quot; % (self.shortName, self.type), self.pbx)
+ 
++	def checkConfig(self):
++		import configlets
++		for o in configlets.configlet_tree:
++			if o==self: continue
++			try:
++				if o.ext == self.set:
++					return (&quot;set&quot;, _(&quot;Extension already in use&quot;))
++				if o.ext == self.unset:
++					return (&quot;unset&quot;, _(&quot;Extension already in use&quot;))
++			except AttributeError:
++				pass
++
+ 	def createAsteriskConfig(self):
+ 		if self.devstateprefix:
+ 		    needModule(&quot;app_devstate&quot;)
+@@ -56,8 +68,8 @@
+ 		c.appendExten(&quot;_%s&quot; % self.set, &quot;Set(lastnum=${DB(%s_LASTNUM/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
+ 		c.appendExten(&quot;_%s&quot; % self.set, 'GotoIf($[&quot;${lastnum}&quot; = &quot;&quot;]?nonumber)')
+ 		c.appendExten(&quot;_%s&quot; % self.set, &quot;Goto(%s,%s${lastnum},1)&quot; % (self.pbx, self.set))
+-		c.appendExten(&quot;_%s&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;nonumber&quot;)
+-		c.appendExten(&quot;_%s&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;switchoff&quot;)
++		c.appendExten(&quot;_%s&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.unset), label=&quot;nonumber&quot;)
++		c.appendExten(&quot;_%s&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.unset), label=&quot;switchoff&quot;)
+ 		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Answer()&quot;)
+ 		if self.toggle:
+ 			c.appendExten(&quot;_%s.&quot; % self.set, &quot;Set(testcf=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
+@@ -74,12 +86,12 @@
+ 			c.appendExten(&quot;_%s.&quot; % self.set, &quot;Playback(call-fwd-on-busy)&quot;)
+ 		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Wait(1)&quot;)
+ 		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;switchoff&quot;)
++		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.unset), label=&quot;switchoff&quot;)
+ 
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;Answer()&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx))
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Answer()&quot;)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx))
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;%s&quot; % self.ext, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type.lower(), self.pbx))
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(call-fwd-cancelled)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;Wait(1)&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;Hangup&quot;)
++			c.appendExten(&quot;%s&quot; % self.unset, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type.lower(), self.pbx))
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Playback(call-fwd-cancelled)&quot;)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Wait(1)&quot;)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;Hangup&quot;)
+
+Modified: trunk/cfg_app_dnd.py
+===================================================================
+--- trunk/cfg_app_dnd.py	2007-04-10 23:59:34 UTC (rev 650)
++++ trunk/cfg_app_dnd.py	2007-04-11 20:37:40 UTC (rev 651)
+@@ -46,8 +46,10 @@
+ 		for o in configlets.configlet_tree:
+ 			if o==self: continue
+ 			try:
+-				if o.ext == self.set or o.ext == self.unset:
+-					return (&quot;ext&quot;, _(&quot;Extension already in use&quot;))
++				if o.ext == self.set:
++					return (&quot;set&quot;, _(&quot;Extension already in use&quot;))
++				if o.ext == self.unset:
++					return (&quot;unset&quot;, _(&quot;Extension already in use&quot;))
+ 			except AttributeError:
+ 				pass
+ 
+
+Modified: trunk/cfg_app_quickdial_global.py
+===================================================================
+--- trunk/cfg_app_quickdial_global.py	2007-04-10 23:59:34 UTC (rev 650)
++++ trunk/cfg_app_quickdial_global.py	2007-04-11 20:37:40 UTC (rev 651)
+@@ -32,7 +32,7 @@
+ 				VarType(&quot;pbx&quot;,    title=_(&quot;Virtual PBX&quot;), type=&quot;choice&quot;, options=getChoice(&quot;CfgOptPBX&quot;)),
+ 				VarType(&quot;pin&quot;, title=_(&quot;Password&quot;), len=20, optional=True),
+ 				VarType(&quot;set&quot;,      title=_(&quot;Setting prefix&quot;), len=6, default=&quot;*9&quot;),
+-				VarType(&quot;ext&quot;,   title=_(&quot;Unsetting prefix&quot;), len=6, default=&quot;#9#&quot;)
++				VarType(&quot;unset&quot;,   title=_(&quot;Unsetting prefix&quot;), len=6, default=&quot;#9#&quot;)
+ 		       ]
+ 		self.dependencies = [ DepType(&quot;pbx&quot;, 
+ 					type=&quot;hard&quot;,
+@@ -40,8 +40,20 @@
+ 					]
+ 	
+ 	def row(self):
+-		return (&quot;%s / %s&quot; % (self.set,self.ext),self.shortName,self.pbx)
++		return (&quot;%s / %s&quot; % (self.set,self.unset),self.shortName,self.pbx)
+ 
++	def checkConfig(self):
++		import configlets
++		for o in configlets.configlet_tree:
++			if o==self: continue
++			try:
++				if o.ext == self.set:
++					return (&quot;set&quot;, _(&quot;Extension already in use&quot;))
++				if o.ext == self.unset:
++					return (&quot;unset&quot;, _(&quot;Extension already in use&quot;))
++			except AttributeError:
++				pass
++
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+@@ -50,5 +62,5 @@
+ 			c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Authenticate(%s)&quot; % self.pin)
+ 		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Set(DB(QUICKDIALLIST/GLOBAL/${EXTEN:%d:2})=${EXTEN:%d})&quot; % (len(self.set),len(self.set)+3))
+ 		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;_%sXX&quot; % self.ext, &quot;DBdel(QUICKDIALLIST/GLOBAL/${EXTEN:%d})&quot; % len(self.ext))
+-		c.appendExten(&quot;_%sXX&quot; % self.ext, &quot;Hangup&quot;)
++		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;DBdel(QUICKDIALLIST/GLOBAL/${EXTEN:%d})&quot; % len(self.unset))
++		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;Hangup&quot;)
+
+Modified: trunk/cfg_app_quickdial_phone.py
+===================================================================
+--- trunk/cfg_app_quickdial_phone.py	2007-04-10 23:59:34 UTC (rev 650)
++++ trunk/cfg_app_quickdial_phone.py	2007-04-11 20:37:40 UTC (rev 651)
+@@ -31,7 +31,7 @@
+ 		self.variables   = [
+ 			VarType(&quot;pbx&quot;,    title=_(&quot;Virtual PBX&quot;), type=&quot;choice&quot;, options=getChoice(&quot;CfgOptPBX&quot;)),
+ 			VarType(&quot;set&quot;,      title=_(&quot;Setting prefix&quot;), len=6, default=&quot;*7&quot;),
+-			VarType(&quot;ext&quot;,   title=_(&quot;Unsetting prefix&quot;), len=6, default=&quot;#7#&quot;),
++			VarType(&quot;unset&quot;,   title=_(&quot;Unsetting prefix&quot;), len=6, default=&quot;#7#&quot;),
+ 			VarType(&quot;dialprefix&quot;,   title=_(&quot;Dial prefix&quot;), len=6, default=&quot;**&quot;),
+ 		       ]
+ 		self.dependencies = [ DepType(&quot;pbx&quot;, 
+@@ -40,12 +40,12 @@
+ 					]
+ 	
+ 	def row(self):
+-		return (&quot;%s / %s&quot; % (self.set,self.ext),self.shortName,self.pbx)
++		return (&quot;%s / %s&quot; % (self.set,self.unset),self.shortName,self.pbx)
+ 
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+ 		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Set(DB(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d:2})=${EXTEN:%d})&quot; % (len(self.set),len(self.set)+3))
+ 		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;_%sXX&quot; % self.ext, &quot;DBdel(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d})&quot; % len(self.ext))
+-		c.appendExten(&quot;_%sXX&quot; % self.ext, &quot;Hangup&quot;)
++		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;DBdel(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d})&quot; % len(self.unset))
++		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;Hangup&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000154.html">[Destar-dev] [Feature #2813] port field in trunk menu
+</A></li>
+	<LI>Next message: <A HREF="000156.html">[Destar-dev] r652 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#155">[ date ]</a>
+              <a href="thread.html#155">[ thread ]</a>
+              <a href="subject.html#155">[ subject ]</a>
+              <a href="author.html#155">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

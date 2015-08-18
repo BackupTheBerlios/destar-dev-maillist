@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r757 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r757%20-%20trunk&In-Reply-To=%3C200707102036.l6AKac7q022586%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000272.html">
+   <LINK REL="Next"  HREF="000276.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r757 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r757%20-%20trunk&In-Reply-To=%3C200707102036.l6AKac7q022586%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r757 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Tue Jul 10 22:36:38 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000272.html">[Destar-dev] r756 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000276.html">[Destar-dev] r758 - in trunk: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#273">[ date ]</a>
+              <a href="thread.html#273">[ thread ]</a>
+              <a href="subject.html#273">[ subject ]</a>
+              <a href="author.html#273">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-07-10 22:36:38 +0200 (Tue, 10 Jul 2007)
+New Revision: 757
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_app_meetme.py
+   trunk/cfg_opt_music.py
+Log:
+* cfg_opt_music: fixed typo. by jmacz
+* cfg_app_meetme: better description. by jmacz
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-10 20:20:04 UTC (rev 756)
++++ trunk/CHANGELOG.txt	2007-07-10 20:36:38 UTC (rev 757)
+@@ -4,6 +4,8 @@
+ 	- TODO: check Devstate lower case.
+ * Added a more clear message to DND application.
+ * Changed inexistant 'privacy-invalid' sound for 'invalid'.
++* cfg_opt_music: fixed typo. by jmacz
++* cfg_app_meetme: better description. by jmacz
+ 
+ 2007-07-09:
+ * cfg_phone_ext: &quot;alias extension&quot; for shor name and obj title
+
+Modified: trunk/cfg_app_meetme.py
+===================================================================
+--- trunk/cfg_app_meetme.py	2007-07-10 20:20:04 UTC (rev 756)
++++ trunk/cfg_app_meetme.py	2007-07-10 20:36:38 UTC (rev 757)
+@@ -25,7 +25,7 @@
+ 
+ 	shortName   = _(&quot;Meeting room&quot;)
+ 	newObjectTitle  = _(&quot;New meeting room&quot;)
+-	description= _(&quot;Application that let create dynamic conferencing rooms&quot;)
++	description= _(&quot;Application that allows the creation of dynamic conferencing rooms&quot;)
+ 	
+ 	def createVariables(self):
+ 		self.variables   = [
+
+Modified: trunk/cfg_opt_music.py
+===================================================================
+--- trunk/cfg_opt_music.py	2007-07-10 20:20:04 UTC (rev 756)
++++ trunk/cfg_opt_music.py	2007-07-10 20:36:38 UTC (rev 757)
+@@ -33,7 +33,7 @@
+ 				type=&quot;choice&quot;, 
+ 				options=((&quot;mp3&quot;, &quot;mp3&quot;), 
+ 					(&quot;quietmp3&quot;, _(&quot;Quiet mp3&quot;)) ,
+-					(&quot;mp3nb&quot;, _(&quot;mp3 nbuffered&quot;)),
++					(&quot;mp3nb&quot;, _(&quot;mp3 unbuffered&quot;)),
+ 					(&quot;quietmp3nb&quot;, _(&quot;Quiet mp3 unbuffered&quot;)),
+ 					(&quot;custom&quot;, _(&quot;Custom&quot;)),
+ 					(&quot;files&quot;, _(&quot;Files&quot;))),
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000272.html">[Destar-dev] r756 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000276.html">[Destar-dev] r758 - in trunk: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#273">[ date ]</a>
+              <a href="thread.html#273">[ thread ]</a>
+              <a href="subject.html#273">[ subject ]</a>
+              <a href="author.html#273">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

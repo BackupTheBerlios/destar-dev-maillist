@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r727 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r727%20-%20trunk&In-Reply-To=%3C200706212053.l5LKr6dw024153%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000237.html">
+   <LINK REL="Next"  HREF="000239.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r727 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r727%20-%20trunk&In-Reply-To=%3C200706212053.l5LKr6dw024153%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r727 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun 21 22:53:06 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000237.html">[Destar-dev] r726 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000239.html">[Destar-dev] r728 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#238">[ date ]</a>
+              <a href="thread.html#238">[ thread ]</a>
+              <a href="subject.html#238">[ subject ]</a>
+              <a href="author.html#238">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-21 22:53:05 +0200 (Thu, 21 Jun 2007)
+New Revision: 727
+
+Added:
+   trunk/version.py
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/Templates.ptl
+   trunk/destar
+Log:
+Added version.py
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-21 20:31:17 UTC (rev 726)
++++ trunk/CHANGELOG.txt	2007-06-21 20:53:05 UTC (rev 727)
+@@ -1,5 +1,6 @@
+ 2007-06-21:
+ * page_admin_cfwstate.ptl: updated to Quixote 2
++* Added version.py
+ 
+ 2007-06-15:
+ * cfg_phone_queue.py: queuetimeout works without queuetimeoutext
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-06-21 20:31:17 UTC (rev 726)
++++ trunk/Templates.ptl	2007-06-21 20:53:05 UTC (rev 727)
+@@ -25,8 +25,9 @@
+ from quixote.errors import AccessError
+ import os, sys, copy
+ 
++from version import *
+ 
+-VERSION = 'DEVELOPMENT SNAPSHOT'
++VERSION = destar_version
+ 
+ 
+ class HtmlTable:
+
+Modified: trunk/destar
+===================================================================
+--- trunk/destar	2007-06-21 20:31:17 UTC (rev 726)
++++ trunk/destar	2007-06-21 20:53:05 UTC (rev 727)
+@@ -31,12 +31,14 @@
+ import language
+ language.setLanguage('en')
+ 
++from version import *
++
+ import sys, getopt, panelutils
+ import daemonize
+ be_daemon = False
+ rport = 8080
+ pid_file = '/var/run/destar.pid'
+-VERSION = 'DEVELOPMENT SNAPSHOT'
++VERSION = destar_version
+ 
+ def print_version():
+ 	print _(&quot;DeStar %s, Copyright (C) 2005 by Holger Schurig and contributors.\n\n&quot;\
+
+Added: trunk/version.py
+===================================================================
+--- trunk/version.py	2007-06-21 20:31:17 UTC (rev 726)
++++ trunk/version.py	2007-06-21 20:53:05 UTC (rev 727)
+@@ -0,0 +1 @@
++destar_version = &quot;DEVELOPMENT SNAPSHOT&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000237.html">[Destar-dev] r726 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000239.html">[Destar-dev] r728 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#238">[ date ]</a>
+              <a href="thread.html#238">[ thread ]</a>
+              <a href="subject.html#238">[ subject ]</a>
+              <a href="author.html#238">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

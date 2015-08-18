@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r735 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r735%20-%20trunk&In-Reply-To=%3C200707031839.l63IdjpN002691%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000247.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r735 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r735%20-%20trunk&In-Reply-To=%3C200707031839.l63IdjpN002691%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r735 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Jul  3 20:39:45 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000247.html">[Destar-dev] r736 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#246">[ date ]</a>
+              <a href="thread.html#246">[ thread ]</a>
+              <a href="subject.html#246">[ subject ]</a>
+              <a href="author.html#246">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-03 20:39:44 +0200 (Tue, 03 Jul 2007)
+New Revision: 735
+
+Modified:
+   trunk/configlets.py
+Log:
+* Log configlet shortName if name is not present.
+
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-06-30 15:50:11 UTC (rev 734)
++++ trunk/configlets.py	2007-07-03 18:39:44 UTC (rev 735)
+@@ -301,14 +301,22 @@
+ 					for dep in group[i].dependent_objs:
+ 						self.deleteConfiglet(dep.configlet._id)
+ 					obj = group[i]
+-					print (&quot;[%s] Deleting configlet '%s' with id '%s' from group '%s'&quot; % (time.asctime(time.localtime()), obj.name, obj._id, obj.groupName))
++					try: 
++						obj_name = obj.name
++					except AttributeError:
++						obj_name = obj.shortName
++					sys.stderr.write (&quot;[%s] Deleting configlet '%s' with id '%s' from group '%s\n'&quot; % (time.asctime(time.localtime()), obj_name, obj._id, obj.groupName))
+ 					del group[i]
+ 					return
+ 					
+ 	def moveConfigletUp(self, _id):
+ 		obj = self.getConfiglet(_id)
+ 		configlet_list = self.groups[obj.groupName]
+-		print (&quot;[%s] Moving up configlet '%s' with id '%s' in group '%s'&quot; % (time.asctime(time.localtime()), obj.name, obj._id, obj.groupName))
++		try: 
++			obj_name = obj.name
++		except AttributeError:
++			obj_name = obj.shortName
++		sys.stderr.write (&quot;[%s] Moving up configlet '%s' with id '%s' in group '%s'\n&quot; % (time.asctime(time.localtime()), obj_name, obj._id, obj.groupName))
+ 		
+ 		for i in range(len(configlet_list)):
+ 			if configlet_list[i]._id == obj._id and i &gt; 0:
+@@ -320,7 +328,11 @@
+ 	def moveConfigletDown(self, _id):
+ 		obj = self.getConfiglet(_id)
+ 		configlet_list = self.groups[obj.groupName]
+-		print (&quot;[%s] Moving down configlet '%s' with id '%s' in group '%s'&quot; % (time.asctime(time.localtime()), obj.name, obj._id, obj.groupName))
++		try: 
++			obj_name = obj.name
++		except AttributeError:
++			obj_name = obj.shortName
++		sys.stderr.write (&quot;[%s] Moving down configlet '%s' with id '%s' in group '%s'\n&quot; % (time.asctime(time.localtime()), obj_name, obj._id, obj.groupName))
+ 		
+ 		for i in range(len(configlet_list)):
+ 			if configlet_list[i]._id == obj._id and i &lt; (len(configlet_list) -1):
+@@ -378,7 +390,11 @@
+ 	def addConfiglet(self, configlet):
+ 		if not self.groups.has_key(configlet.groupName):
+ 			self.groups[configlet.groupName] = []
+-		print (&quot;[%s] Loading configlet '%s' with id '%s' in group '%s'&quot; % (time.asctime(time.localtime()), configlet.name, configlet._id, configlet.groupName))
++		try: 
++			obj_name = configlet.name
++		except AttributeError:
++			obj_name = configlet.shortName
++		sys.stderr.write (&quot;[%s] Loading configlet '%s' with id '%s' in group '%s'\n&quot; % (time.asctime(time.localtime()), obj_name, configlet._id, configlet.groupName))
+ 		self.groups[configlet.groupName].append(configlet)
+ 		
+ 	def generateUniqueId(self):
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000247.html">[Destar-dev] r736 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#246">[ date ]</a>
+              <a href="thread.html#246">[ thread ]</a>
+              <a href="subject.html#246">[ subject ]</a>
+              <a href="author.html#246">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

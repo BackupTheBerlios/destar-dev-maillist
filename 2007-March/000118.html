@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r624 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r624%20-%20branches/0.2.X&In-Reply-To=%3C200703051725.l25HPFsG021671%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000117.html">
+   <LINK REL="Next"  HREF="000119.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r624 - branches/0.2.X</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r624%20-%20branches/0.2.X&In-Reply-To=%3C200703051725.l25HPFsG021671%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r624 - branches/0.2.X">santiago at mail.berlios.de
+       </A><BR>
+    <I>Mon Mar  5 18:25:15 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000117.html">[Destar-dev] r623 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000119.html">[Destar-dev] r625 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#118">[ date ]</a>
+              <a href="thread.html#118">[ thread ]</a>
+              <a href="subject.html#118">[ subject ]</a>
+              <a href="author.html#118">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-03-05 18:25:15 +0100 (Mon, 05 Mar 2007)
+New Revision: 624
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/configlets.py
+Log:
+* Fixed crazy ids assignment, Patch by ceronman
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-05 17:24:05 UTC (rev 623)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-05 17:25:15 UTC (rev 624)
+@@ -1,3 +1,6 @@
++2007-03-05:
++* Fixed crazy ids assignment, Patch by ceronman
++
+ 2007-03-03
+ * Bad example line. Default values are not stored in destar_cfg.py
+ 
+
+Modified: branches/0.2.X/configlets.py
+===================================================================
+--- branches/0.2.X/configlets.py	2007-03-05 17:24:05 UTC (rev 623)
++++ branches/0.2.X/configlets.py	2007-03-05 17:25:15 UTC (rev 624)
+@@ -375,8 +375,15 @@
+ 		if not self.groups.has_key(configlet.groupName):
+ 			self.groups[configlet.groupName] = []
+ 		self.groups[configlet.groupName].append(configlet)
+-	
++		
++	def generateUniqueId(self):
++		ids = [i._id for i in self]
++		newid = 0
++		while newid in ids:
++			newid = newid + 1
++		return newid
+ 
++
+ configlet_tree = ConfigletTree()
+ 
+ class Holder(object):
+@@ -481,7 +488,7 @@
+ 
+ 		# Store the object into global array
+ 		global configlet_tree
+-		self._id = len(configlet_tree)
++		self._id = configlet_tree.generateUniqueId()
+ 		if autoAdd:
+ 			configlet_tree.addConfiglet(self)
+ 		else:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000117.html">[Destar-dev] r623 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000119.html">[Destar-dev] r625 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#118">[ date ]</a>
+              <a href="thread.html#118">[ thread ]</a>
+              <a href="subject.html#118">[ subject ]</a>
+              <a href="author.html#118">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

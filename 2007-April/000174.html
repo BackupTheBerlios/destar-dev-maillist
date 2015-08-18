@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r665 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r665%20-%20trunk&In-Reply-To=%3C200704200444.l3K4iXUq002259%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000173.html">
+   <LINK REL="Next"  HREF="000175.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r665 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r665%20-%20trunk&In-Reply-To=%3C200704200444.l3K4iXUq002259%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r665 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Apr 20 06:44:33 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000173.html">[Destar-dev] r664 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000175.html">[Destar-dev] r666 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#174">[ date ]</a>
+              <a href="thread.html#174">[ thread ]</a>
+              <a href="subject.html#174">[ subject ]</a>
+              <a href="author.html#174">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-04-20 06:44:27 +0200 (Fri, 20 Apr 2007)
+New Revision: 665
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_app_agentcallbacklogin.py
+Log:
+remove DND when agent logs in.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-04-19 17:23:33 UTC (rev 664)
++++ trunk/CHANGELOG.txt	2007-04-20 04:44:27 UTC (rev 665)
+@@ -2,7 +2,8 @@
+ * configlets.py: fixed technologies for agents, persistent queues members
+ * cfg_phone_agent.py: allow agents with no password
+ * cfg_app_agentcallbacklogin.py, added change location ext,
+-  allow silent login, automatic logout
++  allow silent login, automatic logout,
++  remove DND when agent logs in.
+ * New groupName and ptl for queues and agents
+ 
+ 2007-04-18:
+
+Modified: trunk/cfg_app_agentcallbacklogin.py
+===================================================================
+--- trunk/cfg_app_agentcallbacklogin.py	2007-04-19 17:23:33 UTC (rev 664)
++++ trunk/cfg_app_agentcallbacklogin.py	2007-04-20 04:44:27 UTC (rev 665)
+@@ -69,6 +69,11 @@
+ 			opts = &quot;&quot;
+ 		
+ 		c.appendExten(self.ext, &quot;AgentCallbackLogin(${CALLERIDNUM}|%s|${CALLERIDNUM}@%s)&quot; % (opts, self.pbx) )
++		c.appendExten(self.ext, &quot;DBdel(DND/%s/${CALLERIDNUM})&quot;)
++		c.appendExten(self.ext, &quot;Playback(do-not-disturb)&quot;)
++		c.appendExten(self.ext, &quot;Playback(cancelled)&quot;)
++		c.appendExten(self.ext, &quot;Hangup&quot;)
++
+ 		c.appendExten(self.changeext, &quot;AgentCallbackLogin(${CALLERIDNUM}|%s|'#')&quot; % (opts) )
+ 		c.appendExten(self.logoutext, &quot;Dial(Local/%<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">s at pbx1</A>/n,,D(#))&quot; % self.changeext)
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000173.html">[Destar-dev] r664 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000175.html">[Destar-dev] r666 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#174">[ date ]</a>
+              <a href="thread.html#174">[ thread ]</a>
+              <a href="subject.html#174">[ subject ]</a>
+              <a href="author.html#174">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

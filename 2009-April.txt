@@ -1,0 +1,1157 @@
+From tzafrir.cohen at xorcom.com  Wed Apr  1 06:47:04 2009
+From: tzafrir.cohen at xorcom.com (Tzafrir Cohen)
+Date: Wed, 1 Apr 2009 07:47:04 +0300
+Subject: [Destar-dev] Fwd: Multiple security issues
+Message-ID: <20090401044704.GP5233@xorcom.com>
+
+Hi
+
+http://bugs.debian.org/522123
+
+Two vulnerabilities have been found in DeStar:
+
+http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-6538
+
+http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-6539
+
+Were those fixed later on?
+
+-- System Information:
+Debian Release: squeeze/sid
+  APT prefers unstable
+  APT policy: (500, 'unstable')
+Architecture: i386 (i686)
+
+Kernel: Linux 2.6.29-1-686 (SMP w/1 CPU core)
+Locale: LANG=C, LC_CTYPE=de_DE.ISO-8859-15 at euro (charmap=ISO-8859-15)
+Shell: /bin/sh linked to /bin/bash
+
+Versions of packages destar depends on:
+pn  asterisk                      <none>     (no description available)
+ii  debconf                       1.5.26     Debian configuration management sy
+ii  python                        2.5.4-2    An interactive high-level object-o
+pn  python-medusa                 <none>     (no description available)
+pn  python-pychart                <none>     (no description available)
+pn  python-pysqlite2              <none>     (no description available)
+pn  python-quixote1               <none>     (no description available)
+pn  sqlite3                       <none>     (no description available)
+
+Versions of packages destar recommends:
+pn  op-panel                      <none>     (no description available)
+
+destar suggests no packages.
+
+
+
+_______________________________________________
+Pkg-voip-maintainers mailing list
+Pkg-voip-maintainers at lists.alioth.debian.org
+http://lists.alioth.debian.org/mailman/listinfo/pkg-voip-maintainers
+
+----- End forwarded message -----
+
+-- 
+               Tzafrir Cohen
+icq#16849755              jabber:tzafrir.cohen at xorcom.com
++972-50-7952406           mailto:tzafrir.cohen at xorcom.com
+http://www.xorcom.com  iax:guest at local.xorcom.com/tzafrir
+
+
+From tzafrir at mail.berlios.de  Thu Apr 16 15:06:56 2009
+From: tzafrir at mail.berlios.de (tzafrir at BerliOS)
+Date: Thu, 16 Apr 2009 15:06:56 +0200
+Subject: [Destar-dev] r830 - trunk
+Message-ID: <200904161306.n3GD6uGn011847@sheep.berlios.de>
+
+Author: tzafrir
+Date: 2009-04-16 15:06:56 +0200 (Thu, 16 Apr 2009)
+New Revision: 830
+
+Modified:
+   trunk/backend.py
+   trunk/cfg_app_agentcallbacklogin.py
+   trunk/cfg_app_chanspy.py
+   trunk/cfg_app_disa.py
+   trunk/cfg_app_dnd.py
+   trunk/cfg_app_meetme.py
+   trunk/cfg_dialout_normal.py
+   trunk/cfg_ivr_autoatt.py
+   trunk/cfg_ivr_treenode.py
+   trunk/cfg_opt_voicemail.py
+   trunk/cfg_phone_queue.py
+   trunk/configlets.py
+Log:
+A first shot at Asterisk 1.6 compatibility: s/|/,/
+
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/backend.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -216,7 +216,7 @@
+ 	c.append("; get global dial options")
+ 	c.append("exten=s,n,Set(dopt=${DIAL_OPTIONS})")
+         if tapisupport:
+-	        c.append("exten=s,n,Set(dopt=${dopt}M(tapi^${UNIQUEID}|${ARG1}))")
++	        c.append("exten=s,n,Set(dopt=${dopt}M(tapi^${UNIQUEID},${ARG1}))")
+ 	c.append(";")
+ 	c.append("; get early media")
+ 	c.append("exten=s,n,Set(emedia=${DB(EMEDIA/${ARG4}/${ARG3})})")
+@@ -231,10 +231,10 @@
+ 	c.append("; Dial")
+ 	c.append("exten=s,n(dialstart),NoOp()")
+         if tapisupport:
+-                c.append("exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${ARG1})")
+-                c.append("exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)")
+-                c.append("exten=s,n,UserEvent(TAPI|TAPIEVENT: SET CALLERID ${CALLERID})")
+-                c.append("exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)")
++                c.append("exten=s,n,UserEvent(TAPI,TAPIEVENT: LINE_NEWCALL ${ARG1})")
++                c.append("exten=s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)")
++                c.append("exten=s,n,UserEvent(TAPI,TAPIEVENT: SET CALLERID ${CALLERID})")
++                c.append("exten=s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)")
+ 	c.append("exten=s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWwr${dopt})")
+ 	c.append(";")
+ 	c.append("; Dial result was 'timeout'")
+@@ -277,11 +277,11 @@
+ 	c.append(";")
+ 	c.append("exten=i,0,Hangup")
+         if tapisupport:
+-                c.append("exten=h,1,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)")
++                c.append("exten=h,1,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)")
+ 
+                 c.append("[macro-tapi];")
+-                c.append("exten=s,1,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&${ARG2}] LINE_CALLSTATE LINECALLSTATE_CONNECTED)")
+-                c.append("exten=s,2,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)")
++                c.append("exten=s,1,UserEvent(TAPI,TAPIEVENT: [~${ARG1}&${ARG2}] LINE_CALLSTATE LINECALLSTATE_CONNECTED)")
++                c.append("exten=s,2,UserEvent(TAPI,TAPIEVENT: [~${ARG1}&!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)")
+ 
+ 	c.append(";")
+ 	c.append("; format: Macro(voicemail,<VoiceMail arguments>,PBX)")
+@@ -320,7 +320,7 @@
+ 	c.append("exten => s,n,Playback(vm-message)")
+ 	c.append("exten => s,n,Playback(is-now-being-recorded)")
+ 	c.append("exten => s,n,Playback(after-the-tone)")
+-	c.append("exten => s,n,Record(${ARG1}.${ARG2}|1|${ARG3})")
++	c.append("exten => s,n,Record(${ARG1}.${ARG2},1,${ARG3})")
+ 	c.append("exten => s,n,Playback(vm-message)")
+ 	c.append("exten => s,n,Playback(recorded)")
+ 
+
+Modified: trunk/cfg_app_agentcallbacklogin.py
+===================================================================
+--- trunk/cfg_app_agentcallbacklogin.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_app_agentcallbacklogin.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -17,6 +17,8 @@
+ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ #
+ 
++# FIXME: not available on 1.6. How do we tell Asterisk is 1.6? Any 
++# replacement dialplan?
+ 
+ from configlets import *
+ 
+
+Modified: trunk/cfg_app_chanspy.py
+===================================================================
+--- trunk/cfg_app_chanspy.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_app_chanspy.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -66,6 +66,6 @@
+ 		if self.password:
+ 			c.appendExten(self.ext, "Authenticate(%s)" % self.password, self.pbx)
+ 		if self.quiet:
+-			c.appendExten(self.ext, "Chanspy(%s|q)" % self.scanspec, self.pbx)
++			c.appendExten(self.ext, "Chanspy(%s,q)" % self.scanspec, self.pbx)
+ 		else: 
+ 			c.appendExten(self.ext, "Chanspy(%s)" % self.scanspec, self.pbx)
+
+Modified: trunk/cfg_app_disa.py
+===================================================================
+--- trunk/cfg_app_disa.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_app_disa.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -84,4 +84,4 @@
+ 		c.appendExten("%s" % self.ext ,"Set(TIMEOUT(digit)=5)", self.pbx)
+ 		c.appendExten("%s" % self.ext ,"Set(TIMEOUT(response)=10)", self.pbx)
+ 		c.appendExten("%s" % self.ext ,"Authenticate(%s)" % self.pin, self.pbx)
+-		c.appendExten("%s" % self.ext ,"DISA(no-password|out-%s)" % self.name, self.pbx)
++		c.appendExten("%s" % self.ext ,"DISA(no-password,out-%s)" % self.name, self.pbx)
+
+Modified: trunk/cfg_app_dnd.py
+===================================================================
+--- trunk/cfg_app_dnd.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_app_dnd.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -65,8 +65,8 @@
+ 		c.appendExten("%s" % self.set, "Set(DB(DND/%s/${CALLERIDNUM})=True)" % self.pbx, self.pbx)
+ 		if tapisupport:
+ 			needModule("app_cut")
+-			c.appendExten("%s" % self.set, "Set(CHAN=${CUT(CHANNEL|-|1)})", self.pbx)
+-			c.appendExten("%s" % self.set, "UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: True)", self.pbx )
++			c.appendExten("%s" % self.set, "Set(CHAN=${CUT(CHANNEL,-,1)})", self.pbx)
++			c.appendExten("%s" % self.set, "UserEvent(ASTDB,Channel: ${CHAN}^Family: DND^Value: True)", self.pbx )
+ 				
+ 		c.appendExten("%s" % self.set, "Playback(do-not-disturb)", self.pbx)
+ 		c.appendExten("%s" % self.set, "Playback(activated)", self.pbx)
+@@ -74,8 +74,8 @@
+ 
+ 		c.appendExten("%s" % self.unset, "DBdel(DND/%s/${CALLERIDNUM})" % self.pbx, self.pbx)
+ 		if tapisupport:
+-			c.appendExten("%s" % self.unset, "Set(CHAN=${CUT(CHANNEL|-|1)})", self.pbx)
+-			c.appendExten("%s" % self.unset, "UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: ^)", self.pbx )
++			c.appendExten("%s" % self.unset, "Set(CHAN=${CUT(CHANNEL,-,1)})", self.pbx)
++			c.appendExten("%s" % self.unset, "UserEvent(ASTDB,Channel: ${CHAN}^Family: DND^Value: ^)", self.pbx )
+ 		c.appendExten("%s" % self.unset, "Playback(do-not-disturb)", self.pbx)
+ 		c.appendExten("%s" % self.unset, "Playback(cancelled)", self.pbx)
+ 		c.appendExten("%s" % self.unset, "Hangup", self.pbx)
+
+Modified: trunk/cfg_app_meetme.py
+===================================================================
+--- trunk/cfg_app_meetme.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_app_meetme.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -89,7 +89,7 @@
+ 		args=""
+ 		if self.confno:
+ 			args += "%d" % self.confno
+-		args += "|d"
++		args += ",d"
+ 		if self.pin:
+ 			args += "P|%d" % self.pin
+ 		c.appendExten(self.ext, "MeetMe(%s)" % args, self.pbx)
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_dialout_normal.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -184,11 +184,11 @@
+ 				        if tapisupport:
+ 						needModule("app_cut")
+ 					        c.append("exten=>s,n,Set(chan=${CUT(CHANNEL,,1)})")
+-					        c.append("exten=>s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${chan})")
+-	    				        c.append("exten=>s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALTONE)")
+-					        c.append("exten=>s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALING)")
+-					        c.append("exten=>s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_PROCEEDING)")
+-					c.append("exten=>s,n,Dial(%s,%d|${options})" % (obj.dial,self.ringtime))
++					        c.append("exten=>s,n,UserEvent(TAPI,TAPIEVENT: LINE_NEWCALL ${chan})")
++	    				        c.append("exten=>s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALTONE)")
++					        c.append("exten=>s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALING)")
++					        c.append("exten=>s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_PROCEEDING)")
++					c.append("exten=>s,n,Dial(%s,%d,${options})" % (obj.dial,self.ringtime))
+ 					unavail+=1
+ 					c.append('exten=>s,n,GotoIf($["${DIALSTATUS}" = "CHANUNAVAIL"]?unavail%s)' % unavail)
+ 			except KeyError:
+@@ -204,5 +204,5 @@
+ 		c.appendExten("t","NoCDR", context=context)
+ 		c.appendExten("t","Hangup", context=context)
+ 		if tapisupport:
+-		        c.appendExten("h","UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)", context=context)
++		        c.appendExten("h","UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)", context=context)
+ 
+
+Modified: trunk/cfg_ivr_autoatt.py
+===================================================================
+--- trunk/cfg_ivr_autoatt.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_ivr_autoatt.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -96,7 +96,7 @@
+ 
+ 			VarType("times",
+ 					title=_("Times string"),
+-					hint=_("i.e. hours|weekdays|monthdays|months (comma separated)"),
++					hint=_("i.e. hours,weekdays,monthdays,months (comma separated)"),
+ 					default="",
+ 					optional=True,
+ 					len=300),
+
+Modified: trunk/cfg_ivr_treenode.py
+===================================================================
+--- trunk/cfg_ivr_treenode.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_ivr_treenode.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -97,7 +97,7 @@
+ 
+ 			VarType("times",
+ 					title=_("Times string"),
+-					hint=_("i.e. *|*|25|dec,*|*|20|jul (comma separated)"),
++					hint=_("i.e. *,*,25,dec,*,*,20,jul (comma separated)"),
+ 					default="",
+ 					optional=True,
+ 					len=300),
+
+Modified: trunk/cfg_opt_voicemail.py
+===================================================================
+--- trunk/cfg_opt_voicemail.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_opt_voicemail.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -89,5 +89,5 @@
+ 
+ 		c.setSection("zonemessages")
+ 		# TODO: find out our own timezone somehow
+-		c.append("cest=Europe/Berlin|'vm-received' Q 'digits/at' k 'oclock' M")
++		c.append("cest=Europe/Berlin,'vm-received' Q 'digits/at' k 'oclock' M")
+ 
+
+Modified: trunk/cfg_phone_queue.py
+===================================================================
+--- trunk/cfg_phone_queue.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_phone_queue.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -242,9 +242,9 @@
+ 			else:          
+ 				options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+ 			if self.monitorfilename:
+-				mon_line = "MixMonitor(%s.%s|%s)" % (self.monitorfilename,self.monitorfileformat,options)
++				mon_line = "MixMonitor(%s.%s,%s)" % (self.monitorfilename,self.monitorfileformat,options)
+ 			else:
+-				mon_line = "MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)" % (self.monitorfileformat,options)
++				mon_line = "MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s,%s)" % (self.monitorfileformat,options)
+ 
+ 		qnames = []
+ 		if self.ext:
+@@ -270,7 +270,7 @@
+ 
+ 			if self.queuetimeout:
+ 				opt = opt + "n"
+-				extensions.appendExten(qname, "Queue(%s|%s|||%s)" % (self.name, opt, self.queuetimeout), self.pbx)
++				extensions.appendExten(qname, "Queue(%s,%s,,,%s)" % (self.name, opt, self.queuetimeout), self.pbx)
+ 				if self.queuetimeoutext:
+ 					import configlets
+ 					obj = configlets.configlet_tree.getConfigletByName(self.queuetimeoutext)
+@@ -279,7 +279,7 @@
+ 					except AttributeError:
+ 						pass
+ 			else:
+-				extensions.appendExten(qname, "Queue(%s|%s)" % (self.name, opt), self.pbx)
++				extensions.appendExten(qname, "Queue(%s,%s)" % (self.name, opt), self.pbx)
+ 		self.createPanelConfig()
+ 
+         def createPanelConfig(self):
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/configlets.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -1045,9 +1045,9 @@
+ 				else:          
+ 					options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+ 				if self.monitorfilename:
+-					extensions.appendExten(tmp_ext, "MixMonitor(%s.%s|%s)" % (self.monitorfilename,self.monitorfileformat,options), context=pbx)
++					extensions.appendExten(tmp_ext, "MixMonitor(%s.%s,%s)" % (self.monitorfilename,self.monitorfileformat,options), context=pbx)
+ 				else:
+-					extensions.appendExten(tmp_ext, "MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)" % (self.monitorfileformat,options), context=pbx)
++					extensions.appendExten(tmp_ext, "MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s,%s)" % (self.monitorfileformat,options), context=pbx)
+ 			self.createDialEntry(extensions, tmp_ext, pbx, self.ext)
+ 
+ 		for obj in configlet_tree:
+@@ -1144,9 +1144,9 @@
+ 							else:          
+ 								options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+ 							if self.monitorfilename:
+-								c.appendExten("%s" % obj.pattern, "MixMonitor(%s.%s|%s)" % (self.monitorfilename,self.monitorfileformat,options), context=contextout)
++								c.appendExten("%s" % obj.pattern, "MixMonitor(%s.%s,%s)" % (self.monitorfilename,self.monitorfileformat,options), context=contextout)
+ 							else:
+-								c.appendExten("%s" % obj.pattern, "MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)" % (self.monitorfileformat,options), context=contextout)
++								c.appendExten("%s" % obj.pattern, "MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s,%s)" % (self.monitorfileformat,options), context=contextout)
+ 						
+ 						secret = self.__getitem__("dialout_%s_secret" % obj.name)							
+ 						if secret:
+
+
+
+From tzafrir.cohen at xorcom.com  Thu Apr 16 15:16:25 2009
+From: tzafrir.cohen at xorcom.com (Tzafrir Cohen)
+Date: Thu, 16 Apr 2009 16:16:25 +0300
+Subject: [Destar-dev] r830 - trunk
+In-Reply-To: <200904161306.n3GD6uGn011847@sheep.berlios.de>
+References: <200904161306.n3GD6uGn011847@sheep.berlios.de>
+Message-ID: <20090416131625.GQ3227@xorcom.com>
+
+On Thu, Apr 16, 2009 at 03:06:56PM +0200, tzafrir at BerliOS wrote:
+> Author: tzafrir
+> Date: 2009-04-16 15:06:56 +0200 (Thu, 16 Apr 2009)
+> New Revision: 830
+> 
+> Modified:
+>    trunk/backend.py
+>    trunk/cfg_app_agentcallbacklogin.py
+>    trunk/cfg_app_chanspy.py
+>    trunk/cfg_app_disa.py
+>    trunk/cfg_app_dnd.py
+>    trunk/cfg_app_meetme.py
+>    trunk/cfg_dialout_normal.py
+>    trunk/cfg_ivr_autoatt.py
+>    trunk/cfg_ivr_treenode.py
+>    trunk/cfg_opt_voicemail.py
+>    trunk/cfg_phone_queue.py
+>    trunk/configlets.py
+> Log:
+> A first shot at Asterisk 1.6 compatibility: s/|/,/
+
+Completely untested. Starting to test this now. But I suppose nobody
+really uses SVN trunk by now.
+
+-- 
+               Tzafrir Cohen
+icq#16849755              jabber:tzafrir.cohen at xorcom.com
++972-50-7952406           mailto:tzafrir.cohen at xorcom.com
+http://www.xorcom.com  iax:guest at local.xorcom.com/tzafrir
+
+
+From tzafrir at mail.berlios.de  Thu Apr 16 17:11:18 2009
+From: tzafrir at mail.berlios.de (tzafrir at BerliOS)
+Date: Thu, 16 Apr 2009 17:11:18 +0200
+Subject: [Destar-dev] r831 - trunk
+Message-ID: <200904161511.n3GFBI4L026868@sheep.berlios.de>
+
+Author: tzafrir
+Date: 2009-04-16 17:11:18 +0200 (Thu, 16 Apr 2009)
+New Revision: 831
+
+Modified:
+   trunk/page_main.ptl
+Log:
+If a module fails to load: warn. Don't Panic.
+
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2009-04-16 13:06:56 UTC (rev 830)
++++ trunk/page_main.ptl	2009-04-16 15:11:18 UTC (rev 831)
+@@ -69,7 +69,11 @@
+ 			m = None
+ 			if s.endswith('.ptl'):
+ 				s= s[:-4]
+-				m = __import__(s)
++				try:
++					m = __import__(s)
++				except SyntaxError, e:
++					sys.stderr.write('Warning: Module %s failed to compile. Disabling.\n' % s)
++					continue
+ 			elif s.endswith('.py'):
+ 				s = s[:-3]
+ 				m =  __import__(s)
+
+
+
+From tzafrir at mail.berlios.de  Thu Apr 16 23:20:30 2009
+From: tzafrir at mail.berlios.de (tzafrir at BerliOS)
+Date: Thu, 16 Apr 2009 23:20:30 +0200
+Subject: [Destar-dev] r833 - trunk
+Message-ID: <200904162120.n3GLKUGE008998@sheep.berlios.de>
+
+Author: tzafrir
+Date: 2009-04-16 23:20:29 +0200 (Thu, 16 Apr 2009)
+New Revision: 833
+
+Modified:
+   trunk/manager.py
+Log:
+Manager API 1.1 (from branch icom-avatar). This only works on Asterisk 1.6
+
+With this reload will fail on Asterisk < 1.6.0
+
+
+Modified: trunk/manager.py
+===================================================================
+--- trunk/manager.py	2009-04-16 16:10:27 UTC (rev 832)
++++ trunk/manager.py	2009-04-16 21:20:29 UTC (rev 833)
+@@ -208,7 +208,7 @@
+ 		if self.action_data.has_key(id):
+ 			self.action_data[id] = data
+ 
+-		if data[0]=="Asterisk Call Manager/1.0":
++		if data[0]=="Asterisk Call Manager/1.1":
+ 			self.set_terminator('\r\n\r\n')
+ 			self.call_nowait('Login', Username=self.username, Secret=self.password)
+ 
+@@ -620,8 +620,8 @@
+ def originateCallApp(channel,application,data):
+ 	return conn.action('Originate', Channel=channel, Application=application)
+ 
+-def originateCallExt(channel,context,extension,priority):
+-	return conn.action('Originate', Channel=channel, Context=context, Exten=extension, Priority=priority)
++def originateCallExt(channel,context,extension,priority,callerid):
++	return conn.action('Originate', Channel=channel, Context=context, Exten=extension, Priority=priority, CallerID=callerid)
+ 
+ def getVarFamily(family):
+ 	varlist = []
+@@ -629,7 +629,11 @@
+ 		if s.startswith("/%s" % family):
+ 			varlist.append(s[len(family)+2:])
+ 	return varlist
++	
++def getSIPPeers():
++	return conn.action('Command', Command='sip show peers')
+ 
++
+ def checkMailBox(ext):
+ 	vmstate = {}
+ 	for s in conn.action('MailboxCount', Mailbox=ext):
+
+
+
+From tzafrir at mail.berlios.de  Thu Apr 16 23:54:03 2009
+From: tzafrir at mail.berlios.de (tzafrir at BerliOS)
+Date: Thu, 16 Apr 2009 23:54:03 +0200
+Subject: [Destar-dev] r834 - trunk
+Message-ID: <200904162154.n3GLs3vV011813@sheep.berlios.de>
+
+Author: tzafrir
+Date: 2009-04-16 23:54:03 +0200 (Thu, 16 Apr 2009)
+New Revision: 834
+
+Modified:
+   trunk/backend.py
+   trunk/cfg_opt_zap_audio.py
+   trunk/cfg_opt_zap_trunk.py
+   trunk/cfg_opt_zappri.py
+   trunk/cfg_phone_zap.py
+   trunk/cfg_trunk_zap.py
+   trunk/cfg_trunk_zapbri.py
+   trunk/cfg_trunk_zapdynamic.py
+   trunk/cfg_trunk_zappbx.py
+   trunk/cfg_trunk_zappri.py
+   trunk/page_config.ptl
+Log:
+Zap -> DAHDI changes from branch icom-avatar
+
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/backend.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -123,7 +123,7 @@
+ 	* extensions.conf
+ 	* sip.conf
+ 	* iax.conf
+-	* zapata.conf
++	* chan_dahdi.conf
+ 	* macros.inc
+ 	"""
+ 
+@@ -168,7 +168,7 @@
+ 	c.append("language=%s" % getSetting('language', 'en'))
+ 
+ 
+-	c = AstConf("zapata.conf")
++	c = AstConf("chan_dahdi.conf")
+ 	c.setSection("channels")
+ 	c.append("language=%s" % getSetting('language', 'en'))
+ 	c.append("immediate=no")
+@@ -460,11 +460,11 @@
+ 	# test if all config files are OK to be written or overwritten
+ 	tmp_conf = []
+ 	for fn,cnf in configlets.asterisk_configfiles:
+-		# zaptel.conf can't have CONF_TAG at the top, so no need to search for it
++		# system.conf can't have CONF_TAG at the top, so no need to search for it
+ 		if os.path.exists(cnf.fn):
+ 			f = open(cnf.fn, "r")
+ 			s = f.readline()
+-			if s != configlets.CONF_TAG or fn == 'zaptel.conf':
++			if s != configlets.CONF_TAG or fn == 'system.conf':
+ 				# Backup file not created by us
+ 				try:
+ 					backupAsteriskConfig(fn)
+
+Modified: trunk/cfg_opt_zap_audio.py
+===================================================================
+--- trunk/cfg_opt_zap_audio.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_opt_zap_audio.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -21,10 +21,10 @@
+ from configlets import *
+ 
+ 
+-class CfgOptZapAudio(CfgOptSingle):
++class CfgOptDAHDIAudio(CfgOptSingle):
+ 
+-	shortName = _("Zaptel Audio Options")
+-	newObjectTitle = _("Zaptel Audio Options")
++	shortName = _("DAHDItel Audio Options")
++	newObjectTitle = _("DAHDItel Audio Options")
+ 	
+ 	def createVariables(self):
+ 		self.variables = [
+@@ -44,14 +44,14 @@
+ 		# despite the "from configlets import *" above
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__.startswith('CfgTrunkZap') or obj.__class__.__name__.startswith('CfgPhoneZap'):
++			if obj.__class__.__name__.startswith('CfgTrunkDAHDI') or obj.__class__.__name__.startswith('CfgPhoneDAHDI'):
+ 				return CfgOptSingle.isAddable(self)
+ 		return False
+ 	isAddable = classmethod(isAddable)
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		c = AstConf("zapata.conf")
++		c = AstConf("chan_dahdi.conf")
+ 		c.setSection("channels")
+ 
+ 		c.append("")
+
+Modified: trunk/cfg_opt_zap_trunk.py
+===================================================================
+--- trunk/cfg_opt_zap_trunk.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_opt_zap_trunk.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -21,10 +21,10 @@
+ from configlets import *
+ 
+ 
+-class CfgOptZapTrunk(CfgOptSingle):
++class CfgOptDAHDITrunk(CfgOptSingle):
+ 
+-	shortName = _("Zaptel Trunk Options")
+-	newObjectTitle = _("Zaptel Trunk Options")
++	shortName = _("DAHDItel Trunk Options")
++	newObjectTitle = _("DAHDItel Trunk Options")
+ 	
+ 	def createVariables(self):
+ 		self.variables = [
+@@ -42,14 +42,14 @@
+ 		# despite the "from configlets import *" above
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__.startswith('CfgTrunkZap'):
++			if obj.__class__.__name__.startswith('CfgTrunkDAHDI'):
+ 				return CfgOptSingle.isAddable(self)
+ 		return False
+ 	isAddable = classmethod(isAddable)
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		c = AstConf("zapata.conf")
++		c = AstConf("chan_dahdi.conf")
+ 		c.setSection("channels")
+ 
+ 		c.append("")
+
+Modified: trunk/cfg_opt_zappri.py
+===================================================================
+--- trunk/cfg_opt_zappri.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_opt_zappri.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -23,15 +23,15 @@
+ import panelutils
+ 
+ 
+-class CfgOptZapPRI(CfgOpt):
++class CfgOptDAHDIPRI(CfgOpt):
+ 
+-	shortName = _("Zaptel configuration for PRI")
+-	newObjectTitle = _("Zaptel configuration for PRI")
++	shortName = _("DAHDItel configuration for PRI")
++	newObjectTitle = _("DAHDItel configuration for PRI")
+ 	def createVariables(self):
+ 		self.variables = [
+ 			VarType("name",       title=_("Name"), len=35),
+-			VarType("span",    title=_("Zaptel span"), hint=_("i.e. 1 if 1st card"), type="string", len=5),
+-			VarType("timing",    title=_("Zaptel timing parameter"), hint=_("Read zaptel documentation"), type="string", len=5),
++			VarType("span",    title=_("DAHDItel span"), hint=_("i.e. 1 if 1st card"), type="string", len=5),
++			VarType("timing",    title=_("DAHDItel timing parameter"), hint=_("Read dahditel documentation"), type="string", len=5),
+ 			VarType("distance",    title=_("Line Build Out (dB)"), hint=_("Power level based on distance from the card to the service provider's gateway."), type="choice", 
+ 					options=[
+ 						('0',_("0: 0 db (CSU) / 0-133 feet (DSX-1)")),
+@@ -58,9 +58,9 @@
+ 		return (self.shortName, self.name)
+ 
+ 	def createAsteriskConfig(self):
+-		needModule("chan_zap")
++		needModule("chan_dahdi")
+ 
+-		c = AstConf("zaptel.conf")
++		c = AstConf("system.conf")
+ 		c.setSection("")
+ 		c.destar_comment = False
+ 		c.append("# %s" % self.name)
+
+Modified: trunk/cfg_phone_zap.py
+===================================================================
+--- trunk/cfg_phone_zap.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_phone_zap.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -22,7 +22,7 @@
+ import panelutils
+ 
+ 
+-class CfgPhoneZap(CfgPhone):
++class CfgPhoneDAHDI(CfgPhone):
+ 
+ 	shortName = _("Normal ZAP phone")
+ 	newObjectTitle = _("New ZAP phone")
+@@ -40,7 +40,7 @@
+ 				len=35),
+ 
+ 			VarType("channels",
+-				title=_("Zaptel channel number"),
++				title=_("DAHDItel channel number"),
+ 				type="string",
+ 				len=5),
+ 
+@@ -244,10 +244,10 @@
+ 	isAddable = classmethod(isAddable)
+ 
+ 	def createAsteriskConfig(self):
+-		needModule("chan_zap")
++		needModule("chan_dahdi")
+ 
+-		# Create config for chan_zap:
+-		c = AstConf("zapata.conf")
++		# Create config for chan_dahdi:
++		c = AstConf("chan_dahdi.conf")
+ 		c.append("signalling=fxo_%s" % self.sigtype)
+ 
+ 		if self.calleridname and self.calleridnum:
+@@ -272,7 +272,7 @@
+ 		c.append("channel=%s" % self.channels)
+ 		c.append("")
+ 
+-		c = AstConf("zaptel.conf")
++		c = AstConf("system.conf")
+ 		c.setSection("")
+ 		c.destar_comment = False
+ 		c.append("fxo%s=%s" % (self.sigtype, self.channels))
+
+Modified: trunk/cfg_trunk_zap.py
+===================================================================
+--- trunk/cfg_trunk_zap.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_trunk_zap.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -22,7 +22,7 @@
+ import panelutils
+ 
+ 
+-class CfgTrunkZap(CfgTrunk):
++class CfgTrunkDAHDI(CfgTrunk):
+ 
+ 	shortName = _("Standard ZAP trunk")
+ 	newObjectTitle = _("New standard ZAP trunk")
+@@ -34,14 +34,15 @@
+ 				len=35),
+ 
+ 			VarType("channels",
+-				title=_("Zaptel channel number"),
++				title=_("DAHDItel channel number"),
+ 				type="string",
+ 				len=5),
+ 
+ 			VarType("signalling",
+ 				title=_("Signalling type"),
+ 				type="choice",
+-				options=[('fxs_ls','loopstart'),('fxs_ks', 'kewlstart')]),
++				options=[('fxs_ls',_('loopstart')),
++					('fxs_ks',_('kewlstart'))]),
+ 
+ 			VarType("group",
+ 				title=_("Callout group"),
+@@ -148,18 +149,18 @@
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		needModule("chan_zap")
++		needModule("chan_dahdi")
+ 
+-		c = AstConf("zaptel.conf")
++		c = AstConf("system.conf")
+ 		c.setSection("")
+ 		c.destar_comment = False
+ 		c.append("fxs%s=%s" % (self.signalling[4:], self.channels))
+ 		c.append("")
+ 
+-		# Create config for chan_zap:
+-		c = AstConf("zapata.conf")
++		# Create config for chan_dahdi:
++		c = AstConf("chan_dahdi.conf")
+ 		c.append("")
+-		c.append("; Zaptel Trunk %s" % self.name)
++		c.append("; DAHDItel Trunk %s" % self.name)
+ 		c.append("context=in-%s" % self.name)
+ 		c.append("callerid=asreceived")
+                 c.append("busydetect=yes")
+@@ -174,9 +175,9 @@
+ 
+ 		#Dial part to use on dialout macro
+ 		if self.group:
+-			self.dial = "Zap/g%d/${ARG1}" % (self.group)
++			self.dial = "DAHDI/g%d/${ARG1}" % (self.group)
+ 		else:
+-			self.dial = "Zap/%s/${ARG1}" % (self.channels)
++			self.dial = "DAHDI/%s/${ARG1}" % (self.channels)
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+Modified: trunk/cfg_trunk_zapbri.py
+===================================================================
+--- trunk/cfg_trunk_zapbri.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_trunk_zapbri.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -22,7 +22,7 @@
+ import panelutils
+ 
+ 
+-class CfgTrunkZapBRI(CfgTrunk):
++class CfgTrunkDAHDIBRI(CfgTrunk):
+ 
+ 	shortName = _("Standard ZAP BRI trunk")
+ 	newObjectTitle = _("New standard ZAP BRI trunk")
+@@ -35,7 +35,7 @@
+ 				len=35),
+ 
+ 			VarType("channels",
+-				title=_("Zaptel channel number"),
++				title=_("DAHDItel channel number"),
+ 				type="int",
+ 				len=2,
+ 				default = 1),
+@@ -139,9 +139,9 @@
+                         return res
+ 
+ 	def createAsteriskConfig(self):
+-		needModule("chan_zap")
++		needModule("chan_dahdi")
+ 
+-		c = AstConf("zaptel.conf")
++		c = AstConf("system.conf")
+ 		c.setSection("")
+ 		c.destar_comment = False
+ 		for n in range(self.cards):
+@@ -152,8 +152,8 @@
+ 		c.append("alaw=%d-%d" % (self.channels + n * 3, self.channels + n * 3 + 2))
+ 		c.append("")
+ 
+-		# Create config for chan_zap:
+-		c = AstConf("zapata.conf")
++		# Create config for chan_dahdi:
++		c = AstConf("chan_dahdi.conf")
+ 		c.append("")
+ 		c.append("nationalprefix = 0")
+ 		c.append("internationalprefix = 00")
+@@ -181,7 +181,7 @@
+ 
+ 		#Dial part to use on dialout macro
+ 		if self.group:
+-			self.dial = "Zap/g%d/${ARG1}" % (self.group)
++			self.dial = "DAHDI/g%d/${ARG1}" % (self.group)
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+Modified: trunk/cfg_trunk_zapdynamic.py
+===================================================================
+--- trunk/cfg_trunk_zapdynamic.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_trunk_zapdynamic.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -23,10 +23,10 @@
+ import panelutils
+ 
+ 
+-class CfgTrunkZapDynamic(CfgTrunk):
++class CfgTrunkDAHDIDynamic(CfgTrunk):
+ 
+-	shortName = _("Zaptel dynamic span configuration")
+-	newObjectTitle = _("Zaptel dynamic span configuration")
++	shortName = _("DAHDItel dynamic span configuration")
++	newObjectTitle = _("DAHDItel dynamic span configuration")
+ 	technology = "ZAP"
+ 
+ 	def createVariables(self):
+@@ -174,8 +174,8 @@
+ 				default=31),
+ 
+ 			VarType("timing",    
+-				title=_("Zaptel timing parameter"), 
+-				hint=_("Read zaptel documentation"), 
++				title=_("DAHDItel timing parameter"), 
++				hint=_("Read system documentation"), 
+ 				type="int", 
+ 				len=2),
+ 
+@@ -201,9 +201,9 @@
+                         return res
+ 
+ 	def createAsteriskConfig(self):
+-		needModule("chan_zap")
++		needModule("chan_dahdi")
+ 
+-		c = AstConf("zaptel.conf")
++		c = AstConf("system.conf")
+ 		c.setSection("")
+ 		c.destar_comment = False
+ 		c.append("# %s" % self.name)
+@@ -214,10 +214,10 @@
+ 		c.append("dchan=%s" % self.dchannel)
+ 		c.append("")
+ 
+-		# Create config for chan_zap:
+-		c = AstConf("zapata.conf")
++		# Create config for chan_dahdi:
++		c = AstConf("chan_dahdi.conf")
+ 		c.append("")
+-		c.append("; Zaptel Trunk %s" % self.name)
++		c.append("; DAHDItel Trunk %s" % self.name)
+ 		c.appendValue(self, "signalling")
+ 		c.append("context=in-%s" % self.name)
+ 		c.append("usecallerid=yes")
+@@ -250,9 +250,9 @@
+ 		#Dial part to use on dialout macro
+ 		self.dial = ""
+ 		if self.group:
+-			self.dial = "Zap/g%d/${ARG1}" % (self.group)
++			self.dial = "DAHDI/g%d/${ARG1}" % (self.group)
+ 		else:
+-			self.dial = "Zap/%s/${ARG1}" % (self.channels)
++			self.dial = "DAHDI/%s/${ARG1}" % (self.channels)
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+Modified: trunk/cfg_trunk_zappbx.py
+===================================================================
+--- trunk/cfg_trunk_zappbx.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_trunk_zappbx.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -22,7 +22,7 @@
+ import panelutils
+ 
+ 
+-class CfgTrunkZapPBX(CfgTrunk):
++class CfgTrunkDAHDIPBX(CfgTrunk):
+ 
+ 	shortName = _("PBX ZAP trunk")
+ 	newObjectTitle = _("New PBX ZAP trunk")
+@@ -35,7 +35,7 @@
+ 				len=35),
+ 
+ 			VarType("channels",
+-				title=_("Zaptel channel number"),
++				title=_("DAHDItel channel number"),
+ 				type="string",
+ 				len=5),
+ 
+@@ -161,18 +161,18 @@
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		needModule("chan_zap")
++		needModule("chan_dahdi")
+ 
+-		c = AstConf("zaptel.conf")
++		c = AstConf("system.conf")
+ 		c.setSection("")
+ 		c.destar_comment = False
+ 		c.append("fxs%s=%s" % (self.signalling[4:], self.channels))
+ 		c.append("")
+ 
+-		# Create config for chan_zap:
+-		c = AstConf("zapata.conf")
++		# Create config for chan_dahdi:
++		c = AstConf("chan_dahdi.conf")
+ 		c.append("")
+-		c.append("; Zaptel Trunk %s" % self.name)
++		c.append("; DAHDItel Trunk %s" % self.name)
+ 		c.append("context=in-%s" % self.name)
+ 		c.append("callerid=asreceived")
+ 		c.appendValue(self, "signalling")
+@@ -185,9 +185,9 @@
+ 
+ 		#Dial part to use on dialout macro
+ 		if self.group:
+-			self.dial = "Zap/g%d/%sww${ARG1}" % (self.group, self.prefix)
++			self.dial = "DAHDI/g%d/%sww${ARG1}" % (self.group, self.prefix)
+ 		else:
+-			self.dial = "Zap/%s/%sww${ARG1}" % (self.channels, self.prefix)
++			self.dial = "DAHDI/%s/%sww${ARG1}" % (self.channels, self.prefix)
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+Modified: trunk/cfg_trunk_zappri.py
+===================================================================
+--- trunk/cfg_trunk_zappri.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_trunk_zappri.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -23,7 +23,7 @@
+ import panelutils
+ 
+ 
+-class CfgTrunkZapPRI(CfgTrunk):
++class CfgTrunkDAHDIPRI(CfgTrunk):
+ 
+ 	shortName = _("Standard ZAP PRI trunk")
+ 	newObjectTitle = _("New standard ZAP PRI trunk")
+@@ -167,13 +167,13 @@
+ 
+ 	def isAddable(self):
+ 		"""We can only add this configlet if we have at least one
+-		ZapPRI option defined."""
++		DAHDIPRI option defined."""
+ 
+ 		# BUG: it does somehow not work to simply write for obj in config_entries,
+ 		# despite the "from configlets import *" above
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__ == 'CfgOptZapPRI':
++			if obj.__class__.__name__ == 'CfgOptDAHDIPRI':
+ 				return True
+ 		return False 
+ 	isAddable = classmethod(isAddable)
+@@ -184,7 +184,7 @@
+                         return res
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__ == 'CfgTrunkZapPRI':
++			if obj.__class__.__name__ == 'CfgTrunkDAHDIPRI':
+ 				if obj==self: continue
+ 				try:
+ 					if obj.group == self.group and obj.group:
+@@ -202,12 +202,12 @@
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		needModule("chan_zap")
++		needModule("chan_dahdi")
+ 
+-		# Create config for chan_zap:
+-		c = AstConf("zapata.conf")
++		# Create config for chan_dahdi:
++		c = AstConf("chan_dahdi.conf")
+ 		c.append("")
+-		c.append("; Zaptel Trunk %s" % self.name)
++		c.append("; DAHDItel Trunk %s" % self.name)
+ 		if self.group:
+ 			c.appendValue(self, "group")
+ 		c.appendValue(self, "signalling")
+@@ -238,9 +238,9 @@
+ 
+ 		#Dial part to use on dialout macro
+ 		if self.group:
+-			self.dial = "Zap/g%s/${ARG1}" % (self.group)
++			self.dial = "DAHDI/g%s/${ARG1}" % (self.group)
+ 		else:
+-			self.dial = "Zap/%s/${ARG1}" % (self.channels)
++			self.dial = "DAHDI/%s/${ARG1}" % (self.channels)
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+Modified: trunk/page_config.ptl
+===================================================================
+--- trunk/page_config.ptl	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/page_config.ptl	2009-04-16 21:54:03 UTC (rev 834)
+@@ -106,9 +106,9 @@
+ 				"trunks/",
+ 				[_("Configuration"), _("Trunks")] )
+ 
+-		if not os.access("/etc/zaptel.conf", os.O_RDWR):
++		if not os.access("/etc/dahdi/system.conf", os.O_RDWR):
+ 			self.configurationTip(
+-				_("You should enable write access to /etc/zaptel.conf. Without write access to this file you cannot configure Zaptel devices, e.g. FXO/FXS cards, T1/E1 cards, ZapHFC ISDN cards, etc. You should 'chmod g+rw' this file and set it's group to one of '%s'.") % groups,
++				_("You should enable write access to /etc/dahdi/system.conf. Without write access to this file you cannot configure Zaptel devices, e.g. FXO/FXS cards, T1/E1 cards, ZapHFC ISDN cards, etc. You should 'chmod g+rw' this file and set it's group to one of '%s'.") % groups,
+ 				"",
+ 				[])
+ 		if not os.access(panelutils.PANEL_CONF_DIR, os.O_RDWR):
+
+
+
+From alerios at mail.berlios.de  Tue Apr 21 17:46:13 2009
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Tue, 21 Apr 2009 17:46:13 +0200
+Subject: [Destar-dev] r835 - branches/icom-avatar
+Message-ID: <200904211546.n3LFkDDs010308@sheep.berlios.de>
+
+Author: alerios
+Date: 2009-04-21 17:46:12 +0200 (Tue, 21 Apr 2009)
+New Revision: 835
+
+Modified:
+   branches/icom-avatar/CHANGELOG.txt
+   branches/icom-avatar/page_stats_agents.ptl
+   branches/icom-avatar/page_stats_cdr-csv.ptl
+   branches/icom-avatar/page_stats_cdr.ptl
+   branches/icom-avatar/page_stats_queuecdr-csv.ptl
+   branches/icom-avatar/page_stats_queuecdr.ptl
+Log:
+ * Added fixes related to Debian's bug #501207
+   ( http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=501207 )
+
+
+
+
+Modified: branches/icom-avatar/CHANGELOG.txt
+===================================================================
+--- branches/icom-avatar/CHANGELOG.txt	2009-04-16 21:54:03 UTC (rev 834)
++++ branches/icom-avatar/CHANGELOG.txt	2009-04-21 15:46:12 UTC (rev 835)
+@@ -1,3 +1,14 @@
++2009-04-21
++ * Added fixes related to Debian's bug #501207
++   ( http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=501207 )
++
++2009-04-16
++ * In this branch:
++ 	- Asterisk 1.6 support
++	- queue_log precesing and merging with CDR
++	- New features (click to dial, export to csv)
++	- Bug fixes
++
+ 2007-11-27
+ * Added password field to Cfg Record.
+ * Fixed typo in cfg_trunk_zapdynamic.py
+
+Modified: branches/icom-avatar/page_stats_agents.ptl
+===================================================================
+--- branches/icom-avatar/page_stats_agents.ptl	2009-04-16 21:54:03 UTC (rev 834)
++++ branches/icom-avatar/page_stats_agents.ptl	2009-04-21 15:46:12 UTC (rev 835)
+@@ -234,7 +234,7 @@
+ 	
+ 	return render()
+ 
+-def	cdrShowResults [html] (where=[], limit, offset, total = 0, field="start", order="DESC"):
++def	cdrShowResults [html] (where, limit, offset, total = 0, field="start", order="DESC"):
+ 	if total == 0:
+ 		'<p>'
+ 		'--No records to Show--'
+
+Modified: branches/icom-avatar/page_stats_cdr-csv.ptl
+===================================================================
+--- branches/icom-avatar/page_stats_cdr-csv.ptl	2009-04-16 21:54:03 UTC (rev 834)
++++ branches/icom-avatar/page_stats_cdr-csv.ptl	2009-04-21 15:46:12 UTC (rev 835)
+@@ -241,7 +241,7 @@
+ 	
+ 	return render()
+ 
+-def	cdrShowResults [html] (where=[], limit, offset, total = 0, field="start", order="DESC"):
++def	cdrShowResults [html] (where, limit, offset, total = 0, field="start", order="DESC"):
+ 	if total == 0:
+ 		'<p>'
+ 		'--No records to Show--'
+
+Modified: branches/icom-avatar/page_stats_cdr.ptl
+===================================================================
+--- branches/icom-avatar/page_stats_cdr.ptl	2009-04-16 21:54:03 UTC (rev 834)
++++ branches/icom-avatar/page_stats_cdr.ptl	2009-04-21 15:46:12 UTC (rev 835)
+@@ -232,7 +232,7 @@
+ 	
+ 	return render()
+ 
+-def	cdrShowResults [html] (where=[], limit, offset, total = 0, field="start", order="DESC"):
++def	cdrShowResults [html] (where, limit, offset, total = 0, field="start", order="DESC"):
+ 	if total == 0:
+ 		'<p>'
+ 		'--No records to Show--'
+
+Modified: branches/icom-avatar/page_stats_queuecdr-csv.ptl
+===================================================================
+--- branches/icom-avatar/page_stats_queuecdr-csv.ptl	2009-04-16 21:54:03 UTC (rev 834)
++++ branches/icom-avatar/page_stats_queuecdr-csv.ptl	2009-04-21 15:46:12 UTC (rev 835)
+@@ -248,7 +248,7 @@
+ 	
+ 	return render()
+ 
+-def	cdrShowResults [html] (where=[], limit, offset, total = 0, field="start", order="DESC"):
++def	cdrShowResults [html] (where, limit, offset, total = 0, field="start", order="DESC"):
+ 	if total == 0:
+ 		'<p>'
+ 		'--No records to Show--'
+
+Modified: branches/icom-avatar/page_stats_queuecdr.ptl
+===================================================================
+--- branches/icom-avatar/page_stats_queuecdr.ptl	2009-04-16 21:54:03 UTC (rev 834)
++++ branches/icom-avatar/page_stats_queuecdr.ptl	2009-04-21 15:46:12 UTC (rev 835)
+@@ -241,7 +241,7 @@
+ 	
+ 	return render()
+ 
+-def	cdrShowResults [html] (where=[], limit, offset, total = 0, field="start", order="DESC"):
++def	cdrShowResults [html] (where, limit, offset, total = 0, field="start", order="DESC"):
+ 	if total == 0:
+ 		'<p>'
+ 		'--No records to Show--'
+
+
+

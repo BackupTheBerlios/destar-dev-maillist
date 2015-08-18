@@ -1,0 +1,759 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r608 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r608%20-%20branches/0.2.X&In-Reply-To=%3C200703011906.l21J66GB011222%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000099.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r608 - branches/0.2.X</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r608%20-%20branches/0.2.X&In-Reply-To=%3C200703011906.l21J66GB011222%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r608 - branches/0.2.X">alerios at mail.berlios.de
+       </A><BR>
+    <I>Thu Mar  1 20:06:06 CET 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000099.html">[Destar-dev] r609 - in branches/0.2.X: . misc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#98">[ date ]</a>
+              <a href="thread.html#98">[ thread ]</a>
+              <a href="subject.html#98">[ subject ]</a>
+              <a href="author.html#98">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-03-01 20:06:06 +0100 (Thu, 01 Mar 2007)
+New Revision: 608
+
+Added:
+   branches/0.2.X/page_stats_queue.ptl
+   branches/0.2.X/queueutils.py
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/StatsHelper.ptl
+Log:
+* Added queueutils.py to put queue_log in an sqlite3 database.
+* Added initial version of page_stats_queue.ptl for Queue statistics.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-02-28 22:44:13 UTC (rev 607)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-01 19:06:06 UTC (rev 608)
+@@ -1,3 +1,7 @@
++2007-03-01:
++ * Added queueutils.py to put queue_log in an sqlite3 database.
++ * Added initial version of page_stats_queue.ptl for Queue statistics.
++
+ 2007-02-26:
+ * cfg_dialout_normal: adding r Dial option if no Authenticate() is used
+ 
+
+Modified: branches/0.2.X/StatsHelper.ptl
+===================================================================
+--- branches/0.2.X/StatsHelper.ptl	2007-02-28 22:44:13 UTC (rev 607)
++++ branches/0.2.X/StatsHelper.ptl	2007-03-01 19:06:06 UTC (rev 608)
+@@ -1,6 +1,6 @@
+ # -*- coding: iso-latin-1 -*-
+ #
+-# Copyright (C) 2005 Manuel Alejandro Cer&#243;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
++# Copyright (C) 2005 Manuel Alejandro Cer&#195;&#179;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
+ # 
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -41,6 +41,13 @@
+ 		self.name = None
+ 		self.group = None
+ 		self.host = None
++		self.seconds = 0
++		self.holdtime = 0
++		self.completed_by_agent = 0
++		self.completed_by_caller = 0
++		self.dumped = 0
++		self.abandon = 0
++
+ 	
+ 	def addCall(self, seconds, cost_per_minute, disp):
+ 		self.calls_number += 1
+@@ -60,6 +67,25 @@
+ 		elif disp == &quot;FAILED&quot;:
+ 			self.failed += 1
+ 	
++	def addQueueCall(self, holdtime, calltime, origposition, disp):
++		self.calls_number += 1
++		self.seconds += int(calltime)
++		self.holdtime += int(holdtime)
++		self.origposition = origposition
++		if disp == &quot;COMPLETEAGENT&quot;:
++			self.completed_by_agent += 1
++		elif disp == &quot;COMPLETECALLER&quot;:
++			self.completed_by_caller += 1
++		elif disp == &quot;AGENTDUMP&quot;:
++			self.dumped += 1
++		elif disp == &quot;ABANDON&quot;:
++			self.abandon += 1
++
++	def addAgentCall(self, holdtime, calltime):
++		self.calls_number += 1
++		self.seconds += int(calltime)
++		self.holdtime += int(holdtime)
++
+ 	def asignPattern(self, pat):
+ 		self.pattern = re.compile(pat.replace('X','[0-9]'))
+ 	
+@@ -132,8 +158,50 @@
+ 		&quot;&lt;td&gt;%d&lt;/td&gt;&quot; % calls[i].busy
+ 		&quot;&lt;td&gt;%d&lt;/td&gt;&quot; % calls[i].failed
+ 		'&lt;/tr&gt;\n'
+-	'&lt;/table&gt;'
++	'&lt;/table&gt;\n&lt;br/&gt;'
+ 
++def makeAgentCallsTable [plain] (label, calls, names):
++	'&lt;table border=&quot;1&quot;&gt; \n'
++	'&lt;tr&gt; &lt;td&gt;&lt;b&gt;'+ label
++	'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Number of Calls&quot;))
++	#'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;% Number of Calls&quot;))
++	'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Avg. Hold Time&quot;))
++	#'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;% Avg. Hold Time&quot;))
++	'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Avg. Call Duration&quot;))
++	#'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;% Avg. Call Duration&quot;))
++	#'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Transfered Calls&quot;))
++	#'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;% Transfered Calls&quot;))
++	'&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;\n'
++	for i in range(len(calls)):
++		'&lt;tr&gt;'
++		&quot;&lt;td&gt;%s&lt;/td&gt;&quot; % names[i]
++		&quot;&lt;td&gt;%d&lt;/td&gt;&quot; % calls[i].calls_number
++		&quot;&lt;td&gt;%d&lt;/td&gt;&quot; % (calls[i].calls_number and (calls[i].holdtime / calls[i].calls_number) or 0)
++		&quot;&lt;td&gt;%d&lt;/td&gt;&quot; % (calls[i].calls_number and (calls[i].seconds / calls[i].calls_number) or 0)
++		'&lt;/tr&gt;\n'
++	'&lt;/table&gt;\n&lt;br/&gt;'
++
++def makeQueueCallsTable [plain] (label, calls, names):
++	'&lt;table border=&quot;1&quot;&gt; \n'
++	'&lt;tr&gt; &lt;td&gt;&lt;b&gt;'+ label
++	'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Number of Calls&quot;))
++	#'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;% Number of Calls&quot;))
++	'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Avg. Hold Time&quot;))
++	#'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;% Avg. Hold Time&quot;))
++	'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Avg. Call Duration&quot;))
++	#'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;% Avg. Call Duration&quot;))
++	#'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Transfered Calls&quot;))
++	#'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;% Transfered Calls&quot;))
++	'&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;\n'
++	for i in range(len(calls)):
++		'&lt;tr&gt;'
++		&quot;&lt;td&gt;%s&lt;/td&gt;&quot; % names[i]
++		&quot;&lt;td&gt;%d&lt;/td&gt;&quot; % calls[i].calls_number
++		&quot;&lt;td&gt;%d&lt;/td&gt;&quot; % (calls[i].calls_number and (calls[i].holdtime / calls[i].calls_number) or 0)
++		&quot;&lt;td&gt;%d&lt;/td&gt;&quot; % (calls[i].calls_number and (calls[i].seconds / calls[i].calls_number) or 0)
++		'&lt;/tr&gt;\n'
++	'&lt;/table&gt;\n&lt;br/&gt;'
++
+ def makeCallsGraphic [plain] (names, calls, title, labelx, filename):
+ 	theme.use_color = True;
+ 	theme.default_font_size = 14
+
+Added: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-02-28 22:44:13 UTC (rev 607)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-01 19:06:06 UTC (rev 608)
+@@ -0,0 +1,379 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Destar has Copyright (C) 2004-2007 by Holger Schurig
++# This fila has Copyright (C) 2007 by Alejandro Rios P.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++from Templates import *
++from quixote.form2 import *
++import queueutils
++import time
++from StatsHelper import *
++
++pychart_exists = True
++try:	
++	from pychart import *
++except ImportError:
++	pychart_exists = False
++	
++
++_q_parent = 'page_stats'
++_q_title  = _(&quot;Queue Statistics&quot;)
++_q_desc   = _(&quot;Statistics by Queue&quot;)
++_q_level  = 3
++_q_menupos = 30
++
++def _q_access(request):
++	if request.session.level &lt; _q_level:
++		cantAccessPage()
++
++def _q_test():
++	return cdrutils.db
++
++def N_(message): return message
++
++def getQueues():
++	import configlets
++	objs = configlets.configlet_tree.getConfigletsByName('CfgPhoneQueue')
++	queues=[]
++	for obj in objs:
++		queues.append(obj.name)		
++	return queues
++
++def makeForm():
++	form = Form()
++	form.name = &quot;queryform&quot;
++	form.add_single_select('queue', 
++							title=htmltext(_('Queue:')),
++							value=&quot;&quot;,
++							options=zip(getQueues(),getQueues(),getQueues()),
++							render_br=True )
++
++	form.add_single_select('year', 
++							title=htmltext(_('Day:')),
++							value=&quot;&quot;,
++							options=zip([all] + years, 
++										[_(all)] + years,
++										[all] + years),
++							render_br=False )
++							
++	form.add_single_select('month', 
++							options=zip([all] + months, 
++										[_(all)] + getMonthnames(),
++										[all] + months),
++
++							render_br=False )
++							
++	form.add_single_select('day',
++							options=zip([all] + days,
++										[_(all)] + daynames,
++										[all] + days),
++							render_br=True )
++							
++	form.add(SubmitWidget, '_submit', _(&quot;Submit&quot;), render_br=True)
++	
++	return form
++		
++def perHourInDay [plain] (day, month, year, queue):
++	
++	date = &quot;%s-%s-%s&quot; % (year, month, day)
++	where = []
++	where.append(&quot;date(timestamp) = date('%s')&quot; % date)
++	where.append(&quot;qname = '%s'&quot; % queue)
++	where.append(&quot;action like 'COMPLETE%'&quot;)
++	cursor = queueutils.select(
++				fields = ['time(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where,
++				order=['timestamp','agent'])
++	row = cursor.fetchone()
++	calls_per_hour = [CallData() for i in hours]
++	calls_by_agent = []
++	agentnames = []
++	total_completed = cursor.rowcount
++	total_completed_by_agent = 0
++	total_completed_by_caller = 0
++	total_duration = 0
++	average_duration = 0
++	average_hodtime = 0
++
++	if cursor.description:
++		fieldIndices = range(len(cursor.description))
++	else:
++		fieldIndices = []
++
++	while row:
++		for fieldIndex in fieldIndices:
++			c = cursor.description[fieldIndex][0]
++			s = row[fieldIndex]
++			if c=='time(timestamp)':
++				hour = s.split(&quot;:&quot;)
++				hour = int(hour[0])
++			if c=='agent':
++				agent = s.split(&quot;-&quot;)[0]
++				if not agentnames.count(agent):
++					agentnames.append(agent)
++					calls_by_agent.insert(agentnames.index(agent), CallData())
++			if c=='action':
++				disposition = s
++			if c=='info1':
++				try:
++					holdtime = int(s)
++				except ValueError:
++					holdtime = 0
++			if c=='info2':
++				try:
++					calltime = int(s)
++				except ValueError:
++					calltime = 0
++			if c=='info2':
++				try:
++					origposition = int(s)
++				except ValueError:
++					origposition = 0
++		calls_per_hour[hour].addQueueCall(holdtime, calltime, origposition, disposition)
++		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
++		row = cursor.fetchone()
++		
++	htmltext(&quot;&lt;h4&gt;%s&lt;/h4&gt;&quot; % _(&quot;Completed Calls&quot;))
++	makeQueueCallsTable(_(&quot;Time&quot;), calls_per_hour, hournames)
++	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
++	
++def perDayInMonth [plain] (month, year, queue):
++	
++	date1 = &quot;%s-%s-01&quot; % (year, month)
++	date2 = &quot;%s-%s-31&quot; % (year, month)
++	where = []
++	where.append(&quot;date(timestamp) between date('%s') and date('%s')&quot; % (date1, date2))
++	where.append(&quot;qname = '%s'&quot; % queue)
++	where.append(&quot;action like 'COMPLETE%'&quot;)
++	cursor = queueutils.select(
++				fields = ['date(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where,
++				order=['timestamp','agent'])
++	row = cursor.fetchone()
++	calls_per_day = [CallData() for i in days]
++	calls_by_agent = []
++	agentnames = []
++	total_completed = cursor.rowcount
++	total_completed_by_agent = 0
++	total_completed_by_caller = 0
++	total_duration = 0
++	average_duration = 0
++	average_hodtime = 0
++
++	if cursor.description:
++		fieldIndices = range(len(cursor.description))
++	else:
++		fieldIndices = []
++
++	while row:
++		for fieldIndex in fieldIndices:
++			c = cursor.description[fieldIndex][0]
++			s = row[fieldIndex]
++			if c=='date(timestamp)':
++				day = s.split(&quot;-&quot;)
++				day = int(day[2]) - 1
++			if c=='agent':
++				agent = s.split(&quot;-&quot;)[0]
++				if not agentnames.count(agent):
++					agentnames.append(agent)
++					calls_by_agent.insert(agentnames.index(agent), CallData())
++			if c=='action':
++				disposition = s
++			if c=='info1':
++				try:
++					holdtime = int(s)
++				except ValueError:
++					holdtime = 0
++			if c=='info2':
++				try:
++					calltime = int(s)
++				except ValueError:
++					calltime = 0
++			if c=='info2':
++				try:
++					origposition = int(s)
++				except ValueError:
++					origposition = 0
++		calls_per_day[day].addQueueCall(holdtime, calltime, origposition, disposition)
++		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
++		row = cursor.fetchone()
++		
++	htmltext(&quot;&lt;h4&gt;%s&lt;/h4&gt;&quot; % _(&quot;Completed Calls&quot;))
++	makeQueueCallsTable(_(&quot;Day&quot;), calls_per_day, daynames)
++	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
++
++	
++def perMonthInYear [plain] (year, queue):
++	date1 = &quot;%s-01-01&quot; % (year)
++	date2 = &quot;%s-12-31&quot; % (year)
++	where = []
++	where.append(&quot;date(timestamp) between date('%s') and date('%s')&quot; % (date1, date2))
++	where.append(&quot;qname = '%s'&quot; % queue)
++	where.append(&quot;action like 'COMPLETE%'&quot;)
++	cursor = queueutils.select(
++				fields = ['date(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where,
++				order=['timestamp','agent'])
++	row = cursor.fetchone()
++	calls_per_month = [CallData() for i in months]
++	calls_by_agent = []
++	agentnames = []
++	total_completed = cursor.rowcount
++	total_completed_by_agent = 0
++	total_completed_by_caller = 0
++	total_duration = 0
++	average_duration = 0
++	average_hodtime = 0
++
++	if cursor.description:
++		fieldIndices = range(len(cursor.description))
++	else:
++		fieldIndices = []
++
++	while row:
++		for fieldIndex in fieldIndices:
++			c = cursor.description[fieldIndex][0]
++			s = row[fieldIndex]
++			if c=='date(timestamp)':
++				month = s.split(&quot;-&quot;)
++				month = int(month[1]) - 1
++			if c=='agent':
++				agent = s.split(&quot;-&quot;)[0]
++				if not agentnames.count(agent):
++					agentnames.append(agent)
++					calls_by_agent.insert(agentnames.index(agent), CallData())
++			if c=='action':
++				disposition = s
++			if c=='info1':
++				try:
++					holdtime = int(s)
++				except ValueError:
++					holdtime = 0
++			if c=='info2':
++				try:
++					calltime = int(s)
++				except ValueError:
++					calltime = 0
++			if c=='info2':
++				try:
++					origposition = int(s)
++				except ValueError:
++					origposition = 0
++		calls_per_month[month].addQueueCall(holdtime, calltime, origposition, disposition)
++		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
++		row = cursor.fetchone()
++		
++	htmltext(&quot;&lt;h4&gt;%s&lt;/h4&gt;&quot; % _(&quot;Completed Calls&quot;))
++	makeQueueCallsTable(_(&quot;Month&quot;), calls_per_month, monthnames)
++	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
++
++
++def perYear [plain] (queue):
++	where = []
++	where.append(&quot;qname = '%s'&quot; % queue)
++	where.append(&quot;action like 'COMPLETE%'&quot;)
++	cursor = queueutils.select(
++				fields = ['date(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where,
++				order=['timestamp','agent'])
++	row = cursor.fetchone()
++	calls_per_year = [CallData() for i in years]
++	calls_by_agent = []
++	agentnames = []
++	total_completed = cursor.rowcount
++	total_completed_by_agent = 0
++	total_completed_by_caller = 0
++	total_duration = 0
++	average_duration = 0
++	average_hodtime = 0
++
++	if cursor.description:
++		fieldIndices = range(len(cursor.description))
++	else:
++		fieldIndices = []
++
++	while row:
++		for fieldIndex in fieldIndices:
++			c = cursor.description[fieldIndex][0]
++			s = row[fieldIndex]
++			if c=='date(timestamp)':
++				year = s.split(&quot;-&quot;)
++				year = int(year[0]) - startyear
++			if c=='agent':
++				agent = s.split(&quot;-&quot;)[0]
++				if not agentnames.count(agent):
++					agentnames.append(agent)
++					calls_by_agent.insert(agentnames.index(agent), CallData())
++			if c=='action':
++				disposition = s
++			if c=='info1':
++				try:
++					holdtime = int(s)
++				except ValueError:
++					holdtime = 0
++			if c=='info2':
++				try:
++					calltime = int(s)
++				except ValueError:
++					calltime = 0
++			if c=='info2':
++				try:
++					origposition = int(s)
++				except ValueError:
++					origposition = 0
++		calls_per_year[year].addQueueCall(holdtime, calltime, origposition, disposition)
++		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
++		row = cursor.fetchone()
++		
++	htmltext(&quot;&lt;h4&gt;%s&lt;/h4&gt;&quot; % _(&quot;Completed Calls&quot;))
++	makeQueueCallsTable(_(&quot;Year&quot;), calls_per_year, yearnames)
++	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
++
++	
++def showResults [plain] (day, month, year, queue):
++	all = N_(&quot;All&quot;)
++	if day != all and month != all and year != all:
++		perHourInDay(day, month, year, queue)
++	elif day == all and month != all and year != all:
++		perDayInMonth(month, year, queue)
++	elif day == all and month == all and year != all:
++		perMonthInYear(year, queue)
++	elif day == all and month == all and year == all:
++		perYear(queue)
++	else:
++		htmltext(&quot;&lt;p style='color:red;'&gt;\n&quot;)
++		htmltext(&quot;%s&quot; % _(&quot;Sorry, this kind of query is not supported yet&quot;))
++		htmltext(&quot;&lt;/p&gt;&quot;)
++
++def cdrForm [plain] (request):
++	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Statistics for a Queue by Date:&quot;))
++	form = makeForm()
++	form.render()
++	
++	if form.is_submitted() and not form.has_errors():
++		htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Results&quot;))
++		showResults(form[&quot;day&quot;], form[&quot;month&quot;], form[&quot;year&quot;], form[&quot;queue&quot;])
++	
++def _q_index [plain] (request):
++	header(_q_desc)
++	if pychart_exists:
++		cdrForm(request)
++	else:
++		_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
++	footer()
++	
+
+Added: branches/0.2.X/queueutils.py
+===================================================================
+--- branches/0.2.X/queueutils.py	2007-02-28 22:44:13 UTC (rev 607)
++++ branches/0.2.X/queueutils.py	2007-03-01 19:06:06 UTC (rev 608)
+@@ -0,0 +1,175 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Destar has Copyright (C) 2005-2007 by Holger Schurig
++# This file has Copyright (C) 2007 by Alejandro Rios P.
++#
++# The loadQueue method has some GPL code with
++# Copyright (C) 2006 Earl Terwilliger  <A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">earl at micpc.com</A>
++# Tooked from Asterisk Queue Log Analyzer <A HREF="http://www.micpc.com/qloganalyzer/">http://www.micpc.com/qloganalyzer/</A> 
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++import sys, os, string
++import language
++from datetime import datetime
++from time import strptime
++language.setLanguage('en')
++
++
++try:
++	from pysqlite2 import dbapi2 as sqlite
++except ImportError:
++	print _(&quot;Note: you should install python-pysqlite2 to have Queue Stats functionality&quot;)
++
++try:
++	db_fn = &quot;/var/log/asterisk/queue.db&quot;
++	if not os.access(db_fn, os.O_RDWR):
++		raise ImportError
++	db = sqlite.connect(db_fn)
++	db.isolation_level = None
++except:
++	print _(&quot;Note: you don't seem to have access to %s. See INSTALL.txt for details.&quot;) % db_fn
++	if __name__ == &quot;__main__&quot;: sys.exit(0)
++	db = None
++
++def loadQueueLog ():
++	try:
++		q_fn = &quot;/var/log/asterisk/queue_log&quot;
++		if not os.access(q_fn, os.O_RDWR):
++			raise ImportError
++	except:
++		print _(&quot;Note: you don't seem to have access to %s.&quot;) % q_fn
++		if __name__ == &quot;__main__&quot;: sys.exit(0)
++
++	cursor = db.cursor()
++	cursor.execute(&quot;select max(timestamp) from queuelog&quot;)
++	row = cursor.fetchone()
++	maxtime = datetime.fromtimestamp(float(0))
++	if row[0]:
++		try:
++			maxtime = datetime(*strptime(row[0], &quot;%Y-%m-%d %H:%M:%S&quot;)[0:6])
++		except:
++			continue
++
++	rows = 0
++	in_file = open(q_fn,&quot;r&quot;)
++	for in_line in in_file.readlines():
++		in_line = string.strip(in_line[:-1])
++		if (in_line[-1] == &quot;|&quot;):
++			in_line = in_line[0:-1]
++		s = string.split(in_line,&quot;|&quot;)
++		s[0] = datetime.fromtimestamp(float(s[0]))
++		if (maxtime &gt;= s[0]):
++			continue
++		s[0] = s[0].isoformat(' ')
++		length = len(s)
++		if (length &lt; 6):
++			s.append('')
++		if (length &lt; 7):
++			s.append('')
++		if (length &lt; 8):
++			s.append('')
++		try:
++			cursor.execute( &quot;INSERT INTO queuelog (timestamp,callid,qname,agent,action,info1,info2,info3) VALUES  ('%s','%s','%s','%s','%s','%s','%s','%s')&quot; % tuple(s) )
++		except:
++			print &quot;Failed to execute insert at timestamp %s&quot; % s[0]
++			if __name__ == &quot;__main__&quot;: sys.exit(0)
++		rows += 1
++	in_file.close()
++	print &quot;%d rows were inserted&quot; % rows
++	return rows
++
++
++def N_(message): return message
++
++def select(
++		fields=['date(timestamp)',
++			'callid',
++			'qname',
++			'agent',
++			'action',
++			'info1',
++			'info2',
++			'info3'
++			],
++		groupby=[],
++		having=[],
++		where=[],
++		order=['timestamp'],
++		limit=0,
++		offset=0,
++	):
++	cursor = db.cursor()
++
++	sql = ['SELECT']
++	sql.append( ','.join(fields) )
++	sql.append('FROM queuelog')
++
++	if where:
++		sql.append('WHERE ')
++		sql.append( ' AND '.join(where) )
++
++	if groupby:
++		sql.append('GROUP BY')
++		sql.append( ','.join(groupby) )
++
++	if having:
++		sql.append('HAVING')
++		sql.append( ','.join(having) )
++
++	if order:
++		sql.append('ORDER BY')
++		sql.append( ','.join(order) )
++
++	if limit:
++		sql.append('LIMIT %d' % limit)
++		if offset:
++			sql.append('OFFSET %d' % offset)
++
++	cursor.execute( ' '.join(sql) )
++	return cursor
++
++def count(
++		where=[],
++		groupby=[],
++		having=[],
++	):
++	cursor = db.cursor()
++
++	sql = ['SELECT count(*)']
++	sql.append('FROM queuelog')
++
++	if where:
++		sql.append('WHERE ')
++		sql.append( ' AND '.join(where) )
++
++	if groupby:
++		sql.append('GROUP BY')
++		sql.append( ','.join(groupby) )
++
++	if having:
++		sql.append('HAVING')
++		sql.append( ','.join(having) )
++	
++	cursor.execute( ' '.join(sql) )
++	resultRow = cursor.fetchone()
++	result = int(resultRow[0])
++
++	return result
++
++if __name__ == &quot;__main__&quot;:
++	loadQueueLog()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000099.html">[Destar-dev] r609 - in branches/0.2.X: . misc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#98">[ date ]</a>
+              <a href="thread.html#98">[ thread ]</a>
+              <a href="subject.html#98">[ subject ]</a>
+              <a href="author.html#98">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

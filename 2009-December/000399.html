@@ -1,0 +1,1097 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r845 - in trunk: . static/themes/avatar	static/themes/avatar/css static/themes/avatar/imgs
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r845%20-%20in%20trunk%3A%20.%20static/themes/avatar%0A%09static/themes/avatar/css%20static/themes/avatar/imgs&In-Reply-To=%3C200912152250.nBFMo5Zc012553%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000398.html">
+   <LINK REL="Next"  HREF="000400.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r845 - in trunk: . static/themes/avatar	static/themes/avatar/css static/themes/avatar/imgs</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r845%20-%20in%20trunk%3A%20.%20static/themes/avatar%0A%09static/themes/avatar/css%20static/themes/avatar/imgs&In-Reply-To=%3C200912152250.nBFMo5Zc012553%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r845 - in trunk: . static/themes/avatar	static/themes/avatar/css static/themes/avatar/imgs">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec 15 23:50:05 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000398.html">[Destar-dev] r844 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000400.html">[Destar-dev] r846 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#399">[ date ]</a>
+              <a href="thread.html#399">[ thread ]</a>
+              <a href="subject.html#399">[ subject ]</a>
+              <a href="author.html#399">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-15 23:50:03 +0100 (Tue, 15 Dec 2009)
+New Revision: 845
+
+Added:
+   trunk/static/themes/avatar/css/
+   trunk/static/themes/avatar/css/ADxMenu.htc
+   trunk/static/themes/avatar/css/Menu.css
+   trunk/static/themes/avatar/css/Menu4IE.css
+   trunk/static/themes/avatar/css/general.css
+   trunk/static/themes/avatar/imgs/
+   trunk/static/themes/avatar/imgs/_notes/
+   trunk/static/themes/avatar/imgs/body-f.jpg
+   trunk/static/themes/avatar/imgs/btn-aceptar.gif
+   trunk/static/themes/avatar/imgs/btn-cancelar.gif
+   trunk/static/themes/avatar/imgs/btn-enviar.gif
+   trunk/static/themes/avatar/imgs/content-f.jpg
+   trunk/static/themes/avatar/imgs/contentnav-f.jpg
+   trunk/static/themes/avatar/imgs/footer-f.jpg
+   trunk/static/themes/avatar/imgs/header-f.jpg
+   trunk/static/themes/avatar/imgs/icom-logo.gif
+   trunk/static/themes/avatar/imgs/menu-f1.gif
+   trunk/static/themes/avatar/imgs/menu-f2.gif
+   trunk/static/themes/avatar/imgs/submenu-f_bottom.gif
+   trunk/static/themes/avatar/imgs/submenu-f_top.gif
+   trunk/static/themes/avatar/imgs/text-btn_f1.gif
+   trunk/static/themes/avatar/imgs/text-btn_f2.gif
+Modified:
+   trunk/CHANGELOG.txt
+Log:
+* Added avatar web style
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-15 03:02:12 UTC (rev 844)
++++ trunk/CHANGELOG.txt	2009-12-15 22:50:03 UTC (rev 845)
+@@ -1,3 +1,6 @@
++2009-12-15
++* Added avatar web style
++
+ 2009-12-14
+ * page_stats_*.ptl: set _q_level = 2
+ * Added page_stats_agents.ptl
+
+Added: trunk/static/themes/avatar/css/ADxMenu.htc
+===================================================================
+--- trunk/static/themes/avatar/css/ADxMenu.htc	2009-12-15 03:02:12 UTC (rev 844)
++++ trunk/static/themes/avatar/css/ADxMenu.htc	2009-12-15 22:50:03 UTC (rev 845)
+@@ -0,0 +1,139 @@
++&lt;attach event=&quot;ondocumentready&quot; handler=&quot;_ParseStylesheets&quot; /&gt;
++&lt;script language=&quot;JScript&quot;&gt;
++/**
++ *	ADxMenu behavior - standard - v0.21
++ *	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
++ *	(c) 2004 - Aleksandar Vacic, www.aplus.co.yu
++ * Licensed under <A HREF="http://creativecommons.org/licenses/by/2.0/">http://creativecommons.org/licenses/by/2.0/</A>
++ *	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
++ * Based on PSEUDOS V1.20.040828
++ *	<A HREF="http://www.xs4all.nl/~peterned/csshover.html">http://www.xs4all.nl/~peterned/csshover.html</A>
++ *	(c) 2004 - Peter Nederlof
++ *	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
++ */
++
++var _oCurrentSheet, _oDoc = window.document;
++var _aActivators = {
++	onhover:{on:'onmouseover', off:'onmouseout'}
++}
++
++//	keeps the menu IDs
++var _aMenuIDs = new Array();
++
++//	find menus on the page - look for class named &quot;adxm&quot;
++function _FindMenus() {
++	var aTmp = xGetElementsByClassName(&quot;adxm&quot;, element.document, &quot;ul&quot;, function(oM) {
++		_Add(oM.id);
++	} );
++};
++
++//	add the menu to the array
++function _Add(sMenuID) {
++	if ( typeof(sMenuID) == &quot;undefined&quot;) return;
++	_aMenuIDs[_aMenuIDs.length] = sMenuID.replace(/List/, &quot;&quot;);
++};
++
++function _ParseStylesheets() {
++	_FindMenus();
++	var sheets = _oDoc.styleSheets, l = sheets.length;
++	for(var i=0; i&lt;l; i++) 
++		_ParseStylesheet(sheets[i]);
++}
++
++function _ParseStylesheet(sheet) {
++	var l, rules, imports;
++	if(sheet.imports) {
++		imports = sheet.imports, l = imports.length;
++		for(var i=0; i&lt;l; i++) 
++			_ParseStylesheet(sheet.imports[i]);
++	}
++
++	rules = (_oCurrentSheet = sheet).rules, l = rules.length;
++	for(var j=0; j&lt;l; j++) _ParseCSSRule(rules[j]);
++}
++
++function _ParseCSSRule(rule) {
++	var select = rule.selectorText, style = rule.style.cssText;
++
++	//	if style text is empty, IE throws &quot;invalid pointer&quot; error	
++	if ( style.replace(/ /, &quot;&quot;) == &quot;&quot; ) return;
++	
++	//	work only with #menu
++	var sMenuID, bFound = 0;
++	for (var t=0;t&lt;_aMenuIDs.length;t++) {
++		if (select.indexOf(_aMenuIDs[t]) != -1) {
++			bFound = 1;
++			sMenuID = _aMenuIDs[t];
++			break;
++		}
++	}
++	if (!bFound) return;
++
++	if(!(/(^|\s)(([^a]([^ ]+)?)|(a([^#.][^ ]+)+)):(hover)/i).test(select)) return;
++	
++	var pseudo = select.replace(/[^:]+:([a-z-]+).*/i, 'on$1');
++	var newSelect = select.replace(/(\.([a-z0-9_-]+):[a-z]+)|(:[a-z]+)/gi, '.$2' + pseudo);
++	var className = (/\.([a-z0-9_-]+)/i).exec(newSelect)[1];
++	var affected = select.replace(/:hover.*$/, '');
++
++	//	remove the #menu part
++	eval('affected = affected.replace(/#' + sMenuID + '([ ]+)/i, &quot;&quot;)');
++
++	var elements = _GetElementsBySelect(affected, sMenuID);
++
++	_oCurrentSheet.addRule(newSelect, style);
++	for(var i=0; i&lt;elements.length; i++)
++		new _HoverElement(elements[i], className, _aActivators[pseudo]);
++}
++
++function _HoverElement(node, className, events) {
++	if(!node.hovers) node.hovers = {};
++	if(node.hovers[className]) return;
++	node.hovers[className] = true;
++	node.attachEvent(events.on,
++		function() { node.className += ' ' + className; });
++	node.attachEvent(events.off,
++		function() { node.className = 
++			node.className.replace(new RegExp('\\s+'+className, 'g'),''); });
++}
++
++function _GetElementsBySelect(rule, sMenuID) {
++	//	work only inside of the #menu div
++	var parts, nodes = [_oDoc.getElementById(sMenuID)];
++	parts = rule.split(' ');
++	for(var i=0; i&lt;parts.length; i++) {
++		nodes = _GetSelectedNodes(parts[i], nodes);
++	}
++	return nodes;
++}
++
++function _GetSelectedNodes(select, elements) {
++	var result, node, nodes = [];
++	var classname = (/\.([a-z0-9_-]+)/i).exec(select);
++	var identify = (/\#([a-z0-9_-]+)/i).exec(select);
++	var tagName = (/^[a-z0-9]+/i).exec(select.toUpperCase()) || '*';
++	for(var i=0; i&lt;elements.length; i++) {
++		result = elements[i].getElementsByTagName(tagName);
++		for(var j=0; j&lt;result.length; j++) {
++			node = result[j];
++			if((identify &amp;&amp; node.id != identify[1]) || (classname &amp;&amp; !(new RegExp('\\b' +
++				classname[1] + '\\b').exec(node.className)))) continue;
++			nodes[nodes.length] = node;
++		}
++	}	return nodes;
++}
++
++function xGetElementsByClassName(clsName, parentEle, tagName, fn) {
++	var found = new Array();
++	var re = new RegExp('\\b'+clsName+'\\b', 'i');
++	var list = parentEle.getElementsByTagName(tagName);
++	for (var i = 0; i &lt; list.length; ++i) {
++		if (list[i].className.search(re) != -1) {
++			found[found.length] = list[i];
++			if (fn) fn(list[i]);
++		}
++	}
++	return found;
++}
++
++&lt;/script&gt;
+\ No newline at end of file
+
+
+Property changes on: trunk/static/themes/avatar/css/ADxMenu.htc
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Added: trunk/static/themes/avatar/css/Menu.css
+===================================================================
+--- trunk/static/themes/avatar/css/Menu.css	2009-12-15 03:02:12 UTC (rev 844)
++++ trunk/static/themes/avatar/css/Menu.css	2009-12-15 22:50:03 UTC (rev 845)
+@@ -0,0 +1,181 @@
++/* 
++ *		Horizontal, top-2-bottom menu
++ *		Copyright Aleksandar Vacic, www.aplus.co.yu, some rights reserved <A HREF="http://creativecommons.org/licenses/by/2.0/">http://creativecommons.org/licenses/by/2.0/</A>
++ */
++
++/*		------	Basic style	------		*/
++	#menu
++	{
++		clear:both;
++		display:block;
++		width:750px;
++		height:25px;
++		margin:0 0 0 15px;
++	}
++		#menu ul
++		{
++			margin:0;
++			padding:0;
++			border:0;
++			list-style-type:none;
++		}
++			#menu li
++			{
++				margin:0;
++				padding:0;
++				border:0;
++				display:block;
++				float:left;
++				position:relative;
++			}
++		#menu a
++		{
++			display:block;
++		}
++		#menu li li
++		{
++			width:100%;
++		}
++		
++		/* fix the position for 2nd level submenus. first make sure no horizontal scrollbars are visible on initial page load... */
++			#menu li li ul
++			{
++				top:0;
++				left:0;
++			}
++			
++			/* ...and then place it where it should be when shown */
++				#menu li li:hover ul
++				{
++					left:100%;
++				}
++		/* initialy hide all sub menus */
++		#menu li ul
++		{
++			display:none;
++			position:absolute;
++			z-index:10;
++		}
++		/* display them on hover */
++			#menu li:hover&gt;ul
++			{
++				display:block;
++			}		
++		/* this is needed if you want to style #menu div - force containment of floated LIs inside of main UL */
++		#menuList:after
++		{
++			content:&quot;.&quot;;
++			height:0;
++			display:block;
++			visibility:hidden;
++			overflow:hidden;
++			clear:both;
++		}
++		/* Clear-fix for IE5/Mac \*//*/
++		#menu a
++		{
++			float:left;
++		}
++		
++		#menuList
++		{
++			display:inline-block;
++		}
++		/*  */
++		
++		/*		------   Make-up	--------			*/
++		
++	#menu
++	{
++		font-size:11px;
++		color:#FFFFFF;
++		min-height:25px;/* 	Height mentioned above	 */
++	}		
++		#menu li
++		{
++		}
++			#menu li li
++			{
++				background:none;
++				width:129px;
++			}		
++				#menu li li:last-child
++				{
++					
++				}
++				#menu a
++				{
++					font-size:11px;
++					font-weight:bold;
++					text-decoration:none;
++					text-align:left;
++					padding:0 0 0 10px;
++					background:url(&quot;../imgs/menu-f1.gif&quot;) -20px -20px no-repeat;
++				}
++					#menu a span
++					{
++						color:#FFFFFF;
++						padding:4px 10px 2px 0px;
++						display:block;
++						background:url(&quot;../imgs/menu-f1.gif&quot;) -20px -20px no-repeat;
++					}
++						#menu span em
++						{
++							text-decoration:underline;
++							font-style:normal;
++						}
++					/*Para cazar un bug en el IE-Apple*/
++					#menu a span
++					{
++						float:none;
++					}
++					/*Fin de la cacer&#237;a*/
++				#menu li:hover&gt;a
++				{
++					background:url(&quot;../imgs/menu-f1.gif&quot;) left top no-repeat;
++				}
++					#menu li:hover&gt;a span
++					{
++						color:#990000;
++						background:url(&quot;../imgs/menu-f2.gif&quot;) right top no-repeat;
++						display:block;
++					}
++			#menu a:hover span
++			{
++				color:#990000;
++			}		
++				#menu li li a
++				{
++					color:#333333;
++					text-decoration:none;
++					font-size:1em;
++					font-weight:normal;
++					text-align:left;
++					background:none;
++					padding:5px 10px 5px 10px;
++				}
++					#menu li li:hover&gt;a,
++					#menu li li a:hover
++					{
++						color:#000000 !important;
++						text-decoration:underline;
++						background:none;
++					}
++				#menu li ul
++				{
++					background:url(&quot;../imgs/submenu-f_bottom.gif&quot;) bottom repeat-y;
++					width:150px;
++				}
++					#menu li li ul
++					{
++						
++					}		
++						#menu li li li:first-child
++						{
++							
++						}
++						
++						#menu li li.submenu&gt;a:after
++						{
++							content:&quot; ...&quot;;
++						}
+\ No newline at end of file
+
+
+Property changes on: trunk/static/themes/avatar/css/Menu.css
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Added: trunk/static/themes/avatar/css/Menu4IE.css
+===================================================================
+--- trunk/static/themes/avatar/css/Menu4IE.css	2009-12-15 03:02:12 UTC (rev 844)
++++ trunk/static/themes/avatar/css/Menu4IE.css	2009-12-15 22:50:03 UTC (rev 845)
+@@ -0,0 +1,60 @@
++/* 
++ *		Horizontal, top-2-bottom menu ## Tweaks for IE5, IE6
++ *		Copyright Aleksandar Vacic, www.aplus.co.yu, some rights reserved <A HREF="http://creativecommons.org/licenses/by/2.0/">http://creativecommons.org/licenses/by/2.0/</A>
++ */
++
++/*		------	Basic style	------		*/
++
++/* Fix IE6's inability to expand clickable area */
++#menu li a
++{
++	position:relative;
++}
++
++/* IE can't handle display, so fail-over to visibility */
++#menu li ul
++{
++	display:block;
++	visibility:hidden;
++}
++
++/* simulate child selector for IE */
++#menu li:hover ul,
++#menu li:hover li:hover ul,
++#menu li:hover li:hover li:hover ul
++{
++	visibility:visible;
++}
++#menu li:hover li ul,
++#menu li:hover li:hover li ul,
++#menu li:hover li:hover li:hover li ul
++{
++	visibility:hidden;
++}
++
++#menuList
++{
++	height:26px;
++}
++
++/*		------   Make-up	--------			*/
++
++#menu a:hover
++{
++	color:#990000;
++	background:url(&quot;../imgs/menu-f1.gif&quot;) left top no-repeat;
++}
++	#menu a:hover span
++	{
++		color:#990000;
++		background:url(&quot;../imgs/menu-f2.gif&quot;) right top no-repeat;
++		display:block;
++	}
++#menu li li a:hover
++{
++	color:#000000;
++	text-decoration:underline;
++	background:none;
++}
++
++/* 	------	Behaviors --------		*/
+\ No newline at end of file
+
+
+Property changes on: trunk/static/themes/avatar/css/Menu4IE.css
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Added: trunk/static/themes/avatar/css/general.css
+===================================================================
+--- trunk/static/themes/avatar/css/general.css	2009-12-15 03:02:12 UTC (rev 844)
++++ trunk/static/themes/avatar/css/general.css	2009-12-15 22:50:03 UTC (rev 845)
+@@ -0,0 +1,379 @@
++body
++{
++	font-family:Arial, Helvetica, sans-serif;
++	text-align:center;
++	margin:0;
++	padding:16px 0 20px 0;
++	background:url(&quot;../imgs/body-f.jpg&quot;) 0 0;
++}
++	/*common definitions*/
++	#wrapper,
++	#header,
++	#mainContent,
++	#contentNav,
++	#footer
++	{
++		width:790px;
++	}
++		#header,
++		#mainContent,
++		#contentNav,
++		#footer
++		{
++			float:left;
++			text-align:left;
++		}
++			#mainContent, #footer
++			{
++				background:#FFFFFF;
++			}
++	/*end common definitions*/
++	#wrapper
++	{
++		margin-left:auto;
++		margin-right:auto;
++	}
++		#header
++		{
++			background:url(&quot;../imgs/header-f.jpg&quot;) 0 0 no-repeat #AF2A2A;
++			height:112px;
++		}
++			#header h1
++			{
++				margin:0;
++				padding:14px 0 9px 26px;
++				float:left;
++			}
++			#loginNavigation
++			{
++				float:right;
++			}
++				#loginNavigation ul
++				{
++					list-style-type:none;
++					font-size:11px;
++					margin:15px 25px 0 0;
++					padding:0;
++				}
++					#loginNavigation ul li
++					{
++						margin:0;
++						padding:0;
++					}
++						#loginNavigation li a
++						{
++							color:#FFFFFF;
++							text-decoration:none;
++						}
++							#loginNavigation li a:hover
++							{
++								text-decoration:underline;
++							}
++			#globalNavigation
++			{
++				clear:both;
++				padding-left:17px;
++				background:blue;
++				height:26px;
++			}
++			
++/**/			
++				#globalNavigation ul
++				{
++					list-style-type:none;
++					margin:0;
++					padding:0;
++				}
++					#globalNavigation ul li
++					{
++						float:left;
++						font-size:12px;
++						margin:0;
++						padding:0;
++					}
++						#globalNavigation li a
++						{
++							color:#FFFFFF;
++						}
++		#mainContent
++		{
++			background:url(&quot;../imgs/content-f.jpg&quot;) 0 0 repeat-y;
++		}
++			#contentNav
++			{
++			}
++			#mainContent h1,
++			#mainContent h2,
++			#mainContent h3,
++			#mainContent table,
++			#mainContent p
++			{
++				margin-left:25px;
++				margin-right:25px;
++				padding:0;
++			}
++				#mainContent h1
++				{
++					font-size:20px;
++					font-weight:normal;
++					color:#990000;
++					margin-top:0px;
++					margin-bottom:10px;
++				}
++				#mainContent h2,
++				#mainContent #config #configFile p
++				{
++					font-size:16px;
++					color:#666666;
++					margin-top:0px;
++					margin-bottom:5px;
++				}
++				#mainContent #config #configFile p
++				{
++					background:#EEEEEE;
++					color:#666666;
++					font-size:16px;
++				}
++				#mainContent h3
++				{
++					font-size:14px;
++					color:#999999;
++					margin-top:0px;
++					margin-bottom:0px;
++				}
++				#mainContent p,
++				form.quixote
++				{
++					color:#666666;
++					font-size:12px;
++					margin:25px;
++				}
++				#mainContent li
++				{
++					color:#666666;
++					font-size:12px;
++					margin:15px;
++				}
++
++				#mainContent ul
++				{
++				}
++				#mainContent a
++				{
++					color:#666666;
++				}
++					#mainContent a:hover
++					{
++						color:#990000;
++					}
++				/*Forms definitions*/
++				#mainContent form,
++				#mainContent form.quixote
++				{
++					padding:0px 25px 0px 25px;
++				}
++					#manContent table,
++					#mainContent form.quixote table
++					{
++						width:738px;
++					}
++						#mainContent table th,
++						#mainContent table td,
++						#mainContent form.quixote table th,
++						#mainContent form.quixote table td
++						{
++							padding:3px 5px 3px 5px;
++						}
++						#mainContent table thead th,
++						#mainContent #dump table th,
++						#mainContent form.quixote table thead th
++						{
++							background:#E7C3C3;
++							color:#990000;
++							font-size:11px;
++						}
++						#mainContent table tbody td,
++						#mainContent #dump table td,
++						#mainContent form.quixote table tbody td
++						{
++							background:#EEEEEE;
++							color:#666666;
++							font-size:11px;
++						}
++					#mainContent form p,
++					#mainContent form.quixote div.widget
++					{
++						margin-left:0;
++						margin-right:0;
++					}
++					#mainContent form.quixote input,
++					#mainContent form.quixote textarea,
++					#mainContent form.quixote select
++					{
++						font-family:Arial, Helvetica, sans-serif;
++						font-size:12px;
++						color:#333333;
++						background:#EEEEEE;
++						padding:1px 3px 1px 3px;
++						margin-left:0;
++						margin-right:0;
++					}
++					#mainContent .error,
++					div.error,
++					#mainContent .required,
++					span.required
++					{
++						font-family:Arial, Helvetica, sans-serif;
++						font-size:12px;
++						color:red;
++						padding:1px 3px 1px 3px;
++						margin-left:0;
++						margin-right:0;
++					}
++					/*#mainContent form.quixote div.submit div.SubmitWidget div.content,
++					{
++						font-family:Arial, Helvetica, sans-serif;
++						font-size:12px;
++						color:#333333;
++						background:#EEEEEE;
++						padding:1px 3px 1px 3px;
++					}*/
++					/*#mainContent form input.btn01,
++					#mainContent form.quixote div.submit div.SubmitWidget div.content,
++					#mainContent form input.btn02
++					{
++						border-width:1px;
++						border-style:solid;
++						font-size:11px;
++						font-weight:bold;
++						padding:1px 3px 1px 3px;
++					}
++						#mainContent form input.btn01,
++						#mainContent form.quixote div.submit div.SubmitWidget div.content
++						{
++							border-color:#9A0202;
++							background:#E7C3C3;
++							color:#990000;
++						}
++						#mainContent form input.btn02,
++						{
++							border-color:#676767;
++							background:#DBDBDB;
++							color:#333333;
++							font-size:10px;
++						}
++
++					#mainContent form input.noestilo
++					{
++						background:none;
++					}*/
++					#mainContent form.quixote select
++					{
++						padding:0;
++					}
++					/*#mainContent a.textBtn,
++					#mainContent form.quixote div.submit div.SubmitWidget,
++					{
++						padding:0 0 0 10px;
++						display:block;
++						background:url(&quot;../imgs/text-btn_f1.gif&quot;) left top no-repeat;
++						text-decoration:none;
++						font-weight:bold;
++						font-size:11px;
++					}
++						#mainContent a.textBtn span,
++						#mainContent form.quixote div.submit div.SubmitWidget,
++						{
++							padding:2px 10px 5px 0;
++							background:url(&quot;../imgs/text-btn_f2.gif&quot;) right top no-repeat;
++							display:block;
++							color:#990000;
++						}*/
++/**********************************/
++
++form.quixote .errornotice {
++	margin-bottom: 1em;
++	font-weight: bold;
++	color: #f00;
++	float: left;
++}
++
++form.quixote .title {
++	width: 16em;
++	float: left;
++	margin: 0 0.5em 10px 0;
++}
++
++form.quixote .required {
++	color: #f00;
++	padding: 0.4em;
++}
++
++form.quixote .submit {
++	clear: left;
++}
++
++form.quixote .content {
++	float: left;
++}
++
++form.quixote .content .error {
++	color: #f00;
++	display: inline;
++	font-weight: bold;
++	margin-left: 1em;
++}
++
++form.quixote .LabelWidget {
++	margin-top: 1em;
++	margin-bottom: 0.5em;
++	font-weight: bold;
++	font-size: 114%;
++	color: #336;
++	background-color: #f7f7f7;
++}
++
++form.quixote .SubmitWidget {
++	margin-top: 2em;
++	margin-right: 1em;
++	float: left;
++}
++
++
++
++form.quixote div.FormTokenWidget,
++form.quixote.div.HiddenWidget {
++	display: none;
++}
++
++form.quixote br {
++	clear: left;
++}
++/**********************************/
++		#footer
++		{
++			background:url(&quot;../imgs/footer-f.jpg&quot;) 0 bottom repeat-x;
++			height:60px;
++			text-align:right;
++		}
++			#footer p 
++			{
++				font-size:11px;
++				margin:7px 135px 10px auto;
++				padding:0;
++				color:#999999;
++			}
++				#footer p em
++				{
++					font-style:normal;
++					color:#990000;
++				}
++				#footer p a
++				{
++					color:#CCCCCC;
++				}
++					#footer p a:hover
++					{
++						color:#999999;
++					}
++		
+
+
+Property changes on: trunk/static/themes/avatar/css/general.css
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Added: trunk/static/themes/avatar/imgs/body-f.jpg
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/body-f.jpg
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/btn-aceptar.gif
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/btn-aceptar.gif
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/btn-cancelar.gif
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/btn-cancelar.gif
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/btn-enviar.gif
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/btn-enviar.gif
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/content-f.jpg
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/content-f.jpg
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/contentnav-f.jpg
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/contentnav-f.jpg
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/footer-f.jpg
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/footer-f.jpg
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/header-f.jpg
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/header-f.jpg
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/icom-logo.gif
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/icom-logo.gif
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/menu-f1.gif
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/menu-f1.gif
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/menu-f2.gif
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/menu-f2.gif
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/submenu-f_bottom.gif
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/submenu-f_bottom.gif
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/submenu-f_top.gif
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/submenu-f_top.gif
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/text-btn_f1.gif
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/text-btn_f1.gif
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/static/themes/avatar/imgs/text-btn_f2.gif
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/static/themes/avatar/imgs/text-btn_f2.gif
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/octet-stream
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000398.html">[Destar-dev] r844 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000400.html">[Destar-dev] r846 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#399">[ date ]</a>
+              <a href="thread.html#399">[ thread ]</a>
+              <a href="subject.html#399">[ subject ]</a>
+              <a href="author.html#399">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

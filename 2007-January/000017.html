@@ -1,0 +1,325 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r554 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r554%20-%20trunk&In-Reply-To=%3C200701151703.l0FH3akn032663%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000016.html">
+   <LINK REL="Next"  HREF="000018.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r554 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r554%20-%20trunk&In-Reply-To=%3C200701151703.l0FH3akn032663%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r554 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Mon Jan 15 18:03:36 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000016.html">[Destar-dev] r553 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000018.html">[Destar-dev] r555 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#17">[ date ]</a>
+              <a href="thread.html#17">[ thread ]</a>
+              <a href="subject.html#17">[ subject ]</a>
+              <a href="author.html#17">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-01-15 18:03:35 +0100 (Mon, 15 Jan 2007)
+New Revision: 554
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_dialout_normal.py
+   trunk/cfg_opt_did.py
+   trunk/cfg_trunk_iax.py
+   trunk/cfg_trunk_sip.py
+   trunk/configlets.py
+Log:
+* added callerid(number) option on incoming calls. Patch by Harald Holzer
+- added callerid(number) option on outcoming calls
+- added sip from domain option
+- added DID custom mapping option
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-01-15 16:54:57 UTC (rev 553)
++++ trunk/CHANGELOG.txt	2007-01-15 17:03:35 UTC (rev 554)
+@@ -3,6 +3,10 @@
+ * dont add modules to modules.conf, if they does not exists (Bug #9708). Patch by Harald Holzer
+ * added sip tos option. Patch by Harald Holzer
+ * added queue timeout. Patch by Harald Holzer
++* added callerid(number) option on incoming calls. Patch by Harald Holzer
++- added callerid(number) option on outcoming calls
++- added sip from domain option
++- added DID custom mapping option
+ 
+ 2006-12-29:
+ * &quot;updated&quot; version
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-01-15 16:54:57 UTC (rev 553)
++++ trunk/cfg_dialout_normal.py	2007-01-15 17:03:35 UTC (rev 554)
+@@ -113,9 +113,13 @@
+ 					c.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(absolute)=${timeout})&quot;)
+ 					c.appendExten(&quot;s&quot;,&quot;Set(CDR(outtrunk)=%s)&quot; % obj.name)
+ 					if self.__getitem__(&quot;trunk_%s_price&quot; % obj.name):
+-						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=%s)&quot; % self.__getitem__(&quot;trunk_%s_price&quot; % obj.name))	
++						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=%s)&quot; % self.__getitem__(&quot;trunk_%s_price&quot; % obj.name))
+ 					else:
+-						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=0)&quot;)	
++						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=0)&quot;)
++					if obj.clidnameout:
++						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; % obj.clidnameout)
++					if obj.clidnumout:
++						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; % obj.clidnumout)
+ 					c.appendExten(&quot;s&quot;,&quot;Dial(%s,%d|${options})&quot; % (obj.dial,self.ringtime))
+ 			except KeyError:
+ 				pass
+
+Modified: trunk/cfg_opt_did.py
+===================================================================
+--- trunk/cfg_opt_did.py	2007-01-15 16:54:57 UTC (rev 553)
++++ trunk/cfg_opt_did.py	2007-01-15 17:03:35 UTC (rev 554)
+@@ -45,7 +45,7 @@
+ 					title = _(&quot;Go to&quot;),
+ 					type = &quot;radio&quot;,
+ 					default = 'phone',
+-					options = [('phone', _(&quot;Phone&quot;)), ('ivr', _(&quot;IVR&quot;))]),
++					options = [('phone', _(&quot;Phone&quot;)), ('ivr', _(&quot;IVR&quot;)), (&quot;custommap&quot;, _(&quot;Custom map&quot;))]),
+ 
+ 			VarType(&quot;phone&quot;,
+ 					title = _(&quot;Phone to ring&quot;),
+@@ -59,10 +59,31 @@
+ 					type = &quot;choice&quot;, 
+ 					options = getChoice(&quot;CfgIVR&quot;)),
+ 
++			VarType(&quot;custommappbx&quot;,
++                                        title=_(&quot;Custom map, PBX&quot;),
++                                        type=&quot;choice&quot;,
++                                        optional = True,
++                                        options=getChoice(&quot;CfgOptPBX&quot;)),
++
++    			VarType(&quot;custommapdest&quot;,
++                                        title = _(&quot;Custom map, destination&quot;),
++                                        len = 30,
++                                        optional = True),
++
++			VarType(&quot;callerid&quot;,
++					title=_(&quot;CallerID:&quot;),
++					type=&quot;label&quot;),
++
+ 			VarType(&quot;clid&quot;,
+-					title = _(&quot;Change Caller*Id to:&quot;), 
++					title = _(&quot;Change Caller*Id Name to:&quot;),
+ 					len = 25,
+-					optional = True)]
++					optional = True),
++
++			VarType(&quot;clidnum&quot;,
++					title = _(&quot;Change Caller*Id Number to:&quot;),
++					len = 25,
++					optional = True),
++					]
+ 					
+ 		self.dependencies = [
+ 			DepType(&quot;trunk&quot;, 
+@@ -104,6 +125,9 @@
+ 		if self.clid:
+ 			needModule(&quot;func_callerid&quot;)
+ 			c.appendExten(self.did,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid)
++		if self.clidnum:
++			needModule(&quot;func_callerid&quot;)
++			c.appendExten(self.did,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnum)
+ 		if self.contextin == 'phone' and self.phone:
+ 			import configlets
+ 			obj = configlets.configlet_tree.getConfigletByName(self.phone)
+@@ -113,5 +137,5 @@
+ 				pass
+ 		elif self.contextin == 'ivr' and self.ivr:
+ 			c.appendExten(self.did,&quot;Goto(%s,s,1)&quot; % self.ivr)
+-
+-
++        	elif self.contextin == 'custommap' and self.custommapdest:
++        		c.appendExten(self.did,&quot;Goto(%s,%s,1)&quot; % (self.custommappbx, self.custommapdest))
+
+Modified: trunk/cfg_trunk_iax.py
+===================================================================
+--- trunk/cfg_trunk_iax.py	2007-01-15 16:54:57 UTC (rev 553)
++++ trunk/cfg_trunk_iax.py	2007-01-15 17:03:35 UTC (rev 554)
+@@ -99,6 +99,11 @@
+ 				len=40,
+ 				optional=True),
+ 
++			VarType(&quot;clidnumin&quot;,
++				title=_(&quot;Change Caller*Id Number to:&quot;),
++				len=40,
++				optional=True),
++
+ 			VarType(&quot;contextin&quot;,
+ 				title=_(&quot;Go to&quot;),
+ 				type=&quot;radio&quot;,
+@@ -123,9 +128,24 @@
+ 				optional=True,
+ 				options=getChoice(&quot;CfgOptPBX&quot;)),
+ 
++			VarType(&quot;Outbound&quot;,
++				title=_(&quot;Outgoing calls to IAX trunk&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;clidnameout&quot;,
++				title=_(&quot;Change Caller*Id Name to:&quot;),
++				len=40,
++				optional=True),
++
++			VarType(&quot;clidnumout&quot;,
++				title=_(&quot;Change Caller*Id Number to:&quot;),
++				len=40,
++				optional=True),
++
+ 			VarType(&quot;dial&quot;,
+ 				hide=True,
+-				len=50),]
++				len=50),
++				]
+ 	
+ 		self.dependencies = [
+ 			DepType(&quot;phone&quot;, 
+
+Modified: trunk/cfg_trunk_sip.py
+===================================================================
+--- trunk/cfg_trunk_sip.py	2007-01-15 16:54:57 UTC (rev 553)
++++ trunk/cfg_trunk_sip.py	2007-01-15 17:03:35 UTC (rev 554)
+@@ -73,6 +73,11 @@
+ 				title=_(&quot;Show this trunk in the panel&quot;),
+ 				type=&quot;bool&quot;,
+ 				hide=True),
++
++	    		VarType(&quot;fromdomain&quot;,
++                               title=_(&quot;Sip domain:&quot;),
++                               len=40,
++                               optional=True),
+ 	
+ 			VarType(&quot;Inbound&quot;,
+ 				title=_(&quot;Calls from SIP trunk&quot;),
+@@ -82,6 +87,11 @@
+ 				title=_(&quot;Change Caller*Id to:&quot;),
+ 				len=25,
+ 				optional=True),
++
++ 			VarType(&quot;clidnumin&quot;,
++ 				title=_(&quot;Change Caller*Id Number to:&quot;),
++ 				len=40,
++ 				optional=True),
+ 			
+ 			VarType(&quot;contextin&quot;,
+ 				title=_(&quot;Go to&quot;),
+@@ -107,9 +117,24 @@
+ 				optional=True,
+ 				options=getChoice(&quot;CfgOptPBX&quot;)),
+ 
++ 			VarType(&quot;Outbound&quot;,
++ 				title=_(&quot;Outgoing calls to IAX trunk&quot;),
++ 				type=&quot;label&quot;),
++ 
++ 			VarType(&quot;clidnameout&quot;,
++ 				title=_(&quot;Change Caller*Id Name to:&quot;),
++ 				len=40,
++ 				optional=True),
++ 
++ 			VarType(&quot;clidnumout&quot;,
++ 				title=_(&quot;Change Caller*Id Number to:&quot;),
++ 				len=40,
++ 				optional=True),
++
+ 			VarType(&quot;dial&quot;,
+ 				hide=True,
+-				len=80),]
++				len=80),
++				]
+ 
+ 		self.dependencies = [
+ 			DepType(&quot;phone&quot;, 
+@@ -156,6 +181,8 @@
+ 			c.append(&quot;host=%s&quot; % self.host)
+ 			c.append(&quot;context=in-%s&quot; % self.name)
+ 			c.append(&quot;canreinvite=no&quot;)
++			if self.fromdomain:
++				c.append(&quot;fromdomain=%s&quot; % self.fromdomain)
+ 			if self.nat:
+ 				c.append(&quot;nat=yes&quot;)
+ 			if self.insecure:
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-01-15 16:54:57 UTC (rev 553)
++++ trunk/configlets.py	2007-01-15 17:03:35 UTC (rev 554)
+@@ -877,6 +877,9 @@
+ 		if self.clid:
+ 			needModule(&quot;func_callerid&quot;)
+ 			c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid)
++		if self.clidnumin:
++			needModule(&quot;func_callerid&quot;)
++			c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin)
+ 		global configlet_tree
+ 		if self.contextin == 'phone' and self.phone:
+ 			obj = configlet_tree.getConfigletByName(self.phone)
+@@ -894,6 +897,9 @@
+ 		if self.clid:
+ 			needModule(&quot;func_callerid&quot;)
+ 			c.appendExten(&quot;_X&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid)
++		if self.clidnumin:
++			needModule(&quot;func_callerid&quot;)
++			c.appendExten(&quot;_X&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin)
+ 		if self.contextin == 'phone' and self.phone:
+ 			obj = configlet_tree.getConfigletByName(self.phone)
+ 			try:
+@@ -910,6 +916,9 @@
+ 		if self.clid:
+ 			needModule(&quot;func_callerid&quot;)
+ 			c.appendExten(&quot;_X.&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid)
++		if self.clidnumin:
++			needModule(&quot;func_callerid&quot;)
++			c.appendExten(&quot;_X.&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin)
+ 		if self.contextin == 'phone' and self.phone:
+ 			obj = configlet_tree.getConfigletByName(self.phone)
+ 			try:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000016.html">[Destar-dev] r553 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000018.html">[Destar-dev] r555 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#17">[ date ]</a>
+              <a href="thread.html#17">[ thread ]</a>
+              <a href="subject.html#17">[ subject ]</a>
+              <a href="author.html#17">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

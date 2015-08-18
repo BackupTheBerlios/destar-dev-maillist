@@ -1,0 +1,499 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r846 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r846%20-%20trunk&In-Reply-To=%3C200912162042.nBGKgRFF021867%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000399.html">
+   <LINK REL="Next"  HREF="000401.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r846 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r846%20-%20trunk&In-Reply-To=%3C200912162042.nBGKgRFF021867%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r846 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Wed Dec 16 21:42:27 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000399.html">[Destar-dev] r845 - in trunk: . static/themes/avatar	static/themes/avatar/css static/themes/avatar/imgs
+</A></li>
+        <LI>Next message: <A HREF="000401.html">[Destar-dev] r847 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#400">[ date ]</a>
+              <a href="thread.html#400">[ thread ]</a>
+              <a href="subject.html#400">[ subject ]</a>
+              <a href="author.html#400">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-16 21:42:23 +0100 (Wed, 16 Dec 2009)
+New Revision: 846
+
+Added:
+   trunk/cfg_app_cidblock.py
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_app_agentcallbacklogin.py
+   trunk/cfg_app_agentlogin.py
+   trunk/cfg_app_callfw.py
+   trunk/cfg_app_chanspy.py
+   trunk/cfg_app_conference.py
+   trunk/cfg_app_dnd.py
+   trunk/cfg_app_meetme.py
+   trunk/cfg_app_parking.py
+   trunk/cfg_app_pickup.py
+   trunk/cfg_app_quickdial_global.py
+   trunk/cfg_app_quickdial_phone.py
+   trunk/cfg_app_voicemail.py
+   trunk/cfg_app_voicemailsettings.py
+Log:
+* cfg_app_*: separate context for all apps for security.
+* Replaced CALLERIDNUM with CALLERID(num).
+* Added cfg_app_cidblock.py to implement ex-girlfriend feature.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/CHANGELOG.txt	2009-12-16 20:42:23 UTC (rev 846)
+@@ -1,3 +1,8 @@
++2009-12-16
++* cfg_app_*: separate context for all apps.
++* Replaced CALLERIDNUM with CALLERID(num).
++* Added cfg_app_cidblock.py to implement ex-girlfriend feature.
++
+ 2009-12-15
+ * Added avatar web style
+ 
+
+Modified: trunk/cfg_app_agentcallbacklogin.py
+===================================================================
+--- trunk/cfg_app_agentcallbacklogin.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_agentcallbacklogin.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -63,19 +63,19 @@
+ 		needModule(&quot;chan_local&quot;)
+ 	
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
+ 
+ 		if self.silentlogin:
+ 			opts = &quot;s&quot;
+ 		else:
+ 			opts = &quot;&quot;
+ 		
+-		c.appendExten(self.ext, &quot;AgentCallbackLogin(${CALLERIDNUM}|%s|${CALLERIDNUM}@%s)&quot; % (opts, self.pbx), self.pbx )
+-		c.appendExten(self.ext, &quot;DBdel(DND/%s/${CALLERIDNUM})&quot; % self.pbx, self.pbx)
++		c.appendExten(self.ext, &quot;AgentCallbackLogin(${CALLERID(num)},%s,${CALLERID(num)}@%s)&quot; % (opts, self.pbx), self.pbx )
++		c.appendExten(self.ext, &quot;DBdel(DND/%s/${CALLERID(num)})&quot; % self.pbx, self.pbx)
+ 		c.appendExten(self.ext, &quot;Playback(do-not-disturb)&quot;, self.pbx)
+ 		c.appendExten(self.ext, &quot;Playback(cancelled)&quot;, self.pbx)
+ 		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+ 
+-		c.appendExten(self.changeext, &quot;AgentCallbackLogin(${CALLERIDNUM}|%s|'#')&quot; % (opts), self.pbx )
++		c.appendExten(self.changeext, &quot;AgentCallbackLogin(${CALLERID(num)},%s,'#')&quot; % (opts), self.pbx )
+ 		c.appendExten(self.logoutext, &quot;Dial(Local/%s@%s/n,,D(#))&quot; % (self.changeext, self.pbx), self.pbx)
+ 
+
+Modified: trunk/cfg_app_agentlogin.py
+===================================================================
+--- trunk/cfg_app_agentlogin.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_agentlogin.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -46,6 +46,6 @@
+ 		needModule(&quot;chan_agent&quot;)
+ 	
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
+ 		c.appendExten(self.ext, &quot;AgentLogin()&quot;, self.pbx)
+ 
+
+Modified: trunk/cfg_app_callfw.py
+===================================================================
+--- trunk/cfg_app_callfw.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_callfw.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -68,15 +68,15 @@
+ 		if self.devstateprefix:
+ 		    needModule(&quot;app_devstate&quot;)
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
+ 		c.appendExten(self.set, &quot;Goto(cfw-%s,s,1)&quot; % self.set, self.pbx)
+ 		c.appendExten(self.set, &quot;Hangup&quot;, self.pbx)
+ 		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Macro(call-forward,%s,%s,${EXTEN:%d},%s)&quot; % (self.type,self.pbx,len(self.set),msg), self.pbx)
+ 		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Hangup&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.unset, &quot;Answer()&quot;, self.pbx)
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx), self.pbx)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;DBdel(%s/%s/${CALLERID(num)})&quot; % (self.type, self.pbx), self.pbx)
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;%s&quot; % self.unset, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type, self.pbx), self.pbx)
++			c.appendExten(&quot;%s&quot; % self.unset, &quot;Devstate(%s_%s_${CALLERID(num)},0)&quot; % (self.type, self.pbx), self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.unset, &quot;Playback(call-fwd-cancelled)&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.unset, &quot;Wait(1)&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.unset, &quot;Hangup&quot;, self.pbx)
+@@ -84,22 +84,23 @@
+ 		context=&quot;cfw-%s&quot; % self.set
+ 		c.setSection(context)
+ 		if self.toggle:
+-			c.appendExten(&quot;s&quot;, &quot;Set(testcf=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx), context)
++			c.appendExten(&quot;s&quot;, &quot;Set(testcf=${DB(%s/%s/${CALLERID(num)})})&quot; % (self.type, self.pbx), context)
+ 			c.appendExten(&quot;s&quot;, 'GotoIf($[&quot;${testcf}&quot; != &quot;&quot;]?switchoff)', context)	
+ 		c.appendExten(&quot;s&quot;, &quot;Set(TIMEOUT(digit)=2)&quot;, context)
+-		c.appendExten(&quot;s&quot;, &quot;Set(lastnum=${DB(%s_LASTNUM/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx), context)
++		c.appendExten(&quot;s&quot;, &quot;Set(lastnum=${DB(%s_LASTNUM/%s/${CALLERID(num)})})&quot; % (self.type, self.pbx), context)
+ 		c.appendExten(&quot;s&quot;, 'GotoIf($[&quot;${lastnum}&quot; = &quot;&quot;]?nonumber)', context)
+ 		c.appendExten(&quot;s&quot;,&quot;Background(press-1&amp;to-enter-a-number&amp;or&amp;press-2&amp;for&amp;vm-last&amp;number)&quot;, context)
+ 		c.appendExten(&quot;s&quot;,&quot;WaitExten(3)&quot;, context)
+ 		c.appendExten(&quot;s&quot;,&quot;Hangup()&quot;, context)
+ 		c.appendExten(&quot;s&quot;, &quot;Goto(1,1)&quot;, context, label=&quot;nonumber&quot;)
+ 		c.appendExten(&quot;s&quot;, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.unset), context, label=&quot;switchoff&quot;)
++		c.appendExten(&quot;i&quot;, &quot;Goto(1,1)&quot;, context, label=&quot;nonumber&quot;)
+ 		c.appendExten(&quot;2&quot;,&quot;Macro(call-forward,%s,%s,${lastnum},%s)&quot; % (self.type,self.pbx,msg), context)
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;2&quot;, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx), context)
++			c.appendExten(&quot;2&quot;, &quot;Devstate(%s_%s_${CALLERID(num)},2)&quot; % (self.type.lower(), self.pbx), context)
+ 		c.appendExten(&quot;1&quot;, &quot;Playback(please-enter-the&amp;number&amp;after-the-tone&amp;beep)&quot;, context)
+ 		c.appendExten(&quot;1&quot;,&quot;WaitExten(5)&quot;, context)
+ 		c.appendExten(&quot;_X.&quot;,&quot;Macro(call-forward,%s,%s,${EXTEN},%s)&quot; % (self.type,self.pbx,msg), context)
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;_X.&quot;, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx), context)
++			c.appendExten(&quot;_X.&quot;, &quot;Devstate(%s_%s_${CALLERID(num)},2)&quot; % (self.type.lower(), self.pbx), context)
+ 
+
+Modified: trunk/cfg_app_chanspy.py
+===================================================================
+--- trunk/cfg_app_chanspy.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_chanspy.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -30,10 +30,17 @@
+ 	def createVariables(self):
+ 		self.variables   = [ 
+ 			VarType(&quot;pbx&quot;,
+-				title=_(&quot;Virtual PBX&quot;),
++				title=_(&quot;Virtual PBX allowed to dial&quot;),
+ 				type=&quot;choice&quot;,
++				optional = True,
+ 				options=getChoice(&quot;CfgOptPBX&quot;)),
+ 			
++			VarType(&quot;phone&quot;,
++				title = _(&quot;Phone allowed to dial&quot;),
++				optional = True,
++				type =&quot;choice&quot;,
++				options = getChoice(&quot;CfgPhone&quot;)),
++
+ 			VarType(&quot;ext&quot;,
+ 				title=_(&quot;Extension&quot;),
+ 				len=6),
+@@ -44,6 +51,11 @@
+ 				optional=True,
+ 				len=15),
+ 
++			VarType(&quot;spygroup&quot;,
++				title=_(&quot;Spy Group&quot;),
++				optional=True,
++				len=15),
++
+ 			VarType(&quot;password&quot;,
+ 				type=&quot;int&quot;,
+ 				title=_(&quot;Password&quot;),
+@@ -62,10 +74,17 @@
+ 	def createAsteriskConfig(self):
+ 		needModule(&quot;app_chanspy&quot;)
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
++		if self.pbx:
++			c.setSection(&quot;%s-apps&quot; % self.pbx)
++		else:
++			c.setSection(&quot;real-out-%s&quot; % self.phone)
+ 		if self.password:
+ 			c.appendExten(self.ext, &quot;Authenticate(%s)&quot; % self.password, self.pbx)
+ 		if self.quiet:
+-			c.appendExten(self.ext, &quot;Chanspy(%s,q)&quot; % self.scanspec, self.pbx)
+-		else: 
+-			c.appendExten(self.ext, &quot;Chanspy(%s)&quot; % self.scanspec, self.pbx)
++			quiet = &quot;q&quot;
++		else:
++			quiet = &quot;&quot;
++		if self.spygroup:
++			c.appendExten(self.ext, &quot;Chanspy(,g(%s)%s)&quot; % (self.spygroup,quiet), self.pbx)
++		else:
++			c.appendExten(self.ext, &quot;Chanspy(%s,q%s&quot; % (self.scanspec,quiet), self.pbx)
+
+Added: trunk/cfg_app_cidblock.py
+===================================================================
+--- trunk/cfg_app_cidblock.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_cidblock.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -0,0 +1,50 @@
++# -*- coding: utf-8 -*-
++#
++# Destar has Copyright (C) 2005 by Holger Schurig
++# This file has Copyright (C) 2005 by Alejandro Rios
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++
++class CfgAppCIDBlocking(CfgApp):
++
++	shortName   = _(&quot;Caller Identifier Blocking List&quot;)
++	description = _(&quot;Extensions to add/remove from personal CID blocking list. The add extension will be of the form prefix+*+number_to_block. The remove extension will be of the form prefix+*+number_to_block.&quot;)
++	newObjectTitle = _(&quot;New extensions to add/remove/access personal CID blocking list&quot;)
++	
++	def createVariables(self):
++		self.variables   = [
++			VarType(&quot;pbx&quot;,    title=_(&quot;Virtual PBX&quot;), type=&quot;choice&quot;, options=getChoice(&quot;CfgOptPBX&quot;)),
++			VarType(&quot;set&quot;,      title=_(&quot;Setting prefix&quot;), len=6, default=&quot;*9&quot;),
++			VarType(&quot;unset&quot;,   title=_(&quot;Unsetting prefix&quot;), len=6, default=&quot;#9&quot;),
++		       ]
++		self.dependencies = [ DepType(&quot;pbx&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;)),
++					]
++	
++	def row(self):
++		return (&quot;%s / %s&quot; % (self.set,self.unset),self.shortName,self.pbx)
++
++	def createAsteriskConfig(self):
++		c = AstConf(&quot;extensions.conf&quot;)
++		c.setSection(self.pbx)
++		c.appendExten(&quot;_%s*X.&quot; % self.set, &quot;Set(DB(CIDBLOCKLIST/${CALLERID(num)}/${EXTEN:%d})=${EXTEN:%d})&quot; % (len(self.set)+1,len(self.set)+1))
++		c.appendExten(&quot;_%s*X.&quot; % self.set, &quot;Hangup&quot;)
++		c.appendExten(&quot;_%s*X&quot; % self.unset, &quot;DBdel(CIDBLOCKLIST/${CALLERID(num)}/${EXTEN:%d})&quot; % len(self.unset)+1)
++		c.appendExten(&quot;_%s*X&quot; % self.unset, &quot;Hangup&quot;)
+
+
+Property changes on: trunk/cfg_app_cidblock.py
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Modified: trunk/cfg_app_conference.py
+===================================================================
+--- trunk/cfg_app_conference.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_conference.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -40,7 +40,7 @@
+ 		needModule(&quot;app_conference&quot;)
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
+ 		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
+ 		c.appendExten(self.ext, &quot;Wait(1)&quot;, self.pbx)
+ 		c.appendExten(self.ext, &quot;Conference&quot;, self.pbx)
+
+Modified: trunk/cfg_app_dnd.py
+===================================================================
+--- trunk/cfg_app_dnd.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_dnd.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -61,8 +61,8 @@
+ 				if obj.tapi:
+ 				    tapisupport = True
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Set(DB(DND/%s/${CALLERIDNUM})=True)&quot; % self.pbx, self.pbx)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Set(DB(DND/%s/${CALLERID(num)})=True)&quot; % self.pbx, self.pbx)
+ 		if tapisupport:
+ 			needModule(&quot;app_cut&quot;)
+ 			c.appendExten(&quot;%s&quot; % self.set, &quot;Set(CHAN=${CUT(CHANNEL,-,1)})&quot;, self.pbx)
+@@ -72,7 +72,7 @@
+ 		c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.set, &quot;Hangup&quot;, self.pbx)
+ 
+-		c.appendExten(&quot;%s&quot; % self.unset, &quot;DBdel(DND/%s/${CALLERIDNUM})&quot; % self.pbx, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.unset, &quot;DBdel(DND/%s/${CALLERID(num)})&quot; % self.pbx, self.pbx)
+ 		if tapisupport:
+ 			c.appendExten(&quot;%s&quot; % self.unset, &quot;Set(CHAN=${CUT(CHANNEL,-,1)})&quot;, self.pbx)
+ 			c.appendExten(&quot;%s&quot; % self.unset, &quot;UserEvent(ASTDB,Channel: ${CHAN}^Family: DND^Value: ^)&quot;, self.pbx )
+
+Modified: trunk/cfg_app_meetme.py
+===================================================================
+--- trunk/cfg_app_meetme.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_meetme.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -81,7 +81,7 @@
+ 		needModule(&quot;app_meetme&quot;)
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
+ 		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
+ 		c.appendExten(self.ext, &quot;Set(TIMEOUT(absolute)=%d)&quot; % self.timeout, self.pbx)
+ 		# 'd' -- dynamically add conference
+@@ -91,7 +91,7 @@
+ 			args += &quot;%d&quot; % self.confno
+ 		args += &quot;,d&quot;
+ 		if self.pin:
+-			args += &quot;P|%d&quot; % self.pin
++			args += &quot;P,%d&quot; % self.pin
+ 		c.appendExten(self.ext, &quot;MeetMe(%s)&quot; % args, self.pbx)
+ 
+ 		if self.confno:
+
+Modified: trunk/cfg_app_parking.py
+===================================================================
+--- trunk/cfg_app_parking.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_parking.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -49,7 +49,7 @@
+ 		# transferdigittimeout
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
+ 		c.appendExten(self.ext, &quot;Park(%s)&quot; % self.ext, self.pbx)
+ 		
+ 		panelutils.createParkButton(self)
+
+Modified: trunk/cfg_app_pickup.py
+===================================================================
+--- trunk/cfg_app_pickup.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_pickup.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -36,8 +36,7 @@
+ 			VarType(&quot;prefix&quot;,
+ 				title=_(&quot;Channel Pickup Prefix&quot;),
+ 				len=6,
+-				default=&quot;*8&quot;,
+-				hint=&quot;needs bristuff patches (app_pickup.so).&quot;),
++				default=&quot;*8&quot;)
+ 		       ]
+ 		self.dependencies = [ DepType(&quot;pbx&quot;, 
+ 					type=&quot;hard&quot;,
+@@ -48,4 +47,8 @@
+ 		return (&quot;%s&quot; % (self.prefix), self.shortName, self.pbx)
+ 	
+ 	def createAsteriskConfig(self):
+-		needModule(&quot;app_pickup&quot;)
++		needModule(&quot;app_directed_pickup&quot;)
++		c = AstConf(&quot;extensions.conf&quot;)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
++		c.appendExten(&quot;_%s.&quot; % self.prefix, &quot;Pickup(${EXTEN:%d}@PICKUPMARK)&quot; % (len(self.prefix)), self.pbx)
++		c.appendExten(&quot;_%s.&quot; % self.prefix, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_quickdial_global.py
+===================================================================
+--- trunk/cfg_app_quickdial_global.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_quickdial_global.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -56,7 +56,7 @@
+ 
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
+ 		if self.pin:
+ 			needModule(&quot;app_authenticate&quot;)
+ 			c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Authenticate(%s)&quot; % self.pin, self.pbx)
+
+Modified: trunk/cfg_app_quickdial_phone.py
+===================================================================
+--- trunk/cfg_app_quickdial_phone.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_quickdial_phone.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -44,8 +44,8 @@
+ 
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
+-		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Set(DB(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d:2})=${EXTEN:%d})&quot; % (len(self.set),len(self.set)+3), self.pbx)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
++		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Set(DB(QUICKDIALLIST/${CALLERID(num)}/${EXTEN:%d:2})=${EXTEN:%d})&quot; % (len(self.set),len(self.set)+3), self.pbx)
+ 		c.appendExten(&quot;_%sXX*X.&quot; % self.set, &quot;Hangup&quot;, self.pbx)
+-		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;DBdel(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d})&quot; % len(self.unset), self.pbx)
++		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;DBdel(QUICKDIALLIST/${CALLERID(num)}/${EXTEN:%d})&quot; % len(self.unset), self.pbx)
+ 		c.appendExten(&quot;_%sXX&quot; % self.unset, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_voicemail.py
+===================================================================
+--- trunk/cfg_app_voicemail.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_voicemail.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -47,7 +47,7 @@
+ 		c.appendExten(self.ext, &quot;Answer&quot;, self.pbx)
+ 		c.appendExten(self.ext, &quot;Wait(1)&quot;, self.pbx)
+ 		if not self.mailbox:
+-			c.appendExten(self.ext, &quot;VoiceMailMain(${CALLERIDNUM}@%s)&quot; % self.pbx, self.pbx)
++			c.appendExten(self.ext, &quot;VoiceMailMain(${CALLERID(num)}@%s)&quot; % self.pbx, self.pbx)
+ 		else:
+ 			c.appendExten(self.ext, &quot;VoiceMailMain(@%s)&quot; % self.pbx, self.pbx)
+ 		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_voicemailsettings.py
+===================================================================
+--- trunk/cfg_app_voicemailsettings.py	2009-12-15 22:50:03 UTC (rev 845)
++++ trunk/cfg_app_voicemailsettings.py	2009-12-16 20:42:23 UTC (rev 846)
+@@ -69,14 +69,14 @@
+ 		if self.devstateprefix:
+ 		    needModule(&quot;app_devstate&quot;)
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(self.pbx)
++		c.setSection(&quot;%s-apps&quot; % self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.set, &quot;Answer()&quot;, self.pbx)
+ 		if self.toggle:
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Set(togglestate=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx), self.pbx)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Set(togglestate=${DB(%s/%s/${CALLERID(num)})})&quot; % (self.type, self.pbx), self.pbx)
+ 			c.appendExten(&quot;%s&quot; % self.set, 'GotoIf($[&quot;${togglestate}&quot; != &quot;&quot;]?switchoff)', self.pbx)
+-		c.appendExten(&quot;%s&quot; % self.set, &quot;Set(DB(%s/%s/${CALLERIDNUM})=1)&quot; % (self.type, self.pbx), self.pbx)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Set(DB(%s/%s/${CALLERID(num)})=1)&quot; % (self.type, self.pbx), self.pbx)
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx), self.pbx)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Devstate(%s_%s_${CALLERID(num)},2)&quot; % (self.type.lower(), self.pbx), self.pbx)
+ 		if self.type == &quot;VMIM&quot;:
+ 			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(voice-mail-system)&quot;, self.pbx)
+ 			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;, self.pbx)
+@@ -90,9 +90,9 @@
+ 		c.appendExten(&quot;%s&quot; % self.set, &quot;Hangup&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), self.pbx, label=&quot;switchoff&quot;)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Answer()&quot;, self.pbx)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx), self.pbx)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERID(num)})&quot; % (self.type, self.pbx), self.pbx)
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;%s&quot; % self.ext, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type.lower(), self.pbx), self.pbx)
++			c.appendExten(&quot;%s&quot; % self.ext, &quot;Devstate(%s_%s_${CALLERID(num)},0)&quot; % (self.type.lower(), self.pbx), self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(voice-mail-system)&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(cancelled)&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Wait(1)&quot;, self.pbx)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000399.html">[Destar-dev] r845 - in trunk: . static/themes/avatar	static/themes/avatar/css static/themes/avatar/imgs
+</A></li>
+	<LI>Next message: <A HREF="000401.html">[Destar-dev] r847 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#400">[ date ]</a>
+              <a href="thread.html#400">[ thread ]</a>
+              <a href="subject.html#400">[ subject ]</a>
+              <a href="author.html#400">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,2195 @@
+From dasenjo at mail.berlios.de  Tue May  8 06:31:04 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Tue, 8 May 2007 06:31:04 +0200
+Subject: [Destar-dev] r673 - trunk
+Message-ID: <200705080431.l484V4Ss029041@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-05-08 06:30:58 +0200 (Tue, 08 May 2007)
+New Revision: 673
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/panelutils.py
+Log:
+* Added Astdbkey for the extension buttons in the panel.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-04-25 22:52:26 UTC (rev 672)
++++ trunk/CHANGELOG.txt	2007-05-08 04:30:58 UTC (rev 673)
+@@ -1,3 +1,6 @@
++2007-05-07:
++* Added Astdbkey for the extension buttons in the panel.
++
+ 2007-04-25
+ * Added panel buttons for agents. (still does not work at all)
+ * Allow configuring op_server debug level.
+
+Modified: trunk/panelutils.py
+===================================================================
+--- trunk/panelutils.py	2007-04-25 22:52:26 UTC (rev 672)
++++ trunk/panelutils.py	2007-05-08 04:30:58 UTC (rev 673)
+@@ -120,6 +120,7 @@
+ 	p.append("Icon=1")
+ 	p.append("Extension=%s" % obj.ext)
+ 	p.append("Label=%s" % obj.name)
++	p.append("Astdbkey=%s/%s" % (obj.pbx, obj.ext))
+ 
+ def createAgentButton(obj):
+ 	p = AstConf("op_buttons.cfg")
+
+
+
+From dasenjo at mail.berlios.de  Tue May  8 21:57:34 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Tue, 8 May 2007 21:57:34 +0200
+Subject: [Destar-dev] r674 - trunk
+Message-ID: <200705081957.l48JvYhs030448@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-05-08 21:57:34 +0200 (Tue, 08 May 2007)
+New Revision: 674
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_app_dnd.py
+Log:
+* Added the needed UserEvents in the dialplan to manage DND completely.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-08 04:30:58 UTC (rev 673)
++++ trunk/CHANGELOG.txt	2007-05-08 19:57:34 UTC (rev 674)
+@@ -1,3 +1,6 @@
++2007-05-08:
++* Added the needed UserEvents in the dialplan to manage DND completely.
++
+ 2007-05-07:
+ * Added Astdbkey for the extension buttons in the panel.
+ 
+
+Modified: trunk/cfg_app_dnd.py
+===================================================================
+--- trunk/cfg_app_dnd.py	2007-05-08 04:30:58 UTC (rev 673)
++++ trunk/cfg_app_dnd.py	2007-05-08 19:57:34 UTC (rev 674)
+@@ -54,12 +54,26 @@
+ 				pass
+ 
+ 	def createAsteriskConfig(self):
++		import configlets
++		tapisupport = False
++		for obj in configlets.configlet_tree:
++			if obj.__class__.__name__ == 'CfgOptSettings':
++				if obj.tapi:
++				    tapisupport = True
+ 		c = AstConf("extensions.conf")
+ 		c.setSection(self.pbx)
+ 		c.appendExten("%s" % self.set, "Set(DB(DND/%s/${CALLERIDNUM})=True)" % self.pbx)
++		if tapisupport:
++			c.appendExten("%s" % self.set, "Set(CHAN=${CUT(CHANNEL|-|1)})")
++			c.appendExten("%s" % self.set, "UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: True" )
++				
+ 		c.appendExten("%s" % self.set, "Playback(do-not-disturb)")
+ 		c.appendExten("%s" % self.set, "Hangup")
++
+ 		c.appendExten("%s" % self.unset, "DBdel(DND/%s/${CALLERIDNUM})" % self.pbx)
++		if tapisupport:
++			c.appendExten("%s" % self.unset, "Set(CHAN=${CUT(CHANNEL|-|1)})")
++			c.appendExten("%s" % self.unset, "UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: ^" )
+ 		c.appendExten("%s" % self.unset, "Playback(do-not-disturb)")
+ 		c.appendExten("%s" % self.unset, "Playback(cancelled)")
+ 		c.appendExten("%s" % self.unset, "Hangup")
+
+
+
+From santiago at mail.berlios.de  Fri May 11 17:45:04 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Fri, 11 May 2007 17:45:04 +0200
+Subject: [Destar-dev] r675 - in branches: . destar-callweaver
+Message-ID: <200705111545.l4BFj46l026866@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-11 17:45:03 +0200 (Fri, 11 May 2007)
+New Revision: 675
+
+Added:
+   branches/destar-callweaver/
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/backend.py
+Log:
+branching destar for callweaver
+
+
+
+Copied: branches/destar-callweaver (from rev 674, trunk)
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-08 19:57:34 UTC (rev 674)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 15:45:03 UTC (rev 675)
+@@ -1,3 +1,6 @@
++2007-05-11:
++* Branching destar for callweaver
++
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+ 
+
+Modified: branches/destar-callweaver/backend.py
+===================================================================
+--- trunk/backend.py	2007-05-08 19:57:34 UTC (rev 674)
++++ branches/destar-callweaver/backend.py	2007-05-11 15:45:03 UTC (rev 675)
+@@ -26,7 +26,7 @@
+ 
+ DESTAR_CFG = "destar_cfg.py"
+ CONFIGLETS_DIR = os.getenv('CONFIGLETS_DIR', default='.') 
+-ASTERISK_MODULES_DIR = os.getenv('ASTERISK_MODULES_DIR', default='/usr/lib/asterisk/modules')
++CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/usr/lib/callweaver/modules')
+ 
+ 
+ 
+@@ -118,7 +118,7 @@
+ 	* sip.conf
+ 	* iax.conf
+ 	* zapata.conf
+-	* macros.inc
++	* procs.inc
+ 	"""
+ 
+ 	tapisupport = False
+@@ -145,7 +145,7 @@
+ 	c = AstConf("extensions.conf")
+ 	c.append("static=yes")
+ 	c.append("writeprotect=yes")
+-	c.append('#include "macros.inc"')
++	c.append('#include "procs.inc"')
+ 
+ 	c.setSection("default")
+ 	c.append("; This context should not be used directly")
+@@ -182,11 +182,11 @@
+ 	needModule("res_indications")
+ 	c = AstConf("macros.inc")
+ 	c.append(";")
+-	c.append("; Macro to dial a standard local extension")
++	c.append("; Proc to dial a standard local extension")
+ 	c.append(";")
+-	c.append("; format: Macro(stdexten,dest,ext,pbx)")
++	c.append("; format: Proc(stdexten,dest,ext,pbx)")
+ 	c.append(";")
+-	c.setSection("macro-dial-std-exten")
++	c.setSection("proc-dial-std-exten")
+ 	c.append(";")
+ 	c.append("; test for CFIM (Call Forwarding Immediate)")
+ 	c.append("exten=s,1,Set(fw_ext=${DB(CFIM/${ARG4}/${ARG3})})")
+@@ -261,10 +261,10 @@
+ 	c.append("exten=s,n(fw),Goto(${ARG2},${fw_ext},1)")
+ 	c.append(";")
+ 	c.append('exten=s,n(vmu),Set(vmopt=u)')
+-	c.append("exten=s,n,Macro(voicemail,${vmopt}${ARG3}@${ARG4})")
++	c.append("exten=s,n,Proc(voicemail,${vmopt}${ARG3}@${ARG4})")
+ 	c.append(";")
+ 	c.append('exten=s,n(vmbs),Set(vmopt=b)')
+-	c.append("exten=s,n,Macro(voicemail,${vmopt}${ARG3}@${ARG4})")
++	c.append("exten=s,n,Proc(voicemail,${vmopt}${ARG3}@${ARG4})")
+ 	c.append(";")
+ 	c.append("exten=s,n(hangup),Hangup()")
+ 	c.append(";")
+@@ -272,14 +272,14 @@
+         if tapisupport:
+                 c.append("exten=h,1,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)")
+ 
+-                c.append("[macro-tapi];")
++                c.append("[proc-tapi];")
+                 c.append("exten=s,1,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&${ARG2}] LINE_CALLSTATE LINECALLSTATE_CONNECTED)")
+                 c.append("exten=s,2,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)")
+ 
+ 	c.append(";")
+-	c.append("; format: Macro(voicemail,<VoiceMail arguments>)")
++	c.append("; format: Proc(voicemail,<VoiceMail arguments>)")
+ 	c.append(";")
+-	c.setSection("macro-voicemail")
++	c.setSection("proc-voicemail")
+ 	c.append("exten => t,1,Hangup()")
+ 	c.append("exten => T,1,Hangup()")
+ 	c.append("exten => s,1,Answer")
+@@ -290,9 +290,9 @@
+ 
+ 
+ 	c.append(";")
+-	c.append("; format: Macro(dial-result,[<cause>])")
++	c.append("; format: Proc(dial-result,[<cause>])")
+ 	c.append(";")
+-	c.setSection("macro-dial-result")
++	c.setSection("proc-dial-result")
+ 	c.append("exten => s,1,Set(TIMEOUT(absolute)=35)")
+ 	c.append("exten => s,2,GotoIf($[foo${ARG1} != foo]?cause_${ARG1},1:cause_${HANGUPCAUSE},1)")
+ 
+@@ -404,7 +404,7 @@
+ 		
+ 	available_modules = []
+ 	missing_modules = []
+-	for f in os.listdir(ASTERISK_MODULES_DIR):
++	for f in os.listdir(CALLWEAVER_MODULES_DIR):
+ 		if f.endswith('.so'): available_modules.append(f[:-3])
+ 	c = AstConf("modules.conf")
+ 	c.setSection("modules")
+
+
+
+From santiago at mail.berlios.de  Fri May 11 17:57:09 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Fri, 11 May 2007 17:57:09 +0200
+Subject: [Destar-dev] r676 - branches/destar-callweaver
+Message-ID: <200705111557.l4BFv9mk028133@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-11 17:57:08 +0200 (Fri, 11 May 2007)
+New Revision: 676
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/backend.py
+   branches/destar-callweaver/cfg_dialout_normal.py
+   branches/destar-callweaver/cfg_phone_epygi.py
+   branches/destar-callweaver/cfg_phone_zap.py
+   branches/destar-callweaver/cfg_trunk_iaxtel.py
+   branches/destar-callweaver/configlets.py
+Log:
+Changing {M,m}acro for Proc and proc
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 15:57:08 UTC (rev 676)
+@@ -1,5 +1,6 @@
+ 2007-05-11:
+ * Branching destar for callweaver
++* Changing {M,m}acro for Proc and proc
+ 
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+
+Modified: branches/destar-callweaver/backend.py
+===================================================================
+--- branches/destar-callweaver/backend.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/backend.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -180,7 +180,7 @@
+ 	c.append("values => '${CDR(clid)}','${CDR(src)}','${CDR(dst)}','${CDR(dcontext)}','${CDR(channel)}','${CDR(dstchannel)}','${CDR(lastapp)}','${CDR(lastdata)}','${CDR(start)}','${CDR(answer)}','${CDR(end)}','${CDR(duration)}','${CDR(billsec)}','${CDR(disposition)}','${CDR(amaflags)}','${CDR(accountcode)}','${CDR(uniqueid)}','${CDR(userfield)}','${CDR(pbx)}','${CDR(intrunk)}','${CDR(outtrunk)}','${CDR(dialout)}'")
+ 
+ 	needModule("res_indications")
+-	c = AstConf("macros.inc")
++	c = AstConf("procs.inc")
+ 	c.append(";")
+ 	c.append("; Proc to dial a standard local extension")
+ 	c.append(";")
+
+Modified: branches/destar-callweaver/cfg_dialout_normal.py
+===================================================================
+--- branches/destar-callweaver/cfg_dialout_normal.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/cfg_dialout_normal.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -114,8 +114,8 @@
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		c = AstConf("macros.inc")
+-		c.setSection("macro-%s" % self.name)
++		c = AstConf("procs.inc")
++		c.setSection("proc-%s" % self.name)
+ 		c.append("; params: exten,secret,timeout")
+ 		needModule("app_authenticate")
+ 		if self.dis_transfer:
+
+Modified: branches/destar-callweaver/cfg_phone_epygi.py
+===================================================================
+--- branches/destar-callweaver/cfg_phone_epygi.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/cfg_phone_epygi.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -294,7 +294,7 @@
+ 		extensions = AstConf("extensions.conf")
+ 		extensions.setSection(self.pbx)
+ 		if self.ext:
+-			extensions.appendExten(self.ext, "Macro(dial-std-exten,%s/%s@%s:5060,out-%s,%s,%s)" % (self.technology,self.name,self.gw,self.name,self.pbx,self.ext))
++			extensions.appendExten(self.ext, "Proc(dial-std-exten,%s/%s@%s:5060,out-%s,%s,%s)" % (self.technology,self.name,self.gw,self.name,self.pbx,self.ext))
+ 
+ 		self.createVoicemailConfig(sip)
+ 		self.createOutgoingContext()
+
+Modified: branches/destar-callweaver/cfg_phone_zap.py
+===================================================================
+--- branches/destar-callweaver/cfg_phone_zap.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/cfg_phone_zap.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -289,7 +289,7 @@
+ 
+ 
+ 	def createDialEntry(self, extensions, exten, pbx, ext):
+-		ret = extensions.appendExten(exten, "Macro(dial-std-exten,%s/%s,out-%s,%s,%s)" % (
++		ret = extensions.appendExten(exten, "Proc(dial-std-exten,%s/%s,out-%s,%s,%s)" % (
+ 			self.technology,
+ 			self.channels,
+ 			self.name,
+
+Modified: branches/destar-callweaver/cfg_trunk_iaxtel.py
+===================================================================
+--- branches/destar-callweaver/cfg_trunk_iaxtel.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/cfg_trunk_iaxtel.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -92,4 +92,4 @@
+ 			c = AstConf("extensions.conf")
+ 			c.setSection("in-iaxtel")
+ 			# TODO: don't hardcode the "SIP/" here:
+-			c.appendExten(self.iaxtelid, "Macro(exten-std,SIP/%s)" % self.phone)
++			c.appendExten(self.iaxtelid, "Proc(exten-std,SIP/%s)" % self.phone)
+
+Modified: branches/destar-callweaver/configlets.py
+===================================================================
+--- branches/destar-callweaver/configlets.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/configlets.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -225,7 +225,7 @@
+ 			app =	[
+ 				"app_db",
+ 				"app_dial", # needs res_musiconhold, res_parking
+-				"app_macro",
++				"app_proc",
+ 				"app_playback",
+ 				"app_cdr",
+ 				],
+@@ -983,7 +983,7 @@
+ 					v.hide = False
+ 
+ 	def createDialEntry(self, extensions, exten, pbx, ext):
+-		ret = extensions.appendExten(exten, "Macro(dial-std-exten,%s/%s,out-%s,%s,%s)" % (
++		ret = extensions.appendExten(exten, "Proc(dial-std-exten,%s/%s,out-%s,%s,%s)" % (
+ 			self.technology,
+ 			self.name,
+ 			self.name,
+@@ -1102,9 +1102,9 @@
+ 						
+ 						secret = self.__getitem__("dialout_%s_secret" % obj.name)							
+ 						if secret:
+-							c.appendExten("%s" % obj.pattern,"Macro(%s,%s${EXTEN:%s},%s,%s)" % (obj.name,obj.addprefix,obj.rmprefix,secret,timeoutvalue))
++							c.appendExten("%s" % obj.pattern,"Proc(%s,%s${EXTEN:%s},%s,%s)" % (obj.name,obj.addprefix,obj.rmprefix,secret,timeoutvalue))
+ 						else:
+-							c.appendExten("%s" % obj.pattern,"Macro(%s,%s${EXTEN:%s},n,%s)" % (obj.name,obj.addprefix,obj.rmprefix,timeoutvalue))
++							c.appendExten("%s" % obj.pattern,"Proc(%s,%s${EXTEN:%s},n,%s)" % (obj.name,obj.addprefix,obj.rmprefix,timeoutvalue))
+ 				except KeyError:
+ 					pass
+ 			elif obj.__class__.__name__ == 'CfgAppPhoneQuickDial':
+
+
+
+From santiago at mail.berlios.de  Fri May 11 18:50:16 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Fri, 11 May 2007 18:50:16 +0200
+Subject: [Destar-dev] r677 - branches/destar-callweaver
+Message-ID: <200705111650.l4BGoGpX030936@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-11 18:50:15 +0200 (Fri, 11 May 2007)
+New Revision: 677
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/backend.py
+   branches/destar-callweaver/configlets.py
+   branches/destar-callweaver/page_admin_viewconf.ptl
+   branches/destar-callweaver/page_config.ptl
+Log:
+moving to /opt/etc/callweaver
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 15:57:08 UTC (rev 676)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 16:50:15 UTC (rev 677)
+@@ -1,6 +1,7 @@
+ 2007-05-11:
+ * Branching destar for callweaver
+ * Changing {M,m}acro for Proc and proc
++* moving /etc/asterisk to /opt/etc/callweaver
+ 
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+
+Modified: branches/destar-callweaver/backend.py
+===================================================================
+--- branches/destar-callweaver/backend.py	2007-05-11 15:57:08 UTC (rev 676)
++++ branches/destar-callweaver/backend.py	2007-05-11 16:50:15 UTC (rev 677)
+@@ -42,7 +42,7 @@
+ 
+ def loadPythonConfig():
+ 	"""This loads the destar_cfg.py config file either from
+-	/etc/asterisk or from the current directory."""
++	/opt/callweaver/etc or from the current directory."""
+ 
+ 
+ 	global __loaded
+@@ -79,7 +79,7 @@
+ 		obj.createDependencies()
+ 
+ def createPythonConfig(f=None):
+-	"""This writes /etc/asterisk/destar_cfg.py.
++	"""This writes /opt/callweaver/etc/destar_cfg.py.
+ 
+ 	The output will be written into file hand 'f' if you provide one.
+ 	Use this for debugging, like this:
+@@ -374,7 +374,7 @@
+ 
+ 
+ def createAsteriskConfig():
+-	"""This creates all the Asterisk config files in /etc/asterisk.
++	"""This creates all the Asterisk config files in /opt/callweaver/etc.
+ 
+ 	First, we create an in-memory representation of all config files
+ 	to create. Then we check if any of the config files is already
+
+Modified: branches/destar-callweaver/configlets.py
+===================================================================
+--- branches/destar-callweaver/configlets.py	2007-05-11 15:57:08 UTC (rev 676)
++++ branches/destar-callweaver/configlets.py	2007-05-11 16:50:15 UTC (rev 677)
+@@ -21,10 +21,10 @@
+ import sys, os, types, sha, binascii, time
+ import panelutils
+ 
+-CONF_DIR = "/etc/asterisk"
++CONF_DIR = "/opt/etc/callweaver"
+ DOC_DIR = os.getenv('DESTAR_DOC_DIR', default='/tmp/destar-doc')
+ CONF_TAG = "; Automatically created by DESTAR\n"
+-ASTERISK_MODULES_DIR = os.getenv('ASTERISK_MODULES_DIR', default='/usr/lib/asterisk/modules') 
++CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/lib/callweaver/modules') 
+ 
+ 
+ class AsteriskConfigFile:
+@@ -231,8 +231,8 @@
+ 				],
+ 			preload = [],
+ 			)
+-		# Get list of codecs and formats from ASTERISK_MODULES_DIR
+-		for f in os.listdir(ASTERISK_MODULES_DIR):
++		# Get list of codecs and formats from CALLWEAVER_MODULES_DIR
++		for f in os.listdir(CALLWEAVER_MODULES_DIR):
+ 			if f.startswith('codec_'): c.modules["codec"].append(f[:-3])
+ 			if f.startswith('format_'): c.modules["format"].append(f[:-3])
+ 	
+
+Modified: branches/destar-callweaver/page_admin_viewconf.ptl
+===================================================================
+--- branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-11 15:57:08 UTC (rev 676)
++++ branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-11 16:50:15 UTC (rev 677)
+@@ -75,7 +75,7 @@
+ 			cantAccessPage()
+ 
+ 	def _q_test(self):
+-		return os.access("/etc/asterisk", os.O_RDWR)
++		return os.access("/opt/etc/callweaver", os.O_RDWR)
+ 
+ 
+ 	def _q_index [plain] (self):
+
+Modified: branches/destar-callweaver/page_config.ptl
+===================================================================
+--- branches/destar-callweaver/page_config.ptl	2007-05-11 15:57:08 UTC (rev 676)
++++ branches/destar-callweaver/page_config.ptl	2007-05-11 16:50:15 UTC (rev 677)
+@@ -76,9 +76,9 @@
+ 				"add/CfgOptUser",
+ 				[_("Configuration"), _("Options"), _("DeStar user")] )
+ 
+-		if not os.access("/etc/asterisk", os.O_RDWR):
++		if not os.access("/opt/etc/callweaver", os.O_RDWR):
+ 			self.configurationTip(
+-				_("You should enable write access to the directory /etc/asterisk. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'." % groups),
++				_("You should enable write access to the directory /opt/etc/callweaver. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'." % groups),
+ 				"",
+ 				[])
+ 
+
+
+
+From santiago at mail.berlios.de  Fri May 11 23:10:37 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Fri, 11 May 2007 23:10:37 +0200
+Subject: [Destar-dev] r678 - branches/destar-callweaver
+Message-ID: <200705112110.l4BLAbhp002502@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-11 23:10:37 +0200 (Fri, 11 May 2007)
+New Revision: 678
+
+Modified:
+   branches/destar-callweaver/cdrutils.py
+   branches/destar-callweaver/cfg_opt_logger.py
+   branches/destar-callweaver/cfg_opt_sipnotify.py
+   branches/destar-callweaver/cfg_phone_iax.py
+   branches/destar-callweaver/cfg_phone_sip.py
+Log:
+modules and log dirs moved to callweaver
+
+
+
+Modified: branches/destar-callweaver/cdrutils.py
+===================================================================
+--- branches/destar-callweaver/cdrutils.py	2007-05-11 16:50:15 UTC (rev 677)
++++ branches/destar-callweaver/cdrutils.py	2007-05-11 21:10:37 UTC (rev 678)
+@@ -28,7 +28,7 @@
+ 	print _("Note: you should install python-pysqlite2 to have CDR functionality")
+ 
+ try:
+-	if not  os.access("/usr/lib/asterisk/modules/cdr_sqlite3_custom.so", os.F_OK):
++	if not  os.access("/opt/lib/callweaver/modules/cdr_sqlite3_custom.so", os.F_OK):
+ 		raise ImportError
+ 	needModule("cdr_sqlite3_custom")
+ except:
+@@ -36,7 +36,7 @@
+ 	
+ 
+ try:
+-	db_fn = "/var/log/asterisk/master.db"
++	db_fn = "/var/log/callweaver/master.db"
+ 	if not os.access(db_fn, os.O_RDWR):
+ 		raise ImportError
+ 	db = sqlite.connect(db_fn, isolation_level="IMMEDIATE")
+
+Modified: branches/destar-callweaver/cfg_opt_logger.py
+===================================================================
+--- branches/destar-callweaver/cfg_opt_logger.py	2007-05-11 16:50:15 UTC (rev 677)
++++ branches/destar-callweaver/cfg_opt_logger.py	2007-05-11 21:10:37 UTC (rev 678)
+@@ -47,7 +47,7 @@
+ 				optional=True,
+ 				default="error,warning,notice,verbose"),
+ 		       VarType("messages",
+-				title=_("Output in /var/log/asterisk/messages"),
++				title=_("Output in /var/log/callweaver/messages"),
+ 				type="mchoice",
+ 				options=_opt,
+ 				optional=True,
+
+Modified: branches/destar-callweaver/cfg_opt_sipnotify.py
+===================================================================
+--- branches/destar-callweaver/cfg_opt_sipnotify.py	2007-05-11 16:50:15 UTC (rev 677)
++++ branches/destar-callweaver/cfg_opt_sipnotify.py	2007-05-11 21:10:37 UTC (rev 678)
+@@ -29,7 +29,7 @@
+ 	def createVariables(self):
+ 		self.variables = [
+ 			VarType("info",
+-			    title=_("Enables the sip notify command to reboot or sync phones on asterisk commanline."),
++			    title=_("Enables the sip notify command to reboot or sync phones on callweaver commanline."),
+ 			    type="label",
+ 			    )]
+ 
+
+Modified: branches/destar-callweaver/cfg_phone_iax.py
+===================================================================
+--- branches/destar-callweaver/cfg_phone_iax.py	2007-05-11 16:50:15 UTC (rev 677)
++++ branches/destar-callweaver/cfg_phone_iax.py	2007-05-11 21:10:37 UTC (rev 678)
+@@ -123,7 +123,7 @@
+ 			
+ 
+ 			VarType("notransfer",
+-					title=_("Skip asterisk media path?"),
++					title=_("Skip callweaver media path?"),
+ 					type="bool"),
+ 	
+ 			VarType("Outbound",
+
+Modified: branches/destar-callweaver/cfg_phone_sip.py
+===================================================================
+--- branches/destar-callweaver/cfg_phone_sip.py	2007-05-11 16:50:15 UTC (rev 677)
++++ branches/destar-callweaver/cfg_phone_sip.py	2007-05-11 21:10:37 UTC (rev 678)
+@@ -269,7 +269,7 @@
+ 		sip.append("type=friend")
+ 		sip.append("qualify=yes")
+ 		m = md5.new()
+-		m.update('%s:asterisk:%s' % (self.name,self.secret))
++		m.update('%s:callweaver:%s' % (self.name,self.secret))
+ 		sip.append("md5secret=%s" % m.hexdigest())
+ 		sip.append("host=dynamic")
+ 		if self.host:
+
+
+
+From santiago at mail.berlios.de  Fri May 11 23:47:50 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Fri, 11 May 2007 23:47:50 +0200
+Subject: [Destar-dev] r679 - branches/destar-callweaver
+Message-ID: <200705112147.l4BLlo4A008087@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-11 23:47:50 +0200 (Fri, 11 May 2007)
+New Revision: 679
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/backend.py
+Log:
+fixed apps names
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 21:10:37 UTC (rev 678)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 21:47:50 UTC (rev 679)
+@@ -2,6 +2,7 @@
+ * Branching destar for callweaver
+ * Changing {M,m}acro for Proc and proc
+ * moving /etc/asterisk to /opt/etc/callweaver
++* backend.py: Fixed apps names
+ 
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+
+Modified: branches/destar-callweaver/backend.py
+===================================================================
+--- branches/destar-callweaver/backend.py	2007-05-11 21:10:37 UTC (rev 678)
++++ branches/destar-callweaver/backend.py	2007-05-11 21:47:50 UTC (rev 679)
+@@ -255,7 +255,7 @@
+ 	c.append("exten=s,n,Set(vmbs=${DB(VMBS/${ARG4}/${ARG3})})")
+ 	c.append('exten=s,n,GotoIf($["${vmbs}" != ""]?vmbs)')
+ 	c.append("exten=s,n,Answer()")
+-	c.append("exten=s,n,Playtones(busy)")
++	c.append("exten=s,n,PlayTones(busy)")
+ 	c.append("exten=s,n,Busy()")
+ 	c.append(";")
+ 	c.append("exten=s,n(fw),Goto(${ARG2},${fw_ext},1)")
+@@ -359,7 +359,7 @@
+ 	c.append("exten => _cause_X.,4,Playback(an-error-has-occured,skip)")
+ 	c.append("exten => _cause_X.,5,Playback(error-number,skip)")
+ 	c.append("exten => _cause_X.,6,GotoIf($[foo${ARG1} != foo]?7:11)")
+-	c.append("exten => _cause_X.,7,Say_Number(${ARG1})")
++	c.append("exten => _cause_X.,7,SayNumber(${ARG1})")
+ 	c.append("exten => _cause_X.,8,Wait(1)")
+ 	c.append("exten => _cause_X.,9,Playback(please-contact-tech-supt,skip)")
+ 	c.append("exten => _cause_X.,10,Goto(14)")
+
+
+
+From santiago at mail.berlios.de  Fri May 11 23:48:46 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Fri, 11 May 2007 23:48:46 +0200
+Subject: [Destar-dev] r680 - branches/destar-callweaver
+Message-ID: <200705112148.l4BLmkj2008211@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-11 23:48:46 +0200 (Fri, 11 May 2007)
+New Revision: 680
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/cfg_phone_sip.py
+Log:
+callweaver.org md5 realm 
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 21:47:50 UTC (rev 679)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 21:48:46 UTC (rev 680)
+@@ -3,6 +3,7 @@
+ * Changing {M,m}acro for Proc and proc
+ * moving /etc/asterisk to /opt/etc/callweaver
+ * backend.py: Fixed apps names
++* cfg_phone_sip.py: fixed realm for MD5
+ 
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+
+Modified: branches/destar-callweaver/cfg_phone_sip.py
+===================================================================
+--- branches/destar-callweaver/cfg_phone_sip.py	2007-05-11 21:47:50 UTC (rev 679)
++++ branches/destar-callweaver/cfg_phone_sip.py	2007-05-11 21:48:46 UTC (rev 680)
+@@ -269,7 +269,7 @@
+ 		sip.append("type=friend")
+ 		sip.append("qualify=yes")
+ 		m = md5.new()
+-		m.update('%s:callweaver:%s' % (self.name,self.secret))
++		m.update('%s:callweaver.org:%s' % (self.name,self.secret))
+ 		sip.append("md5secret=%s" % m.hexdigest())
+ 		sip.append("host=dynamic")
+ 		if self.host:
+
+
+
+From santiago at mail.berlios.de  Sat May 12 01:36:13 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Sat, 12 May 2007 01:36:13 +0200
+Subject: [Destar-dev] r681 - branches/destar-callweaver
+Message-ID: <200705112336.l4BNaDcl029290@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-12 01:36:13 +0200 (Sat, 12 May 2007)
+New Revision: 681
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/backend.py
+   branches/destar-callweaver/cdrutils.py
+   branches/destar-callweaver/configlets.py
+   branches/destar-callweaver/destar
+   branches/destar-callweaver/page_admin_viewconf.ptl
+   branches/destar-callweaver/page_config.ptl
+Log:
+Using /opt/callweaver
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 23:36:13 UTC (rev 681)
+@@ -4,6 +4,7 @@
+ * moving /etc/asterisk to /opt/etc/callweaver
+ * backend.py: Fixed apps names
+ * cfg_phone_sip.py: fixed realm for MD5
++* Using /opt/callweaver, according to FHS
+ 
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+
+Modified: branches/destar-callweaver/backend.py
+===================================================================
+--- branches/destar-callweaver/backend.py	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/backend.py	2007-05-11 23:36:13 UTC (rev 681)
+@@ -26,7 +26,7 @@
+ 
+ DESTAR_CFG = "destar_cfg.py"
+ CONFIGLETS_DIR = os.getenv('CONFIGLETS_DIR', default='.') 
+-CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/usr/lib/callweaver/modules')
++CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/callweaver/usr/lib/callweaver/modules')
+ 
+ 
+ 
+
+Modified: branches/destar-callweaver/cdrutils.py
+===================================================================
+--- branches/destar-callweaver/cdrutils.py	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/cdrutils.py	2007-05-11 23:36:13 UTC (rev 681)
+@@ -28,7 +28,7 @@
+ 	print _("Note: you should install python-pysqlite2 to have CDR functionality")
+ 
+ try:
+-	if not  os.access("/opt/lib/callweaver/modules/cdr_sqlite3_custom.so", os.F_OK):
++	if not  os.access("/opt/callweaver/lib/callweaver/modules/cdr_sqlite3_custom.so", os.F_OK):
+ 		raise ImportError
+ 	needModule("cdr_sqlite3_custom")
+ except:
+
+Modified: branches/destar-callweaver/configlets.py
+===================================================================
+--- branches/destar-callweaver/configlets.py	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/configlets.py	2007-05-11 23:36:13 UTC (rev 681)
+@@ -21,10 +21,10 @@
+ import sys, os, types, sha, binascii, time
+ import panelutils
+ 
+-CONF_DIR = "/opt/etc/callweaver"
++CONF_DIR = "/opt/callweaver/etc/callweaver"
+ DOC_DIR = os.getenv('DESTAR_DOC_DIR', default='/tmp/destar-doc')
+ CONF_TAG = "; Automatically created by DESTAR\n"
+-CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/lib/callweaver/modules') 
++CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/callweaver/lib/callweaver/modules') 
+ 
+ 
+ class AsteriskConfigFile:
+
+Modified: branches/destar-callweaver/destar
+===================================================================
+--- branches/destar-callweaver/destar	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/destar	2007-05-11 23:36:13 UTC (rev 681)
+@@ -125,7 +125,7 @@
+ # only daemonize after binding to the port. This makes error handling saner
+ if be_daemon:
+ 	quixote.config.DISPLAY_EXCEPTIONS = 'plain'
+-	daemonize.daemonize(stdout='/var/log/asterisk/destar.log', stderr='/var/log/asterisk/destar.err', pidfile=pid_file)
++	daemonize.daemonize(stdout='/opt/callweaver/var/log/callweaver/destar.log', stderr='/opt/callweaver/var/log/callweaver/destar.err', pidfile=pid_file)
+ 
+ 	if panelutils.isConfigured():
+ 		panelutils.startPanelDaemon()
+
+Modified: branches/destar-callweaver/page_admin_viewconf.ptl
+===================================================================
+--- branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-11 23:36:13 UTC (rev 681)
+@@ -75,7 +75,7 @@
+ 			cantAccessPage()
+ 
+ 	def _q_test(self):
+-		return os.access("/opt/etc/callweaver", os.O_RDWR)
++		return os.access("/opt/callweaver/etc/callweaver", os.O_RDWR)
+ 
+ 
+ 	def _q_index [plain] (self):
+@@ -126,7 +126,7 @@
+ 	def showMissingModules [plain] (self, missingModules):
+ 		'<div id="error">\n'
+ 		'<p>'
+-		htmltext(_("WARNING: This configuration might experience grave problems because the following asterisk modules are missing on your system:"))
++		htmltext(_("WARNING: This configuration might experience grave problems because the following callweaver modules are missing on your system:"))
+ 		'</p>'
+ 		'<ul>'
+ 		for mod in missingModules:
+
+Modified: branches/destar-callweaver/page_config.ptl
+===================================================================
+--- branches/destar-callweaver/page_config.ptl	2007-05-11 21:48:46 UTC (rev 680)
++++ branches/destar-callweaver/page_config.ptl	2007-05-11 23:36:13 UTC (rev 681)
+@@ -76,9 +76,9 @@
+ 				"add/CfgOptUser",
+ 				[_("Configuration"), _("Options"), _("DeStar user")] )
+ 
+-		if not os.access("/opt/etc/callweaver", os.O_RDWR):
++		if not os.access("/opt/callweaver/etc/callweaver", os.O_RDWR):
+ 			self.configurationTip(
+-				_("You should enable write access to the directory /opt/etc/callweaver. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'." % groups),
++				_("You should enable write access to the directory /opt/callweaver/etc/callweaver. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'." % groups),
+ 				"",
+ 				[])
+ 
+@@ -116,7 +116,7 @@
+ 				_("You should enable write access to the %s directory. Without the ability to modify the Asternic Flash Operator Panel configuration files DeStar won't be integrated whit the panel." % panelutils.PANEL_CONF_DIR),
+ 				"",
+ 				[])
+-		db_fn = "/var/log/asterisk/master.db"
++		db_fn = "/opt/callweaver/var/log/callweaver/master.db"
+ 		if not os.access(db_fn, os.O_RDWR):
+ 			self.configurationTip(
+ 				_("You don't seem to have access to %s yet created by cdr_sqlite3_custom. Without this file CDR reports wont be accesible trough this interface."),
+
+
+
+From santiago at mail.berlios.de  Sat May 12 01:45:39 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Sat, 12 May 2007 01:45:39 +0200
+Subject: [Destar-dev] r682 - trunk
+Message-ID: <200705112345.l4BNjdmw029940@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-12 01:45:39 +0200 (Sat, 12 May 2007)
+New Revision: 682
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/backend.py
+Log:
+fixed some apps names
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-11 23:36:13 UTC (rev 681)
++++ trunk/CHANGELOG.txt	2007-05-11 23:45:39 UTC (rev 682)
+@@ -1,5 +1,6 @@
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
++* Fixed some apps names
+ 
+ 2007-05-07:
+ * Added Astdbkey for the extension buttons in the panel.
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-05-11 23:36:13 UTC (rev 681)
++++ trunk/backend.py	2007-05-11 23:45:39 UTC (rev 682)
+@@ -255,7 +255,7 @@
+ 	c.append("exten=s,n,Set(vmbs=${DB(VMBS/${ARG4}/${ARG3})})")
+ 	c.append('exten=s,n,GotoIf($["${vmbs}" != ""]?vmbs)')
+ 	c.append("exten=s,n,Answer()")
+-	c.append("exten=s,n,Playtones(busy)")
++	c.append("exten=s,n,PlayTones(busy)")
+ 	c.append("exten=s,n,Busy()")
+ 	c.append(";")
+ 	c.append("exten=s,n(fw),Goto(${ARG2},${fw_ext},1)")
+@@ -359,7 +359,7 @@
+ 	c.append("exten => _cause_X.,4,Playback(an-error-has-occured,skip)")
+ 	c.append("exten => _cause_X.,5,Playback(error-number,skip)")
+ 	c.append("exten => _cause_X.,6,GotoIf($[foo${ARG1} != foo]?7:11)")
+-	c.append("exten => _cause_X.,7,Say_Number(${ARG1})")
++	c.append("exten => _cause_X.,7,SayNumber(${ARG1})")
+ 	c.append("exten => _cause_X.,8,Wait(1)")
+ 	c.append("exten => _cause_X.,9,Playback(please-contact-tech-supt,skip)")
+ 	c.append("exten => _cause_X.,10,Goto(14)")
+
+
+
+From santiago at mail.berlios.de  Sat May 12 09:52:19 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Sat, 12 May 2007 09:52:19 +0200
+Subject: [Destar-dev] r683 - branches/destar-callweaver
+Message-ID: <200705120752.l4C7qJ3h006787@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-12 09:52:18 +0200 (Sat, 12 May 2007)
+New Revision: 683
+
+Added:
+   branches/destar-callweaver/cfg_trunk_unicall.py
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+Log:
+adding cfg_trunk_unicall
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 23:45:39 UTC (rev 682)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-12 07:52:18 UTC (rev 683)
+@@ -1,3 +1,6 @@
++2007-05-12:
++* Added cfg_trunk_unicall
++
+ 2007-05-11:
+ * Branching destar for callweaver
+ * Changing {M,m}acro for Proc and proc
+
+Added: branches/destar-callweaver/cfg_trunk_unicall.py
+===================================================================
+--- branches/destar-callweaver/cfg_trunk_unicall.py	2007-05-11 23:45:39 UTC (rev 682)
++++ branches/destar-callweaver/cfg_trunk_unicall.py	2007-05-12 07:52:18 UTC (rev 683)
+@@ -0,0 +1,234 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Destar has Copyright (C) 2005 by Holger Schurig
++# This file has Copyright (C) 2006 by Alejandro Rios P.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++import panelutils
++
++
++class CfgTrunkUnicall(CfgTrunk):
++
++	shortName = _("Standard Unicall MFC/R2 trunk")
++	newObjectTitle = _("New standard MFC/R2 trunk")
++	technology = "UniCall"
++	
++	def createVariables(self):
++		self.variables = [
++			VarType("name",
++				title=_("Name"),
++				len=35),
++
++			VarType("signalling",
++				title=_("Signalling type"),
++				type="choice",
++				options=[('mcfr2_cpe',_('MFC/R2 signalling, CPE side')),
++					('mcfr2_co', _('MFC/R2 signalling, Network side'))]),
++					
++			VarType("protocolvariant",
++				title=_("Protocol variant"),
++				hint=_("i.e. cn,20,7"),
++				type="string",
++				len=20),
++				
++			VarType("channels",
++				title=_("Channels"),
++				hint=_("i.e. 1-15,17-31"),
++				type="string",
++				len=20),
++				
++			VarType("group",
++				title=_("Callout group"),
++				type="string",
++				optional=True),
++
++			VarType("faxdetect",
++				title=_("Fax detection"),
++				type="choice",
++			      	options=[('incoming','Incoming only'),
++					('outgoing', 'Outgoing only'),
++					('both', 'Both Incoming/Outgoing'),
++					('no', 'Disable')],
++				default="no"),
++
++		# TODO: check op-panel support for Unicall.
++		#	VarType("panelLab",
++		#		title=_("Operator Panel"),
++		#		type="label",
++		#		hide=True),
++
++		#	VarType("panel",
++		#		title=_("Show this trunk in the panel"),
++		#		type="bool",
++		#		hide=True,
++		#		optional=True),
++
++			VarType("Gains",
++				title=_("Reception and Transmission Gains"),
++				type="label"),
++
++			VarType("rxgain",
++				title=_("Reception gain"),
++				hint=_("in dB"),
++				optional=True,
++				default="0.0"),
++
++			VarType("txgain",
++				title=_("Transmission gain"),
++				hint=_("in dB"),
++				optional=True,
++				default="0.0"),
++
++			VarType("Inbound",
++				title=_("Calls from PRI channel(s)"),
++				type="label"),
++
++			VarType("clid",
++				title=_("Change Caller*Id to:"),
++				len=25,
++				optional=True),
++
++			VarType("contextin",
++				title=_("Go to"),
++				type="radio",
++				default='phone',
++				options=[('phone',_("Phone")),('ivr',_("IVR")),('pbx',_("Virtual PBX"))]),
++
++			VarType("phone",
++				title=_("Extension to ring"),
++				type="choice",
++				optional=True,
++				options=getChoice("CfgPhone")),
++
++			VarType("ivr",
++				title=_("IVR to jump to"),
++				type="choice",
++				optional=True,
++				options=getChoice("CfgIVR")),
++
++			VarType("pbx",
++				title=_("Allow dial extension from which Virtual PBX"),
++				type="choice",
++				optional=True,options=getChoice("CfgOptPBX")),
++
++			VarType("dial",
++				hide=True,
++				len=50),]
++
++		self.dependencies = [
++			DepType("phone", 
++					type="hard",
++					message = _("This is a Dependency")),
++			DepType("ivr", 
++					type="hard",
++					message = _("This is a Dependency"))
++		]
++
++	def isAddable(self):
++		"""We can only add this configlet if we have at least one
++		ZapPRI option defined."""
++
++		# BUG: it does somehow not work to simply write for obj in config_entries,
++		# despite the "from configlets import *" above
++		import configlets
++		for obj in configlets.configlet_tree:
++			if obj.__class__.__name__ == 'CfgOptZapPRI':
++				return True
++		return False 
++	isAddable = classmethod(isAddable)
++
++	def checkConfig(self):
++                res = CfgTrunk.checkConfig(self)
++                if res:
++                        return res
++		import configlets
++		for obj in configlets.configlet_tree:
++			if obj.__class__.__name__ == 'CfgTrunkUnicall':
++				if obj==self: continue
++				try:
++					if obj.group == self.group and obj.group:
++						return ("group", _("Group already in use"))
++				except AttributeError:
++					pass
++
++
++	def fixup(self):
++		CfgTrunk.fixup(self)
++		if not self.rxgain:
++			self.rxgain = "0.0"
++		if not self.txgain: 
++			self.txgain = "0.0"
++
++
++	def createAsteriskConfig(self):
++		needModule("chan_unicall")
++
++		# Create config for chan_unicall:
++		c = AstConf("unicall.conf")
++		c.append("")
++		c.append("; Unicall MFC/R2 Trunk %s" % self.name)
++		if self.group:
++			c.appendValue(self, "group")
++		c.append("protocolclass=mfcr2")
++		c.appendValue(self, "protocolvariant")
++		if self.signalling == 'mfcr2_cpe':
++			c.append("protocolend=cpe")
++		else:
++			c.append("protocolend=co")
++		contextin = "in-%s" % self.name
++		c.append("context=%s" % contextin)
++		c.appendValue(self, "faxdetect")
++		c.append("usecallerid=yes")
++		c.append("hidecallerid=no")
++		c.append("callwaitingcallerid=yes")
++		c.append("threewaycalling=yes")
++		c.append("transfer=yes")
++		c.append("cancallforward=yes")
++		c.append("callreturn=yes")
++		c.append("echocancel=yes")
++		c.append("echocancelwhenbridged=yes")
++		c.append("echotraining=yes")
++		c.append("relaxdtmf=yes")
++		c.append("immediate=yes")
++		c.appendValue(self, "rxgain")
++		c.appendValue(self, "txgain")
++		c.append("channel=%s" % self.channels)
++		c.append("")
++
++		#Dial part to use on dialout macro
++		if self.group:
++			self.dial = "UniCall/g%s/${ARG1}" % (self.group)
++		else:
++			self.dial = "UniCall/%s/${ARG1}" % (self.channels)
++		
++		#What to do with incoming calls
++		self.createIncomingContext()
++
++	# TODO: check op-panel support for Unicall.
++	#	if panelutils.isConfigured() == 1 and self.panel:
++	#		p = AstConf("op_buttons.cfg")
++        #               chgrp = self.channels.split(',')
++        #               for gr in chgrp:
++        #                       gr_start_end = gr.split('-')
++        #                       for ch in range(int(gr_start_end[0]),int(gr_start_end[1])+1):
++        #                               p.setSection("%s/%d" % (self.technology, ch) )
++        #                               p.append("Position=n")
++        #                               p.append("Icon=2")
++        #                               p.append("Extension=-1")
++        #                               p.append("Label=%s-%d" % (self.name,ch))
+
+
+
+From santiago at mail.berlios.de  Mon May 14 16:40:35 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Mon, 14 May 2007 16:40:35 +0200
+Subject: [Destar-dev] r684 - branches/destar-callweaver
+Message-ID: <200705141440.l4EEeZM5004398@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-14 16:40:33 +0200 (Mon, 14 May 2007)
+New Revision: 684
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/Templates.ptl
+   branches/destar-callweaver/cfg_app_chanspy.py
+   branches/destar-callweaver/cfg_opt_logger.py
+   branches/destar-callweaver/cfg_opt_voicemail.py
+   branches/destar-callweaver/cfg_trunk_iax.py
+   branches/destar-callweaver/destar
+   branches/destar-callweaver/page_admin_pbxstate.ptl
+   branches/destar-callweaver/page_admin_reload.ptl
+   branches/destar-callweaver/page_admin_viewconf.ptl
+   branches/destar-callweaver/page_config.ptl
+   branches/destar-callweaver/page_config_applications.ptl
+   branches/destar-callweaver/page_config_options.ptl
+   branches/destar-callweaver/page_user_quickdiallist.ptl
+   branches/destar-callweaver/page_user_settings.ptl
+   branches/destar-callweaver/page_user_state.ptl
+Log:
+Changing labels to CallWeaver
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-14 14:40:33 UTC (rev 684)
+@@ -1,3 +1,6 @@
++2007-05-15:
++* Changing some labels to CallWeaver
++
+ 2007-05-12:
+ * Added cfg_trunk_unicall
+ 
+
+Modified: branches/destar-callweaver/Templates.ptl
+===================================================================
+--- branches/destar-callweaver/Templates.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/Templates.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -158,7 +158,7 @@
+    	'<head>\n'
+    	if refresh:
+    		'<meta http-equiv="Refresh" content="%d;" />\n' % refresh
+-  	'<title>Asterisk/DeStar PBX :: %s</title>\n' % title
++  	'<title>CallWeaver/DeStar PBX :: %s</title>\n' % title
+   	'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n'
+   	'<style type="text/css" media="screen, tv, projection">\n'
+   	'	@import url("/static/css/general.css");\n' 
+@@ -183,7 +183,7 @@
+ 	# Header
+  	'<div id="wrapper">\n'
+  	'	<div id="header">\n'
+- 	'		<h1>DeStar/Asterisk PBX</h1>\n'
++ 	'		<h1>DeStar/CallWeaver PBX</h1>\n'
+ 
+ 	
+ 	# Side menu
+
+Modified: branches/destar-callweaver/cfg_app_chanspy.py
+===================================================================
+--- branches/destar-callweaver/cfg_app_chanspy.py	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/cfg_app_chanspy.py	2007-05-14 14:40:33 UTC (rev 684)
+@@ -25,7 +25,7 @@
+ 
+ 	shortName   = _("Listen calls")
+ 	newObjectTitle  = _("New spy extension")
+-	description = _("Listen all calls on the Asterisk server. Jump through calls pressing *.")
++	description = _("Listen all calls on the CallWeaver server. Jump through calls pressing *.")
+ 	
+ 	def createVariables(self):
+ 		self.variables   = [ 
+
+Modified: branches/destar-callweaver/cfg_opt_logger.py
+===================================================================
+--- branches/destar-callweaver/cfg_opt_logger.py	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/cfg_opt_logger.py	2007-05-14 14:40:33 UTC (rev 684)
+@@ -24,7 +24,7 @@
+ class CfgOptLogger(CfgOptSingle):
+ 	shortName   = _("Logger options")
+ 	newObjectTitle  = _("Logger options")
+-	description = _("Asterisk can emit many events to it's console or a log file, Here you can make it more (or less) verbose:")
++	description = _("CallWeaver can emit many events to it's console or a log file, Here you can make it more (or less) verbose:")
+ 	
+ 	def createVariables(self):
+ 		_opt = [('error',   _("Errors")),
+
+Modified: branches/destar-callweaver/cfg_opt_voicemail.py
+===================================================================
+--- branches/destar-callweaver/cfg_opt_voicemail.py	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/cfg_opt_voicemail.py	2007-05-14 14:40:33 UTC (rev 684)
+@@ -44,10 +44,10 @@
+ 				 VarType("emailsettings", title=_("E-mail integration settings"), type="label"),
+ 				 VarType("emailintegration", title=_("Activate email voicemail notifications?"), type="bool"),
+ 				 VarType("serveremail", title=_("Who the e-mail notification should appear to come from"), hint=_("destar_pbx at yourdomain"), optional=True, len=30),
+-				 VarType("fromstring", title=_("Change the From: string"), default=_("The Asterisk/DeStar PBX"), optional=True, len=50),
++				 VarType("fromstring", title=_("Change the From: string"), default=_("The CallWeaver/DeStar PBX"), optional=True, len=50),
+ 				 VarType("emailsubject", title=_("Change email Subject"), default=_("[DeStar PBX]: New message from ${VM_CALLERID} in mailbox ${VM_MAILBOX}"), optional=True, len=80),
+ 				 VarType("emailbody", title=_("Change email Body"), type="text", 
+-					default=_("Dear ${VM_NAME}:\\n\\n\\tjust wanted to let you know you were just left a ${VM_DUR} long message (number ${VM_MSGNUM})\\n\\tin mailbox ${VM_MAILBOX} from ${VM_CALLERID}, on ${VM_DATE}, so you might\\n\\twant to check it when you get a chance. Thanks!\\n\\n\\t\\t\\t--Asterisk/Destar PBX."), 
++					default=_("Dear ${VM_NAME}:\\n\\n\\tjust wanted to let you know you were just left a ${VM_DUR} long message (number ${VM_MSGNUM})\\n\\tin mailbox ${VM_MAILBOX} from ${VM_CALLERID}, on ${VM_DATE}, so you might\\n\\twant to check it when you get a chance. Thanks!\\n\\n\\t\\t\\t--CallWeaver/Destar PBX."), 
+ 					optional=True),
+ 				 VarType("attach", title=_("Should the email contain the voicemail as an attachment?"), type="bool"),
+ 				 VarType("mailcmd", title=_("Override the default program to send e-mail"), hint=_("i.e.: /usr/sbin/sendmail -t"), optional=True),
+
+Modified: branches/destar-callweaver/cfg_trunk_iax.py
+===================================================================
+--- branches/destar-callweaver/cfg_trunk_iax.py	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/cfg_trunk_iax.py	2007-05-14 14:40:33 UTC (rev 684)
+@@ -26,7 +26,7 @@
+ 
+ 	shortName   = _("Standard IAX Trunk")
+ 	newObjectTitle  = _("New standard IAX trunk")
+-	description = _("""Used to setup an IAX trunk to another Asterisk server or an IAX termination.""")
++	description = _("""Used to setup an IAX trunk to another CallWeaver or Asterisk server or an IAX termination.""")
+ 	technology = "IAX2"
+ 	
+ 	def createVariables(self):
+
+Modified: branches/destar-callweaver/destar
+===================================================================
+--- branches/destar-callweaver/destar	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/destar	2007-05-14 14:40:33 UTC (rev 684)
+@@ -47,7 +47,7 @@
+ 
+ def print_usage():
+ 	program = "destar"
+-	print _("DeStar: Asterisk Management web interface")
++	print _("DeStar: CallWeaver Management web interface")
+ 	print
+ 	print _("Usage:")
+ 	print _("  %s [options]: normal execution") % program
+
+Modified: branches/destar-callweaver/page_admin_pbxstate.ptl
+===================================================================
+--- branches/destar-callweaver/page_admin_pbxstate.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_admin_pbxstate.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -62,7 +62,7 @@
+ 
+ 	_q_parent  = 'page_admin'
+ 	_q_title   = _("PBX State")
+-	_q_desc    = _("Status of Asterisk/DeStar PBX")
++	_q_desc    = _("Status of CallWeaver/DeStar PBX")
+ 	_q_link    = 'pbxstate'
+ 	_q_menupos = 10
+ 	_q_level   = 3
+@@ -81,7 +81,7 @@
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'<p><span class="errornotice">'
+-			htmltext(_("Asterisk is not running!"))
++			htmltext(_("CallWeaver is not running!"))
+ 			'</span></p>'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+
+Modified: branches/destar-callweaver/page_admin_reload.ptl
+===================================================================
+--- branches/destar-callweaver/page_admin_reload.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_admin_reload.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -29,7 +29,7 @@
+ 
+ 	_q_parent  = 'page_admin'
+ 	_q_title   = _("Apply Changes")
+-	_q_desc    = _("Reload Asterisk/DeStar PBX")
++	_q_desc    = _("Reload CallWeaver/DeStar PBX")
+ 	_q_link    = 'reload'
+ 	_q_menupos = 90
+ 	_q_level   = 3
+@@ -47,7 +47,7 @@
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'<p><span class="errornotice">'
+-			_("Asterisk is not running!")
++			_("CallWeaver is not running!")
+ 			'</span></p>'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+
+Modified: branches/destar-callweaver/page_admin_viewconf.ptl
+===================================================================
+--- branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -61,7 +61,7 @@
+ 
+ 	_q_parent  = 'page_admin'
+ 	_q_title   = _("View/Save Configuration")
+-	_q_desc    = _("Show and Save Asterisk configuration files")
++	_q_desc    = _("Show and Save CallWeaver configuration files")
+ 	_q_link    = 'viewconf'
+ 	_q_menupos = 90
+ 	_q_level   = 3
+@@ -99,7 +99,7 @@
+ 				showForm.render()
+ 
+ 			elif showForm['_show']:
+-				header(_("Asterisk configuration files"))
++				header(_("CallWeaver configuration files"))
+ 				if not missingModules == []: self.showMissingModules(missingModules)
+ 				entries = []
+ 				for file,cnf in configEntries:
+
+Modified: branches/destar-callweaver/page_config.ptl
+===================================================================
+--- branches/destar-callweaver/page_config.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_config.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -28,7 +28,7 @@
+ 
+ 	_q_parent  = 'page_main'
+ 	_q_title   = _("Configuration")
+-	_q_desc    = _("Modify Asterisk configuration")
++	_q_desc    = _("Modify CallWeaver configuration")
+ 	_q_menupos = 30
+ 	_q_level   = 3
+ 
+@@ -84,7 +84,7 @@
+ 
+ 		if not backend.countConfiglets(clazz="CfgOptManager"):
+ 			self.configurationTip(
+-				_("You should create a management API entry. Without this entry, DeStar can't control the Asterisk PBX software."),
++				_("You should create a management API entry. Without this entry, DeStar can't control the CallWeaver PBX software."),
+ 				"add/CfgOptManager",
+ 				[_("Configuration"), _("Options"), _("Management API access")] )
+ 
+
+Modified: branches/destar-callweaver/page_config_applications.ptl
+===================================================================
+--- branches/destar-callweaver/page_config_applications.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_config_applications.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -27,7 +27,7 @@
+ 
+ 	_q_parent  = 'page_config'
+ 	_q_title   = _("Applications")
+-	_q_desc    = _("Special Asterisk Applications")
++	_q_desc    = _("Special CallWeaver Applications")
+ 	_q_link    = 'applications'
+ 	_q_menupos = 50
+ 	_q_level   = 3
+
+Modified: branches/destar-callweaver/page_config_options.ptl
+===================================================================
+--- branches/destar-callweaver/page_config_options.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_config_options.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -27,7 +27,7 @@
+ 
+ 	_q_parent  = 'page_config'
+ 	_q_title   = _("Options")
+-	_q_desc    = _("DeStar and Asterisk options and parameters")
++	_q_desc    = _("DeStar and CallWeaver options and parameters")
+ 	_q_link    = 'options'
+ 	_q_menupos = 999
+ 	_q_level   = 3
+
+Modified: branches/destar-callweaver/page_user_quickdiallist.ptl
+===================================================================
+--- branches/destar-callweaver/page_user_quickdiallist.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_user_quickdiallist.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -81,7 +81,7 @@
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'<p><span class="errornotice">'
+-			htmltext(_("Asterisk is not running!"))
++			htmltext(_("CallWeaver is not running!"))
+ 			'</span></p>'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+
+Modified: branches/destar-callweaver/page_user_settings.ptl
+===================================================================
+--- branches/destar-callweaver/page_user_settings.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_user_settings.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -114,7 +114,7 @@
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'<p><span class="errornotice">'
+-			htmltext(_("Asterisk is not running!"))
++			htmltext(_("CallWeaver is not running!"))
+ 			'</span></p>'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+
+Modified: branches/destar-callweaver/page_user_state.ptl
+===================================================================
+--- branches/destar-callweaver/page_user_state.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_user_state.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -141,7 +141,7 @@
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'<p><span class="errornotice">'
+-			htmltext(_("Asterisk is not running!"))
++			htmltext(_("CallWeaver is not running!"))
+ 			'</span></p>'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+
+
+
+From santiago at mail.berlios.de  Mon May 14 23:13:21 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Mon, 14 May 2007 23:13:21 +0200
+Subject: [Destar-dev] r685 - branches/destar-callweaver
+Message-ID: <200705142113.l4ELDLSC024670@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-14 23:13:21 +0200 (Mon, 14 May 2007)
+New Revision: 685
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/manager.py
+Log:
+Fixed CallWeaver Call Manager
+CHANGELOG.txt: we've back to the present 
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-14 14:40:33 UTC (rev 684)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-14 21:13:21 UTC (rev 685)
+@@ -1,5 +1,6 @@
+-2007-05-15:
++2007-05-14:
+ * Changing some labels to CallWeaver
++* Fixed CallWeaver Call Manager access
+ 
+ 2007-05-12:
+ * Added cfg_trunk_unicall
+
+Modified: branches/destar-callweaver/manager.py
+===================================================================
+--- branches/destar-callweaver/manager.py	2007-05-14 14:40:33 UTC (rev 684)
++++ branches/destar-callweaver/manager.py	2007-05-14 21:13:21 UTC (rev 685)
+@@ -208,7 +208,7 @@
+ 		if self.action_data.has_key(id):
+ 			self.action_data[id] = data
+ 
+-		if data[0]=="Asterisk Call Manager/1.0":
++		if data[0]=="CallWeaver Call Manager/1.0":
+ 			self.set_terminator('\r\n\r\n')
+ 			self.call_nowait('Login', Username=self.username, Secret=self.password)
+ 
+
+
+
+From juanmanuel at mail.berlios.de  Tue May 15 06:49:45 2007
+From: juanmanuel at mail.berlios.de (juanmanuel at BerliOS)
+Date: Tue, 15 May 2007 06:49:45 +0200
+Subject: [Destar-dev] r686 - trunk
+Message-ID: <200705150449.l4F4njpx005547@sheep.berlios.de>
+
+Author: juanmanuel
+Date: 2007-05-15 06:49:43 +0200 (Tue, 15 May 2007)
+New Revision: 686
+
+Modified:
+   trunk/cfg_phone_queue.py
+Log:
+Added CallerID(Name) changing inside a queue, as needed for skill-based call routing.
+
+
+
+Modified: trunk/cfg_phone_queue.py
+===================================================================
+--- trunk/cfg_phone_queue.py	2007-05-14 21:13:21 UTC (rev 685)
++++ trunk/cfg_phone_queue.py	2007-05-15 04:49:43 UTC (rev 686)
+@@ -45,6 +45,11 @@
+ 					optional=True,
+ 					len=6),
+ 
++                        VarType("clid",
++                                        title = _("Cambiar texto Identificador de Llamante a:"),
++                                        len = 25,
++                                        optional = True),
++
+ 			VarType("timeout",
+ 					title=_("Agent timeout"),
+ 					optional=True,
+@@ -254,6 +259,10 @@
+ 
+ 			if self.ring:
+ 				opt = opt + "r"
++
++                        if self.clid:
++                                needModule("func_callerid")
++                                extensions.appendExten(qname,"Set(CALLERID(name)=%s)" %  self.clid)
+ 				
+ 			if self.moh:
+ 				extensions.appendExten(qname, "Answer")
+
+
+
+From dasenjo at mail.berlios.de  Tue May 15 23:26:19 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Tue, 15 May 2007 23:26:19 +0200
+Subject: [Destar-dev] r687 - trunk
+Message-ID: <200705152126.l4FLQJHW030834@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-05-15 23:26:18 +0200 (Tue, 15 May 2007)
+New Revision: 687
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_app_dnd.py
+   trunk/cfg_dialout_normal.py
+Log:
+* Little bug fix: need to load app_cut to make the right UserEvent.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-15 04:49:43 UTC (rev 686)
++++ trunk/CHANGELOG.txt	2007-05-15 21:26:18 UTC (rev 687)
+@@ -1,3 +1,6 @@
++2007-05-15:
++* Little bug fix: need to load app_cut to make the right UserEvent.
++
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+ * Fixed some apps names
+
+Modified: trunk/cfg_app_dnd.py
+===================================================================
+--- trunk/cfg_app_dnd.py	2007-05-15 04:49:43 UTC (rev 686)
++++ trunk/cfg_app_dnd.py	2007-05-15 21:26:18 UTC (rev 687)
+@@ -64,6 +64,7 @@
+ 		c.setSection(self.pbx)
+ 		c.appendExten("%s" % self.set, "Set(DB(DND/%s/${CALLERIDNUM})=True)" % self.pbx)
+ 		if tapisupport:
++			needModule("app_cut")
+ 			c.appendExten("%s" % self.set, "Set(CHAN=${CUT(CHANNEL|-|1)})")
+ 			c.appendExten("%s" % self.set, "UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: True" )
+ 				
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-05-15 04:49:43 UTC (rev 686)
++++ trunk/cfg_dialout_normal.py	2007-05-15 21:26:18 UTC (rev 687)
+@@ -157,6 +157,7 @@
+ 					if obj.clidnumout:
+ 						c.append("exten=>s,n,Set(CALLERID(number)=%s)" % obj.clidnumout)
+ 				        if tapisupport:
++						needModule("app_cut")
+ 					        c.append("exten=>s,n,Set(chan=${CUT(CHANNEL,,1)})")
+ 					        c.append("exten=>s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${chan})")
+ 	    				        c.append("exten=>s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALTONE)")
+
+
+
+From admin at berlios.de  Wed May 23 21:56:45 2007
+From: admin at berlios.de (admin at berlios.de)
+Date: Wed, 23 May 2007 14:56:45 -0500 (COT)
+Subject: [Destar-dev] [Bug #11161] PBX argument needed in login page
+Message-ID: <200705231956.l4NJuj2L006321@unicorn.berlios.de>
+
+Bug #11161, was updated on 2007-May-23 14:56
+Here is a current snapshot of the bug.
+
+Project: DeStar
+Category: web interface
+Status: Open
+Resolution: None
+Bug Group: None
+Priority: 8
+Submitted by: santiago
+Assigned to : none
+Summary: PBX argument needed in login page
+
+Details: If there are two o more extensions or users with the same name or extension number, it's needed to identify their associated pbx.
+
+For detailed info, follow this link:
+http://developer.berlios.de/bugs/?func=detailbug&bug_id=11161&group_id=2112
+
+
+From dasenjo at mail.berlios.de  Sun May 27 08:47:48 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Sun, 27 May 2007 08:47:48 +0200
+Subject: [Destar-dev] r688 - branches/0.2.X trunk
+Message-ID: <200705270647.l4R6lmOs005250@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-05-27 08:47:47 +0200 (Sun, 27 May 2007)
+New Revision: 688
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/page_owner.ptl
+   trunk/CHANGELOG.txt
+   trunk/page_owner.ptl
+Log:
+* Fixed bug in page_owner.ptl that made it forbidden.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-05-15 21:26:18 UTC (rev 687)
++++ branches/0.2.X/CHANGELOG.txt	2007-05-27 06:47:47 UTC (rev 688)
+@@ -1,3 +1,6 @@
++2007-05-27:
++* Fixed bug in page_owner.ptl that made it forbidden.
++
+ 2007-04-25:
+ * Fixed bug in macro-voicemail: added missing t and T extensions and a priority after calling VoiceMail application.
+ * Fixed incerdible bug in the timelimit settings for a macro.
+
+Modified: branches/0.2.X/page_owner.ptl
+===================================================================
+--- branches/0.2.X/page_owner.ptl	2007-05-15 21:26:18 UTC (rev 687)
++++ branches/0.2.X/page_owner.ptl	2007-05-27 06:47:47 UTC (rev 688)
+@@ -32,7 +32,7 @@
+ def _q_access(request):
+         if request.session.level < _q_level:
+ 		cantAccessPage()
+-	if not backend.getConfiglets(name='CfgOptPbx'):
++	if not backend.getConfiglets(name='CfgOptPBX'):
+ 		cantAccessPage()
+         if not request.session.pbx:
+ 		cantAccessPage()
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-15 21:26:18 UTC (rev 687)
++++ trunk/CHANGELOG.txt	2007-05-27 06:47:47 UTC (rev 688)
+@@ -1,3 +1,6 @@
++2007-05-27:
++* Fixed bug in page_owner.ptl that made it forbidden.
++
+ 2007-05-15:
+ * Little bug fix: need to load app_cut to make the right UserEvent.
+ 
+
+Modified: trunk/page_owner.ptl
+===================================================================
+--- trunk/page_owner.ptl	2007-05-15 21:26:18 UTC (rev 687)
++++ trunk/page_owner.ptl	2007-05-27 06:47:47 UTC (rev 688)
+@@ -38,7 +38,7 @@
+ 		self.request = get_request()
+ 		if self.session.level < self._q_level:
+ 			cantAccessPage()
+-		if not backend.getConfiglets(name='CfgOptPbx'):
++		if not backend.getConfiglets(name='CfgOptPBX'):
+ 			cantAccessPage()
+ 		if not request.session.pbx:
+ 			cantAccessPage()
+
+
+
+From santiago at mail.berlios.de  Wed May 30 00:24:52 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Wed, 30 May 2007 00:24:52 +0200
+Subject: [Destar-dev] r689 - trunk
+Message-ID: <200705292224.l4TMOqee015462@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-05-30 00:24:52 +0200 (Wed, 30 May 2007)
+New Revision: 689
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_trunk_sip.py
+Log:
+cfg_trunk_sip: Added port= setting in sip.conf
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-27 06:47:47 UTC (rev 688)
++++ trunk/CHANGELOG.txt	2007-05-29 22:24:52 UTC (rev 689)
+@@ -1,3 +1,6 @@
++2007-05-29:
++* cfg_trunk_sip: Added port= setting in sip.conf 
++
+ 2007-05-27:
+ * Fixed bug in page_owner.ptl that made it forbidden.
+ 
+
+Modified: trunk/cfg_trunk_sip.py
+===================================================================
+--- trunk/cfg_trunk_sip.py	2007-05-27 06:47:47 UTC (rev 688)
++++ trunk/cfg_trunk_sip.py	2007-05-29 22:24:52 UTC (rev 689)
+@@ -188,6 +188,8 @@
+ 			c.append("username=%s" % self.id)
+ 			c.append("secret=%s" % self.pw)
+ 			c.append("host=%s" % self.host)
++			if self.port:
++				c.append("port=%s" % self.port)
+ 			c.append("context=in-%s" % self.name)
+ 			c.append("canreinvite=no")
+ 			if self.fromdomain:
+
+
+
+From dasenjo at mail.berlios.de  Wed May 30 02:01:26 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Wed, 30 May 2007 02:01:26 +0200
+Subject: [Destar-dev] r690 - branches/0.2.X trunk
+Message-ID: <200705300001.l4U01QPw030018@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-05-30 02:01:25 +0200 (Wed, 30 May 2007)
+New Revision: 690
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/Templates.ptl
+   trunk/CHANGELOG.txt
+   trunk/Templates.ptl
+Log:
+* Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-05-29 22:24:52 UTC (rev 689)
++++ branches/0.2.X/CHANGELOG.txt	2007-05-30 00:01:25 UTC (rev 690)
+@@ -1,3 +1,6 @@
++2007-05-29:
++* Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
++
+ 2007-05-27:
+ * Fixed bug in page_owner.ptl that made it forbidden.
+ 
+
+Modified: branches/0.2.X/Templates.ptl
+===================================================================
+--- branches/0.2.X/Templates.ptl	2007-05-29 22:24:52 UTC (rev 689)
++++ branches/0.2.X/Templates.ptl	2007-05-30 00:01:25 UTC (rev 690)
+@@ -238,42 +238,39 @@
+ 
+ def getMenu():
+ 	request = get_request()
+-	path = request.environ['PATH_INFO']
+-	path = path[1:].split('/')
+ 
+ 	stack = get_publisher().get_namespace_stack()
+ 
+-	def calcMenu(root='', n=0):
+-		m = []
+-		try:
+-			obj = stack[n]
+-		except IndexError:
+-			return
+-		try:
+-			prueba = obj._q_menu
+-		except AttributeError:
+-			return
+-		for e in obj._q_menu:
+-			if e._q_level>request.session.level:
++	m = []
++	try:
++		obj = stack[0]
++	except IndexError:
++		return
++	try:
++		prueba = obj._q_menu
++	except AttributeError:
++		return
++	for e in obj._q_menu:
++		if e._q_level>request.session.level:
++			continue
++		if e._q_level<0:
++			if e._q_title == _("Logout") and request.session.level == 4:
+ 				continue
+ 			if e._q_level<0:
+-				if e._q_title == _("Logout") and request.session.level == 4:
+-	                                continue
+-				if e._q_level<0:
+-	                                if abs(e._q_level) <= request.session.level:			
+-	                                	continue
+-			submenu = []
+-			if e._q_parent == sys.modules['page_main']:
+-				for sub in e._q_menu:
+-					parent_name = sub._q_parent.__name__[5:]
+-					submenu.append( (sub._q_menupos, '/'.join([root,parent_name,sub._q_link]), sub._q_title, []) )
+-			submenu.sort()
++				if abs(e._q_level) <= request.session.level:			
++					continue
++		submenu = []
++		if e._q_parent == sys.modules['page_main']:
++			for sub in e._q_menu:
++				parent_name = sub._q_parent.__name__[5:]
++				submenu.append( (sub._q_menupos, '/'.join(['',parent_name,sub._q_link]), sub._q_title, []) )
++		submenu.sort()
+ 
+-			m.append( (e._q_menupos, '/'.join([root,e._q_link]), e._q_title, submenu) )
+-		m.sort()
+-		return m
+-
+-	m = calcMenu()
++		if request.session.level == 3 and e._q_title == _("Virtual PBX Owner"):
++			continue
++		else:
++			m.append( (e._q_menupos, '/'.join(['',e._q_link]), e._q_title, submenu) )
++	m.sort()
+ 	return m
+ 
+ 
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-29 22:24:52 UTC (rev 689)
++++ trunk/CHANGELOG.txt	2007-05-30 00:01:25 UTC (rev 690)
+@@ -1,5 +1,6 @@
+ 2007-05-29:
+ * cfg_trunk_sip: Added port= setting in sip.conf 
++* Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+ 
+ 2007-05-27:
+ * Fixed bug in page_owner.ptl that made it forbidden.
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-05-29 22:24:52 UTC (rev 689)
++++ trunk/Templates.ptl	2007-05-30 00:01:25 UTC (rev 690)
+@@ -240,48 +240,42 @@
+ def getMenu():
+ 	request = get_request()
+ 	session = get_session()
+-	path = request.environ['PATH_INFO']
+-	path = path[1:].split('/')
+ 
+-	#stack = get_publisher().get_namespace_stack()
+ 	stack = get_directory_path()
+ 
+-	def calcMenu(root='', n=0):
+-		m = []
+-		try:
+-			obj = stack[n]
+-		except IndexError:
+-			return
+-		try:
+-			prueba = obj._q_menu
+-		except AttributeError:
+-			return
+-		for e in obj._q_menu:
+-			if e._q_level > session.level:
++	m = []
++	try:
++		obj = stack[0]
++	except IndexError:
++		return
++	try:
++		prueba = obj._q_menu
++	except AttributeError:
++		return
++	for e in obj._q_menu:
++		if e._q_level > session.level:
++			continue
++		if e._q_level<0:
++			if e._q_title == _("Logout") and session.level == 4:
+ 				continue
+ 			if e._q_level<0:
+-				if e._q_title == _("Logout") and session.level == 4:
+-	                                continue
+-				if e._q_level<0:
+-	                                if abs(e._q_level) <= session.level:			
+-	                                	continue
+-			submenu = []
+-			#if e._q_parent == sys.modules['page_main']:
+-			if e._q_parent == 'page_main':
+-				for sub in e._q_menu:
+-					parent_name = sub._q_parent[5:]
+-					submenu.append( (sub._q_menupos, '/'.join([root,parent_name,sub._q_link]), sub._q_title, []) )
+-			submenu.sort()
++				if abs(e._q_level) <= session.level:			
++					continue
++		submenu = []
++		if e._q_parent == 'page_main':
++			for sub in e._q_menu:
++				parent_name = sub._q_parent[5:]
++				submenu.append( (sub._q_menupos, '/'.join(['',parent_name,sub._q_link]), sub._q_title, []) )
++		submenu.sort()
+ 
+-			m.append( (e._q_menupos, '/'.join([root,e._q_link]), e._q_title, submenu) )
+-		m.sort()
+-		return m
+-
+-	m = calcMenu()
++		if session.level == 3 and e._q_title == _("Virtual PBX Owner"):
++			continue
++		else:
++			m.append( (e._q_menupos, '/'.join(['',e._q_link]), e._q_title, submenu) )
++	m.sort()
+ 	return m
+ 
+ 
+-
+ def errorpage [plain] (txt, menu=None):
+ 	header(htmltext(_('Error')), menu)
+ 	'<p>'
+
+
+
+From dasenjo at mail.berlios.de  Wed May 30 18:58:14 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Wed, 30 May 2007 18:58:14 +0200
+Subject: [Destar-dev] r691 - branches/0.2.X trunk
+Message-ID: <200705301658.l4UGwER1019849@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-05-30 18:58:13 +0200 (Wed, 30 May 2007)
+New Revision: 691
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/Templates.ptl
+   trunk/CHANGELOG.txt
+   trunk/Templates.ptl
+Log:
+* Menu adjustment for other languages, _() is not needed.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-05-30 00:01:25 UTC (rev 690)
++++ branches/0.2.X/CHANGELOG.txt	2007-05-30 16:58:13 UTC (rev 691)
+@@ -1,3 +1,6 @@
++2007-05-30:
++* Menu adjustment for other languages, _() is not needed.
++
+ 2007-05-29:
+ * Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+ 
+
+Modified: branches/0.2.X/Templates.ptl
+===================================================================
+--- branches/0.2.X/Templates.ptl	2007-05-30 00:01:25 UTC (rev 690)
++++ branches/0.2.X/Templates.ptl	2007-05-30 16:58:13 UTC (rev 691)
+@@ -266,7 +266,7 @@
+ 				submenu.append( (sub._q_menupos, '/'.join(['',parent_name,sub._q_link]), sub._q_title, []) )
+ 		submenu.sort()
+ 
+-		if request.session.level == 3 and e._q_title == _("Virtual PBX Owner"):
++		if request.session.level == 3 and e._q_title == "Virtual PBX Owner":
+ 			continue
+ 		else:
+ 			m.append( (e._q_menupos, '/'.join(['',e._q_link]), e._q_title, submenu) )
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-30 00:01:25 UTC (rev 690)
++++ trunk/CHANGELOG.txt	2007-05-30 16:58:13 UTC (rev 691)
+@@ -1,3 +1,6 @@
++2007-05-30:
++* Menu adjustment for other languages, _() is not needed.
++
+ 2007-05-29:
+ * cfg_trunk_sip: Added port= setting in sip.conf 
+ * Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-05-30 00:01:25 UTC (rev 690)
++++ trunk/Templates.ptl	2007-05-30 16:58:13 UTC (rev 691)
+@@ -268,7 +268,7 @@
+ 				submenu.append( (sub._q_menupos, '/'.join(['',parent_name,sub._q_link]), sub._q_title, []) )
+ 		submenu.sort()
+ 
+-		if session.level == 3 and e._q_title == _("Virtual PBX Owner"):
++		if session.level == 3 and e._q_title == "Virtual PBX Owner":
+ 			continue
+ 		else:
+ 			m.append( (e._q_menupos, '/'.join(['',e._q_link]), e._q_title, submenu) )
+
+
+
+From dasenjo at mail.berlios.de  Wed May 30 22:12:36 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Wed, 30 May 2007 22:12:36 +0200
+Subject: [Destar-dev] r692 - branches/0.2.X
+Message-ID: <200705302012.l4UKCaRR000730@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-05-30 22:12:35 +0200 (Wed, 30 May 2007)
+New Revision: 692
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/page_owner_cdr.ptl
+Log:
+* Bug fixes and translation adjustments for PBX owner statistics.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-05-30 16:58:13 UTC (rev 691)
++++ branches/0.2.X/CHANGELOG.txt	2007-05-30 20:12:35 UTC (rev 692)
+@@ -1,5 +1,6 @@
+ 2007-05-30:
+ * Menu adjustment for other languages, _() is not needed.
++* Bug fixes and translation adjustments for PBX owner statistics.
+ 
+ 2007-05-29:
+ * Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+
+Modified: branches/0.2.X/page_owner_cdr.ptl
+===================================================================
+--- branches/0.2.X/page_owner_cdr.ptl	2007-05-30 16:58:13 UTC (rev 691)
++++ branches/0.2.X/page_owner_cdr.ptl	2007-05-30 20:12:35 UTC (rev 692)
+@@ -48,6 +48,8 @@
+ def _q_test():
+ 	return cdrutils.db
+ 
++def M_(message): return _(str(message))
++
+ def N_(message): return message
+ 
+ def formScript [html] ():
+@@ -71,8 +73,8 @@
+ 	"<p>"
+ 	lastpage = total/limit
+ 	if pagenum > 1:
+-		"<a href='javascript:gotopage(\"_newest\")'>%s</a> &nbsp; \n" % _(str("First"))
+-		"<a href='javascript:gotopage(\"_newer\")'>%s</a> &nbsp; \n" % _(str("Previous"))
++		"<a href='javascript:gotopage(\"_newest\")'>%s</a> &nbsp; \n" % M_("First")
++		"<a href='javascript:gotopage(\"_newer\")'>%s</a> &nbsp; \n" % M_("Previous")
+ 	
+ 	pagelist = [i for i in range(pagenum-10, pagenum+10) if i >= 0 and  i < lastpage]
+ 
+@@ -83,8 +85,8 @@
+ 			"%d &nbsp; \n" % (i+1)
+ 
+ 	if pagenum < lastpage:
+-		"<a href='javascript:gotopage(\"_older\")'>%s</a> &nbsp; \n" % _(str("Next"))
+-		"<a href='javascript:gotopage(\"_oldest\")'>%s</a> \n" % _(str("Last"))
++		"<a href='javascript:gotopage(\"_older\")'>%s</a> &nbsp; \n" % M_("Next")
++		"<a href='javascript:gotopage(\"_oldest\")'>%s</a> \n" % M_("Last")
+ 	"</p>\n <br />"
+ 
+ def     generateYearsNumbers():
+@@ -152,8 +154,8 @@
+ 	form.add_single_select('today', value=localday, options=zip( generateDaysNumbers() , range(1,32), generateDaysNumbers()  ), render_br=True)
+ 		
+ 	form.add(HiddenWidget, 'pagenumber', value='_newest')
+-	form.add(HiddenWidget, 'order', value='ASC')
+-	form.add(HiddenWidget, 'orderby', value=_('Time_of_start'))
++	form.add(HiddenWidget, 'order', value='DESC')
++	form.add(HiddenWidget, 'orderby', 'Time_of_start')
+ 
+ 	form.add(SubmitWidget, '_submit', _("Search"), render_br=True)
+ 
+@@ -239,7 +241,7 @@
+ 	
+ 	return render()
+ 
+-def	cdrShowResults [html] (where=[], limit, offset, total = 0, field=_("Time_of_start"), order="DESC"):
++def	cdrShowResults [html] (where=[], limit, offset, total = 0, field="start", order="DESC"):
+ 	if total == 0:
+ 		'<p>'
+ 		'--No records to Show--'
+@@ -259,13 +261,13 @@
+ 				'<th>'
+ 				if s[0] == field:
+ 					neworder = (order=='ASC' and 'DESC') or 'ASC'
+-					"<a href='javascript:orderby(\"%s\",\"%s\")'>%s</a>" % (s[0], neworder, _(str(s[0])))
++					"<a href='javascript:orderby(\"%s\",\"%s\")'>%s</a>" % (s[0], neworder, M_(s[0]))
+ 					if order=='ASC':
+-						" <img src='/static/down.gif' border='0' alt='%s'>\n" % _(str('Asc. Order'))
++						" <img src='/static/down.gif' border='0' alt='%s'>\n" % M_('Asc. Order')
+ 					else:
+-						" <img src='/static/up.gif' border='0' alt='%s'>\n" % _(str('Desc. Order'))
++						" <img src='/static/up.gif' border='0' alt='%s'>\n" % M_('Desc. Order')
+ 				else:
+-					"<a href='javascript:orderby(\"%s\",\"%s\")'>%s</a>" % (s[0], order, _(str(s[0])))
++					"<a href='javascript:orderby(\"%s\",\"%s\")'>%s</a>" % (s[0], order, M_(s[0]))
+ 				'</th>'
+                 	'</tr></thead><tbody>'
+ 		
+@@ -295,11 +297,12 @@
+ 
+ 			f = offset + limit
+ 			if total >= f:			
+-				_(str('Showing records from %s to %s of %s <br /><br />')) % (offset+1, f, total)
++				M_('Showing records from %s to %s of %s' % (offset+1, f, total))
+ 			else:
+-				_(str('Showing records from %s to %s of %s <br /><br />')) % (offset+1, total, total)
++				M_('Showing records from %s to %s of %s' % (offset+1, total, total))
++			'<br /><br />'
+ 
+-		_(str('Total Duration of shown calls: %s min.' % totalmin))
++		M_('Total Duration of shown calls: %s min.' % totalmin)
+ 		'</p>'
+ 
+ 
+
+
+

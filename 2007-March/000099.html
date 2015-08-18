@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r609 - in branches/0.2.X: . misc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r609%20-%20in%20branches/0.2.X%3A%20.%20misc&In-Reply-To=%3C200703011914.l21JEaq2012579%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000098.html">
+   <LINK REL="Next"  HREF="000103.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r609 - in branches/0.2.X: . misc</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r609%20-%20in%20branches/0.2.X%3A%20.%20misc&In-Reply-To=%3C200703011914.l21JEaq2012579%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r609 - in branches/0.2.X: . misc">alerios at mail.berlios.de
+       </A><BR>
+    <I>Thu Mar  1 20:14:36 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000098.html">[Destar-dev] r608 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000103.html">[Destar-dev] [Feature #2319] Queues statistics
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#99">[ date ]</a>
+              <a href="thread.html#99">[ thread ]</a>
+              <a href="subject.html#99">[ subject ]</a>
+              <a href="author.html#99">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-03-01 20:14:36 +0100 (Thu, 01 Mar 2007)
+New Revision: 609
+
+Added:
+   branches/0.2.X/misc/queue.db
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/INSTALL.txt
+Log:
+* Added misc/queue.db with initial schema to ease queue stats installation.
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-01 19:06:06 UTC (rev 608)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-01 19:14:36 UTC (rev 609)
+@@ -1,6 +1,7 @@
+ 2007-03-01:
+  * Added queueutils.py to put queue_log in an sqlite3 database.
+  * Added initial version of page_stats_queue.ptl for Queue statistics.
++ * Added misc/queue.db with initial schema to ease queue stats installation.
+ 
+ 2007-02-26:
+ * cfg_dialout_normal: adding r Dial option if no Authenticate() is used
+
+Modified: branches/0.2.X/INSTALL.txt
+===================================================================
+--- branches/0.2.X/INSTALL.txt	2007-03-01 19:06:06 UTC (rev 608)
++++ branches/0.2.X/INSTALL.txt	2007-03-01 19:14:36 UTC (rev 609)
+@@ -34,6 +34,8 @@
+ You will also need to build asterisk using the cdr_sqlite3_custom driver found on
+ <A HREF="http://bugs.digium.com/view.php?id=7149">http://bugs.digium.com/view.php?id=7149</A>
+ 
++For Queue Statistics, the file misc/queue.db must be copied to /var/log/asterisk/
++
+ Optional: Pychart
+ -----------------
+ 
+
+Added: branches/0.2.X/misc/queue.db
+===================================================================
+(Binary files differ)
+
+
+Property changes on: branches/0.2.X/misc/queue.db
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000098.html">[Destar-dev] r608 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000103.html">[Destar-dev] [Feature #2319] Queues statistics
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#99">[ date ]</a>
+              <a href="thread.html#99">[ thread ]</a>
+              <a href="subject.html#99">[ subject ]</a>
+              <a href="author.html#99">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

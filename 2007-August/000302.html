@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r782 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r782%20-%20trunk&In-Reply-To=%3C200708102147.l7ALlLD8024405%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000301.html">
+   <LINK REL="Next"  HREF="000303.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r782 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r782%20-%20trunk&In-Reply-To=%3C200708102147.l7ALlLD8024405%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r782 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Aug 10 23:47:21 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000301.html">[Destar-dev] r781 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000303.html">[Destar-dev] r783 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#302">[ date ]</a>
+              <a href="thread.html#302">[ thread ]</a>
+              <a href="subject.html#302">[ subject ]</a>
+              <a href="author.html#302">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-10 23:47:21 +0200 (Fri, 10 Aug 2007)
+New Revision: 782
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/configlets.py
+Log:
+* configlets.py:
+  - Arranged createExtensionConfig
+  - removed penalty from queues
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-10 21:42:10 UTC (rev 781)
++++ trunk/CHANGELOG.txt	2007-08-10 21:47:21 UTC (rev 782)
+@@ -4,6 +4,9 @@
+ * cfg_trunk_sip:
+   - removed default trunk name
+   - phone is optional
++* configlets.py: 
++  - Arranged createExtensionConfig 
++  - removed penalty from queues
+ 
+ 2007-08-03:
+ * cfg_trunk_zapdynamic: added panel, pridialplan configs and some default
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-08-10 21:42:10 UTC (rev 781)
++++ trunk/configlets.py	2007-08-10 21:47:21 UTC (rev 782)
+@@ -1028,31 +1028,27 @@
+                 except AttributeError:
+                         pbx = &quot;phones&quot;
+                 extensions.setSection(pbx)
+-		extensions.append(&quot;exten=%s,hint,%s/%s&quot; % (self.ext, self.technology, self.name))
+-		extensions.append(&quot;exten=%s,hint,%s/%s&quot; % (self.name, self.technology, self.name))
+-		extensions.appendExten(self.ext, &quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name), context=pbx)
+-		extensions.appendExten(self.name, &quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name), context=pbx)
++	
++		for tmp_ext in (self.ext, self.name):
++			extensions.append(&quot;exten=%s,hint,%s/%s&quot; % (tmp_ext, self.technology, self.name))
++			extensions.appendExten(tmp_ext, &quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name), context=pbx)
++			if self.monitorinbound:
++				needModule(&quot;app_mixmonitor&quot;)	
++				options = &quot;&quot;
++				if self.monitorappend:
++					options = 'a' 
++				if self.monitorwhenbridged:
++					options = options+'b'
++				if self.heardvol == self.spokenvol:
++					options = options+'W(%s)' % (self.heardvol)
++				else:          
++					options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
++				if self.monitorfilename:
++					extensions.appendExten(tmp_ext, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=pbx)
++				else:
++					extensions.appendExten(tmp_ext, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options), context=pbx)
++			self.createDialEntry(extensions, tmp_ext, pbx, self.ext)
+ 
+-		if self.monitorinbound:
+-			needModule(&quot;app_mixmonitor&quot;)	
+-			options = &quot;&quot;
+-			if self.monitorappend:
+-				options = 'a' 
+-			if self.monitorwhenbridged:
+-				options = options+'b'
+-			if self.heardvol == self.spokenvol:
+-				options = options+'W(%s)' % (self.heardvol)
+-			else:          
+-				options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+-			if self.monitorfilename:
+-				extensions.appendExten(self.ext, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=pbx)
+-				extensions.appendExten(self.name, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=pbx)
+-			else:
+-				extensions.appendExten(self.ext, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options), context=pbx)
+-				extensions.appendExten(self.name, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options), context=pbx)
+-
+-		self.createDialEntry(extensions, self.ext, pbx, self.ext)
+-		self.createDialEntry(extensions, self.name, pbx, self.ext)
+ 		for obj in configlet_tree:
+ 			if obj.__class__.__name__ == 'CfgAppCallFW':
+ 				if obj.devstateprefix:
+@@ -1101,9 +1097,11 @@
+ 				for queue in self.queues.split(','):
+ 					c.setSection(queue)
+ 					if self.technology == 'SIP' or self.technology == 'IAX2' or self.technology == 'ZAP':
+-						c.append(&quot;member =&gt; %s/%s,%s&quot; % (self.technology,self.name,self._id))
++						#c.append(&quot;member =&gt; %s/%s,%s&quot; % (self.technology,self.name,self._id))
++						c.append(&quot;member =&gt; %s/%s&quot; % (self.technology,self.name))
+ 					if self.technology == 'AGENT':
+-						c.append(&quot;member =&gt; %s/%s,%s&quot; % (self.technology,self.numer,self._id))
++						#c.append(&quot;member =&gt; %s/%s,%s&quot; % (self.technology,self.numer,self._id))
++						c.append(&quot;member =&gt; %s/%s&quot; % (self.technology,self.numer))
+ 		except AttributeError:
+ 			pass
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000301.html">[Destar-dev] r781 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000303.html">[Destar-dev] r783 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#302">[ date ]</a>
+              <a href="thread.html#302">[ thread ]</a>
+              <a href="subject.html#302">[ subject ]</a>
+              <a href="author.html#302">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

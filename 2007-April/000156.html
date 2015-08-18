@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r652 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r652%20-%20trunk&In-Reply-To=%3C200704120127.l3C1R9oK003549%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000155.html">
+   <LINK REL="Next"  HREF="000157.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r652 - trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r652%20-%20trunk&In-Reply-To=%3C200704120127.l3C1R9oK003549%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r652 - trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Thu Apr 12 03:27:09 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000155.html">[Destar-dev] r651 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000157.html">[Destar-dev] r653 - branches/0.2.X/examples trunk/examples
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#156">[ date ]</a>
+              <a href="thread.html#156">[ thread ]</a>
+              <a href="subject.html#156">[ subject ]</a>
+              <a href="author.html#156">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-04-12 03:27:07 +0200 (Thu, 12 Apr 2007)
+New Revision: 652
+
+Added:
+   trunk/cfg_app_agentlogin.py
+   trunk/cfg_phone_agent.py
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/configlets.py
+Log:
+* Added support for queue agents (not just phones) and an agent login extension.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-04-11 20:37:40 UTC (rev 651)
++++ trunk/CHANGELOG.txt	2007-04-12 01:27:07 UTC (rev 652)
+@@ -1,3 +1,6 @@
++2007-04-11:
++* Added support for queue agents (not just phones) and an agent login extension.
++
+ 2007-04-10:
+ * Added port option in sip trunks
+ 
+
+Added: trunk/cfg_app_agentlogin.py
+===================================================================
+--- trunk/cfg_app_agentlogin.py	2007-04-11 20:37:40 UTC (rev 651)
++++ trunk/cfg_app_agentlogin.py	2007-04-12 01:27:07 UTC (rev 652)
+@@ -0,0 +1,51 @@
++# -*- coding: utf-8 -*-
++#
++# Copyright (C) 2007 by Diego Andr&#233;s Asenjo
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++
++class CfgAppAgentLogin(CfgApp):
++
++	shortName   = _(&quot;Agent login extension&quot;)
++	newObjectTitle  = _(&quot;New agent login extension&quot;)
++	description = _(&quot;&quot;&quot;This application allows an agent to log into the system.&quot;&quot;&quot;)
++	
++	def createVariables(self):
++		self.variables = [
++			VarType(&quot;pbx&quot;,
++				title=_(&quot;Virtual PBX&quot;),
++				type=&quot;choice&quot;,
++				options=getChoice(&quot;CfgOptPBX&quot;)),
++
++			VarType(&quot;ext&quot;,
++				title=_(&quot;Extension&quot;),
++				len=6)]
++
++		self.dependencies = [ DepType(&quot;pbx&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;)),
++					]
++
++	def createAsteriskConfig(self):
++		needModule(&quot;chan_agent&quot;)
++	
++		c = AstConf(&quot;extensions.conf&quot;)
++		c.setSection(self.pbx)
++		c.appendExten(self.ext, &quot;AgentLogin()&quot;)
++
+
+Added: trunk/cfg_phone_agent.py
+===================================================================
+--- trunk/cfg_phone_agent.py	2007-04-11 20:37:40 UTC (rev 651)
++++ trunk/cfg_phone_agent.py	2007-04-12 01:27:07 UTC (rev 652)
+@@ -0,0 +1,82 @@
++# -*- coding: utf-8 -*-
++#
++# Copyright (C) 2005 by Holger Schurig,
++# add ons by Michael Bielicki, TAAN Softworks Corp.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++
++class CfgPhoneAgent(CfgPhone):
++
++	shortName = _(&quot;Agent&quot;)
++	newObjectTitle = _(&quot;New agent&quot;)
++	description = _(&quot;This is a queue agent&quot;)
++	technology = &quot;AGENT&quot;
++	
++	def createVariables(self):
++		self.variables = [
++			VarType(&quot;pbx&quot;,    
++				title=_(&quot;Virtual PBX&quot;), 
++				type=&quot;choice&quot;, 
++				options=getChoice(&quot;CfgOptPBX&quot;)),
++
++			VarType(&quot;name&quot;,
++				title=_(&quot;Name&quot;),
++				len=15),
++
++			VarType(&quot;number&quot;,
++					title=_(&quot;Agent number&quot;),
++					type=&quot;int&quot;,
++					len=15),
++
++			VarType(&quot;secret&quot;,
++					title=_(&quot;Password&quot;),
++					type=&quot;int&quot;,
++					len=15),
++					
++			VarType(&quot;QueueLab&quot;,
++					title=_(&quot;Call Queues&quot;),
++					type=&quot;label&quot;,
++					hide=True),
++			
++			VarType(&quot;queues&quot;,
++					title=_(&quot;Agent of queues:&quot;),
++					type=&quot;mchoice&quot;,
++					optional=True,
++					options=getChoice(&quot;CfgPhoneQueue&quot;),
++					hide=True)]
++					
++		queues = len(configlet_tree.getConfigletsByName('CfgPhoneQueue'))
++		if queues &gt; 0:
++			for v in self.variables:
++				if v.name == &quot;QueueLab&quot; or v.name == &quot;queues&quot;:
++					v.hide = False
++
++		self.dependencies = [
++			DepType(&quot;pbx&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;)),
++		]
++
++	def createAsteriskConfig(self):
++
++		ag = AstConf(&quot;agents.conf&quot;)
++		ag.setSection(&quot;agents&quot;)
++		ag.append(&quot;agent=%d,%d,%s&quot; % (self.number, self.secret, self.name))
++
++		self.createQueuesConfig()
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-04-11 20:37:40 UTC (rev 651)
++++ trunk/configlets.py	2007-04-12 01:27:07 UTC (rev 652)
+@@ -1053,7 +1053,10 @@
+ 				c = AstConf(&quot;queues.conf&quot;)
+ 				for queue in self.queues.split(','):
+ 					c.setSection(queue)
+-					c.append(&quot;member =&gt; %s/%s&quot; % (self.technology,self.name))
++					if self.technology == 'SIP' or self.technology == 'IAX':
++						c.append(&quot;member =&gt; %s/%s&quot; % (self.technology,self.name))
++					if self.technology == 'AGENT':
++						c.append(&quot;member =&gt; %s/%s&quot; % (self.technology,self.number))
+ 		except AttributeError:
+ 			pass
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000155.html">[Destar-dev] r651 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000157.html">[Destar-dev] r653 - branches/0.2.X/examples trunk/examples
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#156">[ date ]</a>
+              <a href="thread.html#156">[ thread ]</a>
+              <a href="subject.html#156">[ subject ]</a>
+              <a href="author.html#156">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

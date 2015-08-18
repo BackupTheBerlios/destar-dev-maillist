@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r606 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r606%20-%20trunk&In-Reply-To=%3C200702281850.l1SIogUP006067%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000095.html">
+   <LINK REL="Next"  HREF="000097.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r606 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r606%20-%20trunk&In-Reply-To=%3C200702281850.l1SIogUP006067%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r606 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Feb 28 19:50:42 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000095.html">[Destar-dev] r605 - in trunk: examples tests
+</A></li>
+        <LI>Next message: <A HREF="000097.html">[Destar-dev] r607 - in trunk: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#96">[ date ]</a>
+              <a href="thread.html#96">[ thread ]</a>
+              <a href="subject.html#96">[ subject ]</a>
+              <a href="author.html#96">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-02-28 19:50:40 +0100 (Wed, 28 Feb 2007)
+New Revision: 606
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_dialout_normal.py
+Log:
+* Better dialout's macros handling
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-02-28 18:10:45 UTC (rev 605)
++++ trunk/CHANGELOG.txt	2007-02-28 18:50:40 UTC (rev 606)
+@@ -2,6 +2,7 @@
+ * ConfigHelper.ptl: Fix a problem in __addit__ method, when creating a new
+ * object all createAsteriskConfig() from all objects where called.
+ * Little name change to skip check in checkConfig() (for extensions to jump in an IVR)
++* Better dialout's macros handling
+ 
+ 2007-02-27:
+ * languages.py: installing the gettext classes using unicode
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-02-28 18:10:45 UTC (rev 605)
++++ trunk/cfg_dialout_normal.py	2007-02-28 18:50:40 UTC (rev 606)
+@@ -119,30 +119,24 @@
+ 		c.append(&quot;; params: exten,secret,timeout&quot;)
+ 		needModule(&quot;app_authenticate&quot;)
+ 		if self.dis_transfer:
+-		       opts=&quot;tW&quot;
++		       opts=&quot;tWr&quot;
+ 		else:
+-		       opts=&quot;TtW&quot;
++		       opts=&quot;TtWr&quot;
++		c.append(&quot;exten=&gt;s,1,SetVar(options=%s)&quot; % opts)
+ 		if self.qlookup:
+-			c.appendExten(&quot;s&quot;,'SetVar(options=%sr)' % opts)
+-			c.appendExten(&quot;s&quot;,&quot;Set(dest=${DB(QUICKDIALLIST/GLOBAL/${ARG1})})&quot;,e=&quot;Goto(3)&quot;)
+-			c.appendExten(&quot;s&quot;,'Set(ARG1=${dest})')
+-			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG2} = n]?6:5)&quot;)
+-			c.appendExten(&quot;s&quot;,&quot;Authenticate(${ARG2})&quot;)
+-			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG3} = 0]?7:10)&quot;)
+-			c.appendExten(&quot;s&quot;,'Set(timeout=0)')
+-			c.appendExten(&quot;s&quot;,'Set(options=%s)' % opts)
+-			c.appendExten(&quot;s&quot;,'Goto(11)')
+-		else:
+-			c.appendExten(&quot;s&quot;,'SetVar(options=%sr)' % opts)
+-			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG2} = n]?4:3)&quot;)
+-			c.appendExten(&quot;s&quot;,&quot;Authenticate(${ARG2})&quot;)
+-			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG3} = 0]?5:8)&quot;)
+-			c.appendExten(&quot;s&quot;,'Set(timeout=0)')
+-			c.appendExten(&quot;s&quot;,'Set(options=%s)' % opts)
+-			c.appendExten(&quot;s&quot;,'Goto(9)')
+-		c.appendExten(&quot;s&quot;,'Set(timeout=%d)' % self.maxtime)
+-		c.appendExten(&quot;s&quot;,'Set(options=%sL(%d000:10000))' % (opts,self.maxtime))
++			c.append(&quot;exten=&gt;s,n(quickd),Set(dest=${DB(QUICKDIALLIST/GLOBAL/${ARG1})})&quot;)
++			c.append(&quot;exten=&gt;s,quickd+1,Goto(ifAuth)&quot;)
++			c.append(&quot;exten=&gt;s,n,Set(ARG1=${dest})&quot;)
++		c.append(&quot;exten=&gt;s,n(ifAuth),GotoIf($[${ARG2} = n]?ifTimeOut:auth)&quot;)
++		c.append(&quot;exten=&gt;s,n(auth),Authenticate(${ARG2})&quot;)
++		c.append(&quot;exten=&gt;s,n,Set(options=%s)&quot; % opts.strip('r'))
++		c.append(&quot;exten=&gt;s,n(ifTimeOut),GotoIf($[${ARG3} = 0]?noTimeOut:setTimeOut)&quot;)
++		c.append(&quot;exten=&gt;s,n(noTimeOut),Set(timeout=0)&quot;)
++		c.append(&quot;exten=&gt;s,n,Goto(CallLimit)&quot;)
++		c.append(&quot;exten=&gt;s,n(setTimeOut),Set(timeout=%d)&quot; % self.maxtime)
++		c.append(&quot;exten=&gt;s,n(CallLimit),Set(options=%sL(%d000:10000))&quot; % (opts,self.maxtime))
+ 		#TODO: add this trunks sorted by price and with a default one.
++
+ 		import configlets
+ 		tapisupport = False
+ 		for obj in configlets.configlet_tree:
+@@ -152,27 +146,28 @@
+ 		for obj in configlets.configlet_tree['Trunks']:
+ 			try:
+ 				if self.__getitem__(&quot;trunk_&quot;+obj.name):
+-					c.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(absolute)=${timeout})&quot;)
+-					c.appendExten(&quot;s&quot;,&quot;Set(CDR(outtrunk)=%s)&quot; % obj.name)
++					c.append(&quot;exten=&gt;s,n,Set(TIMEOUT(absolute)=${timeout})&quot;)
++					c.append(&quot;exten=&gt;s,n,Set(CDR(outtrunk)=%s)&quot; % obj.name)
+ 					if self.__getitem__(&quot;trunk_%s_price&quot; % obj.name):
+-						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=%s)&quot; % self.__getitem__(&quot;trunk_%s_price&quot; % obj.name))
++						c.append(&quot;exten=&gt;s,n,Set(CDR(accountcode)=%s)&quot; % self.__getitem__(&quot;trunk_%s_price&quot; % obj.name))
+ 					else:
+-						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=0)&quot;)
++						c.append(&quot;exten=&gt;s,n,Set(CDR(accountcode)=0)&quot;)
+ 					if obj.clidnameout:
+-						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; % obj.clidnameout)
++						c.append(&quot;exten=&gt;s,n,Set(CALLERID(name)=%s)&quot; % obj.clidnameout)
+ 					if obj.clidnumout:
+-						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; % obj.clidnumout)
++						c.append(&quot;exten=&gt;s,n,Set(CALLERID(number)=%s)&quot; % obj.clidnumout)
+ 				        if tapisupport:
+-					        c.appendExten(&quot;s&quot;,&quot;Set(chan=${CUT(CHANNEL,,1)})&quot;)
+-					        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${chan})&quot;)
+-	    				        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALTONE)&quot;)
+-					        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALING)&quot;)
+-					        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_PROCEEDING)&quot;)
+-					c.appendExten(&quot;s&quot;,&quot;Dial(%s,%d|${options})&quot; % (obj.dial,self.ringtime))
++					        c.append(&quot;exten=&gt;s,n,Set(chan=${CUT(CHANNEL,,1)})&quot;)
++					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${chan})&quot;)
++	    				        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALTONE)&quot;)
++					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALING)&quot;)
++					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_PROCEEDING)&quot;)
++					c.append(&quot;exten=&gt;s,n,Dial(%s,%d|${options})&quot; % (obj.dial,self.ringtime))
+ 			except KeyError:
+ 				pass
+-		c.appendExten(&quot;s&quot;,&quot;Congestion(5)&quot;)
+-		c.appendExten(&quot;s&quot;,&quot;Goto(9)&quot;)
++		c.append(&quot;exten=&gt;s,n,Congestion(5)&quot;)
++		#c.append(&quot;exten=&gt;s,n,Goto(9)&quot;)
++		c.append(&quot;exten=&gt;s,n,Goto(CallLimit)&quot;)
+ 		c.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;)
+ 		c.appendExten(&quot;T&quot;,&quot;NoCDR&quot;)
+ 		c.appendExten(&quot;T&quot;,&quot;Hangup&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000095.html">[Destar-dev] r605 - in trunk: examples tests
+</A></li>
+	<LI>Next message: <A HREF="000097.html">[Destar-dev] r607 - in trunk: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#96">[ date ]</a>
+              <a href="thread.html#96">[ thread ]</a>
+              <a href="subject.html#96">[ subject ]</a>
+              <a href="author.html#96">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

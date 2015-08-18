@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r667 - branches/0.2.X trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r667%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200704201634.l3KGYVxa019640%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000175.html">
+   <LINK REL="Next"  HREF="000177.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r667 - branches/0.2.X trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r667%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200704201634.l3KGYVxa019640%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r667 - branches/0.2.X trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Fri Apr 20 18:34:31 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000175.html">[Destar-dev] r666 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000177.html">[Destar-dev] r668 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#176">[ date ]</a>
+              <a href="thread.html#176">[ thread ]</a>
+              <a href="subject.html#176">[ subject ]</a>
+              <a href="author.html#176">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-04-20 18:34:23 +0200 (Fri, 20 Apr 2007)
+New Revision: 667
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/page_login.ptl
+   trunk/CHANGELOG.txt
+   trunk/page_login.ptl
+Log:
+* Fixed bug in the login page.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-04-20 05:14:41 UTC (rev 666)
++++ branches/0.2.X/CHANGELOG.txt	2007-04-20 16:34:23 UTC (rev 667)
+@@ -1,3 +1,6 @@
++2007-04-19:
++* Fixed bug in the login page.
++
+ 2007-04-17:
+ * Added line to call loadQueueLog every time the queues statistics are seen.
+ 
+
+Modified: branches/0.2.X/page_login.ptl
+===================================================================
+--- branches/0.2.X/page_login.ptl	2007-04-20 05:14:41 UTC (rev 666)
++++ branches/0.2.X/page_login.ptl	2007-04-20 16:34:23 UTC (rev 667)
+@@ -76,7 +76,9 @@
+ 
+ 		# Now search for a phone entry with proper extension/voicemail pin
+ 		for obj in backend.getConfiglets(group=&quot;Phones&quot;):
+-			if (obj.ext==res[0] or obj.name==res[0]) and (obj.secret==res[1] or obj.pin==res[1]):
++			if type(obj) == 'CfgPhoneExtension':
++				continue
++			if (obj.ext==res[0] or obj.name==res[0]) and (obj.secret==res[1] or str(obj.pin)==res[1]):
+ 				request.session.user  = obj.name
+ 				request.session.level = 1
+ 				request.session.phone = obj.name
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-04-20 05:14:41 UTC (rev 666)
++++ trunk/CHANGELOG.txt	2007-04-20 16:34:23 UTC (rev 667)
+@@ -8,6 +8,7 @@
+   allow silent login, automatic logout,
+   remove DND when agent logs in.
+ * New groupName and ptl for queues and agents
++* Fixed bug in the login page.
+ 
+ 2007-04-18:
+ * Added AgentCallbackLogin config
+
+Modified: trunk/page_login.ptl
+===================================================================
+--- trunk/page_login.ptl	2007-04-20 05:14:41 UTC (rev 666)
++++ trunk/page_login.ptl	2007-04-20 16:34:23 UTC (rev 667)
+@@ -82,16 +82,18 @@
+ 					self.session.phone = obj.phone
+ 					self.session.language = obj.language
+ 					self.session.pbx = obj.pbx
+-					return redirect(str('../user/info'))
++					return redirect('../user/info/')
+ 
+ 			# Now search for a phone entry with proper extension/voicemail pin
+ 			for obj in backend.getConfiglets(group=&quot;Phones&quot;):
+-				if (obj.ext==res[0] or obj.name==res[0]) and (obj.secret==res[1] or obj.pin==res[1]):
++				if type(obj) == 'CfgPhoneExtension':
++					continue
++				if (obj.ext==res[0] or obj.name==res[0]) and (obj.secret==res[1] or str(obj.pin)==res[1]):
+ 					self.session.user  = obj.name
+ 					self.session.level = 1
+ 					self.session.phone = obj.name
+ 					self.session.language = 'en'
+ 					self.session.pbx = obj.pbx
+-					return redirect(str('../user/info'))
++					return redirect('../user/info/')
+ 			self.notLoggedIn()
+ 		footer()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000175.html">[Destar-dev] r666 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000177.html">[Destar-dev] r668 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#176">[ date ]</a>
+              <a href="thread.html#176">[ thread ]</a>
+              <a href="subject.html#176">[ subject ]</a>
+              <a href="author.html#176">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

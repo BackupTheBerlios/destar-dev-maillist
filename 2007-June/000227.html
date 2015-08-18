@@ -1,0 +1,3785 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r717 - in branches/0.2.X: . po
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r717%20-%20in%20branches/0.2.X%3A%20.%20po&In-Reply-To=%3C200706132219.l5DMJsfa013610%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000226.html">
+   <LINK REL="Next"  HREF="000230.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r717 - in branches/0.2.X: . po</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r717%20-%20in%20branches/0.2.X%3A%20.%20po&In-Reply-To=%3C200706132219.l5DMJsfa013610%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r717 - in branches/0.2.X: . po">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun 14 00:19:54 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000226.html">[Destar-dev] r716 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000230.html">[Destar-dev] r718 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#227">[ date ]</a>
+              <a href="thread.html#227">[ thread ]</a>
+              <a href="subject.html#227">[ subject ]</a>
+              <a href="author.html#227">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-06-14 00:19:41 +0200 (Thu, 14 Jun 2007)
+New Revision: 717
+
+Added:
+   branches/0.2.X/po/destar.pot
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/po/Makefile
+Log:
+* Changed po/Makefile to create a .pot file, use msgmerge and have better variable names.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-06-13 21:43:18 UTC (rev 716)
++++ branches/0.2.X/CHANGELOG.txt	2007-06-13 22:19:41 UTC (rev 717)
+@@ -4,6 +4,7 @@
+ * cfg_trunk_iax.py: added registry option
+   - using username instead of trunk name in register line
+ * Reverted po/es.po from revsion 708.
++* Changed po/Makefile to create a .pot file, use msgmerge and have better variable names.
+ 
+ 2007-06-12:
+ * Fixed bug in Zap trunks (clidnumin needed).
+
+Modified: branches/0.2.X/po/Makefile
+===================================================================
+--- branches/0.2.X/po/Makefile	2007-06-13 21:43:18 UTC (rev 716)
++++ branches/0.2.X/po/Makefile	2007-06-13 22:19:41 UTC (rev 717)
+@@ -1,23 +1,26 @@
+-DIRS=$(patsubst %.po,../lang/%,$(wildcard *.po))
+-SUBDIRS=$(patsubst %.po,../lang/%/LC_MESSAGES,$(wildcard *.po))
+-LANGUAGES=$(patsubst %.po,%.mo,$(wildcard *.po))
++LANG_DIRS = $(patsubst %.po,../lang/%,$(wildcard *.po))
++LANG_SUBD = $(patsubst %.po,../lang/%/LC_MESSAGES,$(wildcard *.po))
++MO_FILES  = $(patsubst %.po,%.mo,$(wildcard *.po))
+ 
+-main:	msgfmt	
++main:	createdirs $(MO_FILES)
+ 
+-msgfmt:	dirs $(LANGUAGES)
+-
+-dirs:
++createdirs:
+ 	install -d ../lang
+-	install -d $(DIRS)
+-	install -d $(SUBDIRS)
++	install -d $(LANG_DIRS)
++	install -d $(LANG_SUBD)
+ 
+-%.mo:	%.po	dirs
++%.mo:	%.po createdirs
+ 	msgfmt -o $@ $&lt;
+ 	install -m 644 $@ $(patsubst %.mo,../lang/%/LC_MESSAGES/destar.mo,$@)
+ 
+-%.po:	../destar ../*.py ../*.ptl
+-	xgettext --language=python -d $(@:.po=) -kM_ ../destar ../*.py ../*.ptl
++%.po:	pot destar.pot	
++	msgmerge -U $@ destar.pot 
+ 
++pot:	../destar ../*.py ../*.ptl
++	xgettext --language=python -o destar.pot -kM_ ../destar ../*.py ../*.ptl
++	
++.PHONY: clean
++
+ clean:
+ 	rm -rf *.mo
+ 	rm -rf ../lang
+
+Added: branches/0.2.X/po/destar.pot
+===================================================================
+--- branches/0.2.X/po/destar.pot	2007-06-13 21:43:18 UTC (rev 716)
++++ branches/0.2.X/po/destar.pot	2007-06-13 22:19:41 UTC (rev 717)
+@@ -0,0 +1,3647 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# FIRST AUTHOR &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">EMAIL at ADDRESS</A>&gt;, YEAR.
++#
++#, fuzzy
++msgid &quot;&quot;
++msgstr &quot;&quot;
++&quot;Project-Id-Version: PACKAGE VERSION\n&quot;
++&quot;Report-Msgid-Bugs-To: \n&quot;
++&quot;POT-Creation-Date: 2007-06-13 17:02-0500\n&quot;
++&quot;PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n&quot;
++&quot;Last-Translator: FULL NAME &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">EMAIL at ADDRESS</A>&gt;\n&quot;
++&quot;Language-Team: LANGUAGE &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">LL at li.org</A>&gt;\n&quot;
++&quot;MIME-Version: 1.0\n&quot;
++&quot;Content-Type: text/plain; charset=CHARSET\n&quot;
++&quot;Content-Transfer-Encoding: 8bit\n&quot;
++
++#: ../destar:43
++#, python-format
++msgid &quot;&quot;
++&quot;DeStar %s, Copyright (C) 2005 by Holger Schurig and contributors.\n&quot;
++&quot;\n&quot;
++&quot;DeStar comes with ABSOLUTELY NO WARRANTY. This is free software,\n&quot;
++&quot;you are welcome to redistribute it under certain conditions;\n&quot;
++&quot;see the included files GPL-2.txt and COPYRIGHT.txt\n&quot;
++msgstr &quot;&quot;
++
++#: ../destar:51
++msgid &quot;DeStar: Asterisk Management web interface&quot;
++msgstr &quot;&quot;
++
++#: ../destar:53
++msgid &quot;Usage:&quot;
++msgstr &quot;&quot;
++
++#: ../destar:54
++#, python-format
++msgid &quot;  %s [options]: normal execution&quot;
++msgstr &quot;&quot;
++
++#: ../destar:55
++#, python-format
++msgid &quot;  %s -h|--help: print this text and exit peacefully&quot;
++msgstr &quot;&quot;
++
++#: ../destar:56
++#, python-format
++msgid &quot;  %s -v|--version: only print version information&quot;
++msgstr &quot;&quot;
++
++#: ../destar:58
++msgid &quot;Options:&quot;
++msgstr &quot;&quot;
++
++#: ../destar:59
++msgid &quot;  -p &lt;pid&gt;  | --pid=&lt;pid&gt;: use &lt;pid&gt; to store the daemon's PID&quot;
++msgstr &quot;&quot;
++
++#: ../destar:60
++msgid &quot;  -d | --daemonize: run in the background&quot;
++msgstr &quot;&quot;
++
++#: ../destar:61
++msgid &quot;  -r &lt;port&gt; | --port=&lt;port&gt;: run on port &lt;port&gt; (default: 8080)&quot;
++msgstr &quot;&quot;
++
++#: ../destar:62
++msgid &quot;  -b | --backend: run on backend mode&quot;
++msgstr &quot;&quot;
++
++#: ../destar:69
++msgid &quot;DeStar: Command-line parsing error. Aborting.&quot;
++msgstr &quot;&quot;
++
++#: ../destar:98
++msgid &quot;Error: rport (-r &lt;num&gt;/--port=&lt;num&gt; must be a number)&quot;
++msgstr &quot;&quot;
++
++#: ../destar:118
++msgid &quot;Error:&quot;
++msgstr &quot;&quot;
++
++#: ../destar:118
++msgid &quot;please install Quixote &gt; 1.2  and &lt; 2.0&quot;
++msgstr &quot;&quot;
++
++#: ../backend.py:63
++msgid &quot;Warning: Configuration file could not be found.&quot;
++msgstr &quot;&quot;
++
++#: ../backend.py:431
++#, python-format
++msgid &quot;Error backing up %s&quot;
++msgstr &quot;&quot;
++
++#: ../backend.py:449
++#, python-format
++msgid &quot;Error writing up %s&quot;
++msgstr &quot;&quot;
++
++#: ../cdrutils.py:28
++msgid &quot;Note: you should install python-pysqlite2 to have CDR functionality&quot;
++msgstr &quot;&quot;
++
++#: ../cdrutils.py:35
++msgid &quot;&quot;
++&quot;Note: you need the cdr_sqlite3_custom module to have CDR and Stats &quot;
++&quot;functionalities&quot;
++msgstr &quot;&quot;
++
++#: ../cdrutils.py:44
++#, python-format
++msgid &quot;&quot;
++&quot;Note: you don't seem to have access to %s yet created by cdr_sqlite3_custom. &quot;
++&quot;See INSTALL.txt for details.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:26
++msgid &quot;Call forwarding&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:27
++msgid &quot;Extensions to set/unset call forwarding.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:28
++msgid &quot;New extensions to set/unset call forwarding&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:32 ../cfg_app_chanspy.py:33
++#: ../cfg_app_conference.py:31 ../cfg_app_directory.py:31 ../cfg_app_dnd.py:32
++#: ../cfg_app_echo.py:32 ../cfg_app_meetme.py:33 ../cfg_app_milliwatt.py:32
++#: ../cfg_app_music.py:31 ../cfg_app_parking.py:31 ../cfg_app_play.py:31
++#: ../cfg_app_quickdial_global.py:32 ../cfg_app_quickdial_phone.py:32
++#: ../cfg_app_record.py:33 ../cfg_app_saytime.py:30 ../cfg_app_voicemail.py:31
++#: ../cfg_app_voicemailsettings.py:33 ../cfg_opt_pbx.py:27
++#: ../cfg_phone_epygi.py:36 ../cfg_phone_ext.py:34 ../cfg_phone_iax.py:33
++#: ../cfg_phone_mgcp.py:33 ../cfg_phone_queue.py:34 ../cfg_phone_sip.py:36
++#: ../cfg_phone_zap.py:34 ../cfg_trunk_iax.py:121 ../cfg_trunk_sip.py:106
++#: ../cfg_trunk_zappbx.py:103 ../cfg_trunk_zappri.py:111
++#: ../cfg_trunk_zap.py:96 ../configlets.py:959 ../configlets.py:1128
++#: ../page_config_pbx.ptl:27 ../page_config_pbx.ptl:28
++msgid &quot;Virtual PBX&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:33 ../cfg_app_voicemailsettings.py:37
++#: ../cfg_opt_music.py:31 ../cfg_opt_user.py:37 ../configlets.py:582
++#: ../configlets.py:854 ../configlets.py:959 ../configlets.py:1128
++#: ../configlets.py:1149
++msgid &quot;Type&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:33
++msgid &quot;Call Forwarding Unconditional&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:34
++msgid &quot;Call Forwarding if Busy&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:34
++msgid &quot;Call Forwarding if Timeout/Unavailable&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:35 ../cfg_app_voicemailsettings.py:43
++msgid &quot;Setting preffix&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:36 ../cfg_app_dnd.py:34
++#: ../cfg_app_voicemailsettings.py:47
++msgid &quot;Unsetting extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:37 ../cfg_app_voicemailsettings.py:51
++msgid &quot;Set function toggleable&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:38 ../cfg_app_voicemailsettings.py:54
++msgid &quot;Create Devstate extension. Devstate Prefix:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_callfw.py:43 ../cfg_app_chanspy.py:54
++#: ../cfg_app_conference.py:36 ../cfg_app_directory.py:36 ../cfg_app_dnd.py:38
++#: ../cfg_app_echo.py:36 ../cfg_app_meetme.py:72 ../cfg_app_milliwatt.py:36
++#: ../cfg_app_music.py:37 ../cfg_app_parking.py:37 ../cfg_app_play.py:36
++#: ../cfg_app_quickdial_global.py:39 ../cfg_app_quickdial_phone.py:39
++#: ../cfg_app_record.py:48 ../cfg_app_saytime.py:38 ../cfg_app_voicemail.py:38
++#: ../cfg_app_voicemailsettings.py:62 ../cfg_dialout_normal.py:109
++#: ../cfg_ivr_autoatt.py:114 ../cfg_ivr_autoatt.py:117
++#: ../cfg_ivr_autoatt.py:120 ../cfg_ivr_autoatt.py:123 ../cfg_opt_did.py:91
++#: ../cfg_opt_did.py:94 ../cfg_opt_did.py:97 ../cfg_opt_user.py:50
++#: ../cfg_opt_user.py:53 ../cfg_phone_epygi.py:227 ../cfg_phone_epygi.py:234
++#: ../cfg_phone_ext.py:59 ../cfg_phone_iax.py:224 ../cfg_phone_iax.py:231
++#: ../cfg_phone_mgcp.py:227 ../cfg_phone_mgcp.py:234 ../cfg_phone_queue.py:181
++#: ../cfg_phone_queue.py:184 ../cfg_phone_sip.py:229 ../cfg_phone_sip.py:236
++#: ../cfg_phone_zap.py:226 ../cfg_phone_zap.py:233 ../cfg_trunk_capimsn.py:42
++#: ../cfg_trunk_fwdiax.py:57 ../cfg_trunk_iax.py:163 ../cfg_trunk_iax.py:166
++#: ../cfg_trunk_iaxtel.py:56 ../cfg_trunk_sip.py:148 ../cfg_trunk_sip.py:151
++#: ../cfg_trunk_zappbx.py:130 ../cfg_trunk_zappbx.py:133
++#: ../cfg_trunk_zappri.py:137 ../cfg_trunk_zappri.py:140
++#: ../cfg_trunk_zap.py:117 ../cfg_trunk_zap.py:120 ../configlets.py:430
++msgid &quot;This is a Dependency&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_chanspy.py:26
++msgid &quot;Listen calls&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_chanspy.py:27
++msgid &quot;New spy extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_chanspy.py:28
++msgid &quot;Listen all calls on the Asterisk server. Jump through calls pressing *.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_chanspy.py:38 ../cfg_app_conference.py:32
++#: ../cfg_app_directory.py:32 ../cfg_app_echo.py:33 ../cfg_app_meetme.py:38
++#: ../cfg_app_milliwatt.py:33 ../cfg_app_music.py:32 ../cfg_app_parking.py:32
++#: ../cfg_app_play.py:32 ../cfg_app_record.py:34 ../cfg_app_saytime.py:31
++#: ../cfg_app_voicemail.py:32 ../cfg_opt_monitor.py:32 ../cfg_opt_pickup.py:32
++#: ../cfg_phone_epygi.py:59 ../cfg_phone_ext.py:26 ../cfg_phone_ext.py:43
++#: ../cfg_phone_iax.py:52 ../cfg_phone_mgcp.py:51 ../cfg_phone_queue.py:43
++#: ../cfg_phone_sip.py:59 ../cfg_phone_zap.py:59 ../cfg_trunk_fwdiax.py:45
++#: ../cfg_trunk_iaxtel.py:44 ../configlets.py:582 ../configlets.py:959
++#: ../configlets.py:1128 ../configlets.py:1149 ../page_stats_phone.ptl:65
++#: ../page_user_state.ptl:66 ../page_user_state.ptl:81
++msgid &quot;Extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_chanspy.py:43 ../cfg_app_quickdial_global.py:33
++#: ../cfg_opt_user.py:32 ../cfg_phone_epygi.py:45 ../cfg_phone_iax.py:42
++#: ../cfg_phone_mgcp.py:42 ../cfg_phone_sip.py:45 ../cfg_trunk_iax.py:70
++msgid &quot;Password&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_chanspy.py:47
++msgid &quot;Be quiet?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_conference.py:26
++msgid &quot;Conference room&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_conference.py:27
++msgid &quot;New conference room&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_conference.py:33 ../cfg_app_meetme.py:48
++msgid &quot;Conference number&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_directory.py:26 ../cfg_opt_music.py:32
++msgid &quot;Directory&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_directory.py:27
++msgid &quot;New Directory&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_directory.py:28
++msgid &quot;This application allows you to dial by name.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_dnd.py:26
++msgid &quot;Set/Unset DND&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_dnd.py:27
++msgid &quot;New extensions to Set/Unset Do not disturb&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_dnd.py:28
++msgid &quot;Extensions to set/unset 'Do Not Disturb'.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_dnd.py:33
++msgid &quot;Setting extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_dnd.py:50
++msgid &quot;Extension already in use&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_echo.py:26
++msgid &quot;Echo test&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_echo.py:27
++msgid &quot;New Echo test extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_echo.py:28
++msgid &quot;&quot;
++&quot;The echo test immediately plays back what you speek. You can\n&quot;
++&quot;\t\t\t   use this to find out how much echo you have.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_meetme.py:26
++msgid &quot;Meeting room&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_meetme.py:27
++msgid &quot;New meeting room&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_meetme.py:28
++msgid &quot;Application that let create dynamic conferencing rooms&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_meetme.py:42
++msgid &quot;Maximun duration in seconds?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_meetme.py:54
++msgid &quot;PIN&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_meetme.py:60 ../cfg_opt_oppanel.py:27 ../cfg_opt_oppanel.py:28
++#: ../cfg_phone_epygi.py:96 ../cfg_phone_iax.py:89 ../cfg_phone_queue.py:168
++#: ../cfg_phone_sip.py:97 ../cfg_phone_zap.py:95 ../cfg_trunk_iax.py:93
++#: ../cfg_trunk_sip.py:74 ../cfg_trunk_zappbx.py:53 ../cfg_trunk_zappri.py:67
++#: ../cfg_trunk_zap.py:52 ../page_admin_panel.ptl:26
++msgid &quot;Operator Panel&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_meetme.py:65 ../cfg_trunk_iax.py:98 ../cfg_trunk_sip.py:79
++#: ../cfg_trunk_zappbx.py:58 ../cfg_trunk_zappri.py:72 ../cfg_trunk_zap.py:57
++msgid &quot;Show this trunk in the panel&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_milliwatt.py:26
++msgid &quot;Milliwatt test&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_milliwatt.py:27
++msgid &quot;New milliwatt test extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_milliwatt.py:28
++msgid &quot;&quot;
++&quot;Generate a Constant 1000Hz tone at 0dbm (mu-law). Used for\n&quot;
++&quot;\t\t\tmeasuring.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_music.py:26
++msgid &quot;Listen to music-on-hold&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_music.py:27
++msgid &quot;New music-on-hold extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_music.py:28
++msgid &quot;Play Play Music On Hold until you hang up.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_music.py:33 ../cfg_ivr_autoatt.py:61 ../cfg_phone_queue.py:64
++msgid &quot;Music-on-hold class&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_parking.py:26
++msgid &quot;Park calls&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_parking.py:27
++msgid &quot;New call parking extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_parking.py:28
++msgid &quot;Call Parking extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_parking.py:33
++msgid &quot;Parking places&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_play.py:26 ../cfg_app_play.py:27
++msgid &quot;Play sound&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_play.py:28
++msgid &quot;Play a soundfile.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_play.py:33 ../cfg_app_record.py:35 ../cfg_opt_rawcfg.py:32
++msgid &quot;File name&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_play.py:33
++msgid &quot;Don't specify an extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_play.py:45 ../cfg_app_record.py:57 ../cfg_opt_loadmodule.py:40
++msgid &quot;Please don't specify an extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_quickdial_global.py:26
++msgid &quot;Global Quick Dial List&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_quickdial_global.py:27
++msgid &quot;&quot;
++&quot;Extensions to add/remove from global quick dial list. The add extension will &quot;
++&quot;be of the form prefix+2_digits_key+*+final_destination. The remove extension &quot;
++&quot;will be of the form prefix+2_digits_key. The global list only works if the &quot;
++&quot;calling estension has been assigned a dialout with the quick dial lookup &quot;
++&quot;option activated.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_quickdial_global.py:28
++msgid &quot;New extensions to add/remove from global quick dial list&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_quickdial_global.py:34 ../cfg_app_quickdial_phone.py:33
++msgid &quot;Setting prefix&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_quickdial_global.py:35 ../cfg_app_quickdial_phone.py:34
++msgid &quot;Unsetting prefix&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_quickdial_phone.py:26
++msgid &quot;Private Quick Dial List&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_quickdial_phone.py:27
++msgid &quot;&quot;
++&quot;Extensions to add/remove from personal quick dial list. The add extension &quot;
++&quot;will be of the form prefix+2_digits_key+*+final_destination. The remove &quot;
++&quot;extension will be of the form prefix+2_digits_key. The personal quick dial &quot;
++&quot;list works for all extensions, by dialing dial_prefix+2_digits_key and only &quot;
++&quot;if the extension has an assigned dialout entry which pattern matches the &quot;
++&quot;final destination.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_quickdial_phone.py:28
++msgid &quot;New extensions to add/remove/access personal quick dial list&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_quickdial_phone.py:35
++msgid &quot;Dial prefix&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_record.py:26
++msgid &quot;Record sound&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_record.py:27
++msgid &quot;New recording extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_record.py:28
++msgid &quot;&quot;
++&quot;Allows you to record a sound file. You can hang up, be silent for\n&quot;
++&quot;\t\t\ta second or dial '#' to stop the recording.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_record.py:36
++msgid &quot;Sound format&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_record.py:37
++msgid &quot;GSM compression&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_record.py:38
++msgid &quot;PCM format 'ulaw'&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_record.py:39
++msgid &quot;alaw&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_record.py:40
++msgid &quot;vox&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_record.py:41
++msgid &quot;WAV-File with Microsoft PCM, 16 bit, mono 8000 Hz&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_record.py:42
++msgid &quot;WAV-File with GSM 6.10 compression, mono 8000 Hz&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_saytime.py:26 ../cfg_app_saytime.py:27
++msgid &quot;Say time&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_saytime.py:33 ../page_stats_calls.ptl:109
++msgid &quot;Time&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_saytime.py:34 ../page_stats_qcallback.ptl:197
++msgid &quot;Date&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_saytime.py:35
++msgid &quot;Date and Time&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_voicemail.py:26
++msgid &quot;Voicemail dialog&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_voicemail.py:27
++msgid &quot;New voicemail dialog&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_voicemail.py:28
++msgid &quot;Extension to enter the voicemail system.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_voicemail.py:33
++msgid &quot;Ask for user mailbox?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_voicemailsettings.py:26 ../cfg_opt_voicemail.py:26
++#: ../cfg_opt_voicemail.py:27 ../cfg_phone_epygi.py:107
++#: ../cfg_phone_iax.py:100 ../cfg_phone_mgcp.py:108 ../cfg_phone_sip.py:108
++#: ../cfg_phone_zap.py:106
++msgid &quot;Voicemail settings&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_voicemailsettings.py:27
++msgid &quot;Extensions to set/unset voicemail.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_voicemailsettings.py:28
++msgid &quot;New extensions to set/unset voicemail&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_voicemailsettings.py:39
++msgid &quot;Voicemail Unconditional&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_voicemailsettings.py:40
++msgid &quot;Voicemail if Busy&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_app_voicemailsettings.py:41
++msgid &quot;Voicemail if Timeout/Unavailable&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:27
++msgid &quot;Normal dialout entry&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:28
++msgid &quot;New normal dialout entry&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:29
++msgid &quot;Used to route calls through trunks&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:35 ../cfg_ivr_autoatt.py:35 ../cfg_ivr_raw.py:32
++#: ../cfg_opt_manager.py:31 ../cfg_opt_music.py:30 ../cfg_opt_oppanel.py:35
++#: ../cfg_opt_pbx.py:34 ../cfg_opt_rawcfg.py:31 ../cfg_opt_user.py:31
++#: ../cfg_opt_zappri.py:32 ../cfg_phone_epygi.py:41 ../cfg_phone_ext.py:39
++#: ../cfg_phone_iax.py:38 ../cfg_phone_mgcp.py:38 ../cfg_phone_queue.py:39
++#: ../cfg_phone_sip.py:41 ../cfg_phone_zap.py:39 ../cfg_trunk_capimsn.py:32
++#: ../cfg_trunk_capi.py:35 ../cfg_trunk_fwdiax.py:40 ../cfg_trunk_iax.py:35
++#: ../cfg_trunk_iaxtel.py:39 ../cfg_trunk_sip.py:35 ../cfg_trunk_zaphfc.py:31
++#: ../cfg_trunk_zappbx.py:34 ../cfg_trunk_zappri.py:35 ../cfg_trunk_zap.py:33
++#: ../configlets.py:767 ../configlets.py:854 ../configlets.py:959
++#: ../configlets.py:1149 ../configlets.py:1169 ../page_user_state.ptl:64
++msgid &quot;Name&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:39
++msgid &quot;Pattern&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:43
++msgid &quot;Remove Prefix of length&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:48
++msgid &quot;Add Prefix&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:54
++msgid &quot;Maximum call time in seconds&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:60
++msgid &quot;Ringing time in seconds&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:66
++msgid &quot;Search on quick dial list?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:70
++msgid &quot;Disable transfer to the calling party?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:75
++msgid &quot;Caller ID for calls established through this dialout&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:79 ../cfg_opt_did.py:78 ../cfg_trunk_iax.py:146
++#: ../cfg_trunk_sip.py:131
++msgid &quot;Change Caller*Id Name to:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:84 ../cfg_opt_did.py:83 ../cfg_trunk_iax.py:113
++#: ../cfg_trunk_iax.py:151 ../cfg_trunk_sip.py:98 ../cfg_trunk_sip.py:136
++#: ../cfg_trunk_zappbx.py:95 ../cfg_trunk_zappri.py:103 ../cfg_trunk_zap.py:88
++msgid &quot;Change Caller*Id Number to:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_dialout_normal.py:89
++msgid &quot;Trunks to use for routing this dialout entry&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:27
++msgid &quot;Auto attendant&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:28
++msgid &quot;New auto attendant&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:29
++msgid &quot;Basic auto-attendant.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:39
++msgid &quot;Time to wait before answer the line&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:40 ../cfg_ivr_autoatt.py:47
++msgid &quot;(in seconds)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:46
++msgid &quot;How many time has the user to dial an extension?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:53
++msgid &quot;Max. time for incoming calls in seconds&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:54
++msgid &quot;(0 or empty means no time restriction)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:67
++msgid &quot;File to play in the background&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:71
++msgid &quot;How many times should it be played?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:77
++msgid &quot;Pause between each playback&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:81
++msgid &quot;Extension to ring after file playing&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:86
++msgid &quot;Digit to jump that extension directly&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:91
++msgid &quot;IVR to jump on special dates&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:98
++msgid &quot;Times string&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:99
++msgid &quot;i.e. hours|weekdays|monthdays|months (comma separated)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:105
++msgid &quot;Allow calling to all extensions of PBX&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:137
++msgid &quot;File should be played at least one time&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_autoatt.py:139
++msgid &quot;Please specify dates&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_raw.py:27
++msgid &quot;Raw IVR&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_raw.py:28
++msgid &quot;New raw IVR&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_ivr_raw.py:33 ../cfg_opt_rawcfg.py:34
++msgid &quot;Contents&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:29
++msgid &quot;Audio Codec&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:30
++msgid &quot;New audio codec to be used&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:35
++msgid &quot;Allow codec&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:37
++msgid &quot;Use all codecs&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:38
++msgid &quot;A Law (g711a)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:39
++msgid &quot;U Law (g711u)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:40 ../cfg_phone_epygi.py:158 ../cfg_phone_iax.py:155
++#: ../cfg_phone_mgcp.py:158 ../cfg_phone_queue.py:129 ../cfg_phone_sip.py:159
++#: ../cfg_phone_zap.py:157
++msgid &quot;GSM&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:41
++msgid &quot;ILBC&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:42
++msgid &quot;g726&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:43
++msgid &quot;g723.1&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_codec.py:44
++msgid &quot;g729&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:26
++msgid &quot;Direct inward dialing (DID) number&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:27
++msgid &quot;New direct inward dialing (DID) number&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:28
++msgid &quot;&quot;
++&quot; Used to route a DID to an extension \n&quot;
++&quot;\t\t\t\t\t\tor Auto-Attendant.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:36
++msgid &quot;DID&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:40
++msgid &quot;From Trunk:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:45 ../cfg_trunk_iax.py:118 ../cfg_trunk_sip.py:103
++#: ../cfg_trunk_zappbx.py:100 ../cfg_trunk_zappri.py:108
++#: ../cfg_trunk_zap.py:93
++msgid &quot;Go to&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:48 ../cfg_trunk_iax.py:121 ../cfg_trunk_sip.py:106
++#: ../cfg_trunk_zappbx.py:103 ../cfg_trunk_zappri.py:111
++#: ../cfg_trunk_zap.py:96
++msgid &quot;Phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:48 ../cfg_trunk_iax.py:121 ../cfg_trunk_sip.py:106
++#: ../cfg_trunk_zappbx.py:103 ../cfg_trunk_zappri.py:111
++#: ../cfg_trunk_zap.py:96
++msgid &quot;IVR&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:48
++msgid &quot;Custom map&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:51 ../cfg_trunk_capimsn.py:35 ../cfg_trunk_fwdiax.py:50
++#: ../cfg_trunk_iaxtel.py:49
++msgid &quot;Phone to ring&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:57 ../cfg_trunk_iax.py:130 ../cfg_trunk_sip.py:115
++#: ../cfg_trunk_zappbx.py:112 ../cfg_trunk_zappri.py:120
++#: ../cfg_trunk_zap.py:105
++msgid &quot;IVR to jump to&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:63
++msgid &quot;Custom map, PBX&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:69
++msgid &quot;Custom map, destination&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:74
++msgid &quot;CallerID:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_did.py:114
++msgid &quot;DID already in use for that trunk.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_enum.py:26
++msgid &quot;ENUM search domain&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_enum.py:27
++msgid &quot;New ENUM search domain&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_enum.py:30
++msgid &quot;Domain to search for ENUM entries&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_loadmodule.py:26 ../cfg_opt_loadmodule.py:27
++msgid &quot;Load module&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_loadmodule.py:28
++msgid &quot;Module to load&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:25 ../cfg_opt_logger.py:26
++msgid &quot;Logger options&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:27
++msgid &quot;&quot;
++&quot;Asterisk can emit many events to it's console or a log file, Here you can &quot;
++&quot;make it more (or less) verbose:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:30
++msgid &quot;Errors&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:31
++msgid &quot;Warnings&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:32
++msgid &quot;Notifications&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:33
++msgid &quot;Verbose messages&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:34
++msgid &quot;Debug output&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:44
++msgid &quot;Console output&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:50
++msgid &quot;Output in /var/log/asterisk/messages&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:56
++msgid &quot;Log to syslog via facility&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_logger.py:61
++msgid &quot;What kind of messages to log&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_manager.py:26 ../page_config.ptl:80
++msgid &quot;Management API access&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_manager.py:27
++msgid &quot;New management API access&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_manager.py:32
++msgid &quot;Secret&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_manager.py:33
++msgid &quot;IP disable mask&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_manager.py:34
++msgid &quot;IP enable mask&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_manager.py:35
++msgid &quot;Read&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_manager.py:36
++msgid &quot;Write&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_monitor.py:27
++msgid &quot;One Touch Monitor&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_monitor.py:28
++msgid &quot;Touch Monitor Extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_monitor.py:29
++msgid &quot;Extension to dial to start monitoring a call.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_music.py:26
++msgid &quot;Background music directory&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_music.py:27
++msgid &quot;New background music directory&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_music.py:33 ../page_user_state.ptl:87
++msgid &quot;Application&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_music.py:39
++msgid &quot;Please specify an application&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:29
++msgid &quot;Configure Asternic Flash Operator Panel&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:40
++msgid &quot;FQDN/IP to access the panel via web&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:45
++msgid &quot;Security Code&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:50
++msgid &quot;Button Size&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:53
++msgid &quot;Very Small&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:54
++msgid &quot;Small&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:55
++msgid &quot;Normal&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:56
++msgid &quot;Large&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:57
++msgid &quot;Very Large&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:63
++msgid &quot;Manager agent&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_oppanel.py:68
++msgid &quot;Frequency in seconds to poll for sip and iax status&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_pbx.py:28
++msgid &quot;New Virtual PBX&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_pbx.py:29
++msgid &quot;You can have several logically separated PBX&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_pickup.py:27 ../cfg_opt_pickup.py:28
++msgid &quot;Pickup Extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_pickup.py:29
++msgid &quot;Extension to dial to pick-up a call in the same group.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_rawcfg.py:26
++msgid &quot;Raw config file snippet&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_rawcfg.py:27
++msgid &quot;New raw config file snippet&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_rawcfg.py:33
++msgid &quot;Section/Context&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_rtp.py:26 ../cfg_opt_rtp.py:27
++msgid &quot;RTP options&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_rtp.py:31
++msgid &quot;Start of RTP port area&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_rtp.py:32
++msgid &quot;End of RTP port area&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_rtp.py:33
++msgid &quot;Check UDP checksums of RTP packets&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_rtp.py:46
++msgid &quot;must be higher than start value&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:25
++msgid &quot;Austria&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:37
++msgid &quot;Australia&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:52
++msgid &quot;Belgium&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:64
++msgid &quot;Brazil&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:75
++msgid &quot;Chile&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:86
++msgid &quot;Germany&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:98
++msgid &quot;Spain&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:110
++msgid &quot;Finland&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:121
++msgid &quot;France&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:132
++msgid &quot;Greece&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:143
++msgid &quot;India&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:155
++msgid &quot;Italy&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:166
++msgid &quot;Japan&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:178
++msgid &quot;Netherlands&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:189
++msgid &quot;Norway&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:200
++msgid &quot;New Zealand&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:211
++msgid &quot;Poland&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:222
++msgid &quot;Portugal&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:233
++msgid &quot;Russia&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:244
++msgid &quot;Sweden&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:255
++msgid &quot;Taiwan&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:267
++msgid &quot;United Kingdom&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:285
++msgid &quot;United States / North America&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:296
++msgid &quot;South Africa&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:315 ../cfg_opt_settings.py:316
++msgid &quot;General settings&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:320
++msgid &quot;Country&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:321
++msgid &quot;The country is used for generating dialtone, ringtone, busytone etc&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:325
++msgid &quot;language&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:326
++msgid &quot;The language is used for voice prompts&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_settings.py:330
++msgid &quot;Tapi Support&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:28 ../cfg_opt_sip_network.py:29
++msgid &quot;SIP Options&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:34
++msgid &quot;Bind specific address?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:38
++msgid &quot;Bind address&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:43
++msgid &quot;Global NAT&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:45 ../cfg_phone_queue.py:107
++msgid &quot;No&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:46 ../cfg_phone_queue.py:106
++msgid &quot;Yes&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:47
++msgid &quot;Always&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:48
++msgid &quot;Route&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:53
++msgid &quot;SIP Pedantic checking of Call-ID&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:58
++msgid &quot;External/Internal IP&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:62
++msgid &quot;Force external ip/internel network?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:66
++msgid &quot;External ip&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:71
++msgid &quot;Internal network&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:76
++msgid &quot;Netmask&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:81
++msgid &quot;TOS Field&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:87
++msgid &quot;Enable DNS SRV lookups on outbound calls&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:93
++msgid &quot;Defaults&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:97
++msgid &quot;Music on hold&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_transfer.py:27 ../cfg_opt_transfer.py:28
++msgid &quot;Transfer Extensions&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_transfer.py:29
++msgid &quot;Extensions to dial to transfer a call.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_transfer.py:33
++msgid &quot;Blind Transfer Extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_transfer.py:34
++msgid &quot;Attended Transfer Extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_transfer.py:35
++msgid &quot;Number of seconds to wait between digits when transfering a call&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_transfer.py:35
++msgid &quot;Default is 3 seconds&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_transfer.py:36
++msgid &quot;Timeout for answer on attended transfer&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_transfer.py:36
++msgid &quot;Default is 15 seconds&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:25 ../page_config.ptl:68
++msgid &quot;DeStar user&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:26
++msgid &quot;New DeStar user&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:33
++msgid &quot;Associated IP address of PC&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:33
++msgid &quot;Trusted for auto-login&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:34
++msgid &quot;Associated phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:36
++msgid &quot;Associated Virtual PBX&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:38 ../page_user_info.ptl:49
++msgid &quot;disabled&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:39 ../page_user_info.ptl:50 ../page_user.ptl:25
++msgid &quot;User&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:40
++msgid &quot;Virtual PBX Administrator&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:41 ../page_user_info.ptl:52
++msgid &quot;Configurator&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:42
++msgid &quot;Language&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_user.py:65
++msgid &quot;Please choose a Virtual PBX for this user.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:31
++msgid &quot;Enable Voicemail on phones&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:32
++msgid &quot;Recording settings&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:33
++msgid &quot;File format for voicemail messages&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:35
++msgid &quot;Maximal message length (in seconds)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:36
++msgid &quot;Minimal message length (in seconds)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:37
++msgid &quot;Seconds of silence to end the recording&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:38
++msgid &quot;&quot;
++&quot;Silence threshold (what we consider silence, the lower, the more sensitive)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:40
++msgid &quot;Playback settings&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:41
++msgid &quot;Max number of failed login attempts&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:42
++msgid &quot;Seconds to skip forward/backward&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:44
++msgid &quot;E-mail integration settings&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:45
++msgid &quot;Activate email voicemail notifications?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:46
++msgid &quot;Who the e-mail notification should appear to come from&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:46
++msgid &quot;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">destar_pbx at yourdomain</A>&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:47
++msgid &quot;Change the From: string&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:47
++msgid &quot;The Asterisk/DeStar PBX&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:48
++msgid &quot;Change email Subject&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:48
++msgid &quot;[DeStar PBX]: New message from ${VM_CALLERID} in mailbox ${VM_MAILBOX}&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:49
++msgid &quot;Change email Body&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:50
++msgid &quot;&quot;
++&quot;Dear ${VM_NAME}:\\n\\n\\tjust wanted to let you know you were just left a &quot;
++&quot;${VM_DUR} long message (number ${VM_MSGNUM})\\n\\tin mailbox ${VM_MAILBOX} &quot;
++&quot;from ${VM_CALLERID}, on ${VM_DATE}, so you might\\n\\twant to check it when &quot;
++&quot;you get a chance. Thanks!\\n\\n\\t\\t\\t--Asterisk/Destar PBX.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:52
++msgid &quot;Should the email contain the voicemail as an attachment?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:53
++msgid &quot;Override the default program to send e-mail&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_voicemail.py:53
++msgid &quot;i.e.: /usr/sbin/sendmail -t&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_audio.py:26 ../cfg_opt_zap_audio.py:27
++msgid &quot;Zaptel Audio Options&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_audio.py:31
++msgid &quot;Be sloppy when detecting DTMF&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_audio.py:32
++msgid &quot;Echo cancel samples&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_audio.py:34
++msgid &quot;Cancel echo even on bridged calls&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_audio.py:35
++msgid &quot;Do early echo training&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_phone.py:26 ../cfg_opt_zap_phone.py:27
++msgid &quot;Zaptel Phone Options&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_phone.py:31
++msgid &quot;Use ADSI for menu phones&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_phone.py:32
++msgid &quot;Signal a waiting call&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_phone.py:33
++msgid &quot;Send callerid during call waiting indication&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_phone.py:34
++msgid &quot;Suspend a call temporarily via a hook flash&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_phone.py:35
++msgid &quot;Allow call transfer&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_phone.py:36
++msgid &quot;Allow call forwards&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_phone.py:37
++msgid &quot;Read caller number with *69&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:28 ../cfg_opt_zappri.py:29
++msgid &quot;Zaptel configuration for PRI&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:33
++msgid &quot;Zaptel span&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:33
++msgid &quot;i.e. 1 if 1st card&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:34
++msgid &quot;Zaptel timing parameter&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:34
++msgid &quot;Read zaptel documentation&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:35
++msgid &quot;Line Build Out (dB)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:35
++msgid &quot;&quot;
++&quot;Power level based on distance from the card to the service provider's &quot;
++&quot;gateway.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:37
++msgid &quot;0: 0 db (CSU) / 0-133 feet (DSX-1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:38
++msgid &quot;1: 133-266 feet (DSX-1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:39
++msgid &quot;2: 266-399 feet (DSX-1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:40
++msgid &quot;3: 399-533 feet (DSX-1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:41
++msgid &quot;4: 533-655 feet (DSX-1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:42
++msgid &quot;5: -7.5db (CSU)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:43
++msgid &quot;6: -15db (CSU)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:44
++msgid &quot;7: -22.5db (CSU)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:46
++msgid &quot;Framing&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:47
++msgid &quot;D4 (T1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:47
++msgid &quot;ESF (T1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:47
++msgid &quot;CSS (E1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:47
++msgid &quot;CAS (E1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:48
++msgid &quot;Coding&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:49
++msgid &quot;AMI (T1/E1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:49
++msgid &quot;B8ZF (T1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:49
++msgid &quot;HDB3 (E1)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:51 ../cfg_trunk_zappri.py:56
++msgid &quot;Channels&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:51 ../cfg_trunk_zappri.py:57
++msgid &quot;i.e. 1-15,17-31&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:52
++msgid &quot;Signaling channel&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zappri.py:52
++msgid &quot;i.e. 16&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_trunk.py:26 ../cfg_opt_zap_trunk.py:27
++msgid &quot;Zaptel Trunk Options&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_trunk.py:31
++msgid &quot;Try to detect busy signal to detect if remote site hung up&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_zap_trunk.py:32
++msgid &quot;Wait how many busy signals before hanging up&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:29
++msgid &quot;Remote SIP extension - Epygi&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:30
++msgid &quot;New SIP Epigy extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:50
++msgid &quot;IP address of Epygi gateway&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:54 ../cfg_phone_sip.py:54
++msgid &quot;Is the trunk behind NAT ?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:63 ../cfg_phone_sip.py:63
++msgid &quot;DTMF mode:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:65 ../cfg_phone_sip.py:66
++msgid &quot;RFC 2833 (RTP)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:66 ../cfg_phone_sip.py:67
++msgid &quot;In Band (only with ulaw/alaw)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:67 ../cfg_phone_sip.py:68
++msgid &quot;SIP INFO&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:70 ../cfg_phone_iax.py:62 ../cfg_phone_mgcp.py:82
++#: ../cfg_phone_sip.py:71 ../cfg_phone_zap.py:69
++msgid &quot;Call group&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:74 ../cfg_phone_iax.py:66 ../cfg_phone_mgcp.py:86
++#: ../cfg_phone_sip.py:75 ../cfg_phone_zap.py:73
++msgid &quot;Enable call group&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:80 ../cfg_phone_iax.py:72 ../cfg_phone_mgcp.py:92
++#: ../cfg_phone_sip.py:81 ../cfg_phone_zap.py:79
++msgid &quot;Call group number&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:84 ../cfg_phone_iax.py:76 ../cfg_phone_mgcp.py:96
++#: ../cfg_phone_sip.py:85 ../cfg_phone_zap.py:83
++msgid &quot;Call Queues&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:89 ../cfg_phone_iax.py:81 ../cfg_phone_mgcp.py:101
++#: ../cfg_phone_sip.py:90 ../cfg_phone_zap.py:88
++msgid &quot;Agent of queues:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:101 ../cfg_phone_iax.py:94 ../cfg_phone_sip.py:102
++msgid &quot;Show this extension in the panel&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:112 ../cfg_phone_iax.py:104 ../cfg_phone_mgcp.py:113
++#: ../cfg_phone_sip.py:113 ../cfg_phone_zap.py:111
++msgid &quot;Signal waiting mail&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:117 ../cfg_phone_iax.py:109 ../cfg_phone_mgcp.py:118
++#: ../cfg_phone_sip.py:118 ../cfg_phone_zap.py:116
++msgid &quot;Voicemail PIN&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:123
++msgid &quot;E-mail&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:128 ../cfg_phone_iax.py:125 ../cfg_phone_mgcp.py:128
++#: ../cfg_phone_sip.py:129 ../cfg_phone_zap.py:127
++msgid &quot;Calls from the phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:132 ../cfg_phone_iax.py:129 ../cfg_phone_sip.py:133
++#: ../cfg_phone_zap.py:131
++msgid &quot;Caller-Id Number&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:136 ../cfg_phone_iax.py:133 ../cfg_phone_sip.py:137
++#: ../cfg_phone_zap.py:135 ../cfg_trunk_fwdiax.py:47 ../cfg_trunk_iaxtel.py:46
++msgid &quot;Caller-Id Name&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:140 ../cfg_phone_iax.py:137 ../cfg_phone_mgcp.py:140
++#: ../cfg_phone_queue.py:112 ../cfg_phone_sip.py:141 ../cfg_phone_zap.py:139
++msgid &quot;Monitoring&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:145 ../cfg_phone_iax.py:142 ../cfg_phone_mgcp.py:145
++#: ../cfg_phone_sip.py:146 ../cfg_phone_zap.py:144
++msgid &quot;Monitor calls made from this extension?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:150 ../cfg_phone_iax.py:147 ../cfg_phone_mgcp.py:150
++#: ../cfg_phone_queue.py:121 ../cfg_phone_sip.py:151 ../cfg_phone_zap.py:149
++msgid &quot;Monitor file name&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:151 ../cfg_phone_iax.py:148 ../cfg_phone_mgcp.py:151
++#: ../cfg_phone_queue.py:122 ../cfg_phone_sip.py:152 ../cfg_phone_zap.py:150
++msgid &quot;Otherwise it will use Date-CallerIdName(CallerIdNum)-Exten&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:156 ../cfg_phone_iax.py:153 ../cfg_phone_mgcp.py:156
++#: ../cfg_phone_queue.py:127 ../cfg_phone_sip.py:157 ../cfg_phone_zap.py:155
++msgid &quot;Monitor file format&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:159 ../cfg_phone_iax.py:156 ../cfg_phone_mgcp.py:159
++#: ../cfg_phone_queue.py:130 ../cfg_phone_sip.py:160 ../cfg_phone_zap.py:158
++msgid &quot;WAV&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:160 ../cfg_phone_iax.py:157 ../cfg_phone_mgcp.py:160
++#: ../cfg_phone_queue.py:131 ../cfg_phone_sip.py:161 ../cfg_phone_zap.py:159
++msgid &quot;WAV49&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:164 ../cfg_phone_iax.py:161 ../cfg_phone_mgcp.py:164
++#: ../cfg_phone_queue.py:135 ../cfg_phone_sip.py:165 ../cfg_phone_zap.py:163
++msgid &quot;Append to existing file instead of overwriting it?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:169 ../cfg_phone_iax.py:166 ../cfg_phone_mgcp.py:169
++#: ../cfg_phone_sip.py:170 ../cfg_phone_zap.py:168
++msgid &quot;Save audio only while the channel is bridged?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:170 ../cfg_phone_iax.py:167 ../cfg_phone_mgcp.py:170
++#: ../cfg_phone_sip.py:171 ../cfg_phone_zap.py:169
++msgid &quot;Does not include conferences&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:175 ../cfg_phone_iax.py:172 ../cfg_phone_mgcp.py:175
++#: ../cfg_phone_queue.py:140 ../cfg_phone_sip.py:176 ../cfg_phone_zap.py:174
++msgid &quot;Heard volume factor&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:177 ../cfg_phone_epygi.py:191 ../cfg_phone_iax.py:174
++#: ../cfg_phone_iax.py:188 ../cfg_phone_mgcp.py:177 ../cfg_phone_mgcp.py:191
++#: ../cfg_phone_queue.py:142 ../cfg_phone_queue.py:156 ../cfg_phone_sip.py:178
++#: ../cfg_phone_sip.py:192 ../cfg_phone_zap.py:176 ../cfg_phone_zap.py:190
++msgid &quot;+4&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:178 ../cfg_phone_epygi.py:192 ../cfg_phone_iax.py:175
++#: ../cfg_phone_iax.py:189 ../cfg_phone_mgcp.py:178 ../cfg_phone_mgcp.py:192
++#: ../cfg_phone_queue.py:143 ../cfg_phone_queue.py:157 ../cfg_phone_sip.py:179
++#: ../cfg_phone_sip.py:193 ../cfg_phone_zap.py:177 ../cfg_phone_zap.py:191
++msgid &quot;+3&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:179 ../cfg_phone_epygi.py:193 ../cfg_phone_iax.py:176
++#: ../cfg_phone_iax.py:190 ../cfg_phone_mgcp.py:179 ../cfg_phone_mgcp.py:193
++#: ../cfg_phone_queue.py:144 ../cfg_phone_queue.py:158 ../cfg_phone_sip.py:180
++#: ../cfg_phone_sip.py:194 ../cfg_phone_zap.py:178 ../cfg_phone_zap.py:192
++msgid &quot;+2&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:180 ../cfg_phone_epygi.py:194 ../cfg_phone_iax.py:177
++#: ../cfg_phone_iax.py:191 ../cfg_phone_mgcp.py:180 ../cfg_phone_mgcp.py:194
++#: ../cfg_phone_queue.py:145 ../cfg_phone_queue.py:159 ../cfg_phone_sip.py:181
++#: ../cfg_phone_sip.py:195 ../cfg_phone_zap.py:179 ../cfg_phone_zap.py:193
++msgid &quot;+1&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:181 ../cfg_phone_epygi.py:195 ../cfg_phone_iax.py:178
++#: ../cfg_phone_iax.py:192 ../cfg_phone_mgcp.py:181 ../cfg_phone_mgcp.py:195
++#: ../cfg_phone_queue.py:146 ../cfg_phone_queue.py:160 ../cfg_phone_sip.py:182
++#: ../cfg_phone_sip.py:196 ../cfg_phone_zap.py:180 ../cfg_phone_zap.py:194
++msgid &quot;0&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:182 ../cfg_phone_epygi.py:196 ../cfg_phone_iax.py:179
++#: ../cfg_phone_iax.py:193 ../cfg_phone_mgcp.py:182 ../cfg_phone_mgcp.py:196
++#: ../cfg_phone_queue.py:147 ../cfg_phone_queue.py:161 ../cfg_phone_sip.py:183
++#: ../cfg_phone_sip.py:197 ../cfg_phone_zap.py:181 ../cfg_phone_zap.py:195
++msgid &quot;-1&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:183 ../cfg_phone_epygi.py:197 ../cfg_phone_iax.py:180
++#: ../cfg_phone_iax.py:194 ../cfg_phone_mgcp.py:183 ../cfg_phone_mgcp.py:197
++#: ../cfg_phone_queue.py:148 ../cfg_phone_queue.py:162 ../cfg_phone_sip.py:184
++#: ../cfg_phone_sip.py:198 ../cfg_phone_zap.py:182 ../cfg_phone_zap.py:196
++msgid &quot;-2&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:184 ../cfg_phone_epygi.py:198 ../cfg_phone_iax.py:181
++#: ../cfg_phone_iax.py:195 ../cfg_phone_mgcp.py:184 ../cfg_phone_mgcp.py:198
++#: ../cfg_phone_queue.py:149 ../cfg_phone_queue.py:163 ../cfg_phone_sip.py:185
++#: ../cfg_phone_sip.py:199 ../cfg_phone_zap.py:183 ../cfg_phone_zap.py:197
++msgid &quot;-3&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:185 ../cfg_phone_epygi.py:199 ../cfg_phone_iax.py:182
++#: ../cfg_phone_iax.py:196 ../cfg_phone_mgcp.py:185 ../cfg_phone_mgcp.py:199
++#: ../cfg_phone_queue.py:150 ../cfg_phone_queue.py:164 ../cfg_phone_sip.py:186
++#: ../cfg_phone_sip.py:200 ../cfg_phone_zap.py:184 ../cfg_phone_zap.py:198
++msgid &quot;-4&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:189 ../cfg_phone_iax.py:186 ../cfg_phone_mgcp.py:189
++#: ../cfg_phone_queue.py:154 ../cfg_phone_sip.py:190 ../cfg_phone_zap.py:188
++msgid &quot;Spoken volume factor&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:203 ../cfg_phone_iax.py:200 ../cfg_phone_mgcp.py:203
++#: ../cfg_phone_sip.py:204 ../cfg_phone_zap.py:202
++msgid &quot;Allowed dialout-entries&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_epygi.py:208 ../cfg_phone_iax.py:205 ../cfg_phone_mgcp.py:208
++#: ../cfg_phone_sip.py:209 ../cfg_phone_zap.py:207
++msgid &quot;Enable time restriction?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_ext.py:27
++msgid &quot;New extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_ext.py:28
++msgid &quot;Set an 'alias' extension to a phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_ext.py:44
++msgid &quot;This can be used to set operator(o) or fax(fax) extensions.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_ext.py:48
++msgid &quot;Calls to the extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_ext.py:52
++msgid &quot;Real phone to ring&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_iax.py:27
++msgid &quot;Normal IAX phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_iax.py:28
++msgid &quot;New IAX phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_iax.py:47 ../cfg_phone_mgcp.py:47 ../cfg_phone_sip.py:49
++msgid &quot;IP address of phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_iax.py:56 ../cfg_phone_mgcp.py:76 ../cfg_phone_zap.py:63
++msgid &quot;Allow direct dialling from outside?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_iax.py:115 ../cfg_phone_mgcp.py:123 ../cfg_phone_sip.py:124
++#: ../cfg_phone_zap.py:122
++msgid &quot;Voicemail email&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_iax.py:121
++msgid &quot;Skip asterisk media path?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_mgcp.py:26
++msgid &quot;Normal MGCP phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_mgcp.py:27
++msgid &quot;New MGCP phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_mgcp.py:40
++msgid &quot;&quot;
++&quot;If you haven't configured a name for your phone please use the IP address &quot;
++&quot;here.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_mgcp.py:56
++msgid &quot;NAT&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_mgcp.py:61
++msgid &quot;Three way calling&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_mgcp.py:66
++msgid &quot;Enable Call transfer&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_mgcp.py:71
++msgid &quot;Enable Call forward&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_mgcp.py:132
++msgid &quot;Caller-Id-Number&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_mgcp.py:136
++msgid &quot;Caller-Id-Name&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:27
++msgid &quot;Normal Call Queue&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:28
++msgid &quot;New Call Queue&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:48
++msgid &quot;Phone timeout&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:53
++msgid &quot;Queue Timeout&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:58
++msgid &quot;On queue timeout forward to extension&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:70
++msgid &quot;Ring instead of playing Music-on-Hold?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:74
++msgid &quot;Strategy:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:76
++msgid &quot;Ring all - ring all available channels until one answers&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:77
++msgid &quot;Round robin - take turns ringing each available interface&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:78
++msgid &quot;&quot;
++&quot;Least recent - ring interface which was least recently called by this queue&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:79
++msgid &quot;Fewest calls - ring the one with fewest completed calls from this queue&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:80
++msgid &quot;Random - ring random interface&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:81
++msgid &quot;Round robin with memory - remember where we left off last ring pass&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:85
++msgid &quot;How long to wait before trying all the members again?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:90
++msgid &quot;Announces&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:95
++msgid &quot;Announce queue position to caller?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:99
++msgid &quot;&quot;
++&quot;How often to announce queue position and/or estimated holdtime to caller&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:104
++msgid &quot;Include estimated hold time in position announcements?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:108
++msgid &quot;Only Once&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:117
++msgid &quot;Monitor answered calls?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:173
++msgid &quot;Show this queue in the panel&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_queue.py:193
++msgid &quot;You should select a frequency&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_sip.py:28
++msgid &quot;Normal SIP phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_sip.py:29
++msgid &quot;New SIP phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_sip.py:30
++msgid &quot;&quot;
++&quot;This is a SIP phone account, to be used by hard-phones, soft-phones, ATAs, &quot;
++&quot;etc.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_zap.py:27
++msgid &quot;Normal ZAP phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_zap.py:28
++msgid &quot;New ZAP phone&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_zap.py:43 ../cfg_trunk_zappbx.py:38 ../cfg_trunk_zap.py:37
++msgid &quot;Zaptel channel number&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_zap.py:48 ../cfg_trunk_zappbx.py:43 ../cfg_trunk_zappri.py:39
++#: ../cfg_trunk_zap.py:42
++msgid &quot;Signalling type&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_zap.py:54
++msgid &quot;Group&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_phone_zap.py:100
++msgid &quot;Show this phone in the panel&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_capimsn.py:26
++msgid &quot;ISDN using CAPI, incoming&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_capimsn.py:27
++msgid &quot;New incoming ISDN using CAPI&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_capimsn.py:33
++msgid &quot;Calls from the ISDN network&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_capimsn.py:34 ../cfg_trunk_capi.py:37
++#: ../cfg_trunk_zaphfc.py:37
++msgid &quot;Subscriber number&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_capimsn.py:73
++msgid &quot;MSN already assigned&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_capi.py:29
++msgid &quot;ISDN using CAPI, outgoing&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_capi.py:30
++msgid &quot;New outgoing ISDN using CAPI&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_capi.py:36 ../cfg_trunk_zaphfc.py:36
++msgid &quot;Calls to the ISDN network&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_capi.py:38 ../cfg_trunk_zaphfc.py:38
++msgid &quot;Outgoing prefix&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_fwdiax.py:26
++msgid &quot;VOIP-Provider FreeworldDialup (IAX)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_fwdiax.py:27
++msgid &quot;New VOIP-Provider FreeworldDialup (IAX) trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_fwdiax.py:29
++msgid &quot;&quot;
++&quot;You can register free of charge at\n&quot;
++&quot;\t\t\<A HREF="thttp://freeworlddialup.com">thttp://freeworlddialup.com</A> and get an FWD Id where\n&quot;
++&quot;\t\t\tpeople can call you. These calls are is free of charge, too.\n&quot;
++&quot;\n&quot;
++&quot;\t\t\tWhen you've an account, you must enable FWD's IAX support at\n&quot;
++&quot;\t\t\<A HREF="thttp://www.freeworlddialup.com/advanced/iax">thttp://www.freeworlddialup.com/advanced/iax</A> to use this\n&quot;
++&quot;\t\t\tthis 'phone line'.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_fwdiax.py:41
++msgid &quot;FWD number&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_fwdiax.py:42
++msgid &quot;FWD password&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_fwdiax.py:44
++msgid &quot;Calls to FWD&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_fwdiax.py:46 ../cfg_trunk_iaxtel.py:45
++#: ../page_user_state.ptl:94
++msgid &quot;Context&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_fwdiax.py:49
++msgid &quot;Calls from FWD&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:27
++msgid &quot;Standard IAX Trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:28
++msgid &quot;New standard IAX trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:29
++msgid &quot;&quot;
++&quot;Used to setup an IAX trunk to another Asterisk server or an IAX termination.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:40
++msgid &quot;IAX host&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:44
++msgid &quot;IAX2 remote port&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:50
++msgid &quot;Bandwith&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:53
++msgid &quot;Low&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:53
++msgid &quot;High&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:56 ../cfg_trunk_sip.py:58
++msgid &quot;Register with remote host?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:60
++msgid &quot;Authentication&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:64
++msgid &quot;Authentication Method&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:67
++msgid &quot;Plain text&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:67
++msgid &quot;RSA&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:67
++msgid &quot;MD5&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:71
++msgid &quot;For 'Plain' or 'MD5' only&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:76
++msgid &quot;Public key from remote server&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:77 ../cfg_trunk_iax.py:83
++msgid &quot;For 'RSA' only&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:82
++msgid &quot;Private local key&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:88
++msgid &quot;Enable trunking?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:104
++msgid &quot;Calls from IAX trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:108 ../cfg_trunk_sip.py:93 ../cfg_trunk_zappbx.py:90
++#: ../cfg_trunk_zappri.py:98 ../cfg_trunk_zap.py:83
++msgid &quot;Change Caller*Id to:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:124 ../cfg_trunk_sip.py:109 ../cfg_trunk_zappbx.py:106
++#: ../cfg_trunk_zappri.py:114 ../cfg_trunk_zap.py:99
++msgid &quot;Extension to ring&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:136 ../cfg_trunk_sip.py:121 ../cfg_trunk_zappbx.py:118
++#: ../cfg_trunk_zappri.py:126
++msgid &quot;Allow dial extension from which Virtual PBX&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iax.py:142 ../cfg_trunk_sip.py:127
++msgid &quot;Outgoing calls to IAX trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iaxtel.py:26
++msgid &quot;VOIP-Provider Iaxtel&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iaxtel.py:27
++msgid &quot;New VOIP-Provider Iaxtel trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iaxtel.py:29
++msgid &quot;&quot;
++&quot;You can register free of charge at\n&quot;
++&quot;\t\t\<A HREF="thttp://www.iaxtel.com">thttp://www.iaxtel.com</A> and get an IAXtel number  where\n&quot;
++&quot;\t\t\tpeople can call you. These calls are free of charge, too.'.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iaxtel.py:40
++msgid &quot;IAXTEL number&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iaxtel.py:41
++msgid &quot;IAXTEL password&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iaxtel.py:43
++msgid &quot;Calls to IAXTEL&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_iaxtel.py:48
++msgid &quot;Calls from IAXTEL&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:27
++msgid &quot;Standard SIP Trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:28
++msgid &quot;New standard SIP trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:29
++msgid &quot;Used to setup a SIP trunk to a SIP provider or a different SIP server.&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:40
++msgid &quot;SIP username&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:44
++msgid &quot;SIP password&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:48
++msgid &quot;SIP host&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:52
++msgid &quot;SIP port&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:62
++msgid &quot;Enable forward address type?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:66
++msgid &quot;Is the trunk behind NAT?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:70
++msgid &quot;Bypass auth for incoming calls?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:84
++msgid &quot;Sip domain:&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_sip.py:89 ../cfg_trunk_zappbx.py:86
++msgid &quot;Calls from SIP trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zaphfc.py:26
++msgid &quot;ISDN using zaphfc&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zaphfc.py:27
++msgid &quot;New ISDN using zaphfc trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zaphfc.py:32
++msgid &quot;Mode of NTBA&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zaphfc.py:34
++msgid &quot;Number of cards&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappbx.py:27
++msgid &quot;PBX ZAP trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappbx.py:28
++msgid &quot;New PBX ZAP trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappbx.py:48 ../cfg_trunk_zappri.py:62 ../cfg_trunk_zap.py:47
++msgid &quot;Callout group&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappbx.py:64 ../cfg_trunk_zappri.py:78 ../cfg_trunk_zap.py:63
++msgid &quot;Reception and Transmission Gains&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappbx.py:68 ../cfg_trunk_zappri.py:82 ../cfg_trunk_zap.py:67
++msgid &quot;Reception gain&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappbx.py:69 ../cfg_trunk_zappbx.py:75
++#: ../cfg_trunk_zappri.py:83 ../cfg_trunk_zappri.py:89 ../cfg_trunk_zap.py:68
++#: ../cfg_trunk_zap.py:74
++msgid &quot;in dB&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappbx.py:74 ../cfg_trunk_zappri.py:88 ../cfg_trunk_zap.py:73
++msgid &quot;Transmission gain&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappbx.py:80
++msgid &quot;Outbound prefix&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappbx.py:82
++msgid &quot;Used to call through a PBX&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappri.py:28
++msgid &quot;Standard ZAP PRI trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappri.py:29
++msgid &quot;New standard ZAP PRI trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappri.py:41
++msgid &quot;PRI signalling, CPE side&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappri.py:42
++msgid &quot;PRI signalling, Network side&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappri.py:45
++msgid &quot;Switch type&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappri.py:94
++msgid &quot;Calls from PRI channel(s)&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zappri.py:166
++msgid &quot;Group already in use&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zap.py:27
++msgid &quot;Standard ZAP trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zap.py:28
++msgid &quot;New standard ZAP trunk&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_trunk_zap.py:79
++msgid &quot;Calls from ZAP trunk&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:591 ../configlets.py:967 ../configlets.py:968
++#: ../configlets.py:1134 ../configlets.py:1156
++msgid &quot;None&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:619
++msgid &quot;Extension already in use on that PBX&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:626
++msgid &quot;Name should not contain '-' or spaces&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:631
++msgid &quot;Name already in use&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:709
++#, python-format
++msgid &quot;The configlet '%s' does not have a description&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:767 ../configlets.py:1169
++msgid &quot;Info&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:820 ../configlets.py:833
++#, python-format
++msgid &quot;%s&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:821
++msgid &quot;Price/Account_code for this pattern&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:834
++msgid &quot;Password:&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:854
++msgid &quot;Dial Command&quot;
++msgstr &quot;&quot;
++
++#: ../configlets.py:882
++msgid &quot;You should select a phone to ring to&quot;
++msgstr &quot;&quot;
++
++#: ../language.py:67
++msgid &quot;This menu will contain all sorts of administration stuff:&quot;
++msgstr &quot;&quot;
++
++#: ../panelutils.py:75
++msgid &quot;&quot;
++&quot;0,No timeout|300,5 minutes|600,10 minutes|1200,20 minutes|2400,40 minutes|&quot;
++&quot;3000,50 minutes&quot;
++msgstr &quot;&quot;
++
++#: ../panelutils.py:136
++msgid &quot;Meetme&quot;
++msgstr &quot;&quot;
++
++#: ../panelutils.py:140
++msgid &quot;PARK&quot;
++msgstr &quot;&quot;
++
++#: ../panelutils.py:144
++msgid &quot;Park&quot;
++msgstr &quot;&quot;
++
++#: ../panelutils.py:162
++msgid &quot;Restarting the panel daemon ...&quot;
++msgstr &quot;&quot;
++
++#: ../queueutils.py:36
++msgid &quot;&quot;
++&quot;Note: you should install python-pysqlite2 to have Queue Stats functionality&quot;
++msgstr &quot;&quot;
++
++#: ../queueutils.py:45
++#, python-format
++msgid &quot;Note: you don't seem to have access to %s. See INSTALL.txt for details.&quot;
++msgstr &quot;&quot;
++
++#: ../queueutils.py:55
++#, python-format
++msgid &quot;Note: you don't seem to have access to %s.&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:53
++msgid &quot;E&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:54
++msgid &quot;D&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:55
++msgid &quot;U&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:95
++msgid &quot;Add more&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:113
++msgid &quot;Invalid URL&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:118 ../page_config_edit.ptl:43
++msgid &quot;Object does not exist&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:281 ../ConfigHelper.ptl:302 ../ConfigHelper.ptl:309
++#, python-format
++msgid &quot;Required '%s' not found&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:324 ../page_login.ptl:44 ../page_stats_calls.ptl:77
++#: ../page_stats_dialouts.ptl:106 ../page_stats_phone.ptl:109
++#: ../page_stats_qcallback.ptl:87 ../page_stats_queue.ptl:87
++#: ../page_stats_trunks.ptl:105 ../page_user_settings.ptl:73
++msgid &quot;Submit&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:327
++msgid &quot;Update&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:328
++msgid &quot;Delete&quot;
++msgstr &quot;&quot;
++
++#: ../ConfigHelper.ptl:334 ../page_login.ptl:45 ../page_user_settings.ptl:74
++msgid &quot;Cancel&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_backup.ptl:27
++msgid &quot;Backup a config file&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_backup.ptl:44
++#, python-format
++msgid &quot;I had a problem backing up %s&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_panel.ptl:27
++msgid &quot;Asternic Flash Operator Panel&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_panel.ptl:42
++msgid &quot;You don't have a panel configured yet&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_panel.ptl:46
++msgid &quot;You have a panel configured &quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_panel.ptl:48
++msgid &quot;here&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_pbxstate.ptl:26
++msgid &quot;PBX State&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_pbxstate.ptl:27
++msgid &quot;Status of Asterisk/DeStar PBX&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_pbxstate.ptl:80 ../page_admin_reload.ptl:44
++#: ../page_user_quickdiallist.ptl:76 ../page_user_settings.ptl:110
++#: ../page_user_state.ptl:138
++msgid &quot;Asterisk is not running!&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_pbxstate.ptl:85 ../page_admin_reload.ptl:49
++#: ../page_user_quickdiallist.ptl:81 ../page_user_settings.ptl:115
++#: ../page_user_state.ptl:143
++msgid &quot;The manager access is not working!&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin.ptl:25
++msgid &quot;Administration&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin.ptl:26
++msgid &quot;Perform administrative actions to PBX&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin.ptl:38 ../page_owner.ptl:43
++msgid &quot;Action&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin.ptl:38 ../page_owner.ptl:43 ../page_stats.ptl:38
++#: ../page_user.ptl:38
++msgid &quot;Description&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_reload.ptl:27
++msgid &quot;Apply Changes&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_reload.ptl:28
++msgid &quot;Reload Asterisk/DeStar PBX&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_reload.ptl:53
++msgid &quot;Doing a reload, result is:&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:29
++msgid &quot;View/Save Configuration&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:30
++msgid &quot;Show and Save Asterisk configuration files&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:90
++msgid &quot;Show selected files&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:91
++msgid &quot;Save all changes&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:99
++msgid &quot;Asterisk configuration files&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:108
++msgid &quot;Save changes results&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:111
++msgid &quot;Configuration files saved&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:113
++msgid &quot;&quot;
++&quot;There were problems writing the configuration. Please take a look at the &quot;
++&quot;error logs.&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:117
++msgid &quot;Nothing to Show&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:119
++msgid &quot;There is nothing configured yet.&quot;
++msgstr &quot;&quot;
++
++#: ../page_admin_viewconf.ptl:126
++msgid &quot;&quot;
++&quot;WARNING: This configuration might experience grave problems because the &quot;
++&quot;following asterisk modules are missing on your system:&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_add.ptl:26
++msgid &quot;Add a new configlet&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_applications.ptl:26
++msgid &quot;Applications&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_applications.ptl:27
++msgid &quot;Special Asterisk Applications&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_codecs.ptl:27
++msgid &quot;Codecs&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_codecs.ptl:28
++msgid &quot;Audio codecs to use on SIP and IAX channels.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_dialout.ptl:27
++msgid &quot;Dialout&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_dialout.ptl:28
++msgid &quot;Dialout entries for outgoing calls&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_dids.ptl:27
++msgid &quot;DIDs&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_dids.ptl:28
++msgid &quot;Direct Inward Dialing.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_down.ptl:26
++msgid &quot;Moves a configlet one position down&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_down.ptl:41 ../page_config_up.ptl:41
++#, python-format
++msgid &quot;Could not swap id's %(id-1)s and %(id)s&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_edit.ptl:27
++msgid &quot;Edit a configlet&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_ivrs.ptl:27
++msgid &quot;IVRs&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_ivrs.ptl:28
++msgid &quot;Interactive Voice Response menus for the PBX.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_options.ptl:26 ../page_config.ptl:68 ../page_config.ptl:80
++msgid &quot;Options&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_options.ptl:27
++msgid &quot;DeStar and Asterisk options and parameters&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_phones.ptl:26 ../page_config.ptl:86
++msgid &quot;Phones&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_phones.ptl:27
++msgid &quot;Phones and their settings&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:26 ../page_config.ptl:68 ../page_config.ptl:80
++#: ../page_config.ptl:86 ../page_config.ptl:92
++msgid &quot;Configuration&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:27
++msgid &quot;Modify Asterisk configuration&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:42
++msgid &quot;Configuration tips&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:66
++msgid &quot;&quot;
++&quot;You should create a user with type 'Configurator'. Without this user, &quot;
++&quot;everyone connecting to DeStar can configure everything.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:72
++#, python-format
++msgid &quot;&quot;
++&quot;You should enable write access to the directory /etc/asterisk. Without the &quot;
++&quot;ability to modify the configuration files DeStar would be pretty useless. &quot;
++&quot;You should 'chmod g+rwx' this directory and set it's group to one of '%s'.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:78
++msgid &quot;&quot;
++&quot;You should create a management API entry. Without this entry, DeStar can't &quot;
++&quot;control the Asterisk PBX software.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:84
++msgid &quot;&quot;
++&quot;You should create a phone. Without defined phones you can't make and receive &quot;
++&quot;calls.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:90
++msgid &quot;&quot;
++&quot;You should create a trunk (connection to a Phone company or VOIP Provider). &quot;
++&quot;Without a trunk you can only make calls between local phones.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:92 ../page_config_trunks.ptl:26
++msgid &quot;Trunks&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:96
++#, python-format
++msgid &quot;&quot;
++&quot;You should enable write access to /etc/zaptel.conf. Without write access to &quot;
++&quot;this file you cannot configure Zaptel devices, e.g. FXO/FXS cards, T1/E1 &quot;
++&quot;cards, ZapHFC ISDN cards, etc. You should 'chmod g+rw' this file and set &quot;
++&quot;it's group to one of '%s'.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:101
++#, python-format
++msgid &quot;&quot;
++&quot;You should enable write access to the %s directory. Without the ability to &quot;
++&quot;modify the Asternic Flash Operator Panel configuration files DeStar won't be &quot;
++&quot;integrated whit the panel.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:107
++#, python-format
++msgid &quot;&quot;
++&quot;You don't seem to have access to %s yet created by cdr_sqlite3_custom. &quot;
++&quot;Without this file CDR reports wont be accesible trough this interface.&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:120
++msgid &quot;Configured&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:120
++msgid &quot;Category&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:136
++msgid &quot;Other things you can configure:&quot;
++msgstr &quot;&quot;
++
++#: ../page_config.ptl:138
++msgid &quot;You can configure the following things&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_trunks.ptl:27
++msgid &quot;Telephone company lines and VoIP-Trunks&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_trunks.ptl:46
++msgid &quot;You should add at least one phone to configure trunks&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_up.ptl:26
++msgid &quot;Moves a configlet one position up&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_users.ptl:26
++msgid &quot;Users&quot;
++msgstr &quot;&quot;
++
++#: ../page_config_users.ptl:27
++msgid &quot;Users and Mailboxes&quot;
++msgstr &quot;&quot;
++
++#: ../page_debug.ptl:25
++msgid &quot;Debug&quot;
++msgstr &quot;&quot;
++
++#: ../page_debug.ptl:26
++msgid &quot;Various functions to debug DeStar, mostly useful for programmers&quot;
++msgstr &quot;&quot;
++
++#: ../page_debug_values.ptl:25
++msgid &quot;Values&quot;
++msgstr &quot;&quot;
++
++#: ../page_debug_values.ptl:26
++msgid &quot;Dumps all values in the HTTP request&quot;
++msgstr &quot;&quot;
++
++#: ../page_login.ptl:26
++msgid &quot;Login&quot;
++msgstr &quot;&quot;
++
++#: ../page_login.ptl:27
++msgid &quot;Login into DeStar&quot;
++msgstr &quot;&quot;
++
++#: ../page_login.ptl:42
++msgid &quot;User or phone name/number&quot;
++msgstr &quot;&quot;
++
++#: ../page_login.ptl:43
++msgid &quot;Password or PIN&quot;
++msgstr &quot;&quot;
++
++#: ../page_login.ptl:55
++msgid &quot;Invalid username or password&quot;
++msgstr &quot;&quot;
++
++#: ../page_logout.ptl:25 ../Templates.ptl:257
++msgid &quot;Logout&quot;
++msgstr &quot;&quot;
++
++#: ../page_logout.ptl:26
++msgid &quot;Logout and become a guest user&quot;
++msgstr &quot;&quot;
++
++#: ../page_main.ptl:28
++msgid &quot;Main menu&quot;
++msgstr &quot;&quot;
++
++#: ../page_main.ptl:29
++msgid &quot;DeStar main page&quot;
++msgstr &quot;&quot;
++
++#: ../page_main.ptl:137
++msgid &quot;Access Denied&quot;
++msgstr &quot;&quot;
++
++#: ../page_main.ptl:139
++msgid &quot;You don't have access to this page.&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:38
++msgid &quot;Call Details For Virtual PBX&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:39 ../page_stats_cdr.ptl:39
++msgid &quot;Get statistics about made and received calls&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:76 ../page_stats_cdr.ptl:77
++msgid &quot;First&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:77 ../page_stats_cdr.ptl:78
++msgid &quot;Previous&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:88 ../page_stats_cdr.ptl:89
++msgid &quot;Next&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:89 ../page_stats_cdr.ptl:90
++msgid &quot;Last&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:111 ../page_stats_cdr.ptl:112 ../StatsHelper.ptl:78
++msgid &quot;All&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:85
++msgid &quot;January&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:85
++msgid &quot;February&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:85
++msgid &quot;March&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:86
++msgid &quot;April&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:86
++msgid &quot;May&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:86
++msgid &quot;June&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:86
++msgid &quot;July&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:86
++msgid &quot;August&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:87
++msgid &quot;September&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:87
++msgid &quot;October&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:87
++msgid &quot;November&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:120 ../page_stats_cdr.ptl:121 ../StatsHelper.ptl:87
++msgid &quot;December&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:142 ../page_stats_cdr.ptl:144
++msgid &quot;Source &quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:142 ../page_owner_cdr.ptl:143
++#: ../page_stats_cdr.ptl:143 ../page_stats_cdr.ptl:144
++#: ../page_stats_cdr.ptl:145
++#, python-format
++msgid &quot;&quot;
++&quot;Wildcards: % is the 'zero or more characters' wildcard, and _ is the &quot;
++&quot;'exactly one character' wildcard&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:143 ../page_stats_cdr.ptl:145
++#: ../page_stats_phone.ptl:67 ../page_user_state.ptl:100
++msgid &quot;Caller ID&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:144 ../page_stats_cdr.ptl:146
++msgid &quot;Destination&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:144 ../page_stats_cdr.ptl:146
++msgid &quot;You can use the same wildcards as above&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:145 ../page_stats_cdr.ptl:147
++msgid &quot;Duration&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:146 ../page_stats_cdr.ptl:148
++msgid &quot;In seconds&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:147 ../page_stats_cdr.ptl:149
++msgid &quot;Number of records to show:&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:148 ../page_stats_cdr.ptl:150
++msgid &quot;Search between the following dates&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:149 ../page_stats_cdr.ptl:151
++msgid &quot;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Start:&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:152 ../page_stats_cdr.ptl:154
++msgid &quot;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;End:&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:160 ../page_stats_cdr.ptl:162
++msgid &quot;Search&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:266 ../page_stats_cdr.ptl:269
++msgid &quot;Asc. Order&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:268 ../page_stats_cdr.ptl:271
++msgid &quot;Desc. Order&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:300 ../page_stats_cdr.ptl:302
++#, python-format
++msgid &quot;Showing records from %(offset)s to %(f)s of %(total)s&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:302 ../page_stats_cdr.ptl:304
++#, python-format
++msgid &quot;Showing records from %(offset)s to %(total)s of %(total)s&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner_cdr.ptl:305 ../page_stats_cdr.ptl:307
++#, python-format
++msgid &quot;Total Duration of shown calls: %s min.&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner.ptl:26
++msgid &quot;Virtual PBX Owner&quot;
++msgstr &quot;&quot;
++
++#: ../page_owner.ptl:27
++msgid &quot;Perform administrative actions to PBX and extensions&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:39 ../page_stats_calls.ptl:40
++msgid &quot;Calls Statistics&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:57 ../page_stats_qcallback.ptl:67
++#: ../page_stats_queue.ptl:67
++msgid &quot;Day:&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:110
++msgid &quot;Calls per Hour in a Day&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:110 ../page_stats_calls.ptl:111
++#: ../page_stats_calls.ptl:112
++msgid &quot;Hours&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:111
++msgid &quot;Minutes per Hour in a Day&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:111 ../page_stats_calls.ptl:145
++#: ../page_stats_calls.ptl:184 ../page_stats_calls.ptl:185
++#: ../page_stats_calls.ptl:215
++msgid &quot;Minutes&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:112
++msgid &quot;Cost per Hour in a Day&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:112 ../page_stats_calls.ptl:146
++#: ../page_stats_calls.ptl:216
++msgid &quot;Cost&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:143 ../page_stats_queue.ptl:174
++msgid &quot;Day&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:144
++msgid &quot;Calls per Day in a Month&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:144 ../page_stats_calls.ptl:145
++#: ../page_stats_calls.ptl:146
++msgid &quot;Days&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:145
++msgid &quot;Minutes per Day in a Month&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:146
++msgid &quot;Cost per Day in a Month&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:181 ../page_stats_queue.ptl:217
++msgid &quot;Month&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:183
++msgid &quot;Calls per Month in a Year&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:183 ../page_stats_calls.ptl:184
++#: ../page_stats_calls.ptl:185
++msgid &quot;Months&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:184
++msgid &quot;Minutes per Month in a Year&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:185
++msgid &quot;Cost per Month in a Year&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:213 ../page_stats_queue.ptl:257
++msgid &quot;Year&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:214
++msgid &quot;Calls per Year&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:214 ../page_stats_calls.ptl:215
++#: ../page_stats_calls.ptl:216
++msgid &quot;Years&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:215
++msgid &quot;Minutes per Year&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:216
++msgid &quot;cost per Year&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:230 ../page_stats_qcallback.ptl:192
++#: ../page_stats_queue.ptl:462
++msgid &quot;Sorry, this kind of query is not supported yet&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:234
++msgid &quot;Statistics of Calls by Date:&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:239 ../page_stats_dialouts.ptl:176
++#: ../page_stats_phone.ptl:183 ../page_stats_qcallback.ptl:222
++#: ../page_stats_queue.ptl:471 ../page_stats_trunks.ptl:190
++msgid &quot;Results&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_calls.ptl:247 ../page_stats_dialouts.ptl:184
++#: ../page_stats_phone.ptl:191 ../page_stats_qcallback.ptl:231
++#: ../page_stats_queue.ptl:480 ../page_stats_trunks.ptl:198
++msgid &quot;&quot;
++&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_cdr.ptl:38
++msgid &quot;Call Details&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_cdr.ptl:143
++msgid &quot;PBX&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_dialouts.ptl:34
++msgid &quot;Dialout Statistics&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_dialouts.ptl:35
++msgid &quot;Statistics for Dialout Entries&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_dialouts.ptl:67 ../page_stats_phone.ptl:70
++#: ../page_stats_trunks.ptl:66
++msgid &quot;From:&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_dialouts.ptl:86 ../page_stats_phone.ptl:89
++#: ../page_stats_trunks.ptl:86
++msgid &quot;To:&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_dialouts.ptl:131 ../page_stats_phone.ptl:138
++msgid &quot;Other Calls&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_dialouts.ptl:167 ../page_stats_phone.ptl:174
++msgid &quot;Outgoing Calls per Dialout Entry&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_dialouts.ptl:168 ../page_stats_phone.ptl:175
++msgid &quot;Dialout Name&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_dialouts.ptl:171 ../page_stats_phone.ptl:178
++msgid &quot;Statistics of Calls by Dialout Entry:&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_phone.ptl:34
++msgid &quot;Extension Statistics&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_phone.ptl:35
++msgid &quot;Statistics for an Extension&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats.ptl:25 ../page_stats.ptl:38
++msgid &quot;Statistics&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats.ptl:26
++msgid &quot;Global PBX statistics and CDR&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_qcallback.ptl:35
++msgid &quot;Queue Callback&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_qcallback.ptl:36
++msgid &quot;Call Back List by Queue&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_qcallback.ptl:61 ../page_stats_queue.ptl:61
++msgid &quot;Queue:&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_qcallback.ptl:108 ../page_stats_qcallback.ptl:132
++#: ../page_stats_qcallback.ptl:155 ../page_stats_qcallback.ptl:175
++#: ../page_stats_queue.ptl:115 ../page_stats_queue.ptl:158
++#: ../page_stats_queue.ptl:201 ../page_stats_queue.ptl:241
++#: ../StatsHelper.ptl:171
++msgid &quot;Period&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_qcallback.ptl:110 ../page_stats_qcallback.ptl:134
++#: ../page_stats_qcallback.ptl:157 ../page_stats_qcallback.ptl:177
++msgid &quot;List of uncompleted callers&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_qcallback.ptl:175 ../page_stats_queue.ptl:241
++msgid &quot;All Years&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_qcallback.ptl:198
++msgid &quot;Caller&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_qcallback.ptl:217
++msgid &quot;List of calls that entered a Queue but where not completed, by date:&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:35
++msgid &quot;Queue Statistics&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:36
++msgid &quot;Incoming Call Statistics by Queue&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:117 ../page_stats_queue.ptl:160
++#: ../page_stats_queue.ptl:203 ../page_stats_queue.ptl:243
++msgid &quot;Completed Calls&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:120 ../page_stats_queue.ptl:163
++#: ../page_stats_queue.ptl:206 ../page_stats_queue.ptl:246
++msgid &quot;Service Level&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:123 ../page_stats_queue.ptl:166
++#: ../page_stats_queue.ptl:209 ../page_stats_queue.ptl:249
++msgid &quot;Uncompleted Calls&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:126 ../page_stats_queue.ptl:169
++#: ../page_stats_queue.ptl:212 ../page_stats_queue.ptl:252
++msgid &quot;Distribution by Agent&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:128 ../page_stats_queue.ptl:171
++#: ../page_stats_queue.ptl:214 ../page_stats_queue.ptl:254
++msgid &quot;Agent&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:130
++msgid &quot;Distribution by Hour&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:131
++msgid &quot;Hour&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:173
++msgid &quot;Distribution by Days&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:216
++msgid &quot;Distribution by Month&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:256
++msgid &quot;Distribution by Year&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:396
++msgid &quot;Total completed calls&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:398
++msgid &quot;Calls terminated by agents&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:400
++msgid &quot;Calls terminated by caller&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:402
++msgid &quot;Total call duration&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:404
++msgid &quot;Average call duration&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:406
++msgid &quot;Average hold time&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:419
++msgid &quot;Total uncompleted calls&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:421
++msgid &quot;Calls dumped by agents&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:423
++msgid &quot;Calls abandoned by caller&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:425
++msgid &quot;Calls timed out&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:427
++msgid &quot;Average waiting time&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:429
++msgid &quot;Average position at abandon time&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:436
++msgid &quot;Time of answer&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:437 ../page_stats_queue.ptl:445
++#: ../StatsHelper.ptl:171
++msgid &quot;Number of calls&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:438
++#, python-format
++msgid &quot;% of Total Calls&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:445
++msgid &quot;Service Level Graphic&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:445
++msgid &quot;Time of Answer&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_queue.ptl:466
++msgid &quot;Statistics for a Queue by Date:&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_trunks.ptl:34
++msgid &quot;Trunk Statistics&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_trunks.ptl:35
++msgid &quot;Statistics for Trunks&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_trunks.ptl:136
++msgid &quot;Internal&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_trunks.ptl:179
++msgid &quot;Incomming Calls per Trunk&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_trunks.ptl:180 ../page_stats_trunks.ptl:182
++msgid &quot;Trunk Name&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_trunks.ptl:181
++msgid &quot;Outgoing Calls per Trunk&quot;
++msgstr &quot;&quot;
++
++#: ../page_stats_trunks.ptl:185
++msgid &quot;Statistics of Calls by Trunk:&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:26
++msgid &quot;User Info&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:27
++msgid &quot;Your access rights in DeStar&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:43
++msgid &quot;You are now logged in as user&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:48
++msgid &quot;Your access level is &quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:51
++msgid &quot;Administrator&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:53
++msgid &quot;Programmer&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:56
++msgid &quot;Your account is disabled. &quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:58
++msgid &quot;You are not logged in.&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:60
++msgid &quot;You can do&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:64
++msgid &quot;Access all public accessible info pages&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:68
++msgid &quot;Change your personal phone settings&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:72
++msgid &quot;Change phone settings of other people&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:76
++msgid &quot;Configure the PBX&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:80
++msgid &quot;Access debug pages to help program DeStar&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_info.ptl:83
++msgid &quot;Have fun!&quot;
++msgstr &quot;&quot;
++
++#: ../page_user.ptl:26
++msgid &quot;Perform tasks allowed by users&quot;
++msgstr &quot;&quot;
++
++#: ../page_user.ptl:38
++msgid &quot;Available actions&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_quickdiallist.ptl:28 ../page_user_quickdiallist.ptl:29
++msgid &quot;Quick Dial List&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_quickdiallist.ptl:46
++msgid &quot;Global Shorcuts and Final Destinations&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_quickdiallist.ptl:54
++msgid &quot;No Global Shorcuts Found on Database&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_quickdiallist.ptl:60
++msgid &quot;Private Shorcuts and Final Destinations&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_quickdiallist.ptl:68
++msgid &quot;No Private Shorcuts Found on Database&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_quickdiallist.ptl:88 ../page_user_settings.ptl:123
++#: ../page_user_state.ptl:151
++msgid &quot;You don't have an associated phone&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:27
++msgid &quot;Phone Settings&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:28
++msgid &quot;Set your phone settings&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:59
++msgid &quot;Enable 'do not disturb'&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:60
++msgid &quot;Immediate call forwarding to&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:61
++msgid &quot;Forward call when busy to&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:62
++msgid &quot;Forward call when timeout/unavailable to&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:63
++msgid &quot;Seconds of incoming ring time&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:64
++msgid &quot;Immediate voice mailbox&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:65
++msgid &quot;Voice mailbox on busy&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:66
++msgid &quot;Voice mailbox on timeout/unavailable&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:67
++msgid &quot;Voicemail pin&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:70
++msgid &quot;Extension Password&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_settings.ptl:100
++msgid &quot;Could not create destar configuration file.&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:27
++msgid &quot;Phone State&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:28
++msgid &quot;Status of your phone&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:48
++msgid &quot;State&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:57
++msgid &quot;Last updated&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:69
++msgid &quot;Registration status&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:69
++msgid &quot;PeerStatus&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:75
++msgid &quot;Channel ID&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:75
++msgid &quot;Channel&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:81
++msgid &quot;Called extension&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:100
++msgid &quot;Callerid&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:107
++msgid &quot;Other state&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:118
++msgid &quot;New Voicemail Messages&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:118
++msgid &quot;New&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:123
++msgid &quot;Old Voicemail Messages&quot;
++msgstr &quot;&quot;
++
++#: ../page_user_state.ptl:123
++msgid &quot;Old&quot;
++msgstr &quot;&quot;
++
++#: ../StatsHelper.ptl:199
++msgid &quot;Calls&quot;
++msgstr &quot;&quot;
++
++#: ../StatsHelper.ptl:201
++msgid &quot;Answered&quot;
++msgstr &quot;&quot;
++
++#: ../StatsHelper.ptl:202
++msgid &quot;Not Answered&quot;
++msgstr &quot;&quot;
++
++#: ../StatsHelper.ptl:203
++msgid &quot;Busy&quot;
++msgstr &quot;&quot;
++
++#: ../StatsHelper.ptl:204
++msgid &quot;Failed&quot;
++msgstr &quot;&quot;
++
++#: ../StatsHelper.ptl:243
++msgid &quot;Distribution by period&quot;
++msgstr &quot;&quot;
++
++#: ../StatsHelper.ptl:245
++msgid &quot;Completed&quot;
++msgstr &quot;&quot;
++
++#: ../StatsHelper.ptl:246
++msgid &quot;Uncompleted&quot;
++msgstr &quot;&quot;
++
++#: ../Templates.ptl:279
++msgid &quot;Error&quot;
++msgstr &quot;&quot;
++
++#: ../Templates.ptl:287
++msgid &quot;You don't have access to this page&quot;
++msgstr &quot;&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000226.html">[Destar-dev] r716 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000230.html">[Destar-dev] r718 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#227">[ date ]</a>
+              <a href="thread.html#227">[ thread ]</a>
+              <a href="subject.html#227">[ subject ]</a>
+              <a href="author.html#227">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

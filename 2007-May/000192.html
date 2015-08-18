@@ -1,0 +1,326 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r683 - branches/destar-callweaver
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r683%20-%20branches/destar-callweaver&In-Reply-To=%3C200705120752.l4C7qJ3h006787%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000191.html">
+   <LINK REL="Next"  HREF="000193.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r683 - branches/destar-callweaver</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r683%20-%20branches/destar-callweaver&In-Reply-To=%3C200705120752.l4C7qJ3h006787%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r683 - branches/destar-callweaver">santiago at mail.berlios.de
+       </A><BR>
+    <I>Sat May 12 09:52:19 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000191.html">[Destar-dev] r682 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000193.html">[Destar-dev] r684 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#192">[ date ]</a>
+              <a href="thread.html#192">[ thread ]</a>
+              <a href="subject.html#192">[ subject ]</a>
+              <a href="author.html#192">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-05-12 09:52:18 +0200 (Sat, 12 May 2007)
+New Revision: 683
+
+Added:
+   branches/destar-callweaver/cfg_trunk_unicall.py
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+Log:
+adding cfg_trunk_unicall
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 23:45:39 UTC (rev 682)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-12 07:52:18 UTC (rev 683)
+@@ -1,3 +1,6 @@
++2007-05-12:
++* Added cfg_trunk_unicall
++
+ 2007-05-11:
+ * Branching destar for callweaver
+ * Changing {M,m}acro for Proc and proc
+
+Added: branches/destar-callweaver/cfg_trunk_unicall.py
+===================================================================
+--- branches/destar-callweaver/cfg_trunk_unicall.py	2007-05-11 23:45:39 UTC (rev 682)
++++ branches/destar-callweaver/cfg_trunk_unicall.py	2007-05-12 07:52:18 UTC (rev 683)
+@@ -0,0 +1,234 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Destar has Copyright (C) 2005 by Holger Schurig
++# This file has Copyright (C) 2006 by Alejandro Rios P.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++import panelutils
++
++
++class CfgTrunkUnicall(CfgTrunk):
++
++	shortName = _(&quot;Standard Unicall MFC/R2 trunk&quot;)
++	newObjectTitle = _(&quot;New standard MFC/R2 trunk&quot;)
++	technology = &quot;UniCall&quot;
++	
++	def createVariables(self):
++		self.variables = [
++			VarType(&quot;name&quot;,
++				title=_(&quot;Name&quot;),
++				len=35),
++
++			VarType(&quot;signalling&quot;,
++				title=_(&quot;Signalling type&quot;),
++				type=&quot;choice&quot;,
++				options=[('mcfr2_cpe',_('MFC/R2 signalling, CPE side')),
++					('mcfr2_co', _('MFC/R2 signalling, Network side'))]),
++					
++			VarType(&quot;protocolvariant&quot;,
++				title=_(&quot;Protocol variant&quot;),
++				hint=_(&quot;i.e. cn,20,7&quot;),
++				type=&quot;string&quot;,
++				len=20),
++				
++			VarType(&quot;channels&quot;,
++				title=_(&quot;Channels&quot;),
++				hint=_(&quot;i.e. 1-15,17-31&quot;),
++				type=&quot;string&quot;,
++				len=20),
++				
++			VarType(&quot;group&quot;,
++				title=_(&quot;Callout group&quot;),
++				type=&quot;string&quot;,
++				optional=True),
++
++			VarType(&quot;faxdetect&quot;,
++				title=_(&quot;Fax detection&quot;),
++				type=&quot;choice&quot;,
++			      	options=[('incoming','Incoming only'),
++					('outgoing', 'Outgoing only'),
++					('both', 'Both Incoming/Outgoing'),
++					('no', 'Disable')],
++				default=&quot;no&quot;),
++
++		# TODO: check op-panel support for Unicall.
++		#	VarType(&quot;panelLab&quot;,
++		#		title=_(&quot;Operator Panel&quot;),
++		#		type=&quot;label&quot;,
++		#		hide=True),
++
++		#	VarType(&quot;panel&quot;,
++		#		title=_(&quot;Show this trunk in the panel&quot;),
++		#		type=&quot;bool&quot;,
++		#		hide=True,
++		#		optional=True),
++
++			VarType(&quot;Gains&quot;,
++				title=_(&quot;Reception and Transmission Gains&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;rxgain&quot;,
++				title=_(&quot;Reception gain&quot;),
++				hint=_(&quot;in dB&quot;),
++				optional=True,
++				default=&quot;0.0&quot;),
++
++			VarType(&quot;txgain&quot;,
++				title=_(&quot;Transmission gain&quot;),
++				hint=_(&quot;in dB&quot;),
++				optional=True,
++				default=&quot;0.0&quot;),
++
++			VarType(&quot;Inbound&quot;,
++				title=_(&quot;Calls from PRI channel(s)&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;clid&quot;,
++				title=_(&quot;Change Caller*Id to:&quot;),
++				len=25,
++				optional=True),
++
++			VarType(&quot;contextin&quot;,
++				title=_(&quot;Go to&quot;),
++				type=&quot;radio&quot;,
++				default='phone',
++				options=[('phone',_(&quot;Phone&quot;)),('ivr',_(&quot;IVR&quot;)),('pbx',_(&quot;Virtual PBX&quot;))]),
++
++			VarType(&quot;phone&quot;,
++				title=_(&quot;Extension to ring&quot;),
++				type=&quot;choice&quot;,
++				optional=True,
++				options=getChoice(&quot;CfgPhone&quot;)),
++
++			VarType(&quot;ivr&quot;,
++				title=_(&quot;IVR to jump to&quot;),
++				type=&quot;choice&quot;,
++				optional=True,
++				options=getChoice(&quot;CfgIVR&quot;)),
++
++			VarType(&quot;pbx&quot;,
++				title=_(&quot;Allow dial extension from which Virtual PBX&quot;),
++				type=&quot;choice&quot;,
++				optional=True,options=getChoice(&quot;CfgOptPBX&quot;)),
++
++			VarType(&quot;dial&quot;,
++				hide=True,
++				len=50),]
++
++		self.dependencies = [
++			DepType(&quot;phone&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;)),
++			DepType(&quot;ivr&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;))
++		]
++
++	def isAddable(self):
++		&quot;&quot;&quot;We can only add this configlet if we have at least one
++		ZapPRI option defined.&quot;&quot;&quot;
++
++		# BUG: it does somehow not work to simply write for obj in config_entries,
++		# despite the &quot;from configlets import *&quot; above
++		import configlets
++		for obj in configlets.configlet_tree:
++			if obj.__class__.__name__ == 'CfgOptZapPRI':
++				return True
++		return False 
++	isAddable = classmethod(isAddable)
++
++	def checkConfig(self):
++                res = CfgTrunk.checkConfig(self)
++                if res:
++                        return res
++		import configlets
++		for obj in configlets.configlet_tree:
++			if obj.__class__.__name__ == 'CfgTrunkUnicall':
++				if obj==self: continue
++				try:
++					if obj.group == self.group and obj.group:
++						return (&quot;group&quot;, _(&quot;Group already in use&quot;))
++				except AttributeError:
++					pass
++
++
++	def fixup(self):
++		CfgTrunk.fixup(self)
++		if not self.rxgain:
++			self.rxgain = &quot;0.0&quot;
++		if not self.txgain: 
++			self.txgain = &quot;0.0&quot;
++
++
++	def createAsteriskConfig(self):
++		needModule(&quot;chan_unicall&quot;)
++
++		# Create config for chan_unicall:
++		c = AstConf(&quot;unicall.conf&quot;)
++		c.append(&quot;&quot;)
++		c.append(&quot;; Unicall MFC/R2 Trunk %s&quot; % self.name)
++		if self.group:
++			c.appendValue(self, &quot;group&quot;)
++		c.append(&quot;protocolclass=mfcr2&quot;)
++		c.appendValue(self, &quot;protocolvariant&quot;)
++		if self.signalling == 'mfcr2_cpe':
++			c.append(&quot;protocolend=cpe&quot;)
++		else:
++			c.append(&quot;protocolend=co&quot;)
++		contextin = &quot;in-%s&quot; % self.name
++		c.append(&quot;context=%s&quot; % contextin)
++		c.appendValue(self, &quot;faxdetect&quot;)
++		c.append(&quot;usecallerid=yes&quot;)
++		c.append(&quot;hidecallerid=no&quot;)
++		c.append(&quot;callwaitingcallerid=yes&quot;)
++		c.append(&quot;threewaycalling=yes&quot;)
++		c.append(&quot;transfer=yes&quot;)
++		c.append(&quot;cancallforward=yes&quot;)
++		c.append(&quot;callreturn=yes&quot;)
++		c.append(&quot;echocancel=yes&quot;)
++		c.append(&quot;echocancelwhenbridged=yes&quot;)
++		c.append(&quot;echotraining=yes&quot;)
++		c.append(&quot;relaxdtmf=yes&quot;)
++		c.append(&quot;immediate=yes&quot;)
++		c.appendValue(self, &quot;rxgain&quot;)
++		c.appendValue(self, &quot;txgain&quot;)
++		c.append(&quot;channel=%s&quot; % self.channels)
++		c.append(&quot;&quot;)
++
++		#Dial part to use on dialout macro
++		if self.group:
++			self.dial = &quot;UniCall/g%s/${ARG1}&quot; % (self.group)
++		else:
++			self.dial = &quot;UniCall/%s/${ARG1}&quot; % (self.channels)
++		
++		#What to do with incoming calls
++		self.createIncomingContext()
++
++	# TODO: check op-panel support for Unicall.
++	#	if panelutils.isConfigured() == 1 and self.panel:
++	#		p = AstConf(&quot;op_buttons.cfg&quot;)
++        #               chgrp = self.channels.split(',')
++        #               for gr in chgrp:
++        #                       gr_start_end = gr.split('-')
++        #                       for ch in range(int(gr_start_end[0]),int(gr_start_end[1])+1):
++        #                               p.setSection(&quot;%s/%d&quot; % (self.technology, ch) )
++        #                               p.append(&quot;Position=n&quot;)
++        #                               p.append(&quot;Icon=2&quot;)
++        #                               p.append(&quot;Extension=-1&quot;)
++        #                               p.append(&quot;Label=%s-%d&quot; % (self.name,ch))
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000191.html">[Destar-dev] r682 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000193.html">[Destar-dev] r684 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#192">[ date ]</a>
+              <a href="thread.html#192">[ thread ]</a>
+              <a href="subject.html#192">[ subject ]</a>
+              <a href="author.html#192">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,473 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r769 - in branches/alerios: . static
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r769%20-%20in%20branches/alerios%3A%20.%20static&In-Reply-To=%3C200707272315.l6RNFBj9011483%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000288.html">
+   <LINK REL="Next"  HREF="000290.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r769 - in branches/alerios: . static</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r769%20-%20in%20branches/alerios%3A%20.%20static&In-Reply-To=%3C200707272315.l6RNFBj9011483%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r769 - in branches/alerios: . static">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sat Jul 28 01:15:11 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000288.html">[Destar-dev] r768 - in branches: . alerios
+</A></li>
+        <LI>Next message: <A HREF="000290.html">[Destar-dev] r770 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#289">[ date ]</a>
+              <a href="thread.html#289">[ thread ]</a>
+              <a href="subject.html#289">[ subject ]</a>
+              <a href="author.html#289">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-28 01:15:10 +0200 (Sat, 28 Jul 2007)
+New Revision: 769
+
+Added:
+   branches/alerios/cfg_phone_outboundqueue.py
+   branches/alerios/page_admin_outboundcampaign.ptl
+   branches/alerios/page_config_file.ptl
+   branches/alerios/static/outbound/
+Modified:
+   branches/alerios/CHANGELOG.txt
+Log:
+* Added page_config_file.ptl as an example of file uploading on a ptl.
+* Added page_admin_outboundcampaign.ptl and cfg_phone_outboundqueue.py:  Some initial work on a &quot;unpredictive&quot; dialer.
+
+
+
+Modified: branches/alerios/CHANGELOG.txt
+===================================================================
+--- branches/alerios/CHANGELOG.txt	2007-07-27 23:09:10 UTC (rev 768)
++++ branches/alerios/CHANGELOG.txt	2007-07-27 23:15:10 UTC (rev 769)
+@@ -1,3 +1,10 @@
++2007-07-27:
++* cfg_opt_did.py: fixed typos on appendExten().
++* Templates, cfg_opt_settings:  changed logo location.
++* manager.py: added functions to retrieve queue status.
++* Added page_config_file.ptl as an example of file uploading on a ptl.
++* Added page_admin_outboundcampaign.ptl and cfg_phone_outboundqueue.py:  Some initial work on a &quot;unpredictive&quot; dialer.
++
+ 2007-07-26:
+ * Now header title is an option on CfgOptSettings.
+ * Fixed some int values expected where strings types found.
+
+Added: branches/alerios/cfg_phone_outboundqueue.py
+===================================================================
+--- branches/alerios/cfg_phone_outboundqueue.py	2007-07-27 23:09:10 UTC (rev 768)
++++ branches/alerios/cfg_phone_outboundqueue.py	2007-07-27 23:15:10 UTC (rev 769)
+@@ -0,0 +1,101 @@
++# -*- coding: utf-8 -*-
++#
++# Destar has Copyright (C) 2005 by Holger Schurig,
++# This file has Copyright (C) 2007 by Alejandro Rios P.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++from cfg_phone_queue import *
++
++STATIC_DIR = os.getenv('STATICPAGES_DIR','static') 
++
++class CfgPhoneOutboundQueue(CfgPhoneQueue):
++
++	shortName = _(&quot;Outbound Campaing&quot;)
++	newObjectTitle= _(&quot;Outbound Campaing&quot;)
++	description = _(&quot;General settings for an Outbound Campaing&quot;)
++	technology = &quot;QUEUE&quot;
++	groupName = &quot;Queues&quot;
++	
++	def createVariables(self):
++		CfgPhoneQueue.createVariables(self)
++		self.variables = self.variables + [
++			VarType(&quot;OutboundLabel&quot;,
++				title=_(&quot;Outbound campaing parammeters&quot;),
++				type=&quot;label&quot;),
++			VarType(&quot;ratio&quot;,
++				title=_(&quot;'Calls per agent' ratio:&quot;),
++				hint=_(&quot;&lt;calls&gt;:&lt;agents&gt;&quot;),
++				default=&quot;1.5:1&quot;),
++			VarType(&quot;evalperiod&quot;,
++				title=_(&quot;Evaluation period:&quot;),
++				hint=_(&quot;In seconds&quot;),
++				default=60,
++				optional=True,
++				type=&quot;int&quot;),
++			VarType(&quot;calltime&quot;,
++				title=_(&quot;Average call time:&quot;),
++				hint=_(&quot;In seconds&quot;),
++				default=300,
++				type=&quot;int&quot;),
++			VarType(&quot;resttime&quot;,
++				title=_(&quot;Average pause time between calls:&quot;),
++				hint=_(&quot;In seconds&quot;),
++				default=120,
++				type=&quot;int&quot;),
++			VarType(&quot;list&quot;,
++				title=_(&quot;List of numbers to call&quot;),
++				hint=&quot;/static/outbound/&quot;,
++				type=&quot;file&quot;,
++				optional=True),
++			]
++	
++	def checkConfig(self):
++		res = CfgPhoneQueue.checkConfig(self)
++		if res:
++			return res
++		max_size = 2000000
++		if not len(self.ratio.split(&quot;:&quot;)) &gt; 1:
++			return _(&quot;Ratio must be in the format '&lt;calls&gt;:&lt;agents&gt;'&quot;)
++		if self.list:
++			upload = self.list
++			pos = upload.fp.tell()  # Save current position in file.
++			upload.fp.seek(0, 2)    # Go to end of file.
++			size = upload.fp.tell() # Get new position (which is the file size).
++			upload.fp.seek(pos, 0)  # Return to previous position.
++			upload.size = size
++			if size &gt; max_size:
++				msg = &quot;The uploaded file is too big (size=%s, max=%s bytes)&quot;
++				msg %= (size, max_size)
++				return _(&quot;File bigger than %s bytes&quot;) % max_size
++	
++	def createAsteriskConfig(self):
++		CfgPhoneQueue.createAsteriskConfig(self)
++		if self.list:
++			upload = self.list
++			dest = '%s/outbound/%s' % (STATIC_DIR, self.name)
++			out = open(dest, 'wb')
++			# Copy file in chunks to avoid using lots of memory.
++			while 1:
++				chunk = upload.read(1024 * 1024)
++				if not chunk:
++				   break
++				out.write(chunk)
++			out.close()
++			upload.close()
++		self.list = None 
+
+Added: branches/alerios/page_admin_outboundcampaign.ptl
+===================================================================
+--- branches/alerios/page_admin_outboundcampaign.ptl	2007-07-27 23:09:10 UTC (rev 768)
++++ branches/alerios/page_admin_outboundcampaign.ptl	2007-07-27 23:15:10 UTC (rev 769)
+@@ -0,0 +1,163 @@
++# -*- coding: utf-8 -*-
++#
++# Destar has Copyright (C) 2004-2007 by Holger Schurig
++# This file has Copyright (C) 2007 by Alejandro Rios P.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++from Templates import *
++from quixote.form import *
++import queueutils, manager
++import time
++from StatsHelper import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
++
++campaingRunning = False
++currentQueue = &quot;&quot;
++queueObject = None
++
++	
++class Page(AccessControlled, Directory): 
++
++	_q_parent = 'page_admin'
++	_q_title  = _(&quot;Control for outbound campaign&quot;)
++	_q_desc   = _(&quot;Real time control for outbound campaign queues&quot;)
++	_q_level  = 3
++	_q_menupos = 30
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	def _q_index [plain] (self):
++		manager.connect()
++		if not manager.isConnected():
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;Asterisk is not running!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif not manager.isLoggedIn():
++			# TODO: describe how to set this up
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;The manager access is not working!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++
++		(evalperiod,callsXround) = evaluateCallRound()
++		#header(self._q_desc, refresh=evalperiod)
++		header(self._q_desc, refresh=4)
++		queueForm(self)
++		global campaingRunning
++		if campaingRunning:
++			htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Status&quot;))
++			showStatus(evalperiod,callsXround)
++		footer()
++	
++def getQueues():
++	import configlets
++	objs = configlets.configlet_tree.getConfigletsByName('CfgPhoneOutboundQueue')
++	queues=[]
++	for obj in objs:
++		queues.append(obj.name)		
++	return queues
++
++
++def queueForm [plain] (self):
++	global currentQueue
++	global campaingRunning
++	current_queue = currentQueue
++	form = Form()
++	form.name = &quot;queryform&quot;
++	if not campaingRunning:
++		form.add_single_select('queue', 
++				title=htmltext(_('Queue:')),
++				value=current_queue,
++				options=zip(getQueues(),getQueues(),getQueues()),
++				render_br=True )
++		form.add(SubmitWidget, '_start', _(&quot;Start&quot;), render_br=True)
++	else: 
++		htmltext(&quot;&lt;h3&gt;%s: %s&lt;/h3&gt;&quot; % (_(&quot;Queue&quot;),current_queue))
++		form.add(SubmitWidget, '_stop', _(&quot;Stop/Pause&quot;), render_br=True)
++	form.render()
++	
++	
++	if form.is_submitted() and not form.has_errors():
++		if self.request.form.has_key('_start'):
++			startCampaign(form[&quot;queue&quot;])
++			return redirect(&quot;.&quot;)
++		if self.request.form.has_key('_stop'):
++			stopCampaign()
++			return redirect(&quot;.&quot;)
++
++def startCampaign (queue):
++	global campaingRunning
++	global currentQueue
++	global queueObject
++	campaingRunning = True
++	currentQueue = queue
++	import configlets
++	queueObject = configlets.configlet_tree.getConfigletByName(currentQueue)
++
++def stopCampaign ():
++	global campaingRunning
++	global currentQueue
++	global queueObject
++	campaingRunning = False
++	currentQueue = &quot;&quot;
++	queueObject = None
++
++def showStatus [plain] (evalperiod = 0, callsXround = 0):
++	global currentQueue
++	global queueObject
++	queueStatus = manager.getQueue(currentQueue)
++	table = HtmlTable(1,1)
++	table.setCell(0,0, _(&quot;Idle Agents&quot;))
++	table.setCell(1,0, &quot;%d&quot; % queueStatus[&quot;Not in use&quot;])
++	table.setCell(0,1, _(&quot;Callers waiting in queue&quot;))
++	table.setCell(1,1, &quot;%d&quot; % queueStatus[&quot;Callers&quot;])
++	table.setCell(0,2, _(&quot;Next evaluation period&quot;))
++	table.setCell(1,2, &quot;%d&quot; % evalperiod)
++	table.setCell(0,3, _(&quot;Number of calls made in this round&quot;))
++	table.setCell(1,3, &quot;%s&quot; % callsXround)
++	table.getHtml(border=1)
++	#'&lt;p&gt;'
++	#htmltext(&quot;%s&quot; % manager.getQueue(currentQueue))
++	#'&lt;/p&gt;'
++
++def evaluateCallRound ():
++	global campaingRunning
++	global currentQueue
++	global queueObject
++	if campaingRunning:
++		queueStatus = manager.getQueue(currentQueue)
++		ratio = float(queueObject.ratio.split(&quot;:&quot;)[0]) / float(queueObject.ratio.split(&quot;:&quot;)[1]) 
++		evalperiod = (queueObject.calltime + queueObject.resttime) * ratio * max(queueStatus[&quot;Callers&quot;],1) / max(queueStatus[&quot;Not in use&quot;],1) 
++		callsXround = int(ratio * max(queueStatus[&quot;Not in use&quot;],1) / max(queueStatus[&quot;Callers&quot;],1))
++		executeCallRound(callsXround)
++		return (evalperiod,callsXround)
++	else:
++		return (0,0)
++
++def executeCallRound (callsXround=0):
++	#TODO:Read list of numbers of this campaign
++	
++	#TODO:Take callsXround numbers and create .call files
++	
++	#TODO:Execute .call files
++	
+
+Added: branches/alerios/page_config_file.ptl
+===================================================================
+--- branches/alerios/page_config_file.ptl	2007-07-27 23:09:10 UTC (rev 768)
++++ branches/alerios/page_config_file.ptl	2007-07-27 23:15:10 UTC (rev 769)
+@@ -0,0 +1,97 @@
++# -*- coding: utf-8 -*-
++#
++# Destar has Copyright (C) 2005 by Holger Schurig
++# This file has Copyright (C) 2007 by Alejandro Rios P.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from Templates import *
++from quixote.form import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect, get_field
++import backend, manager, configlets
++import time,types,sys,os
++
++def FileUploadForm [plain] (self, exitPath=&quot;.&quot;):
++
++	if self.form.has_key('_cancel'):
++		return redirect(exitPath)
++	form = Form(enctype=&quot;multipart/form-data&quot;)
++	form.add(FileWidget, &quot;filetoupload&quot;, &quot;&quot;, title=_(&quot;File to upload:&quot;), size=30, required=True)
++	form.add(StringWidget, &quot;destination&quot;, &quot;&quot;, title=_(&quot;Destination directory&quot;))
++	form.add(SubmitWidget, '_submit', _(&quot;Submit&quot;), render_br=False)
++	form.add(SubmitWidget, '_cancel', _(&quot;Cancel&quot;), render_br=False)
++
++	if not form.is_submitted() or form.has_errors():
++		return form.render()
++
++	if form[&quot;filetoupload&quot;]:
++		max_size = 2000000
++		#upload = get_field('filetoupload')
++		upload = form['filetoupload']
++		pos = upload.fp.tell()  # Save current position in file.
++		upload.fp.seek(0, 2)    # Go to end of file.
++		size = upload.fp.tell() # Get new position (which is the file size).
++		upload.fp.seek(pos, 0)  # Return to previous position.
++		upload.size = size
++		if size &gt; max_size:
++			msg = &quot;The uploaded file is too big (size=%s, max=%s bytes)&quot;
++			msg %= (size, max_size)
++			return htmltext(_(&quot;File bigger than %s bytes&quot;) % max_size)
++		if form[&quot;destination&quot;]:
++			dest = os.path.join(form[&quot;destination&quot;],upload.base_filename)
++		else:
++			dest = os.path.join(&quot;/usr/share/destar/static&quot;,upload.base_filename)
++		out = open(dest, 'wb')
++		# Copy file in chunks to avoid using lots of memory.
++		while 1:
++			chunk = upload.read(1024 * 1024)
++			if not chunk:
++			   break
++			out.write(chunk)
++		out.close()
++		upload.close()
++		sys.stderr.write(_(&quot;Uploaded file: %s&quot;) % dest)
++		return htmltext(_(&quot;Uploaded file: %s&quot;) % dest)
++	else:
++		return htmltext(_(&quot;No file.&quot;))
++
++class Page(AccessControlled, Directory): 
++
++	_q_parent  = 'page_config'
++	_q_title   = _(&quot;Upload File&quot;)
++	_q_desc    = _(&quot;Upload some pretty file&quot;)
++	_q_link    = 'upload'
++	_q_menupos = 10
++	_q_level   = 3
++
++#	_q_exports = ['', 'static', 'files']
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	def _q_index [plain] (self):
++		header(self._q_desc)
++		'&lt;p&gt;'
++		FileUploadForm(self.request)
++		'.&lt;/p&gt;'
++		footer()
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000288.html">[Destar-dev] r768 - in branches: . alerios
+</A></li>
+	<LI>Next message: <A HREF="000290.html">[Destar-dev] r770 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#289">[ date ]</a>
+              <a href="thread.html#289">[ thread ]</a>
+              <a href="subject.html#289">[ subject ]</a>
+              <a href="author.html#289">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

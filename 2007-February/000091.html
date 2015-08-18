@@ -1,0 +1,1469 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r601 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r601%20-%20trunk&In-Reply-To=%3C200702280507.l1S5779r021909%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000090.html">
+   <LINK REL="Next"  HREF="000092.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r601 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r601%20-%20trunk&In-Reply-To=%3C200702280507.l1S5779r021909%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r601 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Feb 28 06:07:07 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000090.html">[Destar-dev] r600 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000092.html">[Destar-dev] r602 - in trunk/misc: . debian
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#91">[ date ]</a>
+              <a href="thread.html#91">[ thread ]</a>
+              <a href="subject.html#91">[ subject ]</a>
+              <a href="author.html#91">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-02-28 06:07:04 +0100 (Wed, 28 Feb 2007)
+New Revision: 601
+
+Modified:
+   trunk/BACKEND.txt
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+   trunk/Publisher.py
+   trunk/StatsHelper.ptl
+   trunk/Templates.ptl
+   trunk/backend.py
+   trunk/cdrutils.py
+   trunk/cfg_app_callfw.py
+   trunk/cfg_app_chanspy.py
+   trunk/cfg_app_conference.py
+   trunk/cfg_app_directory.py
+   trunk/cfg_app_disa.py
+   trunk/cfg_app_dnd.py
+   trunk/cfg_app_echo.py
+   trunk/cfg_app_meetme.py
+   trunk/cfg_app_milliwatt.py
+   trunk/cfg_app_music.py
+   trunk/cfg_app_parking.py
+   trunk/cfg_app_play.py
+   trunk/cfg_app_quickdial_global.py
+   trunk/cfg_app_quickdial_phone.py
+   trunk/cfg_app_record.py
+   trunk/cfg_app_saytime.py
+   trunk/cfg_app_voicemail.py
+   trunk/cfg_app_voicemailsettings.py
+   trunk/cfg_dialout_normal.py
+   trunk/cfg_ivr_autoatt.py
+   trunk/cfg_ivr_raw.py
+   trunk/cfg_opt_codec.py
+   trunk/cfg_opt_enum.py
+   trunk/cfg_opt_iax.py
+   trunk/cfg_opt_loadmodule.py
+   trunk/cfg_opt_logger.py
+   trunk/cfg_opt_manager.py
+   trunk/cfg_opt_monitor.py
+   trunk/cfg_opt_music.py
+   trunk/cfg_opt_oppanel.py
+   trunk/cfg_opt_pbx.py
+   trunk/cfg_opt_pickup.py
+   trunk/cfg_opt_rawcfg.py
+   trunk/cfg_opt_rtp.py
+   trunk/cfg_opt_settings.py
+   trunk/cfg_opt_sip_network.py
+   trunk/cfg_opt_transfer.py
+   trunk/cfg_opt_user.py
+   trunk/cfg_opt_voicemail.py
+   trunk/cfg_opt_zap_audio.py
+   trunk/cfg_opt_zap_phone.py
+   trunk/cfg_opt_zap_trunk.py
+   trunk/cfg_opt_zappri.py
+   trunk/cfg_phone_epygi.py
+   trunk/cfg_phone_ext.py
+   trunk/cfg_phone_iax.py
+   trunk/cfg_phone_mgcp.py
+   trunk/cfg_phone_queue.py
+   trunk/cfg_phone_sip.py
+   trunk/cfg_phone_zap.py
+   trunk/cfg_trunk_capi.py
+   trunk/cfg_trunk_capimsn.py
+   trunk/cfg_trunk_fwdiax.py
+   trunk/cfg_trunk_iax.py
+   trunk/cfg_trunk_iaxtel.py
+   trunk/cfg_trunk_sip.py
+   trunk/cfg_trunk_zap.py
+   trunk/cfg_trunk_zaphfc.py
+   trunk/cfg_trunk_zappbx.py
+   trunk/cfg_trunk_zappri.py
+   trunk/configlets.py
+   trunk/destar
+   trunk/docs.py
+   trunk/manager.py
+   trunk/page_admin.ptl
+   trunk/page_admin_backup.ptl
+   trunk/page_admin_panel.ptl
+   trunk/page_admin_pbxstate.ptl
+   trunk/page_admin_reload.ptl
+   trunk/page_admin_viewconf.ptl
+   trunk/page_config.ptl
+   trunk/page_config_add.ptl
+   trunk/page_config_applications.ptl
+   trunk/page_config_codecs.ptl
+   trunk/page_config_dialout.ptl
+   trunk/page_config_dids.ptl
+   trunk/page_config_down.ptl
+   trunk/page_config_edit.ptl
+   trunk/page_config_ivrs.ptl
+   trunk/page_config_options.ptl
+   trunk/page_config_pbx.ptl
+   trunk/page_config_phones.ptl
+   trunk/page_config_trunks.ptl
+   trunk/page_config_up.ptl
+   trunk/page_config_users.ptl
+   trunk/page_debug.ptl
+   trunk/page_debug_values.ptl
+   trunk/page_login.ptl
+   trunk/page_logout.ptl
+   trunk/page_main.ptl
+   trunk/page_owner.ptl
+   trunk/page_owner_cdr.ptl
+   trunk/page_stats.ptl
+   trunk/page_stats_calls.ptl
+   trunk/page_stats_dialouts.ptl
+   trunk/page_stats_phone.ptl
+   trunk/page_stats_trunks.ptl
+   trunk/page_user.ptl
+   trunk/page_user_info.ptl
+   trunk/page_user_quickdiallist.ptl
+   trunk/page_user_settings.ptl
+   trunk/page_user_state.ptl
+   trunk/panelutils.py
+   trunk/session.py
+   trunk/tests.py
+Log:
+the &quot;iso-latin-1&quot; doesn't exist, there were some problems with the accents in some names,
+whe Spanish of French was used, destar displayed ?\195?\131?\194?\179, ?\195?\131?\194?\169, and other strange characters, ...
+
+so I decied to move to utf-8, everybody should use unicode and unify the file's charset.
+
+
+
+Modified: trunk/BACKEND.txt
+===================================================================
+--- trunk/BACKEND.txt	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/BACKEND.txt	2007-02-28 05:07:04 UTC (rev 601)
+@@ -101,7 +101,7 @@
+ 
+ Now look at cfg_opt_rtp.py. You'll see:
+ 
+-  # -*- coding: iso-latin-1 -*-
++  # -*- coding: utf-8 -*-
+ 
+   from configlets import *
+   from language import _
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/CHANGELOG.txt	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,5 +1,6 @@
+ 2007-02-27:
+ * languages.py: installing the gettext classes using unicode
++* changing the file's encoding to utf-8, everybody should use unicode.
+ 
+ 2007-02-26:
+ * Fixed &quot;cancel&quot; option in page_login
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/ConfigHelper.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/Publisher.py
+===================================================================
+--- trunk/Publisher.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/Publisher.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ #
+
+Modified: trunk/StatsHelper.ptl
+===================================================================
+--- trunk/StatsHelper.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/StatsHelper.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,6 +1,6 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+-# Copyright (C) 2005 Manuel Alejandro Cer&#243;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
++# Copyright (C) 2005 Manuel Alejandro Cer&#195;&#179;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
+ # 
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/Templates.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+@@ -159,7 +159,7 @@
+    	if refresh:
+    		'&lt;meta http-equiv=&quot;Refresh&quot; content=&quot;%d;&quot; /&gt;\n' % refresh
+   	'&lt;title&gt;Asterisk/DeStar PBX :: %s&lt;/title&gt;\n' % _(str(title))
+-  	'&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=iso-8859-1&quot; /&gt;\n'
++  	'&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;\n'
+   	'&lt;style type=&quot;text/css&quot; media=&quot;screen, tv, projection&quot;&gt;\n'
+   	'	@import url(&quot;/static/css/general.css&quot;);\n' 
+   	'	@import url(&quot;/static/css/Menu.css&quot;);\n'
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/backend.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig, some addons by Michael Bielicki, TAAN Softworks Corp.
+ #
+@@ -94,7 +94,7 @@
+ 	if f is None:
+ 		f = open(os.path.join(configlets.CONF_DIR,DESTAR_CFG),&quot;w&quot;)
+ 
+-	f.write(&quot;# -*- coding: iso-latin-1 -*-\n&quot;)
++	f.write(&quot;# -*- coding: utf-8 -*-\n&quot;)
+ 	f.write(&quot;# You should execfile() this config\n\n&quot;)
+ 	for c in configlets.configlet_tree:
+ 		a = c.createPythonConfig()
+
+Modified: trunk/cdrutils.py
+===================================================================
+--- trunk/cdrutils.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cdrutils.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ #
+
+Modified: trunk/cfg_app_callfw.py
+===================================================================
+--- trunk/cfg_app_callfw.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_callfw.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios
+
+Modified: trunk/cfg_app_chanspy.py
+===================================================================
+--- trunk/cfg_app_chanspy.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_chanspy.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2006 by Diego Andr&#195;&#169;s Asenjo G.
+ #
+
+Modified: trunk/cfg_app_conference.py
+===================================================================
+--- trunk/cfg_app_conference.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_conference.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_app_directory.py
+===================================================================
+--- trunk/cfg_app_directory.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_directory.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_app_disa.py
+===================================================================
+--- trunk/cfg_app_disa.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_disa.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2007 by Ian Sper 
+
+Modified: trunk/cfg_app_dnd.py
+===================================================================
+--- trunk/cfg_app_dnd.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_dnd.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios
+
+Modified: trunk/cfg_app_echo.py
+===================================================================
+--- trunk/cfg_app_echo.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_echo.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_app_meetme.py
+===================================================================
+--- trunk/cfg_app_meetme.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_meetme.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_app_milliwatt.py
+===================================================================
+--- trunk/cfg_app_milliwatt.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_milliwatt.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_app_music.py
+===================================================================
+--- trunk/cfg_app_music.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_music.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ #
+
+Modified: trunk/cfg_app_parking.py
+===================================================================
+--- trunk/cfg_app_parking.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_parking.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_app_play.py
+===================================================================
+--- trunk/cfg_app_play.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_play.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_app_quickdial_global.py
+===================================================================
+--- trunk/cfg_app_quickdial_global.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_quickdial_global.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios
+
+Modified: trunk/cfg_app_quickdial_phone.py
+===================================================================
+--- trunk/cfg_app_quickdial_phone.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_quickdial_phone.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios
+
+Modified: trunk/cfg_app_record.py
+===================================================================
+--- trunk/cfg_app_record.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_record.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_app_saytime.py
+===================================================================
+--- trunk/cfg_app_saytime.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_saytime.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_app_voicemail.py
+===================================================================
+--- trunk/cfg_app_voicemail.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_voicemail.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_app_voicemailsettings.py
+===================================================================
+--- trunk/cfg_app_voicemailsettings.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_app_voicemailsettings.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_dialout_normal.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This module is Copyright (C) 2005 by Alejandro Rios
+ # Destar is Copyright (C) 2005 by Holger Schurig
+
+Modified: trunk/cfg_ivr_autoatt.py
+===================================================================
+--- trunk/cfg_ivr_autoatt.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_ivr_autoatt.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This modules is Copyright (C) 2005 by Alejandro Rios,
+ # Destar is Copyright (C) 2005 by Holger Schurig,
+
+Modified: trunk/cfg_ivr_raw.py
+===================================================================
+--- trunk/cfg_ivr_raw.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_ivr_raw.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # this file has Copyright (C) 2005 by Alejandro Rios P.
+
+Modified: trunk/cfg_opt_codec.py
+===================================================================
+--- trunk/cfg_opt_codec.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_codec.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This module is Copyright (C) 2005 by Alejandro Rios,
+ # Destar is Copyright (C) 2005 by Holger Schurig,
+
+Modified: trunk/cfg_opt_enum.py
+===================================================================
+--- trunk/cfg_opt_enum.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_enum.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_opt_iax.py
+===================================================================
+--- trunk/cfg_opt_iax.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_iax.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This module is Copyright (C) 2007 by dasenjo,
+ # Destar is Copyright (C) 2005 by Holger Schurig,
+
+Modified: trunk/cfg_opt_loadmodule.py
+===================================================================
+--- trunk/cfg_opt_loadmodule.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_loadmodule.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_opt_logger.py
+===================================================================
+--- trunk/cfg_opt_logger.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_logger.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_opt_manager.py
+===================================================================
+--- trunk/cfg_opt_manager.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_manager.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_opt_monitor.py
+===================================================================
+--- trunk/cfg_opt_monitor.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_monitor.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios
+
+Modified: trunk/cfg_opt_music.py
+===================================================================
+--- trunk/cfg_opt_music.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_music.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_opt_oppanel.py
+===================================================================
+--- trunk/cfg_opt_oppanel.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_oppanel.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios
+
+Modified: trunk/cfg_opt_pbx.py
+===================================================================
+--- trunk/cfg_opt_pbx.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_pbx.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This modules is Copyright (C) 2005 by Alejandro Rios,
+ # Destar is Copyright (C) 2005 by Holger Schurig,
+
+Modified: trunk/cfg_opt_pickup.py
+===================================================================
+--- trunk/cfg_opt_pickup.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_pickup.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios
+
+Modified: trunk/cfg_opt_rawcfg.py
+===================================================================
+--- trunk/cfg_opt_rawcfg.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_rawcfg.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_opt_rtp.py
+===================================================================
+--- trunk/cfg_opt_rtp.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_rtp.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_opt_settings.py
+===================================================================
+--- trunk/cfg_opt_settings.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_settings.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_opt_sip_network.py
+===================================================================
+--- trunk/cfg_opt_sip_network.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_sip_network.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This module is Copyright (C) 2005 by Francesco Crescioli,
+ # Heavly based on module cfg_opt_sip_audio Copyright (C) 2005 by Alejandro Rios,
+
+Modified: trunk/cfg_opt_transfer.py
+===================================================================
+--- trunk/cfg_opt_transfer.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_transfer.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios
+
+Modified: trunk/cfg_opt_user.py
+===================================================================
+--- trunk/cfg_opt_user.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_user.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_opt_voicemail.py
+===================================================================
+--- trunk/cfg_opt_voicemail.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_voicemail.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_opt_zap_audio.py
+===================================================================
+--- trunk/cfg_opt_zap_audio.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_zap_audio.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig,
+ # 
+
+Modified: trunk/cfg_opt_zap_phone.py
+===================================================================
+--- trunk/cfg_opt_zap_phone.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_zap_phone.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig,
+ # 
+
+Modified: trunk/cfg_opt_zap_trunk.py
+===================================================================
+--- trunk/cfg_opt_zap_trunk.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_zap_trunk.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig,
+ # 
+
+Modified: trunk/cfg_opt_zappri.py
+===================================================================
+--- trunk/cfg_opt_zappri.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_opt_zappri.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios P.
+
+Modified: trunk/cfg_phone_epygi.py
+===================================================================
+--- trunk/cfg_phone_epygi.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_phone_epygi.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This file has Copyright by Alejandro Rios P.
+ # Destar has Copyright (C) 2005 by Holger Schurig,
+
+Modified: trunk/cfg_phone_ext.py
+===================================================================
+--- trunk/cfg_phone_ext.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_phone_ext.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_phone_iax.py
+===================================================================
+--- trunk/cfg_phone_iax.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_phone_iax.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_phone_mgcp.py
+===================================================================
+--- trunk/cfg_phone_mgcp.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_phone_mgcp.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2004 by Michael Bielicki, TAAN Softworks Corp.
+ # Based on work by Holger Schurig
+
+Modified: trunk/cfg_phone_queue.py
+===================================================================
+--- trunk/cfg_phone_queue.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_phone_queue.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig,
+ # This file has Copyright (C) 2005 by Alejandro Rios P.
+
+Modified: trunk/cfg_phone_sip.py
+===================================================================
+--- trunk/cfg_phone_sip.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_phone_sip.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig,
+ # add ons by Michael Bielicki, TAAN Softworks Corp.
+
+Modified: trunk/cfg_phone_zap.py
+===================================================================
+--- trunk/cfg_phone_zap.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_phone_zap.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig,
+ # 
+
+Modified: trunk/cfg_trunk_capi.py
+===================================================================
+--- trunk/cfg_trunk_capi.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_trunk_capi.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_trunk_capimsn.py
+===================================================================
+--- trunk/cfg_trunk_capimsn.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_trunk_capimsn.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_trunk_fwdiax.py
+===================================================================
+--- trunk/cfg_trunk_fwdiax.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_trunk_fwdiax.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_trunk_iax.py
+===================================================================
+--- trunk/cfg_trunk_iax.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_trunk_iax.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ # Copyright (C) 2004 Michael Bielicki
+ # based on Free World Dialup Module by Hoger Schurig
+ # 
+
+Modified: trunk/cfg_trunk_iaxtel.py
+===================================================================
+--- trunk/cfg_trunk_iaxtel.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_trunk_iaxtel.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ # Copyright (C) 2004 Michael Bielicki
+ # based on Free World Dialup Module by Hoger Schurig
+ # 
+
+Modified: trunk/cfg_trunk_sip.py
+===================================================================
+--- trunk/cfg_trunk_sip.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_trunk_sip.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ # Copyright (C) 2004 Michael Bielicki
+ # based on Free World Dialup Module by Hoger Schurig
+ # 
+
+Modified: trunk/cfg_trunk_zap.py
+===================================================================
+--- trunk/cfg_trunk_zap.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_trunk_zap.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_trunk_zaphfc.py
+===================================================================
+--- trunk/cfg_trunk_zaphfc.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_trunk_zaphfc.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_trunk_zappbx.py
+===================================================================
+--- trunk/cfg_trunk_zappbx.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_trunk_zappbx.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/cfg_trunk_zappri.py
+===================================================================
+--- trunk/cfg_trunk_zappri.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/cfg_trunk_zappri.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Destar has Copyright (C) 2005 by Holger Schurig
+ # This file has Copyright (C) 2005 by Alejandro Rios P.
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/configlets.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ #
+
+Modified: trunk/destar
+===================================================================
+--- trunk/destar	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/destar	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ #
+
+Modified: trunk/docs.py
+===================================================================
+--- trunk/docs.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/docs.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env python
+ 
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2006 by Alejandro Rios P.
+ #
+
+Modified: trunk/manager.py
+===================================================================
+--- trunk/manager.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/manager.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ #
+
+Modified: trunk/page_admin.ptl
+===================================================================
+--- trunk/page_admin.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_admin.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_admin_backup.ptl
+===================================================================
+--- trunk/page_admin_backup.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_admin_backup.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_admin_panel.ptl
+===================================================================
+--- trunk/page_admin_panel.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_admin_panel.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_admin_pbxstate.ptl
+===================================================================
+--- trunk/page_admin_pbxstate.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_admin_pbxstate.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_admin_reload.ptl
+===================================================================
+--- trunk/page_admin_reload.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_admin_reload.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_admin_viewconf.ptl
+===================================================================
+--- trunk/page_admin_viewconf.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_admin_viewconf.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_config.ptl
+===================================================================
+--- trunk/page_config.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_config_add.ptl
+===================================================================
+--- trunk/page_config_add.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_add.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_config_applications.ptl
+===================================================================
+--- trunk/page_config_applications.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_applications.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_config_codecs.ptl
+===================================================================
+--- trunk/page_config_codecs.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_codecs.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This file is Copyright (C) 2006 by Alejandro Rios P.,, 
+ # Destar has Copyright (C) 2003-2006 by Holger Schurig
+
+Modified: trunk/page_config_dialout.ptl
+===================================================================
+--- trunk/page_config_dialout.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_dialout.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This module is Copyright (C) 2005 by Alejandro Rios
+ # Destar is Copyright (C) 2005 by Holger Schurig
+
+Modified: trunk/page_config_dids.ptl
+===================================================================
+--- trunk/page_config_dids.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_dids.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This file is Copyright (C) 2006 by Alejandro Rios P.,, 
+ # Destar has Copyright (C) 2003-2006 by Holger Schurig
+
+Modified: trunk/page_config_down.ptl
+===================================================================
+--- trunk/page_config_down.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_down.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_config_edit.ptl
+===================================================================
+--- trunk/page_config_edit.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_edit.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_config_ivrs.ptl
+===================================================================
+--- trunk/page_config_ivrs.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_ivrs.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,6 +1,6 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+-# This file is Copyright (C) 2005 by Santiago Ruano Rinc&#243;n, 
++# This file is Copyright (C) 2005 by Santiago Ruano Rinc&#195;&#179;n, 
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+ # This program is free software; you can redistribute it and/or modify
+
+Modified: trunk/page_config_options.ptl
+===================================================================
+--- trunk/page_config_options.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_options.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_config_pbx.ptl
+===================================================================
+--- trunk/page_config_pbx.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_pbx.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,6 +1,6 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+-# This file is Copyright (C) 2005 by Santiago Ruano Rinc&#243;n, 
++# This file is Copyright (C) 2005 by Santiago Ruano Rinc&#195;&#179;n, 
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+ # This program is free software; you can redistribute it and/or modify
+
+Modified: trunk/page_config_phones.ptl
+===================================================================
+--- trunk/page_config_phones.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_phones.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_config_trunks.ptl
+===================================================================
+--- trunk/page_config_trunks.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_trunks.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_config_up.ptl
+===================================================================
+--- trunk/page_config_up.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_up.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_config_users.ptl
+===================================================================
+--- trunk/page_config_users.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_config_users.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_debug.ptl
+===================================================================
+--- trunk/page_debug.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_debug.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_debug_values.ptl
+===================================================================
+--- trunk/page_debug_values.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_debug_values.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_login.ptl
+===================================================================
+--- trunk/page_login.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_login.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_logout.ptl
+===================================================================
+--- trunk/page_logout.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_logout.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_main.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_owner.ptl
+===================================================================
+--- trunk/page_owner.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_owner.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_owner_cdr.ptl
+===================================================================
+--- trunk/page_owner_cdr.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_owner_cdr.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 Holger Schurig
+ # Copyright (C) 2005 Manuel Alejandro Cer&#195;&#179;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
+
+Modified: trunk/page_stats.ptl
+===================================================================
+--- trunk/page_stats.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_stats.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_stats_calls.ptl
+===================================================================
+--- trunk/page_stats_calls.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_stats_calls.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,6 +1,6 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+-# Copyright (C) 2005 Manuel Alejandro Cer&#243;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
++# Copyright (C) 2005 Manuel Alejandro Cer&#195;&#179;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
+ # 
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+
+Modified: trunk/page_stats_dialouts.ptl
+===================================================================
+--- trunk/page_stats_dialouts.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_stats_dialouts.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 Manuel Alejandro Cer&#195;&#179;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
+ # 
+
+Modified: trunk/page_stats_phone.ptl
+===================================================================
+--- trunk/page_stats_phone.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_stats_phone.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 Manuel Alejandro Cer&#195;&#179;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
+ # 
+
+Modified: trunk/page_stats_trunks.ptl
+===================================================================
+--- trunk/page_stats_trunks.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_stats_trunks.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 Manuel Alejandro Cer&#195;&#179;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
+ # 
+
+Modified: trunk/page_user.ptl
+===================================================================
+--- trunk/page_user.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_user.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_user_info.ptl
+===================================================================
+--- trunk/page_user_info.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_user_info.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_user_quickdiallist.ptl
+===================================================================
+--- trunk/page_user_quickdiallist.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_user_quickdiallist.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # This file has Copyright (C) 2005 by Alejandro Rios P.
+ # DeStar has Copyright (C) 2005 by Holger Schurig
+
+Modified: trunk/page_user_settings.ptl
+===================================================================
+--- trunk/page_user_settings.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_user_settings.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/page_user_state.ptl
+===================================================================
+--- trunk/page_user_state.ptl	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/page_user_state.ptl	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ # 
+
+Modified: trunk/panelutils.py
+===================================================================
+--- trunk/panelutils.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/panelutils.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2004 by Holger Schurig
+ #
+
+Modified: trunk/session.py
+===================================================================
+--- trunk/session.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/session.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2006 by Holger Schurig
+ #
+
+Modified: trunk/tests.py
+===================================================================
+--- trunk/tests.py	2007-02-28 04:45:39 UTC (rev 600)
++++ trunk/tests.py	2007-02-28 05:07:04 UTC (rev 601)
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env python
+ 
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2006 by Anthony PIRON
+ #
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000090.html">[Destar-dev] r600 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000092.html">[Destar-dev] r602 - in trunk/misc: . debian
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#91">[ date ]</a>
+              <a href="thread.html#91">[ thread ]</a>
+              <a href="subject.html#91">[ subject ]</a>
+              <a href="author.html#91">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

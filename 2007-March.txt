@@ -1,0 +1,5506 @@
+From alerios at mail.berlios.de  Thu Mar  1 20:06:06 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Thu, 1 Mar 2007 20:06:06 +0100
+Subject: [Destar-dev] r608 - branches/0.2.X
+Message-ID: <200703011906.l21J66GB011222@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-01 20:06:06 +0100 (Thu, 01 Mar 2007)
+New Revision: 608
+
+Added:
+   branches/0.2.X/page_stats_queue.ptl
+   branches/0.2.X/queueutils.py
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/StatsHelper.ptl
+Log:
+* Added queueutils.py to put queue_log in an sqlite3 database.
+* Added initial version of page_stats_queue.ptl for Queue statistics.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-02-28 22:44:13 UTC (rev 607)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-01 19:06:06 UTC (rev 608)
+@@ -1,3 +1,7 @@
++2007-03-01:
++ * Added queueutils.py to put queue_log in an sqlite3 database.
++ * Added initial version of page_stats_queue.ptl for Queue statistics.
++
+ 2007-02-26:
+ * cfg_dialout_normal: adding r Dial option if no Authenticate() is used
+ 
+
+Modified: branches/0.2.X/StatsHelper.ptl
+===================================================================
+--- branches/0.2.X/StatsHelper.ptl	2007-02-28 22:44:13 UTC (rev 607)
++++ branches/0.2.X/StatsHelper.ptl	2007-03-01 19:06:06 UTC (rev 608)
+@@ -1,6 +1,6 @@
+ # -*- coding: iso-latin-1 -*-
+ #
+-# Copyright (C) 2005 Manuel Alejandro Cer?n Estrada <ceronman at gmail.com>
++# Copyright (C) 2005 Manuel Alejandro Cer??n Estrada <ceronman at gmail.com>
+ # 
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -41,6 +41,13 @@
+ 		self.name = None
+ 		self.group = None
+ 		self.host = None
++		self.seconds = 0
++		self.holdtime = 0
++		self.completed_by_agent = 0
++		self.completed_by_caller = 0
++		self.dumped = 0
++		self.abandon = 0
++
+ 	
+ 	def addCall(self, seconds, cost_per_minute, disp):
+ 		self.calls_number += 1
+@@ -60,6 +67,25 @@
+ 		elif disp == "FAILED":
+ 			self.failed += 1
+ 	
++	def addQueueCall(self, holdtime, calltime, origposition, disp):
++		self.calls_number += 1
++		self.seconds += int(calltime)
++		self.holdtime += int(holdtime)
++		self.origposition = origposition
++		if disp == "COMPLETEAGENT":
++			self.completed_by_agent += 1
++		elif disp == "COMPLETECALLER":
++			self.completed_by_caller += 1
++		elif disp == "AGENTDUMP":
++			self.dumped += 1
++		elif disp == "ABANDON":
++			self.abandon += 1
++
++	def addAgentCall(self, holdtime, calltime):
++		self.calls_number += 1
++		self.seconds += int(calltime)
++		self.holdtime += int(holdtime)
++
+ 	def asignPattern(self, pat):
+ 		self.pattern = re.compile(pat.replace('X','[0-9]'))
+ 	
+@@ -132,8 +158,50 @@
+ 		"<td>%d</td>" % calls[i].busy
+ 		"<td>%d</td>" % calls[i].failed
+ 		'</tr>\n'
+-	'</table>'
++	'</table>\n<br/>'
+ 
++def makeAgentCallsTable [plain] (label, calls, names):
++	'<table border="1"> \n'
++	'<tr> <td><b>'+ label
++	'</b></td><td><b>'+_(str("Number of Calls"))
++	#'</b></td><td><b>'+_(str("% Number of Calls"))
++	'</b></td><td><b>'+_(str("Avg. Hold Time"))
++	#'</b></td><td><b>'+_(str("% Avg. Hold Time"))
++	'</b></td><td><b>'+_(str("Avg. Call Duration"))
++	#'</b></td><td><b>'+_(str("% Avg. Call Duration"))
++	#'</b></td><td><b>'+_(str("Transfered Calls"))
++	#'</b></td><td><b>'+_(str("% Transfered Calls"))
++	'</b></td></tr>\n'
++	for i in range(len(calls)):
++		'<tr>'
++		"<td>%s</td>" % names[i]
++		"<td>%d</td>" % calls[i].calls_number
++		"<td>%d</td>" % (calls[i].calls_number and (calls[i].holdtime / calls[i].calls_number) or 0)
++		"<td>%d</td>" % (calls[i].calls_number and (calls[i].seconds / calls[i].calls_number) or 0)
++		'</tr>\n'
++	'</table>\n<br/>'
++
++def makeQueueCallsTable [plain] (label, calls, names):
++	'<table border="1"> \n'
++	'<tr> <td><b>'+ label
++	'</b></td><td><b>'+_(str("Number of Calls"))
++	#'</b></td><td><b>'+_(str("% Number of Calls"))
++	'</b></td><td><b>'+_(str("Avg. Hold Time"))
++	#'</b></td><td><b>'+_(str("% Avg. Hold Time"))
++	'</b></td><td><b>'+_(str("Avg. Call Duration"))
++	#'</b></td><td><b>'+_(str("% Avg. Call Duration"))
++	#'</b></td><td><b>'+_(str("Transfered Calls"))
++	#'</b></td><td><b>'+_(str("% Transfered Calls"))
++	'</b></td></tr>\n'
++	for i in range(len(calls)):
++		'<tr>'
++		"<td>%s</td>" % names[i]
++		"<td>%d</td>" % calls[i].calls_number
++		"<td>%d</td>" % (calls[i].calls_number and (calls[i].holdtime / calls[i].calls_number) or 0)
++		"<td>%d</td>" % (calls[i].calls_number and (calls[i].seconds / calls[i].calls_number) or 0)
++		'</tr>\n'
++	'</table>\n<br/>'
++
+ def makeCallsGraphic [plain] (names, calls, title, labelx, filename):
+ 	theme.use_color = True;
+ 	theme.default_font_size = 14
+
+Added: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-02-28 22:44:13 UTC (rev 607)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-01 19:06:06 UTC (rev 608)
+@@ -0,0 +1,379 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Destar has Copyright (C) 2004-2007 by Holger Schurig
++# This fila has Copyright (C) 2007 by Alejandro Rios P.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++from Templates import *
++from quixote.form2 import *
++import queueutils
++import time
++from StatsHelper import *
++
++pychart_exists = True
++try:	
++	from pychart import *
++except ImportError:
++	pychart_exists = False
++	
++
++_q_parent = 'page_stats'
++_q_title  = _("Queue Statistics")
++_q_desc   = _("Statistics by Queue")
++_q_level  = 3
++_q_menupos = 30
++
++def _q_access(request):
++	if request.session.level < _q_level:
++		cantAccessPage()
++
++def _q_test():
++	return cdrutils.db
++
++def N_(message): return message
++
++def getQueues():
++	import configlets
++	objs = configlets.configlet_tree.getConfigletsByName('CfgPhoneQueue')
++	queues=[]
++	for obj in objs:
++		queues.append(obj.name)		
++	return queues
++
++def makeForm():
++	form = Form()
++	form.name = "queryform"
++	form.add_single_select('queue', 
++							title=htmltext(_('Queue:')),
++							value="",
++							options=zip(getQueues(),getQueues(),getQueues()),
++							render_br=True )
++
++	form.add_single_select('year', 
++							title=htmltext(_('Day:')),
++							value="",
++							options=zip([all] + years, 
++										[_(all)] + years,
++										[all] + years),
++							render_br=False )
++							
++	form.add_single_select('month', 
++							options=zip([all] + months, 
++										[_(all)] + getMonthnames(),
++										[all] + months),
++
++							render_br=False )
++							
++	form.add_single_select('day',
++							options=zip([all] + days,
++										[_(all)] + daynames,
++										[all] + days),
++							render_br=True )
++							
++	form.add(SubmitWidget, '_submit', _("Submit"), render_br=True)
++	
++	return form
++		
++def perHourInDay [plain] (day, month, year, queue):
++	
++	date = "%s-%s-%s" % (year, month, day)
++	where = []
++	where.append("date(timestamp) = date('%s')" % date)
++	where.append("qname = '%s'" % queue)
++	where.append("action like 'COMPLETE%'")
++	cursor = queueutils.select(
++				fields = ['time(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where,
++				order=['timestamp','agent'])
++	row = cursor.fetchone()
++	calls_per_hour = [CallData() for i in hours]
++	calls_by_agent = []
++	agentnames = []
++	total_completed = cursor.rowcount
++	total_completed_by_agent = 0
++	total_completed_by_caller = 0
++	total_duration = 0
++	average_duration = 0
++	average_hodtime = 0
++
++	if cursor.description:
++		fieldIndices = range(len(cursor.description))
++	else:
++		fieldIndices = []
++
++	while row:
++		for fieldIndex in fieldIndices:
++			c = cursor.description[fieldIndex][0]
++			s = row[fieldIndex]
++			if c=='time(timestamp)':
++				hour = s.split(":")
++				hour = int(hour[0])
++			if c=='agent':
++				agent = s.split("-")[0]
++				if not agentnames.count(agent):
++					agentnames.append(agent)
++					calls_by_agent.insert(agentnames.index(agent), CallData())
++			if c=='action':
++				disposition = s
++			if c=='info1':
++				try:
++					holdtime = int(s)
++				except ValueError:
++					holdtime = 0
++			if c=='info2':
++				try:
++					calltime = int(s)
++				except ValueError:
++					calltime = 0
++			if c=='info2':
++				try:
++					origposition = int(s)
++				except ValueError:
++					origposition = 0
++		calls_per_hour[hour].addQueueCall(holdtime, calltime, origposition, disposition)
++		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
++		row = cursor.fetchone()
++		
++	htmltext("<h4>%s</h4>" % _("Completed Calls"))
++	makeQueueCallsTable(_("Time"), calls_per_hour, hournames)
++	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
++	
++def perDayInMonth [plain] (month, year, queue):
++	
++	date1 = "%s-%s-01" % (year, month)
++	date2 = "%s-%s-31" % (year, month)
++	where = []
++	where.append("date(timestamp) between date('%s') and date('%s')" % (date1, date2))
++	where.append("qname = '%s'" % queue)
++	where.append("action like 'COMPLETE%'")
++	cursor = queueutils.select(
++				fields = ['date(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where,
++				order=['timestamp','agent'])
++	row = cursor.fetchone()
++	calls_per_day = [CallData() for i in days]
++	calls_by_agent = []
++	agentnames = []
++	total_completed = cursor.rowcount
++	total_completed_by_agent = 0
++	total_completed_by_caller = 0
++	total_duration = 0
++	average_duration = 0
++	average_hodtime = 0
++
++	if cursor.description:
++		fieldIndices = range(len(cursor.description))
++	else:
++		fieldIndices = []
++
++	while row:
++		for fieldIndex in fieldIndices:
++			c = cursor.description[fieldIndex][0]
++			s = row[fieldIndex]
++			if c=='date(timestamp)':
++				day = s.split("-")
++				day = int(day[2]) - 1
++			if c=='agent':
++				agent = s.split("-")[0]
++				if not agentnames.count(agent):
++					agentnames.append(agent)
++					calls_by_agent.insert(agentnames.index(agent), CallData())
++			if c=='action':
++				disposition = s
++			if c=='info1':
++				try:
++					holdtime = int(s)
++				except ValueError:
++					holdtime = 0
++			if c=='info2':
++				try:
++					calltime = int(s)
++				except ValueError:
++					calltime = 0
++			if c=='info2':
++				try:
++					origposition = int(s)
++				except ValueError:
++					origposition = 0
++		calls_per_day[day].addQueueCall(holdtime, calltime, origposition, disposition)
++		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
++		row = cursor.fetchone()
++		
++	htmltext("<h4>%s</h4>" % _("Completed Calls"))
++	makeQueueCallsTable(_("Day"), calls_per_day, daynames)
++	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
++
++	
++def perMonthInYear [plain] (year, queue):
++	date1 = "%s-01-01" % (year)
++	date2 = "%s-12-31" % (year)
++	where = []
++	where.append("date(timestamp) between date('%s') and date('%s')" % (date1, date2))
++	where.append("qname = '%s'" % queue)
++	where.append("action like 'COMPLETE%'")
++	cursor = queueutils.select(
++				fields = ['date(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where,
++				order=['timestamp','agent'])
++	row = cursor.fetchone()
++	calls_per_month = [CallData() for i in months]
++	calls_by_agent = []
++	agentnames = []
++	total_completed = cursor.rowcount
++	total_completed_by_agent = 0
++	total_completed_by_caller = 0
++	total_duration = 0
++	average_duration = 0
++	average_hodtime = 0
++
++	if cursor.description:
++		fieldIndices = range(len(cursor.description))
++	else:
++		fieldIndices = []
++
++	while row:
++		for fieldIndex in fieldIndices:
++			c = cursor.description[fieldIndex][0]
++			s = row[fieldIndex]
++			if c=='date(timestamp)':
++				month = s.split("-")
++				month = int(month[1]) - 1
++			if c=='agent':
++				agent = s.split("-")[0]
++				if not agentnames.count(agent):
++					agentnames.append(agent)
++					calls_by_agent.insert(agentnames.index(agent), CallData())
++			if c=='action':
++				disposition = s
++			if c=='info1':
++				try:
++					holdtime = int(s)
++				except ValueError:
++					holdtime = 0
++			if c=='info2':
++				try:
++					calltime = int(s)
++				except ValueError:
++					calltime = 0
++			if c=='info2':
++				try:
++					origposition = int(s)
++				except ValueError:
++					origposition = 0
++		calls_per_month[month].addQueueCall(holdtime, calltime, origposition, disposition)
++		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
++		row = cursor.fetchone()
++		
++	htmltext("<h4>%s</h4>" % _("Completed Calls"))
++	makeQueueCallsTable(_("Month"), calls_per_month, monthnames)
++	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
++
++
++def perYear [plain] (queue):
++	where = []
++	where.append("qname = '%s'" % queue)
++	where.append("action like 'COMPLETE%'")
++	cursor = queueutils.select(
++				fields = ['date(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where,
++				order=['timestamp','agent'])
++	row = cursor.fetchone()
++	calls_per_year = [CallData() for i in years]
++	calls_by_agent = []
++	agentnames = []
++	total_completed = cursor.rowcount
++	total_completed_by_agent = 0
++	total_completed_by_caller = 0
++	total_duration = 0
++	average_duration = 0
++	average_hodtime = 0
++
++	if cursor.description:
++		fieldIndices = range(len(cursor.description))
++	else:
++		fieldIndices = []
++
++	while row:
++		for fieldIndex in fieldIndices:
++			c = cursor.description[fieldIndex][0]
++			s = row[fieldIndex]
++			if c=='date(timestamp)':
++				year = s.split("-")
++				year = int(year[0]) - startyear
++			if c=='agent':
++				agent = s.split("-")[0]
++				if not agentnames.count(agent):
++					agentnames.append(agent)
++					calls_by_agent.insert(agentnames.index(agent), CallData())
++			if c=='action':
++				disposition = s
++			if c=='info1':
++				try:
++					holdtime = int(s)
++				except ValueError:
++					holdtime = 0
++			if c=='info2':
++				try:
++					calltime = int(s)
++				except ValueError:
++					calltime = 0
++			if c=='info2':
++				try:
++					origposition = int(s)
++				except ValueError:
++					origposition = 0
++		calls_per_year[year].addQueueCall(holdtime, calltime, origposition, disposition)
++		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
++		row = cursor.fetchone()
++		
++	htmltext("<h4>%s</h4>" % _("Completed Calls"))
++	makeQueueCallsTable(_("Year"), calls_per_year, yearnames)
++	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
++
++	
++def showResults [plain] (day, month, year, queue):
++	all = N_("All")
++	if day != all and month != all and year != all:
++		perHourInDay(day, month, year, queue)
++	elif day == all and month != all and year != all:
++		perDayInMonth(month, year, queue)
++	elif day == all and month == all and year != all:
++		perMonthInYear(year, queue)
++	elif day == all and month == all and year == all:
++		perYear(queue)
++	else:
++		htmltext("<p style='color:red;'>\n")
++		htmltext("%s" % _("Sorry, this kind of query is not supported yet"))
++		htmltext("</p>")
++
++def cdrForm [plain] (request):
++	htmltext("<h3>%s</h3>" % _("Statistics for a Queue by Date:"))
++	form = makeForm()
++	form.render()
++	
++	if form.is_submitted() and not form.has_errors():
++		htmltext("<h3>%s</h3>" % _("Results"))
++		showResults(form["day"], form["month"], form["year"], form["queue"])
++	
++def _q_index [plain] (request):
++	header(_q_desc)
++	if pychart_exists:
++		cdrForm(request)
++	else:
++		_("You need to install pychart and use a cdr with sqlite to get these statistics")
++	footer()
++	
+
+Added: branches/0.2.X/queueutils.py
+===================================================================
+--- branches/0.2.X/queueutils.py	2007-02-28 22:44:13 UTC (rev 607)
++++ branches/0.2.X/queueutils.py	2007-03-01 19:06:06 UTC (rev 608)
+@@ -0,0 +1,175 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Destar has Copyright (C) 2005-2007 by Holger Schurig
++# This file has Copyright (C) 2007 by Alejandro Rios P.
++#
++# The loadQueue method has some GPL code with
++# Copyright (C) 2006 Earl Terwilliger  earl at micpc.com
++# Tooked from Asterisk Queue Log Analyzer http://www.micpc.com/qloganalyzer/ 
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++import sys, os, string
++import language
++from datetime import datetime
++from time import strptime
++language.setLanguage('en')
++
++
++try:
++	from pysqlite2 import dbapi2 as sqlite
++except ImportError:
++	print _("Note: you should install python-pysqlite2 to have Queue Stats functionality")
++
++try:
++	db_fn = "/var/log/asterisk/queue.db"
++	if not os.access(db_fn, os.O_RDWR):
++		raise ImportError
++	db = sqlite.connect(db_fn)
++	db.isolation_level = None
++except:
++	print _("Note: you don't seem to have access to %s. See INSTALL.txt for details.") % db_fn
++	if __name__ == "__main__": sys.exit(0)
++	db = None
++
++def loadQueueLog ():
++	try:
++		q_fn = "/var/log/asterisk/queue_log"
++		if not os.access(q_fn, os.O_RDWR):
++			raise ImportError
++	except:
++		print _("Note: you don't seem to have access to %s.") % q_fn
++		if __name__ == "__main__": sys.exit(0)
++
++	cursor = db.cursor()
++	cursor.execute("select max(timestamp) from queuelog")
++	row = cursor.fetchone()
++	maxtime = datetime.fromtimestamp(float(0))
++	if row[0]:
++		try:
++			maxtime = datetime(*strptime(row[0], "%Y-%m-%d %H:%M:%S")[0:6])
++		except:
++			continue
++
++	rows = 0
++	in_file = open(q_fn,"r")
++	for in_line in in_file.readlines():
++		in_line = string.strip(in_line[:-1])
++		if (in_line[-1] == "|"):
++			in_line = in_line[0:-1]
++		s = string.split(in_line,"|")
++		s[0] = datetime.fromtimestamp(float(s[0]))
++		if (maxtime >= s[0]):
++			continue
++		s[0] = s[0].isoformat(' ')
++		length = len(s)
++		if (length < 6):
++			s.append('')
++		if (length < 7):
++			s.append('')
++		if (length < 8):
++			s.append('')
++		try:
++			cursor.execute( "INSERT INTO queuelog (timestamp,callid,qname,agent,action,info1,info2,info3) VALUES  ('%s','%s','%s','%s','%s','%s','%s','%s')" % tuple(s) )
++		except:
++			print "Failed to execute insert at timestamp %s" % s[0]
++			if __name__ == "__main__": sys.exit(0)
++		rows += 1
++	in_file.close()
++	print "%d rows were inserted" % rows
++	return rows
++
++
++def N_(message): return message
++
++def select(
++		fields=['date(timestamp)',
++			'callid',
++			'qname',
++			'agent',
++			'action',
++			'info1',
++			'info2',
++			'info3'
++			],
++		groupby=[],
++		having=[],
++		where=[],
++		order=['timestamp'],
++		limit=0,
++		offset=0,
++	):
++	cursor = db.cursor()
++
++	sql = ['SELECT']
++	sql.append( ','.join(fields) )
++	sql.append('FROM queuelog')
++
++	if where:
++		sql.append('WHERE ')
++		sql.append( ' AND '.join(where) )
++
++	if groupby:
++		sql.append('GROUP BY')
++		sql.append( ','.join(groupby) )
++
++	if having:
++		sql.append('HAVING')
++		sql.append( ','.join(having) )
++
++	if order:
++		sql.append('ORDER BY')
++		sql.append( ','.join(order) )
++
++	if limit:
++		sql.append('LIMIT %d' % limit)
++		if offset:
++			sql.append('OFFSET %d' % offset)
++
++	cursor.execute( ' '.join(sql) )
++	return cursor
++
++def count(
++		where=[],
++		groupby=[],
++		having=[],
++	):
++	cursor = db.cursor()
++
++	sql = ['SELECT count(*)']
++	sql.append('FROM queuelog')
++
++	if where:
++		sql.append('WHERE ')
++		sql.append( ' AND '.join(where) )
++
++	if groupby:
++		sql.append('GROUP BY')
++		sql.append( ','.join(groupby) )
++
++	if having:
++		sql.append('HAVING')
++		sql.append( ','.join(having) )
++	
++	cursor.execute( ' '.join(sql) )
++	resultRow = cursor.fetchone()
++	result = int(resultRow[0])
++
++	return result
++
++if __name__ == "__main__":
++	loadQueueLog()
+
+
+
+From alerios at mail.berlios.de  Thu Mar  1 20:14:36 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Thu, 1 Mar 2007 20:14:36 +0100
+Subject: [Destar-dev] r609 - in branches/0.2.X: . misc
+Message-ID: <200703011914.l21JEaq2012579@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-01 20:14:36 +0100 (Thu, 01 Mar 2007)
+New Revision: 609
+
+Added:
+   branches/0.2.X/misc/queue.db
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/INSTALL.txt
+Log:
+* Added misc/queue.db with initial schema to ease queue stats installation.
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-01 19:06:06 UTC (rev 608)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-01 19:14:36 UTC (rev 609)
+@@ -1,6 +1,7 @@
+ 2007-03-01:
+  * Added queueutils.py to put queue_log in an sqlite3 database.
+  * Added initial version of page_stats_queue.ptl for Queue statistics.
++ * Added misc/queue.db with initial schema to ease queue stats installation.
+ 
+ 2007-02-26:
+ * cfg_dialout_normal: adding r Dial option if no Authenticate() is used
+
+Modified: branches/0.2.X/INSTALL.txt
+===================================================================
+--- branches/0.2.X/INSTALL.txt	2007-03-01 19:06:06 UTC (rev 608)
++++ branches/0.2.X/INSTALL.txt	2007-03-01 19:14:36 UTC (rev 609)
+@@ -34,6 +34,8 @@
+ You will also need to build asterisk using the cdr_sqlite3_custom driver found on
+ http://bugs.digium.com/view.php?id=7149
+ 
++For Queue Statistics, the file misc/queue.db must be copied to /var/log/asterisk/
++
+ Optional: Pychart
+ -----------------
+ 
+
+Added: branches/0.2.X/misc/queue.db
+===================================================================
+(Binary files differ)
+
+
+Property changes on: branches/0.2.X/misc/queue.db
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+
+
+From alerios at mail.berlios.de  Thu Mar  1 23:46:16 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Thu, 1 Mar 2007 23:46:16 +0100
+Subject: [Destar-dev] r610 - branches/0.2.X
+Message-ID: <200703012246.l21MkGx0000452@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-01 23:46:16 +0100 (Thu, 01 Mar 2007)
+New Revision: 610
+
+Modified:
+   branches/0.2.X/page_stats_queue.ptl
+   branches/0.2.X/queueutils.py
+Log:
+ * Fixed wrong execpt on queueutil.py
+ * Added more fields to page_stats_queue.ptl results.
+
+
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-03-01 19:14:36 UTC (rev 609)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-01 22:46:16 UTC (rev 610)
+@@ -1,7 +1,7 @@
+ # -*- coding: iso-latin-1 -*-
+ #
+ # Destar has Copyright (C) 2004-2007 by Holger Schurig
+-# This fila has Copyright (C) 2007 by Alejandro Rios P.
++# This file has Copyright (C) 2007 by Alejandro Rios P.
+ # 
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -33,7 +33,7 @@
+ 
+ _q_parent = 'page_stats'
+ _q_title  = _("Queue Statistics")
+-_q_desc   = _("Statistics by Queue")
++_q_desc   = _("Incoming Call Statistics by Queue")
+ _q_level  = 3
+ _q_menupos = 30
+ 
+@@ -103,7 +103,7 @@
+ 	calls_per_hour = [CallData() for i in hours]
+ 	calls_by_agent = []
+ 	agentnames = []
+-	total_completed = cursor.rowcount
++	total_completed = 0
+ 	total_completed_by_agent = 0
+ 	total_completed_by_caller = 0
+ 	total_duration = 0
+@@ -144,13 +144,21 @@
+ 					origposition = int(s)
+ 				except ValueError:
+ 					origposition = 0
++		total_completed += 1
+ 		calls_per_hour[hour].addQueueCall(holdtime, calltime, origposition, disposition)
+ 		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+ 		row = cursor.fetchone()
+ 		
+-	htmltext("<h4>%s</h4>" % _("Completed Calls"))
++	htmltext("<h3>%s</h3>" % _("Completed Calls"))
++	completed_table = HtmlTable(1,1)
++	completed_table.setCell(0,0, _("Total completed calls"))
++	completed_table.setCell(1,0, "%d" % total_completed)
++	completed_table.getHtml(border=1)
++
++	htmltext("<br/><h3>%s</h3>" % _("Completed Calls by Agent"))
++	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
++	htmltext("<h3>%s</h3>" % _("Distribution of Completed Calls"))
+ 	makeQueueCallsTable(_("Time"), calls_per_hour, hournames)
+-	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
+ 	
+ def perDayInMonth [plain] (month, year, queue):
+ 	
+@@ -213,9 +221,10 @@
+ 		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+ 		row = cursor.fetchone()
+ 		
+-	htmltext("<h4>%s</h4>" % _("Completed Calls"))
++	htmltext("<h3>%s</h3>" % _("Completed Calls by Agent"))
++	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
++	htmltext("<h3>%s</h3>" % _("Distribution of Completed Calls"))
+ 	makeQueueCallsTable(_("Day"), calls_per_day, daynames)
+-	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
+ 
+ 	
+ def perMonthInYear [plain] (year, queue):
+@@ -278,9 +287,10 @@
+ 		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+ 		row = cursor.fetchone()
+ 		
+-	htmltext("<h4>%s</h4>" % _("Completed Calls"))
++	htmltext("<h3>%s</h3>" % _("Completed Calls by Agent"))
++	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
++	htmltext("<h3>%s</h3>" % _("Distribution of Completed Calls"))
+ 	makeQueueCallsTable(_("Month"), calls_per_month, monthnames)
+-	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
+ 
+ 
+ def perYear [plain] (queue):
+@@ -340,9 +350,10 @@
+ 		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+ 		row = cursor.fetchone()
+ 		
+-	htmltext("<h4>%s</h4>" % _("Completed Calls"))
++	htmltext("<h3>%s</h3>" % _("Completed Calls by Agent"))
++	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
++	htmltext("<h3>%s</h3>" % _("Distribution of Completed Calls"))
+ 	makeQueueCallsTable(_("Year"), calls_per_year, yearnames)
+-	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
+ 
+ 	
+ def showResults [plain] (day, month, year, queue):
+
+Modified: branches/0.2.X/queueutils.py
+===================================================================
+--- branches/0.2.X/queueutils.py	2007-03-01 19:14:36 UTC (rev 609)
++++ branches/0.2.X/queueutils.py	2007-03-01 22:46:16 UTC (rev 610)
+@@ -63,7 +63,7 @@
+ 		try:
+ 			maxtime = datetime(*strptime(row[0], "%Y-%m-%d %H:%M:%S")[0:6])
+ 		except:
+-			continue
++			pass
+ 
+ 	rows = 0
+ 	in_file = open(q_fn,"r")
+
+
+
+From santiago at mail.berlios.de  Fri Mar  2 05:08:48 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Fri, 2 Mar 2007 05:08:48 +0100
+Subject: [Destar-dev] r611 - trunk
+Message-ID: <200703020408.l2248mlh022846@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-03-02 05:08:48 +0100 (Fri, 02 Mar 2007)
+New Revision: 611
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/backend.py
+   trunk/manager.py
+Log:
+`Apply changes` relaods MoH
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-01 22:46:16 UTC (rev 610)
++++ trunk/CHANGELOG.txt	2007-03-02 04:08:48 UTC (rev 611)
+@@ -1,3 +1,6 @@
++2007-03-01:
++* `Apply changes` relaods MoH
++ 
+ 2007-02-28:
+ * ConfigHelper.ptl: Fix a problem in __addit__ method, when creating a new
+ * object all createAsteriskConfig() from all objects where called.
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-03-01 22:46:16 UTC (rev 610)
++++ trunk/backend.py	2007-03-02 04:08:48 UTC (rev 611)
+@@ -820,6 +820,8 @@
+ 	writeAsteriskConfig()
+ 	import manager
+ 	s = manager.reloadAsterisk()
++	if configlets.configlet_tree.hasConfiglet('CfgOptMusic'):
++		s += manager.reloadMoH()
+ 	if panelutils.isConfigured():
+ 		s += panelutils.restartPanelDaemon()
+ 	return "<br/>".join(s)
+
+Modified: trunk/manager.py
+===================================================================
+--- trunk/manager.py	2007-03-01 22:46:16 UTC (rev 610)
++++ trunk/manager.py	2007-03-02 04:08:48 UTC (rev 611)
+@@ -636,6 +636,9 @@
+ def reloadAsterisk():
+ 	return conn.action('Command', Command='reload')
+ 
++def reloadMoH():
++	return conn.action('Command', Command='moh reload')
++
+ if __name__ == '__main__':
+ 	connect()
+ 	if not isConnected():
+
+
+
+From santiago at mail.berlios.de  Fri Mar  2 05:28:13 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Fri, 2 Mar 2007 05:28:13 +0100
+Subject: [Destar-dev] r612 - branches/0.2.X
+Message-ID: <200703020428.l224SDBA024807@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-03-02 05:28:11 +0100 (Fri, 02 Mar 2007)
+New Revision: 612
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/backend.py
+   branches/0.2.X/manager.py
+Log:
+merging moh reloading from trunk
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-02 04:08:48 UTC (rev 611)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-02 04:28:11 UTC (rev 612)
+@@ -2,6 +2,7 @@
+  * Added queueutils.py to put queue_log in an sqlite3 database.
+  * Added initial version of page_stats_queue.ptl for Queue statistics.
+  * Added misc/queue.db with initial schema to ease queue stats installation.
++* `Apply changes` relaods MoH
+ 
+ 2007-02-26:
+ * cfg_dialout_normal: adding r Dial option if no Authenticate() is used
+
+Modified: branches/0.2.X/backend.py
+===================================================================
+--- branches/0.2.X/backend.py	2007-03-02 04:08:48 UTC (rev 611)
++++ branches/0.2.X/backend.py	2007-03-02 04:28:11 UTC (rev 612)
+@@ -820,6 +820,8 @@
+ 	writeAsteriskConfig()
+ 	import manager
+ 	s = manager.reloadAsterisk()
++	if configlets.configlet_tree.hasConfiglet('CfgOptMusic'):
++		s += manager.reloadMoH()
+ 	if panelutils.isConfigured():
+ 		s += panelutils.restartPanelDaemon()
+ 	return "<br/>".join(s)
+
+Modified: branches/0.2.X/manager.py
+===================================================================
+--- branches/0.2.X/manager.py	2007-03-02 04:08:48 UTC (rev 611)
++++ branches/0.2.X/manager.py	2007-03-02 04:28:11 UTC (rev 612)
+@@ -636,6 +636,9 @@
+ def reloadAsterisk():
+ 	return conn.action('Command', Command='reload')
+ 
++def reloadMoH():
++	return conn.action('Command', Command='moh reload')
++
+ if __name__ == '__main__':
+ 	connect()
+ 	if not isConnected():
+
+
+
+From admin at berlios.de  Thu Mar  1 22:07:00 2007
+From: admin at berlios.de (admin at berlios.de)
+Date: Thu, 1 Mar 2007 16:07:00 -0500 (COT)
+Subject: [Destar-dev] [Feature #2319] Queues statistics
+Message-ID: <200703012107.l21L70Td028509@unicorn.berlios.de>
+
+Feature Request #2319, was updated on 2006-Jun-21 22:45
+You can respond by visiting: 
+http://developer.berlios.de/feature/?func=detailfeature&feature_id=2319&group_id=2112
+
+Category: None
+Status: Open
+Priority: 9
+Summary: Queues statistics
+
+By: alerios
+Date: 2007-Mar-01 16:06
+
+Message:
+Logged In: YES 
+user_id=11067
+Browser: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.1) Gecko/20061205 Iceweasel/2.0.0.1 (Debian-2.0.0.1+dfsg-2)
+
+Initial version on branches/0.2.X  rev 609.  When I finish
+all related fetures I'll merge the changes into trunk.
+
+----------------------------------------------------------------------
+
+By: alerios
+Date: 2007-Feb-08 12:33
+
+Message:
+Logged In: YES 
+user_id=11067
+Browser: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.1) Gecko/20061205 Iceweasel/2.0.0.1 (Debian-2.0.0.1+dfsg-2)
+
+I started to work on this new feature.
+
+----------------------------------------------------------------------
+You can respond by visiting: 
+http://developer.berlios.de/feature/?func=detailfeature&feature_id=2319&group_id=2112
+
+
+From admin at berlios.de  Thu Mar  1 23:19:26 2007
+From: admin at berlios.de (admin at berlios.de)
+Date: Thu, 1 Mar 2007 17:19:26 -0500 (COT)
+Subject: [Destar-dev] [Feature #2667] Upgrade to Quixote2
+Message-ID: <200703012219.l21MJQPb019588@unicorn.berlios.de>
+
+Feature Request #2667, was updated on 2006-Sep-18 10:51
+You can respond by visiting: 
+http://developer.berlios.de/feature/?func=detailfeature&feature_id=2667&group_id=2112
+
+Category: None
+Status: Closed
+Priority: 5
+Summary: Upgrade to Quixote2
+
+By: santiago
+Date: 2007-Mar-01 17:19
+
+Message:
+Logged In: YES 
+user_id=13352
+Browser: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1) Gecko/20061024 Iceweasel/2.0 (Debian-2.0+dfsg-1)
+
+trunk is working with quixote2 right now
+
+----------------------------------------------------------------------
+
+By: dasenjo
+Date: 2006-Sep-18 10:51
+
+Message:
+Logged In: YES 
+user_id=13402
+Browser: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.0.6) Gecko/20060728 Firefox/1.5.0.6 (Debian-1.5.dfsg+1.5.0.6-4~bpo.1)
+
+Destar uses a very old version of quixote. Quixote 2.4,
+the most recent stable version, was released on 2005-12-13.
+
+Bug reported by alerios closed and replaced by this.
+
+----------------------------------------------------------------------
+You can respond by visiting: 
+http://developer.berlios.de/feature/?func=detailfeature&feature_id=2667&group_id=2112
+
+
+From alerios at mail.berlios.de  Fri Mar  2 17:58:06 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Fri, 2 Mar 2007 17:58:06 +0100
+Subject: [Destar-dev] r613 - branches/0.2.X
+Message-ID: <200703021658.l22Gw6Cv019045@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-02 17:58:06 +0100 (Fri, 02 Mar 2007)
+New Revision: 613
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/page_stats_queue.ptl
+Log:
+ * Improved page_stats_queue.ptl:
+         - Refactored field processing code.
+	 - Added general completed calls stats.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-02 04:28:11 UTC (rev 612)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-02 16:58:06 UTC (rev 613)
+@@ -1,3 +1,8 @@
++2007-03-02:
++ * Improved page_stats_queue.ptl:
++ 	- Refactored field processing code.
++	- Added general completed calls stats.
++
+ 2007-03-01:
+  * Added queueutils.py to put queue_log in an sqlite3 database.
+  * Added initial version of page_stats_queue.ptl for Queue statistics.
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-03-02 04:28:11 UTC (rev 612)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-02 16:58:06 UTC (rev 613)
+@@ -94,72 +94,13 @@
+ 	where = []
+ 	where.append("date(timestamp) = date('%s')" % date)
+ 	where.append("qname = '%s'" % queue)
+-	where.append("action like 'COMPLETE%'")
++	where_completed = where + [("action like 'COMPLETE%'")]
+ 	cursor = queueutils.select(
+-				fields = ['time(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
+-				where = where,
++				fields = ['time(timestamp) as hour', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where_completed,
+ 				order=['timestamp','agent'])
+-	row = cursor.fetchone()
+-	calls_per_hour = [CallData() for i in hours]
+-	calls_by_agent = []
+-	agentnames = []
+-	total_completed = 0
+-	total_completed_by_agent = 0
+-	total_completed_by_caller = 0
+-	total_duration = 0
+-	average_duration = 0
+-	average_hodtime = 0
++	completedPerPeriod (cursor, hours, hournames)
+ 
+-	if cursor.description:
+-		fieldIndices = range(len(cursor.description))
+-	else:
+-		fieldIndices = []
+-
+-	while row:
+-		for fieldIndex in fieldIndices:
+-			c = cursor.description[fieldIndex][0]
+-			s = row[fieldIndex]
+-			if c=='time(timestamp)':
+-				hour = s.split(":")
+-				hour = int(hour[0])
+-			if c=='agent':
+-				agent = s.split("-")[0]
+-				if not agentnames.count(agent):
+-					agentnames.append(agent)
+-					calls_by_agent.insert(agentnames.index(agent), CallData())
+-			if c=='action':
+-				disposition = s
+-			if c=='info1':
+-				try:
+-					holdtime = int(s)
+-				except ValueError:
+-					holdtime = 0
+-			if c=='info2':
+-				try:
+-					calltime = int(s)
+-				except ValueError:
+-					calltime = 0
+-			if c=='info2':
+-				try:
+-					origposition = int(s)
+-				except ValueError:
+-					origposition = 0
+-		total_completed += 1
+-		calls_per_hour[hour].addQueueCall(holdtime, calltime, origposition, disposition)
+-		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+-		row = cursor.fetchone()
+-		
+-	htmltext("<h3>%s</h3>" % _("Completed Calls"))
+-	completed_table = HtmlTable(1,1)
+-	completed_table.setCell(0,0, _("Total completed calls"))
+-	completed_table.setCell(1,0, "%d" % total_completed)
+-	completed_table.getHtml(border=1)
+-
+-	htmltext("<br/><h3>%s</h3>" % _("Completed Calls by Agent"))
+-	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
+-	htmltext("<h3>%s</h3>" % _("Distribution of Completed Calls"))
+-	makeQueueCallsTable(_("Time"), calls_per_hour, hournames)
+-	
+ def perDayInMonth [plain] (month, year, queue):
+ 	
+ 	date1 = "%s-%s-01" % (year, month)
+@@ -169,63 +110,10 @@
+ 	where.append("qname = '%s'" % queue)
+ 	where.append("action like 'COMPLETE%'")
+ 	cursor = queueutils.select(
+-				fields = ['date(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				fields = ['date(timestamp) as day', 'agent', 'action', 'info1', 'info2', 'info3'],
+ 				where = where,
+ 				order=['timestamp','agent'])
+-	row = cursor.fetchone()
+-	calls_per_day = [CallData() for i in days]
+-	calls_by_agent = []
+-	agentnames = []
+-	total_completed = cursor.rowcount
+-	total_completed_by_agent = 0
+-	total_completed_by_caller = 0
+-	total_duration = 0
+-	average_duration = 0
+-	average_hodtime = 0
+-
+-	if cursor.description:
+-		fieldIndices = range(len(cursor.description))
+-	else:
+-		fieldIndices = []
+-
+-	while row:
+-		for fieldIndex in fieldIndices:
+-			c = cursor.description[fieldIndex][0]
+-			s = row[fieldIndex]
+-			if c=='date(timestamp)':
+-				day = s.split("-")
+-				day = int(day[2]) - 1
+-			if c=='agent':
+-				agent = s.split("-")[0]
+-				if not agentnames.count(agent):
+-					agentnames.append(agent)
+-					calls_by_agent.insert(agentnames.index(agent), CallData())
+-			if c=='action':
+-				disposition = s
+-			if c=='info1':
+-				try:
+-					holdtime = int(s)
+-				except ValueError:
+-					holdtime = 0
+-			if c=='info2':
+-				try:
+-					calltime = int(s)
+-				except ValueError:
+-					calltime = 0
+-			if c=='info2':
+-				try:
+-					origposition = int(s)
+-				except ValueError:
+-					origposition = 0
+-		calls_per_day[day].addQueueCall(holdtime, calltime, origposition, disposition)
+-		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+-		row = cursor.fetchone()
+-		
+-	htmltext("<h3>%s</h3>" % _("Completed Calls by Agent"))
+-	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
+-	htmltext("<h3>%s</h3>" % _("Distribution of Completed Calls"))
+-	makeQueueCallsTable(_("Day"), calls_per_day, daynames)
+-
++	completedPerPeriod (cursor, days, daynames)
+ 	
+ def perMonthInYear [plain] (year, queue):
+ 	date1 = "%s-01-01" % (year)
+@@ -235,82 +123,31 @@
+ 	where.append("qname = '%s'" % queue)
+ 	where.append("action like 'COMPLETE%'")
+ 	cursor = queueutils.select(
+-				fields = ['date(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				fields = ['date(timestamp) as month', 'agent', 'action', 'info1', 'info2', 'info3'],
+ 				where = where,
+ 				order=['timestamp','agent'])
+-	row = cursor.fetchone()
+-	calls_per_month = [CallData() for i in months]
+-	calls_by_agent = []
+-	agentnames = []
+-	total_completed = cursor.rowcount
+-	total_completed_by_agent = 0
+-	total_completed_by_caller = 0
+-	total_duration = 0
+-	average_duration = 0
+-	average_hodtime = 0
++	completedPerPeriod (cursor, months, monthnames)
+ 
+-	if cursor.description:
+-		fieldIndices = range(len(cursor.description))
+-	else:
+-		fieldIndices = []
+-
+-	while row:
+-		for fieldIndex in fieldIndices:
+-			c = cursor.description[fieldIndex][0]
+-			s = row[fieldIndex]
+-			if c=='date(timestamp)':
+-				month = s.split("-")
+-				month = int(month[1]) - 1
+-			if c=='agent':
+-				agent = s.split("-")[0]
+-				if not agentnames.count(agent):
+-					agentnames.append(agent)
+-					calls_by_agent.insert(agentnames.index(agent), CallData())
+-			if c=='action':
+-				disposition = s
+-			if c=='info1':
+-				try:
+-					holdtime = int(s)
+-				except ValueError:
+-					holdtime = 0
+-			if c=='info2':
+-				try:
+-					calltime = int(s)
+-				except ValueError:
+-					calltime = 0
+-			if c=='info2':
+-				try:
+-					origposition = int(s)
+-				except ValueError:
+-					origposition = 0
+-		calls_per_month[month].addQueueCall(holdtime, calltime, origposition, disposition)
+-		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+-		row = cursor.fetchone()
+-		
+-	htmltext("<h3>%s</h3>" % _("Completed Calls by Agent"))
+-	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
+-	htmltext("<h3>%s</h3>" % _("Distribution of Completed Calls"))
+-	makeQueueCallsTable(_("Month"), calls_per_month, monthnames)
+-
+-
+ def perYear [plain] (queue):
+ 	where = []
+ 	where.append("qname = '%s'" % queue)
+ 	where.append("action like 'COMPLETE%'")
+ 	cursor = queueutils.select(
+-				fields = ['date(timestamp)', 'agent', 'action', 'info1', 'info2', 'info3'],
++				fields = ['date(timestamp) as year', 'agent', 'action', 'info1', 'info2', 'info3'],
+ 				where = where,
+ 				order=['timestamp','agent'])
++	completedPerPeriod (cursor, years, yearnames)
++
++def completedPerPeriod [plain] (cursor, periods, periodnames):
+ 	row = cursor.fetchone()
+-	calls_per_year = [CallData() for i in years]
++	calls_per_period = [CallData() for i in periods]
+ 	calls_by_agent = []
+ 	agentnames = []
+-	total_completed = cursor.rowcount
++	total_completed = 0
+ 	total_completed_by_agent = 0
+ 	total_completed_by_caller = 0
+ 	total_duration = 0
+-	average_duration = 0
+-	average_hodtime = 0
++	total_holdtime = 0
+ 
+ 	if cursor.description:
+ 		fieldIndices = range(len(cursor.description))
+@@ -321,9 +158,18 @@
+ 		for fieldIndex in fieldIndices:
+ 			c = cursor.description[fieldIndex][0]
+ 			s = row[fieldIndex]
+-			if c=='date(timestamp)':
+-				year = s.split("-")
+-				year = int(year[0]) - startyear
++			if c=='hour':
++				period = s.split(":")
++				period = int(period[0])
++			if c=='day':
++				period = s.split("-")
++				period = int(period[2]) - 1
++			if c=='month':
++				period = s.split("-")
++				period = int(period[1]) - 1
++			if c=='year':
++				period = s.split("-")
++				period = int(period[0]) - startyear
+ 			if c=='agent':
+ 				agent = s.split("-")[0]
+ 				if not agentnames.count(agent):
+@@ -331,6 +177,10 @@
+ 					calls_by_agent.insert(agentnames.index(agent), CallData())
+ 			if c=='action':
+ 				disposition = s
++				if disposition == "COMPLETEAGENT":
++					total_completed_by_agent += 1
++				if disposition == "COMPLETECALLER":
++					total_completed_by_caller += 1
+ 			if c=='info1':
+ 				try:
+ 					holdtime = int(s)
+@@ -346,15 +196,36 @@
+ 					origposition = int(s)
+ 				except ValueError:
+ 					origposition = 0
+-		calls_per_year[year].addQueueCall(holdtime, calltime, origposition, disposition)
++		total_duration += calltime
++		total_holdtime += holdtime
++		calls_per_period [period].addQueueCall(holdtime, calltime, origposition, disposition)
+ 		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+ 		row = cursor.fetchone()
+-		
+-	htmltext("<h3>%s</h3>" % _("Completed Calls by Agent"))
++
++	makeCompletedTable(total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime)
++
++	htmltext("<br/><h3>%s</h3>" % _("Completed Calls by Agent"))
+ 	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
+ 	htmltext("<h3>%s</h3>" % _("Distribution of Completed Calls"))
+-	makeQueueCallsTable(_("Year"), calls_per_year, yearnames)
++	makeQueueCallsTable(_("Period"), calls_per_period, periodnames)
+ 
++def makeCompletedTable [plain] (total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime):
++	total_completed = total_completed_by_agent + total_completed_by_caller
++	htmltext("<h3>%s</h3>" % _("Completed Calls"))
++	completed_table = HtmlTable(1,1)
++	completed_table.setCell(0,0, _("Total completed calls"))
++	completed_table.setCell(1,0, "%d" % total_completed)
++	completed_table.setCell(0,1, _("Calls terminated by agents"))
++	completed_table.setCell(1,1, "%d" % total_completed_by_agent)
++	completed_table.setCell(0,2, _("Calls terminated by caller"))
++	completed_table.setCell(1,2, "%d" % total_completed_by_caller)
++	completed_table.setCell(0,3, _("Total call duration"))
++	completed_table.setCell(1,3, "%d" % total_duration)
++	completed_table.setCell(0,4, _("Average call duration"))
++	completed_table.setCell(1,4, "%d" % (total_completed and (total_duration / total_completed) or 0))
++	completed_table.setCell(0,5, _("Average hold time"))
++	completed_table.setCell(1,5, "%d" % (total_completed and (total_holdtime / total_completed) or 0))
++	completed_table.getHtml(border=1)
+ 	
+ def showResults [plain] (day, month, year, queue):
+ 	all = N_("All")
+
+
+
+From alerios at mail.berlios.de  Fri Mar  2 20:21:33 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Fri, 2 Mar 2007 20:21:33 +0100
+Subject: [Destar-dev] r614 - branches/0.2.X
+Message-ID: <200703021921.l22JLXqX009723@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-02 20:21:32 +0100 (Fri, 02 Mar 2007)
+New Revision: 614
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/StatsHelper.ptl
+   branches/0.2.X/page_stats_queue.ptl
+   branches/0.2.X/queueutils.py
+Log:
+- Added stats for uncompletted queue calls.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-02 16:58:06 UTC (rev 613)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-02 19:21:32 UTC (rev 614)
+@@ -2,6 +2,7 @@
+  * Improved page_stats_queue.ptl:
+  	- Refactored field processing code.
+ 	- Added general completed calls stats.
++	- Added uncompleted calls stats.
+ 
+ 2007-03-01:
+  * Added queueutils.py to put queue_log in an sqlite3 database.
+
+Modified: branches/0.2.X/StatsHelper.ptl
+===================================================================
+--- branches/0.2.X/StatsHelper.ptl	2007-03-02 16:58:06 UTC (rev 613)
++++ branches/0.2.X/StatsHelper.ptl	2007-03-02 19:21:32 UTC (rev 614)
+@@ -45,8 +45,7 @@
+ 		self.holdtime = 0
+ 		self.completed_by_agent = 0
+ 		self.completed_by_caller = 0
+-		self.dumped = 0
+-		self.abandon = 0
++		self.uncompleted = 0
+ 
+ 	
+ 	def addCall(self, seconds, cost_per_minute, disp):
+@@ -67,21 +66,18 @@
+ 		elif disp == "FAILED":
+ 			self.failed += 1
+ 	
+-	def addQueueCall(self, holdtime, calltime, origposition, disp):
++	def addQueueCall(self, holdtime=0, calltime=0, disp):
+ 		self.calls_number += 1
+ 		self.seconds += int(calltime)
+ 		self.holdtime += int(holdtime)
+-		self.origposition = origposition
+ 		if disp == "COMPLETEAGENT":
+ 			self.completed_by_agent += 1
+ 		elif disp == "COMPLETECALLER":
+ 			self.completed_by_caller += 1
+-		elif disp == "AGENTDUMP":
+-			self.dumped += 1
+-		elif disp == "ABANDON":
+-			self.abandon += 1
++		elif disp == "uncompleted":
++			self.uncompleted += 1
+ 
+-	def addAgentCall(self, holdtime, calltime):
++	def addAgentCall(self, holdtime=0, calltime=0):
+ 		self.calls_number += 1
+ 		self.seconds += int(calltime)
+ 		self.holdtime += int(holdtime)
+@@ -160,7 +156,8 @@
+ 		'</tr>\n'
+ 	'</table>\n<br/>'
+ 
+-def makeAgentCallsTable [plain] (label, calls, names):
++#def makeAgentCallsTable [plain] (label, names, completed, dumped, transfered):
++def makeAgentCallsTable [plain] (label, completed, dumped, names):
+ 	'<table border="1"> \n'
+ 	'<tr> <td><b>'+ label
+ 	'</b></td><td><b>'+_(str("Number of Calls"))
+@@ -171,21 +168,29 @@
+ 	#'</b></td><td><b>'+_(str("% Avg. Call Duration"))
+ 	#'</b></td><td><b>'+_(str("Transfered Calls"))
+ 	#'</b></td><td><b>'+_(str("% Transfered Calls"))
++	'</b></td><td><b>'+_(str("Dumped Calls"))
++	#'</b></td><td><b>'+_(str("% Dumped Calls"))
+ 	'</b></td></tr>\n'
+-	for i in range(len(calls)):
++	for i in range(len(names)):
+ 		'<tr>'
+ 		"<td>%s</td>" % names[i]
+-		"<td>%d</td>" % calls[i].calls_number
+-		"<td>%d</td>" % (calls[i].calls_number and (calls[i].holdtime / calls[i].calls_number) or 0)
+-		"<td>%d</td>" % (calls[i].calls_number and (calls[i].seconds / calls[i].calls_number) or 0)
++		"<td>%d</td>" % completed[i].calls_number
++		"<td>%d</td>" % (completed[i].calls_number and (completed[i].holdtime / completed[i].calls_number) or 0)
++		"<td>%d</td>" % (completed[i].calls_number and (completed[i].seconds / completed[i].calls_number) or 0)
++		if i < len(dumped):
++			"<td>%d</td>" % dumped[i].calls_number
++		else:
++			"<td>0</td>" 
+ 		'</tr>\n'
+ 	'</table>\n<br/>'
+ 
+-def makeQueueCallsTable [plain] (label, calls, names):
++def makeQueueCallsTable [plain] (label, completed, uncompleted, names):
+ 	'<table border="1"> \n'
+ 	'<tr> <td><b>'+ label
+-	'</b></td><td><b>'+_(str("Number of Calls"))
+-	#'</b></td><td><b>'+_(str("% Number of Calls"))
++	'</b></td><td><b>'+_(str("Completed Calls"))
++	#'</b></td><td><b>'+_(str("% Completed"))
++	'</b></td><td><b>'+_(str("Uncompleted Calls"))
++	#'</b></td><td><b>'+_(str("% Uncompleted"))
+ 	'</b></td><td><b>'+_(str("Avg. Hold Time"))
+ 	#'</b></td><td><b>'+_(str("% Avg. Hold Time"))
+ 	'</b></td><td><b>'+_(str("Avg. Call Duration"))
+@@ -193,12 +198,13 @@
+ 	#'</b></td><td><b>'+_(str("Transfered Calls"))
+ 	#'</b></td><td><b>'+_(str("% Transfered Calls"))
+ 	'</b></td></tr>\n'
+-	for i in range(len(calls)):
++	for i in range(len(names)):
+ 		'<tr>'
+ 		"<td>%s</td>" % names[i]
+-		"<td>%d</td>" % calls[i].calls_number
+-		"<td>%d</td>" % (calls[i].calls_number and (calls[i].holdtime / calls[i].calls_number) or 0)
+-		"<td>%d</td>" % (calls[i].calls_number and (calls[i].seconds / calls[i].calls_number) or 0)
++		"<td>%d</td>" % completed[i].calls_number
++		"<td>%d</td>" % uncompleted[i].calls_number
++		"<td>%d</td>" % (completed[i].calls_number and (completed[i].holdtime / completed[i].calls_number) or 0)
++		"<td>%d</td>" % (completed[i].calls_number and (completed[i].seconds / completed[i].calls_number) or 0)
+ 		'</tr>\n'
+ 	'</table>\n<br/>'
+ 
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-03-02 16:58:06 UTC (rev 613)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-02 19:21:32 UTC (rev 614)
+@@ -99,8 +99,34 @@
+ 				fields = ['time(timestamp) as hour', 'agent', 'action', 'info1', 'info2', 'info3'],
+ 				where = where_completed,
+ 				order=['timestamp','agent'])
+-	completedPerPeriod (cursor, hours, hournames)
++	completed = completedPerPeriod (cursor, hours, hournames)
+ 
++	where_uncompleted = where + [("( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)")]
++	cursor = queueutils.select(
++				fields = ['time(timestamp) as hour', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where_uncompleted,
++				order=['timestamp','agent'])
++	uncompleted = uncompletedPerPeriod (cursor, hours, hournames, agentnames = completed[2])
++
++	htmltext("<p>%s: %s</p>" % (_("Period"), date))
++
++	htmltext("<br/><h3>%s</h3>" % _("Completed Calls"))
++	completed[3].getHtml(border=1)
++
++	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
++	uncompleted[3].getHtml(border=1)
++
++	htmltext("<br/><h3>%s</h3>" % _("Distribution by Agent"))
++	#Here we use the same agentnames list of completed calls to allow data consolitation
++	makeAgentCallsTable(_("Agent"), completed[1], uncompleted[1], names=uncompleted[2])
++
++	htmltext("<h3>%s</h3>" % _("Distribution by Hour"))
++	makeQueueCallsTable(_("Hour"), completed[0], uncompleted[0], hournames)
++
+ def perDayInMonth [plain] (month, year, queue):
+ 	
+ 	date1 = "%s-%s-01" % (year, month)
+@@ -108,12 +134,39 @@
+ 	where = []
+ 	where.append("date(timestamp) between date('%s') and date('%s')" % (date1, date2))
+ 	where.append("qname = '%s'" % queue)
+-	where.append("action like 'COMPLETE%'")
++	where_completed = where + [("action like 'COMPLETE%'")]
+ 	cursor = queueutils.select(
+ 				fields = ['date(timestamp) as day', 'agent', 'action', 'info1', 'info2', 'info3'],
+-				where = where,
++				where = where_completed,
+ 				order=['timestamp','agent'])
+-	completedPerPeriod (cursor, days, daynames)
++	completed = completedPerPeriod (cursor, days, daynames)
++
++	where_uncompleted = where + [("( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)")]
++	cursor = queueutils.select(
++				fields = ['date(timestamp) as day', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where_uncompleted,
++				order=['timestamp','agent'])
++	uncompleted = uncompletedPerPeriod (cursor, days, daynames, agentnames = completed[2])
++
++	htmltext("<p>%s: %s to %s</p>" % (_("Period"), date1, date2))
++
++	htmltext("<br/><h3>%s</h3>" % _("Completed Calls"))
++	completed[3].getHtml(border=1)
++
++	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
++	uncompleted[3].getHtml(border=1)
++
++	htmltext("<br/><h3>%s</h3>" % _("Distribution by Agent"))
++	#Here we use the same agentnames list of completed calls to allow data consolitation
++	makeAgentCallsTable(_("Agent"), completed[1], uncompleted[1], names=uncompleted[2])
++
++	htmltext("<h3>%s</h3>" % _("Distribution by Days"))
++	makeQueueCallsTable(_("Day"), completed[0], uncompleted[0], daynames)
++
+ 	
+ def perMonthInYear [plain] (year, queue):
+ 	date1 = "%s-01-01" % (year)
+@@ -121,29 +174,82 @@
+ 	where = []
+ 	where.append("date(timestamp) between date('%s') and date('%s')" % (date1, date2))
+ 	where.append("qname = '%s'" % queue)
+-	where.append("action like 'COMPLETE%'")
++	where_completed = where + [("action like 'COMPLETE%'")]
+ 	cursor = queueutils.select(
+ 				fields = ['date(timestamp) as month', 'agent', 'action', 'info1', 'info2', 'info3'],
+ 				where = where,
+ 				order=['timestamp','agent'])
+-	completedPerPeriod (cursor, months, monthnames)
++	completed = completedPerPeriod (cursor, months, monthnames)
+ 
++	where_uncompleted = where + [("( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)")]
++	cursor = queueutils.select(
++				fields = ['date(timestamp) as month', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where_uncompleted,
++				order=['timestamp','agent'])
++	uncompleted = uncompletedPerPeriod (cursor, months, monthnames, agentnames = completed[2])
++
++	htmltext("<p>%s: %s to %s</p>" % (_("Period"), date1, date2))
++
++	htmltext("<br/><h3>%s</h3>" % _("Completed Calls"))
++	completed[3].getHtml(border=1)
++
++	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
++	uncompleted[3].getHtml(border=1)
++
++	htmltext("<br/><h3>%s</h3>" % _("Distribution by Agent"))
++	#Here we use the same agentnames list of completed calls to allow data consolitation
++	makeAgentCallsTable(_("Agent"), completed[1], uncompleted[1], names=uncompleted[2])
++
++	htmltext("<h3>%s</h3>" % _("Distribution by Month"))
++	makeQueueCallsTable(_("Month"), completed[0], uncompleted[0], monthnames)
++
++
+ def perYear [plain] (queue):
+ 	where = []
+ 	where.append("qname = '%s'" % queue)
+-	where.append("action like 'COMPLETE%'")
++	where_completed = where + [("action like 'COMPLETE%'")]
+ 	cursor = queueutils.select(
+ 				fields = ['date(timestamp) as year', 'agent', 'action', 'info1', 'info2', 'info3'],
+ 				where = where,
+ 				order=['timestamp','agent'])
+-	completedPerPeriod (cursor, years, yearnames)
++	completed = completedPerPeriod (cursor, years, yearnames)
+ 
++	where_uncompleted = where + [("( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)")]
++	cursor = queueutils.select(
++				fields = ['date(timestamp) as year', 'agent', 'action', 'info1', 'info2', 'info3'],
++				where = where_uncompleted,
++				order=['timestamp','agent'])
++	uncompleted = uncompletedPerPeriod (cursor, years, yearnames, agentnames = completed[2])
++
++	htmltext("<p>%s: %s</p>" % (_("Period"), _("All Years")))
++
++	htmltext("<br/><h3>%s</h3>" % _("Completed Calls"))
++	completed[3].getHtml(border=1)
++
++	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
++	uncompleted[3].getHtml(border=1)
++
++	htmltext("<br/><h3>%s</h3>" % _("Distribution by Agent"))
++	#Here we use the same agentnames list of completed calls to allow data consolitation
++	makeAgentCallsTable(_("Agent"), completed[1], uncompleted[1], names=uncompleted[2])
++
++	htmltext("<h3>%s</h3>" % _("Distribution by Year"))
++	makeQueueCallsTable(_("Year"), completed[0], uncompleted[0], yearnames)
++
++
+ def completedPerPeriod [plain] (cursor, periods, periodnames):
+ 	row = cursor.fetchone()
+ 	calls_per_period = [CallData() for i in periods]
+ 	calls_by_agent = []
+ 	agentnames = []
+-	total_completed = 0
+ 	total_completed_by_agent = 0
+ 	total_completed_by_caller = 0
+ 	total_duration = 0
+@@ -198,35 +304,114 @@
+ 					origposition = 0
+ 		total_duration += calltime
+ 		total_holdtime += holdtime
+-		calls_per_period [period].addQueueCall(holdtime, calltime, origposition, disposition)
++		calls_per_period [period].addQueueCall(holdtime, calltime, disposition)
+ 		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+ 		row = cursor.fetchone()
+ 
+-	makeCompletedTable(total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime)
++	table = makeCompletedTable(total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime)
+ 
+-	htmltext("<br/><h3>%s</h3>" % _("Completed Calls by Agent"))
+-	makeAgentCallsTable(_("Agent"), calls_by_agent, agentnames)
+-	htmltext("<h3>%s</h3>" % _("Distribution of Completed Calls"))
+-	makeQueueCallsTable(_("Period"), calls_per_period, periodnames)
++	return [calls_per_period, calls_by_agent, agentnames, table]
++	
++def uncompletedPerPeriod [plain] (cursor, periods, periodnames, agentnames):
++	row = cursor.fetchone()
++	calls_per_period = [CallData() for i in periods]
++	calls_by_agent = []
++	total_dumped_by_agent = 0
++	total_abandoned_by_caller = 0
++	total_exited_with_key = 0
++	total_timed_out = 0
++	total_waittime = 0
++	total_position = 0
+ 
++	while row:
++		# Period
++		c = cursor.description[0][0]
++		s = row[0]
++		if c=='hour':
++			period = s.split(":")
++			period = int(period[0])
++		if c=='day':
++			period = s.split("-")
++			period = int(period[2]) - 1
++		if c=='month':
++			period = s.split("-")
++			period = int(period[1]) - 1
++		if c=='year':
++			period = s.split("-")
++			period = int(period[0]) - startyear
++		# Action
++		disposition = row[2]
++		if disposition == "ABANDON":
++			total_abandoned_by_caller += 1
++			total_waittime += int(row[5]) # (info3)
++			total_position += int(row[3]) # (info1)
++		if disposition == "AGENTDUMP":
++			total_dumped_by_agent += 1
++			agent = row[1].split("-")[0]
++			if not agentnames.count(agent):
++				agentnames.append(agent)
++				calls_by_agent.insert(agentnames.index(agent), CallData())
++			calls_by_agent[agentnames.index(agent)].addAgentCall(0,0)
++		if disposition == "EXITWITHKEY":
++			total_exited_with_key += 1
++			total_position += int(row[4]) # (info2)
++		if disposition == "EXITWITHTIMEOUT":
++			total_timed_out += 1
++			total_position += int(row[3]) # (info1)
++
++		calls_per_period [period].addQueueCall(0,0,disp = "uncompleted")
++		row = cursor.fetchone()
++
++	table = makeUncompletedTable (total_dumped_by_agent,
++				total_abandoned_by_caller,
++				total_exited_with_key,
++				total_timed_out,
++				total_waittime,
++				total_position)
++
++	return [calls_per_period, calls_by_agent, agentnames, table]
++
+ def makeCompletedTable [plain] (total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime):
+ 	total_completed = total_completed_by_agent + total_completed_by_caller
+-	htmltext("<h3>%s</h3>" % _("Completed Calls"))
+-	completed_table = HtmlTable(1,1)
+-	completed_table.setCell(0,0, _("Total completed calls"))
+-	completed_table.setCell(1,0, "%d" % total_completed)
+-	completed_table.setCell(0,1, _("Calls terminated by agents"))
+-	completed_table.setCell(1,1, "%d" % total_completed_by_agent)
+-	completed_table.setCell(0,2, _("Calls terminated by caller"))
+-	completed_table.setCell(1,2, "%d" % total_completed_by_caller)
+-	completed_table.setCell(0,3, _("Total call duration"))
+-	completed_table.setCell(1,3, "%d" % total_duration)
+-	completed_table.setCell(0,4, _("Average call duration"))
+-	completed_table.setCell(1,4, "%d" % (total_completed and (total_duration / total_completed) or 0))
+-	completed_table.setCell(0,5, _("Average hold time"))
+-	completed_table.setCell(1,5, "%d" % (total_completed and (total_holdtime / total_completed) or 0))
+-	completed_table.getHtml(border=1)
++	table = HtmlTable(1,1)
++	table.setCell(0,0, _("Total completed calls"))
++	table.setCell(1,0, "%d" % total_completed)
++	table.setCell(0,1, _("Calls terminated by agents"))
++	table.setCell(1,1, "%d" % total_completed_by_agent)
++	table.setCell(0,2, _("Calls terminated by caller"))
++	table.setCell(1,2, "%d" % total_completed_by_caller)
++	table.setCell(0,3, _("Total call duration"))
++	table.setCell(1,3, "%d" % total_duration)
++	table.setCell(0,4, _("Average call duration"))
++	table.setCell(1,4, "%d" % (total_completed and (total_duration / total_completed) or 0))
++	table.setCell(0,5, _("Average hold time"))
++	table.setCell(1,5, "%d" % (total_completed and (total_holdtime / total_completed) or 0))
++	return table
+ 	
++def makeUncompletedTable [plain] (
++				total_dumped_by_agent,
++				total_abandoned_by_caller,
++				total_exited_with_key,
++				total_timed_out,
++				total_waittime,
++				total_position):
++	total_uncompleted = total_dumped_by_agent + total_abandoned_by_caller + total_timed_out + total_exited_with_key
++	table = HtmlTable(1,1)
++	table.setCell(0,0, _("Total uncompleted calls"))
++	table.setCell(1,0, "%d" % total_uncompleted)
++	table.setCell(0,1, _("Calls dumped by agents"))
++	table.setCell(1,1, "%d" % total_dumped_by_agent)
++	table.setCell(0,2, _("Calls abandoned by caller"))
++	table.setCell(1,2, "%d" % (total_abandoned_by_caller+total_exited_with_key))
++	table.setCell(0,3, _("Calls timed out"))
++	table.setCell(1,3, "%d" % total_timed_out)
++	table.setCell(0,4, _("Average waiting time"))
++	table.setCell(1,4, "%d" % (total_abandoned_by_caller and (total_waittime / total_abandoned_by_caller) or 0))
++	table.setCell(0,5, _("Average position at abandon time"))
++	total_positioned = total_abandoned_by_caller + total_exited_with_key + total_timed_out
++	table.setCell(1,5, "%d" % (total_positioned and (total_position / total_positioned) or 0))
++	return table
++
+ def showResults [plain] (day, month, year, queue):
+ 	all = N_("All")
+ 	if day != all and month != all and year != all:
+
+Modified: branches/0.2.X/queueutils.py
+===================================================================
+--- branches/0.2.X/queueutils.py	2007-03-02 16:58:06 UTC (rev 613)
++++ branches/0.2.X/queueutils.py	2007-03-02 19:21:32 UTC (rev 614)
+@@ -140,6 +140,7 @@
+ 		if offset:
+ 			sql.append('OFFSET %d' % offset)
+ 
++	#print ' '.join(sql) 
+ 	cursor.execute( ' '.join(sql) )
+ 	return cursor
+ 
+
+
+
+From alerios at mail.berlios.de  Fri Mar  2 23:46:47 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Fri, 2 Mar 2007 23:46:47 +0100
+Subject: [Destar-dev] r615 - branches/0.2.X
+Message-ID: <200703022246.l22Mkl7d023569@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-02 23:46:46 +0100 (Fri, 02 Mar 2007)
+New Revision: 615
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/StatsHelper.ptl
+   branches/0.2.X/page_stats_queue.ptl
+Log:
+- Added service level table.
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-02 19:21:32 UTC (rev 614)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-02 22:46:46 UTC (rev 615)
+@@ -3,6 +3,7 @@
+  	- Refactored field processing code.
+ 	- Added general completed calls stats.
+ 	- Added uncompleted calls stats.
++	- Added service level table.
+ 
+ 2007-03-01:
+  * Added queueutils.py to put queue_log in an sqlite3 database.
+
+Modified: branches/0.2.X/StatsHelper.ptl
+===================================================================
+--- branches/0.2.X/StatsHelper.ptl	2007-03-02 19:21:32 UTC (rev 614)
++++ branches/0.2.X/StatsHelper.ptl	2007-03-02 22:46:46 UTC (rev 615)
+@@ -66,7 +66,7 @@
+ 		elif disp == "FAILED":
+ 			self.failed += 1
+ 	
+-	def addQueueCall(self, holdtime=0, calltime=0, disp):
++	def addQueueCall(self, holdtime=0, calltime=0, disp=""):
+ 		self.calls_number += 1
+ 		self.seconds += int(calltime)
+ 		self.holdtime += int(holdtime)
+@@ -77,11 +77,6 @@
+ 		elif disp == "uncompleted":
+ 			self.uncompleted += 1
+ 
+-	def addAgentCall(self, holdtime=0, calltime=0):
+-		self.calls_number += 1
+-		self.seconds += int(calltime)
+-		self.holdtime += int(holdtime)
+-
+ 	def asignPattern(self, pat):
+ 		self.pattern = re.compile(pat.replace('X','[0-9]'))
+ 	
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-03-02 19:21:32 UTC (rev 614)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-02 22:46:46 UTC (rev 615)
+@@ -117,6 +117,9 @@
+ 	htmltext("<br/><h3>%s</h3>" % _("Completed Calls"))
+ 	completed[3].getHtml(border=1)
+ 
++	htmltext("<br/><h3>%s</h3>" % _("Service Level"))
++	completed[4].getHtml(border=1)
++
+ 	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
+ 	uncompleted[3].getHtml(border=1)
+ 
+@@ -157,6 +160,9 @@
+ 	htmltext("<br/><h3>%s</h3>" % _("Completed Calls"))
+ 	completed[3].getHtml(border=1)
+ 
++	htmltext("<br/><h3>%s</h3>" % _("Service Level"))
++	completed[4].getHtml(border=1)
++
+ 	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
+ 	uncompleted[3].getHtml(border=1)
+ 
+@@ -177,7 +183,7 @@
+ 	where_completed = where + [("action like 'COMPLETE%'")]
+ 	cursor = queueutils.select(
+ 				fields = ['date(timestamp) as month', 'agent', 'action', 'info1', 'info2', 'info3'],
+-				where = where,
++				where = where_completed,
+ 				order=['timestamp','agent'])
+ 	completed = completedPerPeriod (cursor, months, monthnames)
+ 
+@@ -197,6 +203,9 @@
+ 	htmltext("<br/><h3>%s</h3>" % _("Completed Calls"))
+ 	completed[3].getHtml(border=1)
+ 
++	htmltext("<br/><h3>%s</h3>" % _("Service Level"))
++	completed[4].getHtml(border=1)
++
+ 	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
+ 	uncompleted[3].getHtml(border=1)
+ 
+@@ -214,7 +223,7 @@
+ 	where_completed = where + [("action like 'COMPLETE%'")]
+ 	cursor = queueutils.select(
+ 				fields = ['date(timestamp) as year', 'agent', 'action', 'info1', 'info2', 'info3'],
+-				where = where,
++				where = where_completed,
+ 				order=['timestamp','agent'])
+ 	completed = completedPerPeriod (cursor, years, yearnames)
+ 
+@@ -234,6 +243,9 @@
+ 	htmltext("<br/><h3>%s</h3>" % _("Completed Calls"))
+ 	completed[3].getHtml(border=1)
+ 
++	htmltext("<br/><h3>%s</h3>" % _("Service Level"))
++	completed[4].getHtml(border=1)
++
+ 	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
+ 	uncompleted[3].getHtml(border=1)
+ 
+@@ -254,6 +266,8 @@
+ 	total_completed_by_caller = 0
+ 	total_duration = 0
+ 	total_holdtime = 0
++	holdtimes = ['< 15','< 30','< 45','< 60','< 75','< 90','>= 90']
++	calls_per_holdtime = [CallData() for i in holdtimes]
+ 
+ 	if cursor.description:
+ 		fieldIndices = range(len(cursor.description))
+@@ -278,7 +292,7 @@
+ 				period = int(period[0]) - startyear
+ 			if c=='agent':
+ 				agent = s.split("-")[0]
+-				if not agentnames.count(agent):
++				if not agentnames.count(agent) and agent != "NONE":
+ 					agentnames.append(agent)
+ 					calls_by_agent.insert(agentnames.index(agent), CallData())
+ 			if c=='action':
+@@ -305,12 +319,17 @@
+ 		total_duration += calltime
+ 		total_holdtime += holdtime
+ 		calls_per_period [period].addQueueCall(holdtime, calltime, disposition)
+-		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
++		if holdtime / 15 > 5 : 
++			calls_per_holdtime[6].addQueueCall(0,0,"")
++		else: 
++			calls_per_holdtime[holdtime/15].addQueueCall(0,0,"")
++		calls_by_agent[agentnames.index(agent)].addQueueCall(holdtime, calltime, "")
+ 		row = cursor.fetchone()
+ 
+-	table = makeCompletedTable(total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime)
++	completed_table = makeCompletedTable(total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime)
++	service_table = makeServiceTable((total_completed_by_agent + total_completed_by_caller), calls_per_holdtime, holdtimes)
+ 
+-	return [calls_per_period, calls_by_agent, agentnames, table]
++	return [calls_per_period, calls_by_agent, agentnames, completed_table, service_table]
+ 	
+ def uncompletedPerPeriod [plain] (cursor, periods, periodnames, agentnames):
+ 	row = cursor.fetchone()
+@@ -351,7 +370,7 @@
+ 			if not agentnames.count(agent):
+ 				agentnames.append(agent)
+ 				calls_by_agent.insert(agentnames.index(agent), CallData())
+-			calls_by_agent[agentnames.index(agent)].addAgentCall(0,0)
++			calls_by_agent[agentnames.index(agent)].addQueueCall(0,0,"")
+ 		if disposition == "EXITWITHKEY":
+ 			total_exited_with_key += 1
+ 			total_position += int(row[4]) # (info2)
+@@ -412,6 +431,19 @@
+ 	table.setCell(1,5, "%d" % (total_positioned and (total_position / total_positioned) or 0))
+ 	return table
+ 
++def makeServiceTable [plain] (total_completed, calls_per_holdtime, holdtimes):
++	table = HtmlTable(1,1)
++	table.setCell(0,0, _("Time of answer"))
++	table.setCell(1,0, _("Number of calls"))
++	table.setCell(2,0, _("% of Total Calls"))
++	y = 1
++	for i in range(len(holdtimes)):
++		table.setCell(0,y, "%s" % holdtimes[i])
++		table.setCell(1,y, "%d" % calls_per_holdtime[i].calls_number)
++		table.setCell(2,y, "%f" % (total_completed and (float(calls_per_holdtime[i].calls_number)*100 / float(total_completed)) or 0))
++		y += 1
++	return table
++
+ def showResults [plain] (day, month, year, queue):
+ 	all = N_("All")
+ 	if day != all and month != all and year != all:
+
+
+
+From alerios at mail.berlios.de  Fri Mar  2 23:52:10 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Fri, 2 Mar 2007 23:52:10 +0100
+Subject: [Destar-dev] r616 - branches/0.2.X
+Message-ID: <200703022252.l22MqAYv023945@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-02 23:52:10 +0100 (Fri, 02 Mar 2007)
+New Revision: 616
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/StatsHelper.ptl
+Log:
+ * Removed depricated methods from StatsHelper.ptl
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-02 22:46:46 UTC (rev 615)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-02 22:52:10 UTC (rev 616)
+@@ -1,9 +1,10 @@
+ 2007-03-02:
+- * Improved page_stats_queue.ptl:
++ * Improved Queue statistics:
+  	- Refactored field processing code.
+ 	- Added general completed calls stats.
+ 	- Added uncompleted calls stats.
+ 	- Added service level table.
++ * Removed depricated method from StatsHelper.ptl
+ 
+ 2007-03-01:
+  * Added queueutils.py to put queue_log in an sqlite3 database.
+
+Modified: branches/0.2.X/StatsHelper.ptl
+===================================================================
+--- branches/0.2.X/StatsHelper.ptl	2007-03-02 22:46:46 UTC (rev 615)
++++ branches/0.2.X/StatsHelper.ptl	2007-03-02 22:52:10 UTC (rev 616)
+@@ -37,10 +37,6 @@
+ 		self.not_answered = 0
+ 		self.busy = 0
+ 		self.failed = 0
+-		self.pattern = None
+-		self.name = None
+-		self.group = None
+-		self.host = None
+ 		self.seconds = 0
+ 		self.holdtime = 0
+ 		self.completed_by_agent = 0
+@@ -77,37 +73,7 @@
+ 		elif disp == "uncompleted":
+ 			self.uncompleted += 1
+ 
+-	def asignPattern(self, pat):
+-		self.pattern = re.compile(pat.replace('X','[0-9]'))
+-	
+-	def match(self, pat):
+-		return self.pattern.match(pat)
+-	
+-	def isIncommingCall(self, dcontext):
+-		pat = re.compile('in-(.*)')
+-		match = pat.match(dcontext)
+-		if match:
+-			if self.name == match.group(1):
+-				return True
+-	
+-		return False
+-	
+-	def isOutgoingCall(self, lastdata):
+-		patZap = re.compile('Zap/g([0-9]+)/.*')
+-		patIax = re.compile('IAX2/([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})/.*')
+-		
+-		match = patZap.match(lastdata)
+-		if match:
+-			if str(self.group) == match.group(1):
+-				return True
+-		
+-		match = patIax.match(lastdata)
+-		if match:
+-			if str(self.host) == match.group(1):
+-				return True
+ 
+-		return False
+-
+ startyear = 2005
+ all = _("All")
+ years = ["%d"%i for i in range(startyear,time.localtime()[0]+1)]  
+
+
+
+From alerios at mail.berlios.de  Sat Mar  3 00:41:28 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Sat, 3 Mar 2007 00:41:28 +0100
+Subject: [Destar-dev] r617 - branches/0.2.X
+Message-ID: <200703022341.l22NfSuB017631@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-03 00:41:27 +0100 (Sat, 03 Mar 2007)
+New Revision: 617
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/StatsHelper.ptl
+   branches/0.2.X/page_stats_queue.ptl
+Log:
+- Added service level graphic.
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-02 22:52:10 UTC (rev 616)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-02 23:41:27 UTC (rev 617)
+@@ -4,6 +4,7 @@
+ 	- Added general completed calls stats.
+ 	- Added uncompleted calls stats.
+ 	- Added service level table.
++	- Added service level graphic.
+  * Removed depricated method from StatsHelper.ptl
+ 
+ 2007-03-01:
+
+Modified: branches/0.2.X/StatsHelper.ptl
+===================================================================
+--- branches/0.2.X/StatsHelper.ptl	2007-03-02 22:52:10 UTC (rev 616)
++++ branches/0.2.X/StatsHelper.ptl	2007-03-02 23:41:27 UTC (rev 617)
+@@ -117,7 +117,7 @@
+ 		'</tr>\n'
+ 	'</table>\n<br/>'
+ 
+-#def makeAgentCallsTable [plain] (label, names, completed, dumped, transfered):
++#def makeAgentCallsTable [plain] (label, completed, dumped, transfered, names):
+ def makeAgentCallsTable [plain] (label, completed, dumped, names):
+ 	'<table border="1"> \n'
+ 	'<tr> <td><b>'+ label
+@@ -241,11 +241,13 @@
+ 	ar.draw(can)
+ 	can.close()
+ 	
+-	htmltext('<br/><br/><h3>')
+-	htmltext(title)
+-	htmltext('</h3>')
++	html = htmltext('<br/><br/><h3>')
++	html += htmltext(title)
++	html += htmltext('</h3>')
+ 	
+-	htmltext('<p>')
+-	htmltext('<img alt="table" src="/graphs/%s" />' % filename)
+-	htmltext('</p>')
++	html += htmltext('<p>')
++	html += htmltext('<img alt="table" src="/graphs/%s" />' % filename)
++	html += htmltext('</p>')
++
++	return html
+ 	
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-03-02 22:52:10 UTC (rev 616)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-02 23:41:27 UTC (rev 617)
+@@ -118,7 +118,7 @@
+ 	completed[3].getHtml(border=1)
+ 
+ 	htmltext("<br/><h3>%s</h3>" % _("Service Level"))
+-	completed[4].getHtml(border=1)
++	completed[4]
+ 
+ 	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
+ 	uncompleted[3].getHtml(border=1)
+@@ -161,7 +161,7 @@
+ 	completed[3].getHtml(border=1)
+ 
+ 	htmltext("<br/><h3>%s</h3>" % _("Service Level"))
+-	completed[4].getHtml(border=1)
++	completed[4]
+ 
+ 	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
+ 	uncompleted[3].getHtml(border=1)
+@@ -204,7 +204,7 @@
+ 	completed[3].getHtml(border=1)
+ 
+ 	htmltext("<br/><h3>%s</h3>" % _("Service Level"))
+-	completed[4].getHtml(border=1)
++	completed[4]
+ 
+ 	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
+ 	uncompleted[3].getHtml(border=1)
+@@ -244,7 +244,7 @@
+ 	completed[3].getHtml(border=1)
+ 
+ 	htmltext("<br/><h3>%s</h3>" % _("Service Level"))
+-	completed[4].getHtml(border=1)
++	completed[4]
+ 
+ 	htmltext("<br/><h3>%s</h3>" % _("Uncompleted Calls"))
+ 	uncompleted[3].getHtml(border=1)
+@@ -442,8 +442,11 @@
+ 		table.setCell(1,y, "%d" % calls_per_holdtime[i].calls_number)
+ 		table.setCell(2,y, "%f" % (total_completed and (float(calls_per_holdtime[i].calls_number)*100 / float(total_completed)) or 0))
+ 		y += 1
+-	return table
++	graph = makeGraphic(holdtimes, [i.calls_number for i in calls_per_holdtime], _("Service Level"),_("Time of Answer"), _("Number of calls"), "service_level.png")
++	table_html = table.getHtml(border=1)
+ 
++	return table_html+graph
++
+ def showResults [plain] (day, month, year, queue):
+ 	all = N_("All")
+ 	if day != all and month != all and year != all:
+
+
+
+From alerios at mail.berlios.de  Sat Mar  3 01:27:52 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Sat, 3 Mar 2007 01:27:52 +0100
+Subject: [Destar-dev] r618 - branches/0.2.X
+Message-ID: <200703030027.l230RqcN007791@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-03 01:27:52 +0100 (Sat, 03 Mar 2007)
+New Revision: 618
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/StatsHelper.ptl
+   branches/0.2.X/page_stats_queue.ptl
+Log:
+- Added graphic for queue calls distribution in time periods.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-02 23:41:27 UTC (rev 617)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-03 00:27:52 UTC (rev 618)
+@@ -5,6 +5,7 @@
+ 	- Added uncompleted calls stats.
+ 	- Added service level table.
+ 	- Added service level graphic.
++	- Added graphic for queue calls distribution in time periods.
+  * Removed depricated method from StatsHelper.ptl
+ 
+ 2007-03-01:
+
+Modified: branches/0.2.X/StatsHelper.ptl
+===================================================================
+--- branches/0.2.X/StatsHelper.ptl	2007-03-02 23:41:27 UTC (rev 617)
++++ branches/0.2.X/StatsHelper.ptl	2007-03-03 00:27:52 UTC (rev 618)
+@@ -168,6 +168,7 @@
+ 		"<td>%d</td>" % (completed[i].calls_number and (completed[i].seconds / completed[i].calls_number) or 0)
+ 		'</tr>\n'
+ 	'</table>\n<br/>'
++	makeQueueCallsGraphic(names, completed, uncompleted, _("Number of calls"),_("Period"), "calls_per_period.png")
+ 
+ def makeCallsGraphic [plain] (names, calls, title, labelx, filename):
+ 	theme.use_color = True;
+@@ -213,6 +214,48 @@
+ 	htmltext('<img alt="table" src="/graphs/%s" />' % filename)
+ 	htmltext('</p>')				
+ 
++def makeQueueCallsGraphic [plain] (names, completed, uncompleted, title, labelx, filename):
++	theme.use_color = True;
++	theme.default_font_size = 14
++	theme.reinitialize()
++	
++	can = canvas.init("/tmp/%s" % filename, "png")
++	
++	completed_calls = [i.calls_number for i in completed]
++	
++	interval = max(completed_calls) // 6
++
++	names = [i[:3] for i in names]
++
++	data = zip( names,
++				[i.calls_number for i in completed],
++				[i.calls_number for i in uncompleted])
++
++	chart_object.set_defaults(area.T, 
++								size = (510, 280),
++								x_coord = category_coord.T(data, 0))
++	
++	chart_object.set_defaults(bar_plot.T,
++								width = 15,
++								data = data)
++	
++	ar = area.T(x_axis=axis.X(label=unicode(_(labelx), 'utf-8') ),
++				y_axis=axis.Y(label=unicode(_('Distribution by period'), 'utf-8'), tic_interval=interval))
++	
++	plot1=bar_plot.T(label=unicode(_('Completed'), 'utf-8'), hcol=1, fill_style=fill_style.goldenrod)
++	plot2=bar_plot.T(label=unicode(_('Uncompleted'), 'utf-8'), hcol=2, stack_on = plot1, fill_style=fill_style.gray70)
++	ar.add_plot(plot1,plot2)
++	ar.draw(can)
++	can.close()
++	
++	htmltext('<br/><br/><h3>')
++	htmltext(title)
++	htmltext('</h3>')
++	
++	htmltext('<p>')
++	htmltext('<img alt="table" src="/graphs/%s" />' % filename)
++	htmltext('</p>')				
++
+ def makeGraphic [plain] (names, values, title, labelx, labely, filename):
+ 
+ 	theme.use_color = True;
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-03-02 23:41:27 UTC (rev 617)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-03 00:27:52 UTC (rev 618)
+@@ -442,7 +442,7 @@
+ 		table.setCell(1,y, "%d" % calls_per_holdtime[i].calls_number)
+ 		table.setCell(2,y, "%f" % (total_completed and (float(calls_per_holdtime[i].calls_number)*100 / float(total_completed)) or 0))
+ 		y += 1
+-	graph = makeGraphic(holdtimes, [i.calls_number for i in calls_per_holdtime], _("Service Level"),_("Time of Answer"), _("Number of calls"), "service_level.png")
++	graph = makeGraphic(holdtimes, [i.calls_number for i in calls_per_holdtime], _("Service Level Graphic"),_("Time of Answer"), _("Number of calls"), "service_level.png")
+ 	table_html = table.getHtml(border=1)
+ 
+ 	return table_html+graph
+
+
+
+From dasenjo at mail.berlios.de  Sat Mar  3 09:35:38 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Sat, 3 Mar 2007 09:35:38 +0100
+Subject: [Destar-dev] r619 - branches/0.2.X branches/0.2.X/examples trunk
+	trunk/examples
+Message-ID: <200703030835.l238Zc75010784@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-03-03 09:35:37 +0100 (Sat, 03 Mar 2007)
+New Revision: 619
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/examples/destar_cfg.py
+   trunk/CHANGELOG.txt
+   trunk/examples/destar_cfg.py
+Log:
+* Bad example line. Default values are not stored in destar_cfg.py
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-03 00:27:52 UTC (rev 618)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-03 08:35:37 UTC (rev 619)
+@@ -1,3 +1,6 @@
++2007-03-03
++* Bad example line. Default values are not stored in destar_cfg.py
++
+ 2007-03-02:
+  * Improved Queue statistics:
+  	- Refactored field processing code.
+
+Modified: branches/0.2.X/examples/destar_cfg.py
+===================================================================
+--- branches/0.2.X/examples/destar_cfg.py	2007-03-03 00:27:52 UTC (rev 618)
++++ branches/0.2.X/examples/destar_cfg.py	2007-03-03 08:35:37 UTC (rev 619)
+@@ -21,7 +21,6 @@
+ 
+ CfgIVRAutoatt(
+ 	name     = "attendant1",
+-	timeout  = "0",
+ 	ext      = "queue1",
+ 	pbx      = "pbx1",
+ 	)
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-03 00:27:52 UTC (rev 618)
++++ trunk/CHANGELOG.txt	2007-03-03 08:35:37 UTC (rev 619)
+@@ -1,3 +1,6 @@
++2007-03-03
++* Bad example line. Default values are not stored in destar_cfg.py
++
+ 2007-03-01:
+ * `Apply changes` relaods MoH
+  
+
+Modified: trunk/examples/destar_cfg.py
+===================================================================
+--- trunk/examples/destar_cfg.py	2007-03-03 00:27:52 UTC (rev 618)
++++ trunk/examples/destar_cfg.py	2007-03-03 08:35:37 UTC (rev 619)
+@@ -21,7 +21,6 @@
+ 
+ CfgIVRAutoatt(
+ 	name     = "attendant1",
+-	timeout  = "0",
+ 	ext      = "queue1",
+ 	pbx      = "pbx1",
+ 	)
+
+
+
+From dasenjo at mail.berlios.de  Sat Mar  3 10:42:03 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Sat, 3 Mar 2007 10:42:03 +0100
+Subject: [Destar-dev] r620 - trunk
+Message-ID: <200703030942.l239g3sJ013606@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-03-03 10:42:02 +0100 (Sat, 03 Mar 2007)
+New Revision: 620
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_phone_iax.py
+Log:
+* Enable qualify option for IAX phones.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-03 08:35:37 UTC (rev 619)
++++ trunk/CHANGELOG.txt	2007-03-03 09:42:02 UTC (rev 620)
+@@ -1,5 +1,6 @@
+ 2007-03-03
+ * Bad example line. Default values are not stored in destar_cfg.py
++* Enable qualify option for IAX phones.
+ 
+ 2007-03-01:
+ * `Apply changes` relaods MoH
+
+Modified: trunk/cfg_phone_iax.py
+===================================================================
+--- trunk/cfg_phone_iax.py	2007-03-03 08:35:37 UTC (rev 619)
++++ trunk/cfg_phone_iax.py	2007-03-03 09:42:02 UTC (rev 620)
+@@ -48,6 +48,11 @@
+ 					optional=True,
+ 					len=15),
+ 
++			VarType("qualify",
++					title=_("Qualify? (yes|no|xxx)"),
++					optional=True,
++					len=5),
++
+ 			VarType("ext",
+ 					title=_("Extension"),
+ 					len=6),
+@@ -276,6 +281,7 @@
+ 
+ 		if not self.notransfer:
+ 			iax.append("notransfer=yes")
++		iax.appendValue(self, "qualify")
+ 
+ 		self.createExtensionConfig()
+ 		self.createVoicemailConfig(iax)
+
+
+
+From dasenjo at mail.berlios.de  Sat Mar  3 11:10:14 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Sat, 3 Mar 2007 11:10:14 +0100
+Subject: [Destar-dev] r621 - in trunk: . examples
+Message-ID: <200703031010.l23AAEP7014643@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-03-03 11:10:14 +0100 (Sat, 03 Mar 2007)
+New Revision: 621
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_opt_codec.py
+   trunk/examples/destar_cfg.py
+Log:
+* Add the Speex Codec (http://www.speex.org/) as an option and make it default in the example.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-03 09:42:02 UTC (rev 620)
++++ trunk/CHANGELOG.txt	2007-03-03 10:10:14 UTC (rev 621)
+@@ -1,6 +1,7 @@
+ 2007-03-03
+ * Bad example line. Default values are not stored in destar_cfg.py
+ * Enable qualify option for IAX phones.
++* Add the Speex Codec (http://www.speex.org/) as an option and make it default in the example.
+ 
+ 2007-03-01:
+ * `Apply changes` relaods MoH
+
+Modified: trunk/cfg_opt_codec.py
+===================================================================
+--- trunk/cfg_opt_codec.py	2007-03-03 09:42:02 UTC (rev 620)
++++ trunk/cfg_opt_codec.py	2007-03-03 10:10:14 UTC (rev 621)
+@@ -35,6 +35,7 @@
+ 			VarType("name", title=_("Allow codec"), type="choice",
+ 				options=(
+ 					("all",_("Use all codecs")),
++					("speex",_("Speex")),
+ 					("alaw",_("A Law (g711a)")),
+ 					("ulaw",_("U Law (g711u)")),
+ 					("gsm",_("GSM")),
+
+Modified: trunk/examples/destar_cfg.py
+===================================================================
+--- trunk/examples/destar_cfg.py	2007-03-03 09:42:02 UTC (rev 620)
++++ trunk/examples/destar_cfg.py	2007-03-03 10:10:14 UTC (rev 621)
+@@ -273,6 +273,10 @@
+ 	)
+ 
+ CfgOptCodec(
++	name     = "speex",
++	)
++
++CfgOptCodec(
+ 	name     = "gsm",
+ 	)
+ 
+
+
+
+From dasenjo at mail.berlios.de  Sat Mar  3 11:24:06 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Sat, 3 Mar 2007 11:24:06 +0100
+Subject: [Destar-dev] r622 - trunk
+Message-ID: <200703031024.l23AO6U1015262@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-03-03 11:24:05 +0100 (Sat, 03 Mar 2007)
+New Revision: 622
+
+Modified:
+   trunk/cfg_phone_iax.py
+Log:
+* Enable qualify option for IAX phones.
+
+
+
+Modified: trunk/cfg_phone_iax.py
+===================================================================
+--- trunk/cfg_phone_iax.py	2007-03-03 10:10:14 UTC (rev 621)
++++ trunk/cfg_phone_iax.py	2007-03-03 10:24:05 UTC (rev 622)
+@@ -281,7 +281,8 @@
+ 
+ 		if not self.notransfer:
+ 			iax.append("notransfer=yes")
+-		iax.appendValue(self, "qualify")
++		if self.qualify:
++			iax.appendValue(self, "qualify")
+ 
+ 		self.createExtensionConfig()
+ 		self.createVoicemailConfig(iax)
+
+
+
+From admin at berlios.de  Sun Mar  4 00:32:32 2007
+From: admin at berlios.de (admin at berlios.de)
+Date: Sat, 3 Mar 2007 18:32:32 -0500 (COT)
+Subject: [Destar-dev] [Feature #2319] Queues statistics
+Message-ID: <200703032332.l23NWWac017501@unicorn.berlios.de>
+
+Feature Request #2319, was updated on 2006-Jun-21 22:45
+You can respond by visiting: 
+http://developer.berlios.de/feature/?func=detailfeature&feature_id=2319&group_id=2112
+
+Category: None
+Status: Closed
+Priority: 9
+Summary: Queues statistics
+
+By: alerios
+Date: 2007-Mar-03 18:32
+
+Message:
+Logged In: YES 
+user_id=11067
+Browser: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.1) Gecko/20061205 Iceweasel/2.0.0.1 (Debian-2.0.0.1+dfsg-2)
+
+Initial version of this freature is ready to go on
+branches/0.2.X
+
+----------------------------------------------------------------------
+
+By: alerios
+Date: 2007-Mar-01 16:06
+
+Message:
+Logged In: YES 
+user_id=11067
+Browser: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.1) Gecko/20061205 Iceweasel/2.0.0.1 (Debian-2.0.0.1+dfsg-2)
+
+Initial version on branches/0.2.X  rev 609.  When I finish
+all related fetures I'll merge the changes into trunk.
+
+----------------------------------------------------------------------
+You can respond by visiting: 
+http://developer.berlios.de/feature/?func=detailfeature&feature_id=2319&group_id=2112
+
+
+From ceronman at gmail.com  Sun Mar  4 21:26:30 2007
+From: ceronman at gmail.com (=?ISO-8859-1?Q?Manuel_Alejandro_Cer=F3n_Estrada?=)
+Date: Sun, 4 Mar 2007 15:26:30 -0500
+Subject: [Destar-dev] [patch] Crazy Id behavior fix
+Message-ID: <796874fc0703041226x298aa80cp2a3c4a61f6a686f7@mail.gmail.com>
+
+Hello,
+
+I wrote this patch to fix some crazy behavior with configlet's ids
+after some kind of modification. I have not tested it yet, because I
+do not have a working destar configuration. Please test it.
+
+I am almost sure that the problem is caused because Id assignation in
+Cfg constructor was wrong. I hope this change fix the problem.
+
+Keep working hard on destar!
+
+Cheers.
+
+Manuel.
+
+
+-- 
+? Manuel Alejandro Cer?n Estrada
+? ceronman at gmail.com
+? http://ceronman.blogspot.com
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: crazy_ids_patch
+Type: application/octet-stream
+Size: 765 bytes
+Desc: not available
+URL: <https://lists.berlios.de/pipermail/destar-dev/attachments/20070304/239a3b01/attachment.obj>
+
+From santiago at mail.berlios.de  Mon Mar  5 18:24:05 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Mon, 5 Mar 2007 18:24:05 +0100
+Subject: [Destar-dev] r623 - trunk
+Message-ID: <200703051724.l25HO5HU021571@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-03-05 18:24:05 +0100 (Mon, 05 Mar 2007)
+New Revision: 623
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/configlets.py
+Log:
+* Fixed crazy ids assignment, Patch by ceronman
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-03 10:24:05 UTC (rev 622)
++++ trunk/CHANGELOG.txt	2007-03-05 17:24:05 UTC (rev 623)
+@@ -1,3 +1,6 @@
++2007-03-05:
++* Fixed crazy ids assignment, Patch by ceronman
++
+ 2007-03-03
+ * Bad example line. Default values are not stored in destar_cfg.py
+ * Enable qualify option for IAX phones.
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-03-03 10:24:05 UTC (rev 622)
++++ trunk/configlets.py	2007-03-05 17:24:05 UTC (rev 623)
+@@ -375,8 +375,15 @@
+ 		if not self.groups.has_key(configlet.groupName):
+ 			self.groups[configlet.groupName] = []
+ 		self.groups[configlet.groupName].append(configlet)
+-	
++		
++	def generateUniqueId(self):
++		ids = [i._id for i in self]
++		newid = 0
++		while newid in ids:
++			newid = newid + 1
++		return newid
+ 
++
+ configlet_tree = ConfigletTree()
+ 
+ class Holder(object):
+@@ -481,7 +488,7 @@
+ 
+ 		# Store the object into global array
+ 		global configlet_tree
+-		self._id = len(configlet_tree)
++		self._id = configlet_tree.generateUniqueId()
+ 		if autoAdd:
+ 			configlet_tree.addConfiglet(self)
+ 		else:
+
+
+
+From santiago at mail.berlios.de  Mon Mar  5 18:25:15 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Mon, 5 Mar 2007 18:25:15 +0100
+Subject: [Destar-dev] r624 - branches/0.2.X
+Message-ID: <200703051725.l25HPFsG021671@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-03-05 18:25:15 +0100 (Mon, 05 Mar 2007)
+New Revision: 624
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/configlets.py
+Log:
+* Fixed crazy ids assignment, Patch by ceronman
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-05 17:24:05 UTC (rev 623)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-05 17:25:15 UTC (rev 624)
+@@ -1,3 +1,6 @@
++2007-03-05:
++* Fixed crazy ids assignment, Patch by ceronman
++
+ 2007-03-03
+ * Bad example line. Default values are not stored in destar_cfg.py
+ 
+
+Modified: branches/0.2.X/configlets.py
+===================================================================
+--- branches/0.2.X/configlets.py	2007-03-05 17:24:05 UTC (rev 623)
++++ branches/0.2.X/configlets.py	2007-03-05 17:25:15 UTC (rev 624)
+@@ -375,8 +375,15 @@
+ 		if not self.groups.has_key(configlet.groupName):
+ 			self.groups[configlet.groupName] = []
+ 		self.groups[configlet.groupName].append(configlet)
+-	
++		
++	def generateUniqueId(self):
++		ids = [i._id for i in self]
++		newid = 0
++		while newid in ids:
++			newid = newid + 1
++		return newid
+ 
++
+ configlet_tree = ConfigletTree()
+ 
+ class Holder(object):
+@@ -481,7 +488,7 @@
+ 
+ 		# Store the object into global array
+ 		global configlet_tree
+-		self._id = len(configlet_tree)
++		self._id = configlet_tree.generateUniqueId()
+ 		if autoAdd:
+ 			configlet_tree.addConfiglet(self)
+ 		else:
+
+
+
+From dasenjo at mail.berlios.de  Tue Mar  6 05:17:14 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Tue, 6 Mar 2007 05:17:14 +0100
+Subject: [Destar-dev] r625 - trunk
+Message-ID: <200703060417.l264HE5w021760@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-03-06 05:17:14 +0100 (Tue, 06 Mar 2007)
+New Revision: 625
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+   trunk/page_admin.ptl
+   trunk/page_admin_reload.ptl
+   trunk/page_config.ptl
+   trunk/page_stats.ptl
+   trunk/page_user.ptl
+Log:
+* Fixed some bugs "introduced" by the strict unicode handling
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/CHANGELOG.txt	2007-03-06 04:17:14 UTC (rev 625)
+@@ -1,5 +1,6 @@
+ 2007-03-05:
+ * Fixed crazy ids assignment, Patch by ceronman
++* Fixed some bugs "introduced" by the strict unicode handling
+ 
+ 2007-03-03
+ * Bad example line. Default values are not stored in destar_cfg.py
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/ConfigHelper.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -45,7 +45,7 @@
+ 		pass
+ 
+ 
+-def presentEditableConfiglets [plain] (configlets):
++def presentEditableConfiglets [html] (configlets):
+         if configlets:
+                 # Show currently defined configlets
+                 '<table id="configureditems">'
+@@ -55,7 +55,7 @@
+                 '<th>%s</th>' % _("D")
+                 '<th>%s</th>' % _("U")
+                 for f in configlets[0].head():
+-                        '<th>%s</th>' % htmltext(_(f))
++                        '<th>%s</th>' % _(f)
+                 '</tr>'
+                 '</thead>'
+                 n = 0
+@@ -73,12 +73,12 @@
+                         wrap = True
+                         for f in o.row():
+                                 if wrap:
+-                                        '<td><a href="../edit/%s">%s</a></td>' % (o._id, htmlescape(f))
++                                        '<td><a href="../edit/%s">%s</a></td>' % (o._id, f)
+                                         wrap = False
+ 				else:
+ 					if f == "":
+ 						f = " "
+-	                                '<td>%s</td>' % htmlescape(_(f))
++	                                '<td>%s</td>' % _(f)
+                         '</tr>'
+                         n = n + 1
+                 '</table>'
+
+Modified: trunk/page_admin.ptl
+===================================================================
+--- trunk/page_admin.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/page_admin.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -38,10 +38,10 @@
+ 		if self.session.level < self._q_level:
+ 			cantAccessPage()
+ 
+-	def showMenu [plain] (self):
++	def showMenu [html] (self):
+ 		'<table id="subcategories"><thead>'
+ 		'<tr>'
+-		for s in (htmltext(_('Action')), htmltext(_('Description'))):
++		for s in (_('Action'), _('Description')):
+ 			'<th>%s</th>' % s
+ 		'</thead></tr>'
+ 
+
+Modified: trunk/page_admin_reload.ptl
+===================================================================
+--- trunk/page_admin_reload.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/page_admin_reload.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -42,21 +42,21 @@
+ 		if self.session.level < self._q_level:
+ 			cantAccessPage()
+ 
+-	def _q_index [plain] (self):
++	def _q_index [html] (self):
+ 		header(self._q_desc)
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'<p><span class="errornotice">'
+-			htmltext(_("Asterisk is not running!"))
++			_("Asterisk is not running!")
+ 			'</span></p>'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+ 			'<p><span class="errornotice">'
+-			htmltext(_("The manager access is not working!"))
++			_("The manager access is not working!")
+ 			'</span></p>'
+ 		else:
+ 			'<p>'
+-			htmltext(_('Doing a reload, result is:'))
++			_('Doing a reload, result is:')
+ 			'</p>'
+ 
+ 			'<tt><p>'
+
+Modified: trunk/page_config.ptl
+===================================================================
+--- trunk/page_config.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/page_config.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -131,7 +131,7 @@
+ 		head
+ 		':</p><table id="subcategories"><thead>'
+ 		'<tr>'
+-		for s in (htmltext(_('Configured')), htmltext(_('Category'))):
++		for s in (_('Configured'), _('Category')):
+ 			'<th>%s</th>' % s
+ 		'</thead></tr>'
+ 
+
+Modified: trunk/page_stats.ptl
+===================================================================
+--- trunk/page_stats.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/page_stats.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -38,10 +38,10 @@
+ 		if self.session.level < self._q_level:
+ 			cantAccessPage()
+ 
+-	def showMenu [plain] (self):
++	def showMenu [html] (self):
+ 		'<table id="subcategories"><thead>'
+ 		'<tr>'
+-		for s in (htmltext(_('Statistics')), htmltext(_('Description'))):
++		for s in (_('Statistics'), _('Description')):
+ 			'<th>%s</th>' % s
+ 		'</thead></tr>'
+ 
+
+Modified: trunk/page_user.ptl
+===================================================================
+--- trunk/page_user.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/page_user.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -38,10 +38,10 @@
+ 		if self.session.level < self._q_level:
+ 			cantAccessPage()
+ 
+-	def showMenu [plain] (self):
++	def showMenu [html] (self):
+ 		'<table id="subcategories"><thead>'
+ 		'<tr>'
+-		for s in (htmltext(_('Available actions')), htmltext(_('Description'))):
++		for s in (_('Available actions'), _('Description')):
+ 			'<th>%s</th>' % s
+ 		'</thead></tr>'
+ 
+
+
+
+From dasenjo at unicauca.edu.co  Tue Mar  6 05:23:03 2007
+From: dasenjo at unicauca.edu.co (=?ISO-8859-1?Q?Diego_Andr=E9s_Asenjo_Gonz=E1lez?=)
+Date: Mon, 05 Mar 2007 23:23:03 -0500
+Subject: [Destar-dev] r625 - trunk
+In-Reply-To: <200703060417.l264HE5w021760@sheep.berlios.de>
+References: <200703060417.l264HE5w021760@sheep.berlios.de>
+Message-ID: <45ECECA7.9090204@unicauca.edu.co>
+
+Hi!
+
+I changed the type of some functions from [plain] to [html] to avoid
+htmltext functions, simplify the code and solve the new bugs that are
+present with the unicode handling. This is a fast fix, but we must
+review all the ptls and choose a correc type for each function.
+
+I have to sleep now but I'm gonna keep working on this tomorrow.
+
+Bye.
+
+
+
+
+
+dasenjo at BerliOS escribi?:
+> Author: dasenjo
+> Date: 2007-03-06 05:17:14 +0100 (Tue, 06 Mar 2007)
+> New Revision: 625
+> 
+> Modified:
+>    trunk/CHANGELOG.txt
+>    trunk/ConfigHelper.ptl
+>    trunk/page_admin.ptl
+>    trunk/page_admin_reload.ptl
+>    trunk/page_config.ptl
+>    trunk/page_stats.ptl
+>    trunk/page_user.ptl
+> Log:
+> * Fixed some bugs "introduced" by the strict unicode handling
+> 
+> 
+> 
+> Modified: trunk/CHANGELOG.txt
+> ===================================================================
+> --- trunk/CHANGELOG.txt	2007-03-05 17:25:15 UTC (rev 624)
+> +++ trunk/CHANGELOG.txt	2007-03-06 04:17:14 UTC (rev 625)
+> @@ -1,5 +1,6 @@
+>  2007-03-05:
+>  * Fixed crazy ids assignment, Patch by ceronman
+> +* Fixed some bugs "introduced" by the strict unicode handling
+>  
+>  2007-03-03
+>  * Bad example line. Default values are not stored in destar_cfg.py
+> 
+> Modified: trunk/ConfigHelper.ptl
+> ===================================================================
+> --- trunk/ConfigHelper.ptl	2007-03-05 17:25:15 UTC (rev 624)
+> +++ trunk/ConfigHelper.ptl	2007-03-06 04:17:14 UTC (rev 625)
+> @@ -45,7 +45,7 @@
+>  		pass
+>  
+>  
+> -def presentEditableConfiglets [plain] (configlets):
+> +def presentEditableConfiglets [html] (configlets):
+>          if configlets:
+>                  # Show currently defined configlets
+>                  '<table id="configureditems">'
+> @@ -55,7 +55,7 @@
+>                  '<th>%s</th>' % _("D")
+>                  '<th>%s</th>' % _("U")
+>                  for f in configlets[0].head():
+> -                        '<th>%s</th>' % htmltext(_(f))
+> +                        '<th>%s</th>' % _(f)
+>                  '</tr>'
+>                  '</thead>'
+>                  n = 0
+> @@ -73,12 +73,12 @@
+>                          wrap = True
+>                          for f in o.row():
+>                                  if wrap:
+> -                                        '<td><a href="../edit/%s">%s</a></td>' % (o._id, htmlescape(f))
+> +                                        '<td><a href="../edit/%s">%s</a></td>' % (o._id, f)
+>                                          wrap = False
+>  				else:
+>  					if f == "":
+>  						f = " "
+> -	                                '<td>%s</td>' % htmlescape(_(f))
+> +	                                '<td>%s</td>' % _(f)
+>                          '</tr>'
+>                          n = n + 1
+>                  '</table>'
+> 
+> Modified: trunk/page_admin.ptl
+> ===================================================================
+> --- trunk/page_admin.ptl	2007-03-05 17:25:15 UTC (rev 624)
+> +++ trunk/page_admin.ptl	2007-03-06 04:17:14 UTC (rev 625)
+> @@ -38,10 +38,10 @@
+>  		if self.session.level < self._q_level:
+>  			cantAccessPage()
+>  
+> -	def showMenu [plain] (self):
+> +	def showMenu [html] (self):
+>  		'<table id="subcategories"><thead>'
+>  		'<tr>'
+> -		for s in (htmltext(_('Action')), htmltext(_('Description'))):
+> +		for s in (_('Action'), _('Description')):
+>  			'<th>%s</th>' % s
+>  		'</thead></tr>'
+>  
+> 
+> Modified: trunk/page_admin_reload.ptl
+> ===================================================================
+> --- trunk/page_admin_reload.ptl	2007-03-05 17:25:15 UTC (rev 624)
+> +++ trunk/page_admin_reload.ptl	2007-03-06 04:17:14 UTC (rev 625)
+> @@ -42,21 +42,21 @@
+>  		if self.session.level < self._q_level:
+>  			cantAccessPage()
+>  
+> -	def _q_index [plain] (self):
+> +	def _q_index [html] (self):
+>  		header(self._q_desc)
+>  		manager.connect()
+>  		if not manager.isConnected():
+>  			'<p><span class="errornotice">'
+> -			htmltext(_("Asterisk is not running!"))
+> +			_("Asterisk is not running!")
+>  			'</span></p>'
+>  		elif not manager.isLoggedIn():
+>  			# TODO: describe how to set this up
+>  			'<p><span class="errornotice">'
+> -			htmltext(_("The manager access is not working!"))
+> +			_("The manager access is not working!")
+>  			'</span></p>'
+>  		else:
+>  			'<p>'
+> -			htmltext(_('Doing a reload, result is:'))
+> +			_('Doing a reload, result is:')
+>  			'</p>'
+>  
+>  			'<tt><p>'
+> 
+> Modified: trunk/page_config.ptl
+> ===================================================================
+> --- trunk/page_config.ptl	2007-03-05 17:25:15 UTC (rev 624)
+> +++ trunk/page_config.ptl	2007-03-06 04:17:14 UTC (rev 625)
+> @@ -131,7 +131,7 @@
+>  		head
+>  		':</p><table id="subcategories"><thead>'
+>  		'<tr>'
+> -		for s in (htmltext(_('Configured')), htmltext(_('Category'))):
+> +		for s in (_('Configured'), _('Category')):
+>  			'<th>%s</th>' % s
+>  		'</thead></tr>'
+>  
+> 
+> Modified: trunk/page_stats.ptl
+> ===================================================================
+> --- trunk/page_stats.ptl	2007-03-05 17:25:15 UTC (rev 624)
+> +++ trunk/page_stats.ptl	2007-03-06 04:17:14 UTC (rev 625)
+> @@ -38,10 +38,10 @@
+>  		if self.session.level < self._q_level:
+>  			cantAccessPage()
+>  
+> -	def showMenu [plain] (self):
+> +	def showMenu [html] (self):
+>  		'<table id="subcategories"><thead>'
+>  		'<tr>'
+> -		for s in (htmltext(_('Statistics')), htmltext(_('Description'))):
+> +		for s in (_('Statistics'), _('Description')):
+>  			'<th>%s</th>' % s
+>  		'</thead></tr>'
+>  
+> 
+> Modified: trunk/page_user.ptl
+> ===================================================================
+> --- trunk/page_user.ptl	2007-03-05 17:25:15 UTC (rev 624)
+> +++ trunk/page_user.ptl	2007-03-06 04:17:14 UTC (rev 625)
+> @@ -38,10 +38,10 @@
+>  		if self.session.level < self._q_level:
+>  			cantAccessPage()
+>  
+> -	def showMenu [plain] (self):
+> +	def showMenu [html] (self):
+>  		'<table id="subcategories"><thead>'
+>  		'<tr>'
+> -		for s in (htmltext(_('Available actions')), htmltext(_('Description'))):
+> +		for s in (_('Available actions'), _('Description')):
+>  			'<th>%s</th>' % s
+>  		'</thead></tr>'
+>  
+> 
+> _______________________________________________
+> Destar-dev mailing list
+> Destar-dev at lists.berlios.de
+> https://lists.berlios.de/mailman/listinfo/destar-dev
+> 
+
+
+
+From santiago at mail.berlios.de  Tue Mar  6 06:28:01 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Tue, 6 Mar 2007 06:28:01 +0100
+Subject: [Destar-dev] r626 - trunk
+Message-ID: <200703060528.l265S1Ox024083@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-03-06 06:28:00 +0100 (Tue, 06 Mar 2007)
+New Revision: 626
+
+Modified:
+   trunk/ConfigHelper.ptl
+   trunk/StatsHelper.ptl
+   trunk/Templates.ptl
+   trunk/backend.py
+   trunk/page_main.ptl
+   trunk/panelutils.py
+Log:
+more unicode transition-related bugs fixed 
+
+
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/ConfigHelper.ptl	2007-03-06 05:28:00 UTC (rev 626)
+@@ -31,7 +31,7 @@
+ 	"""
+ 
+ 	def render_content(self):
+-		return htmltext(self.value)
++		return _(self.value)
+ 
+ 
+ class LabelWidget(Widget):
+@@ -267,7 +267,7 @@
+ 		except:
+ 			_v = ''
+ 		if _v: do_update = True
+-		t = htmltext(v.title)
++		t = _(v.title)
+ 		r = not v.optional
+ 		if v.type=="string":
+ 			form.add(StringWidget, v.name, _v, t, v.hint, r, render_br=v.render_br, maxlength=v.len, size=min(v.size,56) )
+@@ -281,6 +281,8 @@
+ 				opts.insert(0, ('',''))
+ 			elif not opts:
+ 				return errorpage(_("Required '%s' not found") % v.name)
++			for a in opts:
++				a = (a[0], _(a[1]))
+ 			form.add(SingleSelectWidget, v.name, _v, title=t, hint=v.hint, required=r, options=opts,render_br=v.render_br)
+ 		elif v.type=="mchoice":
+ 			# TODO: much of this code should NOT by in a *.ptl file
+
+Modified: trunk/StatsHelper.ptl
+===================================================================
+--- trunk/StatsHelper.ptl	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/StatsHelper.ptl	2007-03-06 05:28:00 UTC (rev 626)
+@@ -159,13 +159,13 @@
+ 								width = 15,
+ 								data = data)
+ 	
+-	ar = area.T(x_axis=axis.X(label=unicode(_(labelx), 'utf-8') ),
+-				y_axis=axis.Y(label=unicode(_('Calls'), 'utf-8'), tic_interval=interval))
++	ar = area.T(x_axis=axis.X(label=labelx),
++				y_axis=axis.Y(label=_('Calls'), tic_interval=interval))
+ 	
+-	plot1=bar_plot.T(label=unicode(_('Answered'), 'utf-8'), hcol=1, fill_style=fill_style.goldenrod)
+-	plot2=bar_plot.T(label=unicode(_('Not Answered'), 'utf-8'), hcol=2, stack_on = plot1, fill_style=fill_style.gray70)
+-	plot3=bar_plot.T(label=unicode(_('Busy'), 'utf-8'), hcol=3, stack_on = plot2, fill_style=fill_style.gray50)
+-	plot4=bar_plot.T(label=unicode(_('Failed'), 'utf-8'), hcol=4, stack_on = plot3, fill_style=fill_style.darkseagreen)
++	plot1=bar_plot.T(label=_('Answered'), hcol=1, fill_style=fill_style.goldenrod)
++	plot2=bar_plot.T(label=_('Not Answered'), hcol=2, stack_on = plot1, fill_style=fill_style.gray70)
++	plot3=bar_plot.T(label=_('Busy'), hcol=3, stack_on = plot2, fill_style=fill_style.gray50)
++	plot4=bar_plot.T(label=_('Failed'), hcol=4, stack_on = plot3, fill_style=fill_style.darkseagreen)
+ 	ar.add_plot(plot1,plot2,plot3,plot4)
+ 	ar.draw(can)
+ 	can.close()
+@@ -198,10 +198,10 @@
+ 								width = 15,
+ 								data = data)
+ 	
+-	ar = area.T(x_axis=axis.X(label=unicode(_(labelx), 'utf-8') ),
+-				y_axis=axis.Y(label=unicode(_(labely), 'utf-8'), tic_interval=interval))
++	ar = area.T(x_axis=axis.X(label=_(labelx)),
++				y_axis=axis.Y(label=_(labely), tic_interval=interval))
+ 	
+-	plot1=bar_plot.T(label=unicode(_(labely), 'utf-8'), hcol=1, fill_style=fill_style.darkseagreen)
++	plot1=bar_plot.T(label=_(labely), hcol=1, fill_style=fill_style.darkseagreen)
+ 	ar.add_plot(plot1)
+ 	ar.draw(can)
+ 	can.close()
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/Templates.ptl	2007-03-06 05:28:00 UTC (rev 626)
+@@ -158,7 +158,7 @@
+    	'<head>\n'
+    	if refresh:
+    		'<meta http-equiv="Refresh" content="%d;" />\n' % refresh
+-  	'<title>Asterisk/DeStar PBX :: %s</title>\n' % _(str(title))
++  	'<title>Asterisk/DeStar PBX :: %s</title>\n' % title
+   	'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n'
+   	'<style type="text/css" media="screen, tv, projection">\n'
+   	'	@import url("/static/css/general.css");\n' 
+@@ -221,7 +221,7 @@
+  	'			</div>\n'
+ 
+ 	if title:
+-		'<h2 id="contentHeading">%s</h2>\n' % _(str(title))
++		'<h2 id="contentHeading">%s</h2>\n' % _(title)
+ 
+ 	
+ def footer [html] ():
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/backend.py	2007-03-06 05:28:00 UTC (rev 626)
+@@ -824,7 +824,7 @@
+ 		s += manager.reloadMoH()
+ 	if panelutils.isConfigured():
+ 		s += panelutils.restartPanelDaemon()
+-	return "<br/>".join(s)
++	return "".join(s)
+ 
+ def createDocs():
+ 	for c in configletsList():
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/page_main.ptl	2007-03-06 05:28:00 UTC (rev 626)
+@@ -149,13 +149,13 @@
+         def _q_exception_handler [plain] (self, exc):
+                 if isinstance(exc, quixote.errors.AccessError) or isinstance(exc, quixote.errors.PublishError):
+                         if (exc.title == "Access denied"):
+-                                #header(htmltext(_('Access Denied')))
++                                header(_('Access Denied'))
+                                 '<p>'
+                                 htmltext(_("You don't have access to this page."))
+                                 '</p>'
+                                 footer()
+                         else:
+-                                #header(_(exc.title))
++                                header(_(exc.title))
+                                 '<p>'
+                                 _(exc.public_msg)
+                                 '</p>'
+
+Modified: trunk/panelutils.py
+===================================================================
+--- trunk/panelutils.py	2007-03-06 04:17:14 UTC (rev 625)
++++ trunk/panelutils.py	2007-03-06 05:28:00 UTC (rev 626)
+@@ -35,6 +35,8 @@
+ PANEL_STOP_CMD	= "/etc/init.d/op-panel stop"
+ PANEL_RESTART_CMD = "/etc/init.d/op-panel restart"
+ 
++def N_(message): return message
++
+ def isConfigured ():
+ 	import configlets
+ 	configured=0
+@@ -72,7 +74,7 @@
+ 	c.append("change_led_agent=1")
+ 	c.append("reverse_transfer=0")
+ 	c.append("clicktodial_insecure=0")
+-	c.append('transfer_timeout="%s"' % _("0,No timeout|300,5 minutes|600,10 minutes|1200,20 minutes|2400,40 minutes|3000,50 minutes"))
++	c.append('transfer_timeout="%s"' % N_("0,No timeout|300,5 minutes|600,10 minutes|1200,20 minutes|2400,40 minutes|3000,50 minutes"))
+ 	c.append("enable_restart = 0")
+ 
+ def createDefaultStyle(c):
+
+
+
+From imesper at mail.berlios.de  Tue Mar  6 16:31:28 2007
+From: imesper at mail.berlios.de (imesper at BerliOS)
+Date: Tue, 6 Mar 2007 16:31:28 +0100
+Subject: [Destar-dev] r627 - trunk
+Message-ID: <200703061531.l26FVSQl024958@sheep.berlios.de>
+
+Author: imesper
+Date: 2007-03-06 16:31:27 +0100 (Tue, 06 Mar 2007)
+New Revision: 627
+
+Modified:
+   trunk/Templates.ptl
+Log:
+More unicode bug fix on Templates.ptl
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-03-06 05:28:00 UTC (rev 626)
++++ trunk/Templates.ptl	2007-03-06 15:31:27 UTC (rev 627)
+@@ -198,9 +198,9 @@
+  			'<li>\n'
+   			if e[1]:
+  				if not submenu:
+- 					'<a href="%s"><span>%s</span></a>\n' % (e[1],_(str(e[2])))
++ 					'<a href="%s"><span>%s</span></a>\n' % (e[1],_(e[2]))
+  				else:
+- 					'<a href="%s">%s</a>\n' % (e[1],_(str(e[2])))
++ 					'<a href="%s">%s</a>\n' % (e[1],_(e[2]))
+   			else:
+   				'<li>&nbsp;</li>\n'
+   			if e[3]:
+
+
+
+From imesper at mail.berlios.de  Thu Mar  8 17:33:36 2007
+From: imesper at mail.berlios.de (imesper at BerliOS)
+Date: Thu, 8 Mar 2007 17:33:36 +0100
+Subject: [Destar-dev] r628 - trunk
+Message-ID: <200703081633.l28GXaBH012461@sheep.berlios.de>
+
+Author: imesper
+Date: 2007-03-08 17:33:36 +0100 (Thu, 08 Mar 2007)
+New Revision: 628
+
+Modified:
+   trunk/page_main.ptl
+Log:
+Added _q_traverse() at page_main, to handle exceptions correctly
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2007-03-06 15:31:27 UTC (rev 627)
++++ trunk/page_main.ptl	2007-03-08 16:33:36 UTC (rev 628)
+@@ -21,6 +21,7 @@
+ from Templates import *
+ import sys, os, quixote, backend
+ from quixote import get_session, get_session_manager, redirect
++from quixote.errors import PublishError
+ from quixote.util import StaticDirectory
+ from quixote.directory import Directory, AccessControlled
+ 
+@@ -163,6 +164,11 @@
+                 else:
+                         raise exc
+ 
++	def _q_traverse(self, path):
++		try:
++			return Directory._q_traverse(self, path)
++		except PublishError, exc:
++			return self._q_exception_handler(exc)	
+ 
+ 	#from page_login import Page as Page
+ 	#login = Page()
+
+
+
+From santiago at mail.berlios.de  Thu Mar  8 20:42:42 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Thu, 8 Mar 2007 20:42:42 +0100
+Subject: [Destar-dev] r629 - trunk
+Message-ID: <200703081942.l28JggXX004544@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-03-08 20:42:42 +0100 (Thu, 08 Mar 2007)
+New Revision: 629
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+Log:
+* Fixed an unicode and select widgets problem
+* added missing changelog entry
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-08 16:33:36 UTC (rev 628)
++++ trunk/CHANGELOG.txt	2007-03-08 19:42:42 UTC (rev 629)
+@@ -1,3 +1,7 @@
++2007-03-08:
++* Fixed an unicode and select widgets problem
++* Added _q_traverse() at page_main, to handle exceptions correctly
++
+ 2007-03-05:
+ * Fixed crazy ids assignment, Patch by ceronman
+ * Fixed some bugs "introduced" by the strict unicode handling
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-08 16:33:36 UTC (rev 628)
++++ trunk/ConfigHelper.ptl	2007-03-08 19:42:42 UTC (rev 629)
+@@ -274,16 +274,17 @@
+ 		elif v.type=="text":
+ 			form.add(TextWidget,   v.name, _v, t, v.hint, r, render_br=v.render_br, rows=v.__dict__.setdefault("rows",8), cols=v.__dict__.setdefault("cols",65) )
+ 		elif v.type=="choice":
+-			opts = v.options
+-			if type(opts) == types.FunctionType:
+-				opts = opts()
++			op = v.options
++			if type(op) == types.FunctionType:
++				op = op()
++			elif not op:
++				return errorpage(_("Required '%s' not found") % v.name)
++			opts = []
++			for a in op:
++				opts.append((a[0], _(a[1]), a[0]))
+ 			if v.optional and opts[0][0]:
+-				opts.insert(0, ('',''))
+-			elif not opts:
+-				return errorpage(_("Required '%s' not found") % v.name)
+-			for a in opts:
+-				a = (a[0], _(a[1]))
+-			form.add(SingleSelectWidget, v.name, _v, title=t, hint=v.hint, required=r, options=opts,render_br=v.render_br)
++				opts.insert(0, ('',_('(None)'),''))
++			form.add(SingleSelectWidget, v.name, _v, title=t, hint=v.hint, required=r, options=opts, render_br=v.render_br)
+ 		elif v.type=="mchoice":
+ 			# TODO: much of this code should NOT by in a *.ptl file
+ 			if not v.__dict__.has_key("options") and v.name=="include":
+@@ -296,15 +297,18 @@
+ 					v.options.append((c.name,desc))
+ 			if type(_v) == types.StringType:
+ 				_v = map(string.strip, _v.split(','))
+-			opts = v.options
+-			if type(opts) == types.FunctionType:
+-				opts = opts()
++			op = v.options
++			if type(op) == types.FunctionType:
++				op = op()
++			elif not op:
++				return errorpage(_("Required '%s' not found") % v.name)
++			opts = []
++			for a in op:
++				opts.append((a[0], _(a[1]), a[0]))
+ 			if v.optional and type(opts) == types.ListType:
+ 				if opts[0][0]:
+-					opts.insert(0, ('',''))
+-			elif not opts:
+-				return errorpage(_("Required '%s' not found") % v.name)
+-			form.add(MultipleSelectWidget, v.name, _v, title=t, hint=v.hint, required=r, options=opts,render_br=v.render_br)
++					opts.insert(0, ('',_('(None)'),''))
++			form.add(MultipleSelectWidget, v.name, _v, title=t, hint=v.hint, required=r, options=opts, render_br=v.render_br)
+ 		elif v.type=="radio":
+ 			opts = v.options
+ 			if type(opts) == types.FunctionType:
+
+
+
+From santiago at mail.berlios.de  Thu Mar  8 22:05:34 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Thu, 8 Mar 2007 22:05:34 +0100
+Subject: [Destar-dev] r630 - trunk
+Message-ID: <200703082105.l28L5YoR009863@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-03-08 22:05:33 +0100 (Thu, 08 Mar 2007)
+New Revision: 630
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+   trunk/backend.py
+   trunk/cfg_opt_music.py
+Log:
+* Fixed a cfg_opt_music.py problem
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-08 19:42:42 UTC (rev 629)
++++ trunk/CHANGELOG.txt	2007-03-08 21:05:33 UTC (rev 630)
+@@ -1,6 +1,7 @@
+ 2007-03-08:
+ * Fixed an unicode and select widgets problem
+ * Added _q_traverse() at page_main, to handle exceptions correctly
++* Fixed a cfg_opt_music.py problem
+ 
+ 2007-03-05:
+ * Fixed crazy ids assignment, Patch by ceronman
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-08 19:42:42 UTC (rev 629)
++++ trunk/ConfigHelper.ptl	2007-03-08 21:05:33 UTC (rev 630)
+@@ -283,7 +283,7 @@
+ 			for a in op:
+ 				opts.append((a[0], _(a[1]), a[0]))
+ 			if v.optional and opts[0][0]:
+-				opts.insert(0, ('',_('(None)'),''))
++				opts.insert(0, ('', _('(None)'), ''))
+ 			form.add(SingleSelectWidget, v.name, _v, title=t, hint=v.hint, required=r, options=opts, render_br=v.render_br)
+ 		elif v.type=="mchoice":
+ 			# TODO: much of this code should NOT by in a *.ptl file
+@@ -307,7 +307,7 @@
+ 				opts.append((a[0], _(a[1]), a[0]))
+ 			if v.optional and type(opts) == types.ListType:
+ 				if opts[0][0]:
+-					opts.insert(0, ('',_('(None)'),''))
++					opts.insert(0, ('', _('(None)'), ''))
+ 			form.add(MultipleSelectWidget, v.name, _v, title=t, hint=v.hint, required=r, options=opts, render_br=v.render_br)
+ 		elif v.type=="radio":
+ 			opts = v.options
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-03-08 19:42:42 UTC (rev 629)
++++ trunk/backend.py	2007-03-08 21:05:33 UTC (rev 630)
+@@ -683,7 +683,7 @@
+ 		a.append( (obj.__dict__[val], obj.__dict__[key]) )
+ 		
+ 	if a == [] :
+-		a.append( ('','') )
++		a.append( ('', '(None)') )
+ 		
+ 	if sort:
+ 		a.sort()
+
+Modified: trunk/cfg_opt_music.py
+===================================================================
+--- trunk/cfg_opt_music.py	2007-03-08 19:42:42 UTC (rev 629)
++++ trunk/cfg_opt_music.py	2007-03-08 21:05:33 UTC (rev 630)
+@@ -28,9 +28,26 @@
+ 	
+ 	def createVariables(self):
+ 		self.variables = [VarType("name", title=_("Name"), len=15),
+-		     VarType("type", title=_("Type"), type="choice", options=("mp3", "quietmp3","mp3nb","quietmp3nb","custom","files")),
+-		     VarType("dir",  title=_("Directory"), len=255),
+-		     VarType("app",  title=_("Application"), len=255, optional=True),
++		     VarType("type", 
++		     		title=_("Type"), 
++				type="choice", 
++				options=(("mp3", "mp3"), 
++					("quietmp3", _("Quiet mp3")) ,
++					("mp3nb", _("mp3 nbuffered")),
++					("quietmp3nb", _("Quiet mp3 unbuffered")),
++					("custom", _("Custom")),
++					("files", _("Files"))),
++					default="quietmp3",
++					),
++
++		     VarType("dir",  
++		     		title=_("Directory"), 
++				len=255),
++
++		     VarType("app",  
++		     		title=_("Application"), 
++				len=255, 
++				optional=True),
+ 				]
+ 
+ 	def checkConfig(self):
+
+
+
+From hholzer at mail.berlios.de  Sun Mar 11 21:21:36 2007
+From: hholzer at mail.berlios.de (hholzer at mail.berlios.de)
+Date: Sun, 11 Mar 2007 21:21:36 +0100
+Subject: [Destar-dev] r631 - trunk
+Message-ID: <200703112021.l2BKLamd013933@sheep.berlios.de>
+
+Author: hholzer
+Date: 2007-03-11 21:21:26 +0100 (Sun, 11 Mar 2007)
+New Revision: 631
+
+Added:
+   trunk/cfg_trunk_zapbri.py
+Removed:
+   trunk/cfg_trunk_zaphfc.py
+Log:
+zap bri configuration update (zaphfc)
+
+
+Added: trunk/cfg_trunk_zapbri.py
+===================================================================
+--- trunk/cfg_trunk_zapbri.py	2007-03-08 21:05:33 UTC (rev 630)
++++ trunk/cfg_trunk_zapbri.py	2007-03-11 20:21:26 UTC (rev 631)
+@@ -0,0 +1,191 @@
++# -*- coding: utf-8 -*-
++#
++# Copyright (C) 2005 by Holger Schurig
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++import panelutils
++
++
++class CfgTrunkZapBRI(CfgTrunk):
++
++	shortName = _("Standard ZAP BRI trunk")
++	newObjectTitle = _("New standard ZAP BRI trunk")
++	technology = "ZAP"
++	
++	def createVariables(self):
++		self.variables = [
++			VarType("name",
++				title=_("Name"),
++				len=35),
++
++			VarType("channels",
++				title=_("Zaptel channel number"),
++				type="int",
++				len=2,
++				default = 1),
++
++			VarType("cards", title=_("Number of lines"), type="int", default=1, len=2),
++
++			VarType("signalling",
++				title=_("Signalling type"),
++				type="choice",
++				options=[('bri_cpe',_('BRI signalling PTP, CPE side')),
++					('bri_net', _('BRI signalling PTP, Network side')),
++					('bri_cpe_ptmp',_('BRI signalling PTMP, CPE side')),
++					('bri_net_ptmp',_('BRI signalling PTMP, Network side'))],
++				default="bri_cpe_ptmp"),
++
++			VarType("group",
++				title=_("Callout group"),
++				type="int",
++				default = 1),
++	
++			VarType("panelLab",
++				title=_("Operator Panel"),
++				type="label",
++				hide=True),
++
++			VarType("panel",
++				title=_("Show this trunk in the panel"),
++				type="bool",
++				hide=True,
++				optional=True),
++
++			VarType("Inbound",
++				title=_("Calls from BRI trunk"),
++				type="label"),
++
++			VarType("clid",
++				title=_("Change Caller*Id to:"),
++				len=25,
++				optional=True),
++
++ 			VarType("clidnumin",
++ 				title=_("Change Caller*Id Number to:"),
++ 				len=40,
++ 				optional=True),
++
++			VarType("contextin",
++				title=_("Go to"),
++				type="radio",
++				default='phone',
++				options=[('phone',_("Phone")),('ivr',_("IVR")),('pbx',_("Virtual PBX"))]),
++
++			VarType("phone",
++				title=_("Extension to ring"),
++				type="choice",
++				optional=False,
++				options=getChoice("CfgPhone")),
++
++			VarType("ivr",
++				title=_("IVR to jump to"),
++				type="choice",
++				optional=True,
++				options=getChoice("CfgIVR")),
++
++			VarType("pbx",
++				title=_("Allow dial extension from which Virtual PBX"),
++				type="choice",
++				optional=True,
++				options=getChoice("CfgOptPBX")),
++
++ 			VarType("Outbound",
++ 				title=_("Outgoing calls to BRI trunk"),
++ 				type="label"),
++ 
++ 			VarType("clidnameout",
++ 				title=_("Change Caller*Id Name to:"),
++ 				len=40,
++ 				optional=True),
++ 
++ 			VarType("clidnumout",
++ 				title=_("Change Caller*Id Number to:"),
++ 				len=40,
++ 				optional=True),
++
++			VarType("dial",
++				hide=True,
++				len=50),
++				]
++
++		self.dependencies = [
++			DepType("phone", 
++					type="hard",
++					message = _("This is a Dependency")),
++			DepType("ivr", 
++					type="hard",
++					message = _("This is a Dependency"))
++		]
++
++	def checkConfig(self):
++                res = CfgTrunk.checkConfig(self)
++                if res:
++                        return res
++
++	def createAsteriskConfig(self):
++		needModule("chan_zap")
++
++		c = AstConf("zaptel.conf")
++		c.setSection("")
++		c.destar_comment = False
++		for n in range(self.cards):
++			c.append("span=%d,1,3,ccs,ami" % (self.channels + n))
++		for n in range(self.cards):
++			c.append("bchan=%d-%d" % (self.channels + n * 3, self.channels + n * 3 + 1))
++			c.append("dchan=%d" % (self.channels + n * 3 + 2))
++		c.append("alaw=%d-%d" % (self.channels + n * 3, self.channels + n * 3 + 2))
++		c.append("")
++
++		# Create config for chan_zap:
++		c = AstConf("zapata.conf")
++		c.append("")
++		c.append("nationalprefix = 0")
++		c.append("internationalprefix = 00")
++		c.append("pridialplan = dynamic")
++		c.append("prilocaldialplan = local")
++		c.append("echocancel=no")
++		c.append("echotraining = 300")
++		c.append("echocancelwhenbridged=no")
++		
++		c.append("switchtype=euroisdn")
++		c.append("signalling=%s" % self.signalling)
++
++		c.append("; ISDN Trunk %s" % self.name)
++		c.append("context=in-%s" % self.name)
++		if self.group:
++			c.appendValue(self, "group")
++
++		chanstr = ""
++		for n in range(self.cards):
++		    if chanstr:
++			chanstr = chanstr + ","
++		    chanstr = chanstr + "%d-%d" % (self.channels + n * 3 , self.channels + 1 + n * 3 )
++		c.append("channel=%s" % chanstr)
++		c.append("")
++
++		#Dial part to use on dialout macro
++		if self.group:
++			self.dial = "Zap/g%d/${ARG1}" % (self.group)
++		
++		#What to do with incoming calls
++		self.createIncomingContext()
++
++		if panelutils.isConfigured() == 1 and self.panel:
++			panelutils.createTrunkButton(self)
++
+
+Deleted: trunk/cfg_trunk_zaphfc.py
+===================================================================
+--- trunk/cfg_trunk_zaphfc.py	2007-03-08 21:05:33 UTC (rev 630)
++++ trunk/cfg_trunk_zaphfc.py	2007-03-11 20:21:26 UTC (rev 631)
+@@ -1,91 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# Copyright (C) 2005 by Holger Schurig
+-# 
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-#
+-
+-
+-from configlets import *
+-
+-
+-class CfgTrunkZapHFC(CfgTrunk):
+-
+-	shortName = _("ISDN using zaphfc")
+-	newObjectTitle = _("New ISDN using zaphfc trunk")
+-	
+-	def createVariables(self):
+-		self.variables = [
+-			VarType("name",  title=_("Name"), len=35),
+-			VarType("mode",  title=_("Mode of NTBA"), type="choice",
+-							 options=("p2p","p2mp"), default="p2mp"),
+-			VarType("cards", title=_("Number of cards"), type="int", default=1, len=2),
+-	
+-			VarType("Outbound",  title=_("Calls to the ISDN network"), type="label"),
+-			VarType("msn",   title=_("Subscriber number"), len=15),
+-			VarType("ext",   title=_("Outgoing prefix"), optional=True, len=6),
+-			]
+-
+-
+-	def fixup(self):
+-		CfgTrunk.fixup(self)
+-
+-
+-	def createAsteriskConfig(self):
+-		needModule("chan_zap")
+-
+-		# Create config for the zaphfc kernel module:
+-		c = AstConf("zaptel.conf")
+-		c.destar_comment = False
+-		c.setSection("")
+-		c.append("loadzone=nl")
+-		c.append("defaultzone=nl")
+-		for n in range(self.cards):
+-			c.append("span=%d,1,3,ccs,ami" % (n+1))
+-		for n in range(self.cards):
+-			c.append("bchan=%d-%d" % (n*3+1,n*3+2))
+-			c.append("dchan=%d" % (n*3+3))
+-
+-
+-		# Create config for chan_zap:
+-		c = AstConf("zapata.conf")
+-		c.append("switchtype=euroisdn")
+-		if self.mode=="p2p":
+-			c.append("signalling=bri_cpe")
+-			prefix=self.msn
+-		else:
+-			c.append("signalling=bri_net_ptmp")
+-			prefix = ""
+-		c.append("group=1")
+-		# TODO?
+-		c.append("context=in-pstn")
+-		c.append("channel=1-2")
+-
+-		# Write DID extensions
+-		if self.mode=="p2p":
+-			# For every phone, we need a separate DID config entry, we create them
+-			# in the [in-pstn] context.
+-			c = AstConf("extensions.conf")
+-			c.setSection("in-pstn")
+-			for p in configlet_tree:
+-				if not isinstance(p, Phone): continue
+-				if not p.did: continue
+-				#c.appendExten("%s%s" % (self.msn,p.ext), "Macro(exten-std,SIP/%s)" % p.name)
+-
+-		# Write dialout entry:
+-		if self.ext:
+-			c = AstConf("extensions.conf")
+-			c.setSection("default")
+-			c.appendExten("_%s." % self.ext, "Dial(Zap/g1/${EXTEN:%d},60)" % (len(self.ext)))
+
+
+
+From alerios at mail.berlios.de  Mon Mar 12 20:09:37 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Mon, 12 Mar 2007 20:09:37 +0100
+Subject: [Destar-dev] r632 - branches/0.2.X/misc
+Message-ID: <200703121909.l2CJ9bXe027110@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-12 20:09:37 +0100 (Mon, 12 Mar 2007)
+New Revision: 632
+
+Modified:
+   branches/0.2.X/misc/queue.db
+Log:
+* Added missing field to schema in queue.db sqlite3 database.
+
+
+Modified: branches/0.2.X/misc/queue.db
+===================================================================
+(Binary files differ)
+
+
+
+From hholzer at mail.berlios.de  Mon Mar 12 22:37:22 2007
+From: hholzer at mail.berlios.de (hholzer at mail.berlios.de)
+Date: Mon, 12 Mar 2007 22:37:22 +0100
+Subject: [Destar-dev] r633 - trunk
+Message-ID: <200703122137.l2CLbMk5004196@sheep.berlios.de>
+
+Author: hholzer
+Date: 2007-03-12 22:37:18 +0100 (Mon, 12 Mar 2007)
+New Revision: 633
+
+Added:
+   trunk/cfg_app_pickup.py
+Modified:
+   trunk/configlets.py
+Log:
+channel pickup
+
+
+Added: trunk/cfg_app_pickup.py
+===================================================================
+--- trunk/cfg_app_pickup.py	2007-03-12 19:09:37 UTC (rev 632)
++++ trunk/cfg_app_pickup.py	2007-03-12 21:37:18 UTC (rev 633)
+@@ -0,0 +1,51 @@
++# -*- coding: utf-8 -*-
++#
++# Destar has Copyright (C) 2005 by Holger Schurig
++# This file has Copyright (C) 2005 by Alejandro Rios
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++
++class CfgAppPickup(CfgApp):
++
++	shortName   = _("Channel Pickup")
++	newObjectTitle  = _("New extensions to pickup a ringing Channel")
++	description = _("Extensions to pickup a ringing Channel.")
++	
++	def createVariables(self):
++		self.variables   = [
++			VarType("pbx",
++				title=_("Virtual PBX"),
++				type="choice",
++				options=getChoice("CfgOptPBX")),
++			VarType("prefix",
++				title=_("Channel Pickup Prefix"),
++				len=6,
++				default="*8",
++				hint="needs bristuff patches (app_pickup.so)."),
++		       ]
++		self.dependencies = [ DepType("pbx", 
++					type="hard",
++					message = _("This is a Dependency")),
++					]
++
++	def row(self):
++		return ("%s" % (self.prefix), self.shortName, self.pbx)
++	
++	def createAsteriskConfig(self):
++		needModule("app_pickup")
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-03-12 19:09:37 UTC (rev 632)
++++ trunk/configlets.py	2007-03-12 21:37:18 UTC (rev 633)
+@@ -1001,6 +1001,7 @@
+                         pbx = "phones"
+                 extensions.setSection(pbx)
+ 		extensions.append("exten=%s,hint,%s/%s" % (self.ext, self.technology, self.name))
++		extensions.append("exten=%s,hint,%s/%s" % (self.name, self.technology, self.name))
+ 		extensions.appendExten(self.ext,"Set(CDR(pbx)=%s,CDR(userfield)=%s)" % (pbx,self.name))
+ 		self.createDialEntry(extensions, self.ext, pbx, self.ext)
+ 		extensions.appendExten(self.name,"Set(CDR(pbx)=%s,CDR(userfield)=%s)" % (pbx,self.name))
+@@ -1010,11 +1011,14 @@
+ 				if obj.devstateprefix:
+ 					extensions.append("exten=%s%s,hint,DS/%s_%s_%s" % (obj.devstateprefix, self.ext, obj.type.lower(), pbx, self.ext))
+ 					extensions.appendExten("%s%s" % (obj.devstateprefix, self.ext), "Goto(%s,%s,1)" % (pbx, obj.set))
+-		for obj in configlet_tree:
+ 			if obj.__class__.__name__ == 'CfgAppVoicemailSettings':
+ 				if obj.devstateprefix:
+ 					extensions.append("exten=%s%s,hint,DS/%s_%s_%s" % (obj.devstateprefix, self.ext, obj.type.lower(), pbx, self.ext))
+ 					extensions.appendExten("%s%s" % (obj.devstateprefix, self.ext), "Goto(%s,%s,1)" % (pbx, obj.set))
++			if obj.__class__.__name__ == 'CfgAppPickup':
++				if obj.prefix:
++					extensions.append("exten=%s%s,1,PickupChan(%s/%s)" % (obj.prefix, self.ext, self.technology, self.name))
++					extensions.append("exten=%s%s,1,PickupChan(%s/%s)" % (obj.prefix, self.name, self.technology, self.name))
+ 
+ 	def createVoicemailConfig(self, conf):
+ 		vmconfig = False;
+
+
+
+From admin at berlios.de  Tue Mar 13 02:19:06 2007
+From: admin at berlios.de (admin at berlios.de)
+Date: Tue, 13 Mar 2007 02:19:06 +0100 (CET)
+Subject: [Destar-dev] [Bug #10469] zaphfc trunk config doesn't work
+Message-ID: <200703130119.l2D1J63w019532@unicorn.berlios.de>
+
+Bug #10469, was updated on 2007-Feb-23 22:28
+Here is a current snapshot of the bug.
+
+Project: DeStar
+Category: None
+Status: Closed
+Resolution: Fixed
+Bug Group: None
+Priority: 7
+Submitted by: santiago
+Assigned to : hholzer
+Summary: zaphfc trunk config doesn't work 
+
+Details: the zaphfc trunk configure option doesn't work. 
+
+In destar-0.2.X:
+
+Traceback (most recent call last):
+  File "/var/lib/python-support/python2.4/quixote/publish.py", line 522, in process_request
+    output = self.try_publish(request, env.get('PATH_INFO', ''))
+  File "/var/lib/python-support/python2.4/quixote/publish.py", line 444, in try_publish
+    self.namespace_stack)
+  File "/var/lib/python-support/python2.4/quixote/publish.py", line 697, in _traverse_url
+    namespace_stack)
+  File "/var/lib/python-support/python2.4/quixote/publish.py", line 802, in _get_component
+    object = container._q_lookup(request, component)
+  File "/home/santiago/proyectos/destar-0.2.x/ConfigHelper.ptl", line 125, in lookupConfiglets
+    new=True)
+  File "/home/santiago/proyectos/destar-0.2.x/ConfigHelper.ptl", line 338, in configletsForm
+    checkConfig()
+  File "/home/santiago/proyectos/destar-0.2.x/ConfigHelper.ptl", line 191, in checkConfig
+    ret = obj.checkConfig()
+  File "/home/santiago/proyectos/destar-0.2.x/cfg_trunk_zaphfc.py", line 43, in checkConfig
+    res = CfgTrunk.checkConfig(self)
+  File "/home/santiago/proyectos/destar-0.2.x/configlets.py", line 874, in checkConfig
+    if self.contextin == 'phone' and not self.phone:
+  File "/home/santiago/proyectos/destar-0.2.x/configlets.py", line 508, in __getattr__
+    raise AttributeError
+AttributeError
+
+Also, see http://bugs.debian.org/410341
+
+Follow-Ups:
+
+Date: 2007-Mar-13 02:19
+By: hholzer
+
+Comment:
+zapbri now replaces the zaphfc trunk module
+-------------------------------------------------------
+
+For detailed info, follow this link:
+http://developer.berlios.de/bugs/?func=detailbug&bug_id=10469&group_id=2112
+
+
+From admin at berlios.de  Tue Mar 13 23:27:00 2007
+From: admin at berlios.de (admin at berlios.de)
+Date: Tue, 13 Mar 2007 17:27:00 -0500 (COT)
+Subject: [Destar-dev] [Bug #10622] javascript in call details isn't working
+Message-ID: <200703132227.l2DMR0BZ024087@unicorn.berlios.de>
+
+Bug #10622, was updated on 2007-Mar-13 17:27
+Here is a current snapshot of the bug.
+
+Project: DeStar
+Category: None
+Status: Open
+Resolution: None
+Bug Group: None
+Priority: 1
+Submitted by: santiago
+Assigned to : none
+Summary: javascript in call details isn't working
+
+Details: It's due a bug in quixote.form, __init__ method doesn't have a name attribute, as it was quixote 1.0's form2.
+
+
+
+For detailed info, follow this link:
+http://developer.berlios.de/bugs/?func=detailbug&bug_id=10622&group_id=2112
+
+
+From santiago at avatar.com.co  Tue Mar 13 22:38:37 2007
+From: santiago at avatar.com.co (Santiago Ruano =?ISO-8859-1?Q?Rinc=F3n?=)
+Date: Tue, 13 Mar 2007 16:38:37 -0500
+Subject: [Destar-dev] r631 - trunk
+In-Reply-To: <200703112021.l2BKLamd013933@sheep.berlios.de>
+References: <200703112021.l2BKLamd013933@sheep.berlios.de>
+Message-ID: <1173821917.5275.17.camel@localhost.localdomain>
+
+Hi,
+
+El dom, 11-03-2007 a las 21:21 +0100, hholzer at mail.berlios.de escribi?:
+> Author: hholzer
+> Date: 2007-03-11 21:21:26 +0100 (Sun, 11 Mar 2007)
+> New Revision: 631
+...
+> +		c = AstConf("zapata.conf")
+> +		c.append("")
+> +		c.append("nationalprefix = 0")
+> +		c.append("internationalprefix = 00")
+
+Couldn't these prefixes be set in the dialouts?
+
+Regards,
+
+--
+Santiago Ruano Rinc?n
+http://www.avatar.com.co
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 189 bytes
+Desc: Esta parte del mensaje est? firmada	digitalmente
+URL: <https://lists.berlios.de/pipermail/destar-dev/attachments/20070313/113a50f8/attachment.pgp>
+
+From tzafrir.cohen at xorcom.com  Wed Mar 14 10:33:55 2007
+From: tzafrir.cohen at xorcom.com (Tzafrir Cohen)
+Date: Wed, 14 Mar 2007 11:33:55 +0200
+Subject: [Destar-dev] r631 - trunk
+In-Reply-To: <1173821917.5275.17.camel@localhost.localdomain>
+References: <200703112021.l2BKLamd013933@sheep.berlios.de>
+	<1173821917.5275.17.camel@localhost.localdomain>
+Message-ID: <20070314093355.GH23017@xorcom.com>
+
+On Tue, Mar 13, 2007 at 04:38:37PM -0500, Santiago Ruano Rinc?n wrote:
+> Hi,
+> 
+> El dom, 11-03-2007 a las 21:21 +0100, hholzer at mail.berlios.de escribi?:
+> > Author: hholzer
+> > Date: 2007-03-11 21:21:26 +0100 (Sun, 11 Mar 2007)
+> > New Revision: 631
+> ...
+> > +		c = AstConf("zapata.conf")
+> > +		c.append("")
+> > +		c.append("nationalprefix = 0")
+> > +		c.append("internationalprefix = 00")
+> 
+> Couldn't these prefixes be set in the dialouts?
+
+No. They are used to set the Type Of Number field. There seem to be soem
+variations of this.
+
+BTW: why is that template specific to zapbri? Digital zaptel is quite
+similar. Different signalling, and maybe different defaults, but
+basically the same.
+
+-- 
+               Tzafrir Cohen       
+icq#16849755                    jabber:tzafrir at jabber.org
++972-50-7952406           mailto:tzafrir.cohen at xorcom.com       
+http://www.xorcom.com  iax:guest at local.xorcom.com/tzafrir
+
+
+From santiago at mail.berlios.de  Wed Mar 14 20:10:46 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Wed, 14 Mar 2007 20:10:46 +0100
+Subject: [Destar-dev] r634 - trunk
+Message-ID: <200703141910.l2EJAkvN021529@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-03-14 20:10:45 +0100 (Wed, 14 Mar 2007)
+New Revision: 634
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_stats_cdr.ptl
+Log:
+* page_stats_cdr: added name attribute in the form. Fixes bug #10622
+- closed img tags
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-12 21:37:18 UTC (rev 633)
++++ trunk/CHANGELOG.txt	2007-03-14 19:10:45 UTC (rev 634)
+@@ -1,3 +1,7 @@
++2007-03-14:
++* page_stats_cdr: added name attribute in the form. Fixes bug #10622 
++- closed img tags
++
+ 2007-03-08:
+ * Fixed an unicode and select widgets problem
+ * Added _q_traverse() at page_main, to handle exceptions correctly
+
+Modified: trunk/page_stats_cdr.ptl
+===================================================================
+--- trunk/page_stats_cdr.ptl	2007-03-12 21:37:18 UTC (rev 633)
++++ trunk/page_stats_cdr.ptl	2007-03-14 19:10:45 UTC (rev 634)
+@@ -122,9 +122,7 @@
+ 	else:
+ 		localday = localtime[2]
+ 
+-	form = Form()
+-
+-	form.name = "searchform"
++	form = Form(name = "searchform")
+ 	
+ 	form.add(StringWidget, "pbx",  "%s" % pbx, title=htmltext(_("PBX")),hint=htmltext(_("Wildcards: % is the 'zero or more characters' wildcard, and _ is the 'exactly one character' wildcard")), render_br=True )
+ 	form.add(StringWidget, "srcextension",  "%s" % srcextension, title=htmltext(_("Source ")),hint=htmltext(_("Wildcards: % is the 'zero or more characters' wildcard, and _ is the 'exactly one character' wildcard")), render_br=True )
+@@ -252,9 +250,9 @@
+ 					neworder = (order=='ASC' and 'DESC') or 'ASC'
+ 					"<a href='javascript:orderby(\"%s\",\"%s\")'>%s</a>" % (s[0], neworder, M_(s[0]))
+ 					if order=='ASC':
+-						" <img src='/static/down.gif' border='0' alt='%s'>\n" % M_('Asc. Order')
++						" <img src='/static/down.gif' border='0' alt='%s' />\n" % M_('Asc. Order')
+ 					else:
+-						" <img src='/static/up.gif' border='0' alt='%s'>\n" % M_('Desc. Order')
++						" <img src='/static/up.gif' border='0' alt='%s' />\n" % M_('Desc. Order')
+ 				else:
+ 					"<a href='javascript:orderby(\"%s\",\"%s\")'>%s</a>" % (s[0], order, M_(s[0]))
+ 				'</th>'
+
+
+
+From admin at berlios.de  Wed Mar 14 20:09:46 2007
+From: admin at berlios.de (admin at berlios.de)
+Date: Wed, 14 Mar 2007 14:09:46 -0500 (COT)
+Subject: [Destar-dev] [Bug #10622] javascript in call details isn't working
+Message-ID: <200703141909.l2EJ9kd2019212@unicorn.berlios.de>
+
+Bug #10622, was updated on 2007-Mar-13 17:27
+Here is a current snapshot of the bug.
+
+Project: DeStar
+Category: None
+Status: Closed
+Resolution: Fixed
+Bug Group: None
+Priority: 1
+Submitted by: santiago
+Assigned to : none
+Summary: javascript in call details isn't working
+
+Details: It's due a bug in quixote.form, __init__ method doesn't have a name attribute, as it was quixote 1.0's form2.
+
+
+
+Follow-Ups:
+
+Date: 2007-Mar-14 14:09
+By: santiago
+
+Comment:
+Fixed in rev 634
+-------------------------------------------------------
+
+For detailed info, follow this link:
+http://developer.berlios.de/bugs/?func=detailbug&bug_id=10622&group_id=2112
+
+
+From santiago at mail.berlios.de  Wed Mar 14 22:02:27 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Wed, 14 Mar 2007 22:02:27 +0100
+Subject: [Destar-dev] r635 - trunk
+Message-ID: <200703142102.l2EL2R3N028402@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-03-14 22:02:26 +0100 (Wed, 14 Mar 2007)
+New Revision: 635
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_opt_manager.py
+Log:
+* cfg_opt_manager.py: fixed an options problem, cosmetic changes
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-14 19:10:45 UTC (rev 634)
++++ trunk/CHANGELOG.txt	2007-03-14 21:02:26 UTC (rev 635)
+@@ -1,6 +1,7 @@
+ 2007-03-14:
+ * page_stats_cdr: added name attribute in the form. Fixes bug #10622 
+ - closed img tags
++* cfg_opt_manager.py: fixed an options problem, cosmetic changes
+ 
+ 2007-03-08:
+ * Fixed an unicode and select widgets problem
+
+Modified: trunk/cfg_opt_manager.py
+===================================================================
+--- trunk/cfg_opt_manager.py	2007-03-14 19:10:45 UTC (rev 634)
++++ trunk/cfg_opt_manager.py	2007-03-14 21:02:26 UTC (rev 635)
+@@ -27,13 +27,47 @@
+ 	newObjectTitle= _("New management API access")
+ 	
+ 	def createVariables(self):
+-		_opt = ("","system", "call", "log", "verbose", "command", "agent", "user")
+-		self.variables = [VarType("name",   title=_("Name"), len=15),
+-		     VarType("secret", title=_("Secret"), len=15, default=generatePassword(8)),
+-		     VarType("deny",   title=_("IP disable mask"), len=31, default="0.0.0.0/0.0.0.0"),
+-		     VarType("permit", title=_("IP enable mask"), len=31,   default="127.0.0.1/255.255.255.0"),
+-		     VarType("read",   title=_("Read"),  type="mchoice", optional=True, options=_opt),
+-		     VarType("write",  title=_("Write"), type="mchoice", optional=True, options=_opt, default=','.join(_opt)),
++		_opt = ( ("system", _("System")), 
++			("call", _("Call")), 
++			("log", _("Log")), 
++			("verbose", _("Verbose")),
++			("command", _("Command")), 
++			("agent", _("Agent")), 
++			("user", _("User")) )
++
++		self.variables = [
++			VarType("name",   
++				title=_("Name"), 
++				len=15),
++
++		     	VarType("secret", 
++				title=_("Secret"), 
++				len=15, 
++				default=generatePassword(8)),
++		     
++		     VarType("deny",   
++		     		title=_("IP disable mask"), 
++				len=31, 
++				default="0.0.0.0/0.0.0.0"),
++
++		     VarType("permit", 
++		     		title=_("IP enable mask"), 
++				len=31,   
++				default="127.0.0.1/255.255.255.0"),
++
++		     VarType("read",   
++		     		title=_("Read"),  
++				type="mchoice", 
++				optional=True, 
++				options=_opt),
++
++		     VarType("write",  
++		     		title=_("Write"), 
++				type="mchoice", 
++				optional=True, 
++				options=_opt, 
++				),
++				#default=','.join(_opt)),
+ 		    ]
+ 
+ 	def createAsteriskConfig(self):
+
+
+
+From santiago at mail.berlios.de  Wed Mar 14 22:07:11 2007
+From: santiago at mail.berlios.de (santiago at BerliOS)
+Date: Wed, 14 Mar 2007 22:07:11 +0100
+Subject: [Destar-dev] r636 - trunk
+Message-ID: <200703142107.l2EL7BNe028824@sheep.berlios.de>
+
+Author: santiago
+Date: 2007-03-14 22:07:10 +0100 (Wed, 14 Mar 2007)
+New Revision: 636
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+Log:
+* ConfigHelper: Don't translate "" strings in single and multi select widgets
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-14 21:02:26 UTC (rev 635)
++++ trunk/CHANGELOG.txt	2007-03-14 21:07:10 UTC (rev 636)
+@@ -2,6 +2,7 @@
+ * page_stats_cdr: added name attribute in the form. Fixes bug #10622 
+ - closed img tags
+ * cfg_opt_manager.py: fixed an options problem, cosmetic changes
++* ConfigHelper: Don't translate "" strings in single and multi select widgets
+ 
+ 2007-03-08:
+ * Fixed an unicode and select widgets problem
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-14 21:02:26 UTC (rev 635)
++++ trunk/ConfigHelper.ptl	2007-03-14 21:07:10 UTC (rev 636)
+@@ -281,7 +281,10 @@
+ 				return errorpage(_("Required '%s' not found") % v.name)
+ 			opts = []
+ 			for a in op:
+-				opts.append((a[0], _(a[1]), a[0]))
++                                if a[1]:
++                                        opts.append((a[0], _(a[1]), a[0]))
++                                else:
++                                        opts.append((a[0], a[1], a[0]))
+ 			if v.optional and opts[0][0]:
+ 				opts.insert(0, ('', _('(None)'), ''))
+ 			form.add(SingleSelectWidget, v.name, _v, title=t, hint=v.hint, required=r, options=opts, render_br=v.render_br)
+@@ -304,7 +307,10 @@
+ 				return errorpage(_("Required '%s' not found") % v.name)
+ 			opts = []
+ 			for a in op:
+-				opts.append((a[0], _(a[1]), a[0]))
++                                if a[1]:
++                                        opts.append((a[0], _(a[1]), a[0]))
++                                else:
++                                        opts.append((a[0], a[1], a[0]))
+ 			if v.optional and type(opts) == types.ListType:
+ 				if opts[0][0]:
+ 					opts.insert(0, ('', _('(None)'), ''))
+
+
+
+From admin at berlios.de  Thu Mar 15 02:59:22 2007
+From: admin at berlios.de (admin at berlios.de)
+Date: Wed, 14 Mar 2007 22:59:22 -0300 (BRT)
+Subject: [Destar-dev] [Bug #10641] Unicode should be turned off
+Message-ID: <200703150159.l2F1xMeE021504@unicorn.berlios.de>
+
+Bug #10641, was updated on 2007-Mar-14 22:59
+Here is a current snapshot of the bug.
+
+Project: DeStar
+Category: None
+Status: Open
+Resolution: None
+Bug Group: None
+Priority: 5
+Submitted by: imesper
+Assigned to : none
+Summary: Unicode should be turned off
+
+Details: we should not use unicode, we must change the charset to utf-8, so we will be able to have accent in widgets, the branch 0.2.x show the page in utf-8 not in iso-8859-1 as trunk does
+
+For detailed info, follow this link:
+http://developer.berlios.de/bugs/?func=detailbug&bug_id=10641&group_id=2112
+
+
+From imesper at mail.berlios.de  Fri Mar 16 15:41:54 2007
+From: imesper at mail.berlios.de (imesper at BerliOS)
+Date: Fri, 16 Mar 2007 15:41:54 +0100
+Subject: [Destar-dev] r637 - trunk
+Message-ID: <200703161441.l2GEfslm009101@sheep.berlios.de>
+
+Author: imesper
+Date: 2007-03-16 15:41:53 +0100 (Fri, 16 Mar 2007)
+New Revision: 637
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+   trunk/session.py
+Log:
+More Unicode corrections - it closes bug [Bug #10641]
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-14 21:07:10 UTC (rev 636)
++++ trunk/CHANGELOG.txt	2007-03-16 14:41:53 UTC (rev 637)
+@@ -1,3 +1,7 @@
++2007-03-16:
++*session.py: added utf-8 in request.response, because quixote-2 uses ISO-8859-1 as default
++*ConfigHelper: had to do some converting to unicode
++
+ 2007-03-14:
+ * page_stats_cdr: added name attribute in the form. Fixes bug #10622 
+ - closed img tags
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-14 21:07:10 UTC (rev 636)
++++ trunk/ConfigHelper.ptl	2007-03-16 14:41:53 UTC (rev 637)
+@@ -78,7 +78,8 @@
+ 				else:
+ 					if f == "":
+ 						f = " "
+-	                                '<td>%s</td>' % _(f)
++	                                f = unicode(f, str('utf-8'))
++					'<td>%s</td>' % _(f)
+                         '</tr>'
+                         n = n + 1
+                 '</table>'
+@@ -263,7 +264,7 @@
+ 		if v.hide:
+ 			continue
+ 		try:
+-			_v = obj.__dict__[v.name]
++			_v = unicode(obj.__dict__[v.name], 'utf-8')
+ 		except:
+ 			_v = ''
+ 		if _v: do_update = True
+
+Modified: trunk/session.py
+===================================================================
+--- trunk/session.py	2007-03-14 21:07:10 UTC (rev 636)
++++ trunk/session.py	2007-03-16 14:41:53 UTC (rev 637)
+@@ -34,7 +34,7 @@
+ 
+ 		request = get_request()
+ 		t = time.time()
+-
++		request.response.set_charset('utf-8')
+ 		# Determine IP of originator, keep Squid in mind :-)
+ 		try:
+ 			self.ip = request.environ['HTTP_X_FORWARDED_FOR']
+
+
+
+From admin at berlios.de  Fri Mar 16 15:53:12 2007
+From: admin at berlios.de (admin at berlios.de)
+Date: Fri, 16 Mar 2007 11:53:12 -0300 (BRT)
+Subject: [Destar-dev] [Bug #10641] Unicode should be turned off
+Message-ID: <200703161453.l2GErC0B010550@unicorn.berlios.de>
+
+Bug #10641, was updated on 2007-Mar-14 22:59
+Here is a current snapshot of the bug.
+
+Project: DeStar
+Category: None
+Status: Open
+Resolution: None
+Bug Group: None
+Priority: 5
+Submitted by: imesper
+Assigned to : none
+Summary: Unicode should be turned off
+
+Details: we should not use unicode, we must change the charset to utf-8, so we will be able to have accent in widgets, the branch 0.2.x show the page in utf-8 not in iso-8859-1 as trunk does
+
+Follow-Ups:
+
+Date: 2007-Mar-16 11:53
+By: imesper
+
+Comment:
+It was solved in revision 637, without the need to turn unicode off
+-------------------------------------------------------
+
+For detailed info, follow this link:
+http://developer.berlios.de/bugs/?func=detailbug&bug_id=10641&group_id=2112
+
+
+From imesper at mail.berlios.de  Fri Mar 16 16:13:10 2007
+From: imesper at mail.berlios.de (imesper at BerliOS)
+Date: Fri, 16 Mar 2007 16:13:10 +0100
+Subject: [Destar-dev] r638 - trunk
+Message-ID: <200703161513.l2GFDAFw011021@sheep.berlios.de>
+
+Author: imesper
+Date: 2007-03-16 16:13:09 +0100 (Fri, 16 Mar 2007)
+New Revision: 638
+
+Modified:
+   trunk/ConfigHelper.ptl
+Log:
+Correcting my mistake
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-16 14:41:53 UTC (rev 637)
++++ trunk/ConfigHelper.ptl	2007-03-16 15:13:09 UTC (rev 638)
+@@ -78,8 +78,11 @@
+ 				else:
+ 					if f == "":
+ 						f = " "
+-	                                f = unicode(f, str('utf-8'))
+-					'<td>%s</td>' % _(f)
++	                		try:	                
++						'<td>%s</td>' % _(f)
++					except:
++						f = unicode(f, str('utf-8'))
++						'<td>%s</td>' % _(f)
+                         '</tr>'
+                         n = n + 1
+                 '</table>'
+@@ -264,13 +267,14 @@
+ 		if v.hide:
+ 			continue
+ 		try:
+-			_v = unicode(obj.__dict__[v.name], 'utf-8')
++			_v = obj.__dict__[v.name]
+ 		except:
+ 			_v = ''
+ 		if _v: do_update = True
+ 		t = _(v.title)
+ 		r = not v.optional
+ 		if v.type=="string":
++			_v = unicode(_v, 'utf-8')
+ 			form.add(StringWidget, v.name, _v, t, v.hint, r, render_br=v.render_br, maxlength=v.len, size=min(v.size,56) )
+ 		elif v.type=="text":
+ 			form.add(TextWidget,   v.name, _v, t, v.hint, r, render_br=v.render_br, rows=v.__dict__.setdefault("rows",8), cols=v.__dict__.setdefault("cols",65) )
+
+
+
+From hholzer at mail.berlios.de  Sun Mar 18 16:19:10 2007
+From: hholzer at mail.berlios.de (hholzer at mail.berlios.de)
+Date: Sun, 18 Mar 2007 16:19:10 +0100
+Subject: [Destar-dev] r639 - trunk
+Message-ID: <200703181519.l2IFJAvf028209@sheep.berlios.de>
+
+Author: hholzer
+Date: 2007-03-18 16:19:06 +0100 (Sun, 18 Mar 2007)
+New Revision: 639
+
+Added:
+   trunk/cfg_opt_sipnotify.py
+Log:
+added sip notify config
+
+
+Added: trunk/cfg_opt_sipnotify.py
+===================================================================
+--- trunk/cfg_opt_sipnotify.py	2007-03-16 15:13:09 UTC (rev 638)
++++ trunk/cfg_opt_sipnotify.py	2007-03-18 15:19:06 UTC (rev 639)
+@@ -0,0 +1,62 @@
++# -*- coding: utf-8 -*-
++#
++# Copyright (C) 2007 by Harald Holzer
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++
++
++class CfgOptEnum(CfgOpt):
++
++	shortName = _("Sip notify")
++	newObjectTitle= _("Sip notify")
++	
++	def createVariables(self):
++		self.variables = [
++			VarType("info",
++			    title=_("Enables the sip notify command to reboot or sync phones on asterisk commanline."),
++			    type="label",
++			    )]
++
++	def createAsteriskConfig(self):
++		c = AstConf("sip_notify.conf")
++		c.setSection("snom-reboot")
++		c.append("Event=>reboot")
++		c.append("Content-Length=>0")
++		c.append("")
++		c.setSection("snom-check-cfg")
++		c.append("Event=>check-sync;reboot=false")
++		c.append("Content-Length=>0")
++		c.append("")
++		c.setSection("polycom-check-cfg")
++		c.append("Event=>check-sync")
++		c.append("Content-Length=>0")
++		c.append("")
++		c.setSection("sipura-check-cfg")
++		c.append("Event=>resync")
++		c.append("Content-Length=>0")
++		c.append("")
++		c.setSection("grandstream-check-cfg")
++		c.append("Event=>sys-control")
++		c.append("")
++		c.setSection("cisco-check-cfg")
++		c.append("Event=>check-sync")
++		c.append("Content-Length=>0")
++
++	def row(self):
++		return (self.shortName, "")
+
+
+
+From imesper at mail.berlios.de  Mon Mar 19 20:12:49 2007
+From: imesper at mail.berlios.de (imesper at BerliOS)
+Date: Mon, 19 Mar 2007 20:12:49 +0100
+Subject: [Destar-dev] r640 - trunk
+Message-ID: <200703191912.l2JJCnOQ012503@sheep.berlios.de>
+
+Author: imesper
+Date: 2007-03-19 20:12:48 +0100 (Mon, 19 Mar 2007)
+New Revision: 640
+
+Modified:
+   trunk/ConfigHelper.ptl
+Log:
+More unicode fix
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-18 15:19:06 UTC (rev 639)
++++ trunk/ConfigHelper.ptl	2007-03-19 19:12:48 UTC (rev 640)
+@@ -72,17 +72,18 @@
+                                 '<td>&nbsp;</td>'
+                         wrap = True
+                         for f in o.row():
+-                                if wrap:
++                                try:
++                                        f = unicode(f, str('utf-8'))
++                                except: 
++                                        pass
++                                
++				if wrap:
+                                         '<td><a href="../edit/%s">%s</a></td>' % (o._id, f)
+                                         wrap = False
+ 				else:
+ 					if f == "":
+ 						f = " "
+-	                		try:	                
+ 						'<td>%s</td>' % _(f)
+-					except:
+-						f = unicode(f, str('utf-8'))
+-						'<td>%s</td>' % _(f)
+                         '</tr>'
+                         n = n + 1
+                 '</table>'
+@@ -273,23 +274,40 @@
+ 		if _v: do_update = True
+ 		t = _(v.title)
+ 		r = not v.optional
++
++                if not v.type == "int" and not v.type == 'bool' and not v.type=='radio' and _v:
++                        try:
++                                _v = unicode(_v, 'utf-8')
++                        except:
++				pass
++		
+ 		if v.type=="string":
+-			_v = unicode(_v, 'utf-8')
+ 			form.add(StringWidget, v.name, _v, t, v.hint, r, render_br=v.render_br, maxlength=v.len, size=min(v.size,56) )
+ 		elif v.type=="text":
+ 			form.add(TextWidget,   v.name, _v, t, v.hint, r, render_br=v.render_br, rows=v.__dict__.setdefault("rows",8), cols=v.__dict__.setdefault("cols",65) )
+ 		elif v.type=="choice":
+-			op = v.options
+ 			if type(op) == types.FunctionType:
+ 				op = op()
+ 			elif not op:
+ 				return errorpage(_("Required '%s' not found") % v.name)
+ 			opts = []
+-			for a in op:
+-                                if a[1]:
+-                                        opts.append((a[0], _(a[1]), a[0]))
+-                                else:
+-                                        opts.append((a[0], a[1], a[0]))
++                        n = 0
++                        for a in op:
++                                try:
++                                        c = unicode(a[1], 'utf-8')
++					b = unicode(a[0], 'utf-8')	
++                                        if a[1]:
++                                                opts.append((b, _(c), n))
++                                        else:
++                                                opts.append((b, c, n))
++
++                                except:
++                                        if a[1]:
++                                                opts.append((a[0], _(a[1]), a[0]))
++                                        else:
++                                                opts.append((a[0], a[1], a[0]))
++                                n += 1
++			
+ 			if v.optional and opts[0][0]:
+ 				opts.insert(0, ('', _('(None)'), ''))
+ 			form.add(SingleSelectWidget, v.name, _v, title=t, hint=v.hint, required=r, options=opts, render_br=v.render_br)
+@@ -311,11 +329,23 @@
+ 			elif not op:
+ 				return errorpage(_("Required '%s' not found") % v.name)
+ 			opts = []
+-			for a in op:
+-                                if a[1]:
+-                                        opts.append((a[0], _(a[1]), a[0]))
+-                                else:
+-                                        opts.append((a[0], a[1], a[0]))
++                        n = 0
++                        for a in op:
++                                try:
++                                        c = unicode(a[1], 'utf-8')
++					b = unicode(a[0], 'utf-8')	
++                                        if a[1]:
++                                                opts.append((b, _(c), n))
++                                        else:
++                                                opts.append((b, c, n))
++
++                                except:
++                                        if a[1]:
++                                                opts.append((a[0], _(a[1]), a[0]))
++                                        else:
++                                                opts.append((a[0], a[1], a[0]))
++                                n += 1
++
+ 			if v.optional and type(opts) == types.ListType:
+ 				if opts[0][0]:
+ 					opts.insert(0, ('', _('(None)'), ''))
+
+
+
+From imesper at mail.berlios.de  Mon Mar 19 20:16:16 2007
+From: imesper at mail.berlios.de (imesper at BerliOS)
+Date: Mon, 19 Mar 2007 20:16:16 +0100
+Subject: [Destar-dev] r641 - trunk
+Message-ID: <200703191916.l2JJGG5g012757@sheep.berlios.de>
+
+Author: imesper
+Date: 2007-03-19 20:16:16 +0100 (Mon, 19 Mar 2007)
+New Revision: 641
+
+Modified:
+   trunk/backend.py
+Log:
+More unicode fix, when it's gonna stop
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-03-19 19:12:48 UTC (rev 640)
++++ trunk/backend.py	2007-03-19 19:16:16 UTC (rev 641)
+@@ -99,7 +99,10 @@
+ 	for c in configlets.configlet_tree:
+ 		a = c.createPythonConfig()
+ 		for s in a:
+-			f.write("%s\n" % s)
++                        try:
++                                f.write("%s\n" % s.encode('utf-8'))
++                        except:
++                                f.write("%s\n" % s)
+ 
+ 
+ 
+
+
+
+From imesper at mail.berlios.de  Mon Mar 19 21:18:52 2007
+From: imesper at mail.berlios.de (imesper at BerliOS)
+Date: Mon, 19 Mar 2007 21:18:52 +0100
+Subject: [Destar-dev] r642 - trunk
+Message-ID: <200703192018.l2JKIqBu016868@sheep.berlios.de>
+
+Author: imesper
+Date: 2007-03-19 21:18:52 +0100 (Mon, 19 Mar 2007)
+New Revision: 642
+
+Modified:
+   trunk/ConfigHelper.ptl
+Log:
+My mistake
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-19 19:16:16 UTC (rev 641)
++++ trunk/ConfigHelper.ptl	2007-03-19 20:18:52 UTC (rev 642)
+@@ -83,7 +83,7 @@
+ 				else:
+ 					if f == "":
+ 						f = " "
+-						'<td>%s</td>' % _(f)
++					'<td>%s</td>' % _(f)
+                         '</tr>'
+                         n = n + 1
+                 '</table>'
+@@ -286,6 +286,7 @@
+ 		elif v.type=="text":
+ 			form.add(TextWidget,   v.name, _v, t, v.hint, r, render_br=v.render_br, rows=v.__dict__.setdefault("rows",8), cols=v.__dict__.setdefault("cols",65) )
+ 		elif v.type=="choice":
++			op = v.options
+ 			if type(op) == types.FunctionType:
+ 				op = op()
+ 			elif not op:
+
+
+
+From dasenjo at mail.berlios.de  Tue Mar 20 22:50:45 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Tue, 20 Mar 2007 22:50:45 +0100
+Subject: [Destar-dev] r643 - trunk
+Message-ID: <200703202150.l2KLojwq018226@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-03-20 22:50:44 +0100 (Tue, 20 Mar 2007)
+New Revision: 643
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/backend.py
+   trunk/configlets.py
+Log:
+* fixed a bug related with encoding in form widgets
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-19 20:18:52 UTC (rev 642)
++++ trunk/CHANGELOG.txt	2007-03-20 21:50:44 UTC (rev 643)
+@@ -1,3 +1,6 @@
++2007-03-20:
++* fixed a bug related with encoding in form widgets
++
+ 2007-03-16:
+ *session.py: added utf-8 in request.response, because quixote-2 uses ISO-8859-1 as default
+ *ConfigHelper: had to do some converting to unicode
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-03-19 20:18:52 UTC (rev 642)
++++ trunk/backend.py	2007-03-20 21:50:44 UTC (rev 643)
+@@ -55,6 +55,8 @@
+ 	fn = os.path.join(configlets.CONF_DIR,DESTAR_CFG)
+ 	try:
+ 		try:
++			reload(sys)
++			sys.setdefaultencoding('utf-8')
+ 			execfile(fn)
+ 		except IOError:
+ 			try:
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-03-19 20:18:52 UTC (rev 642)
++++ trunk/configlets.py	2007-03-20 21:50:44 UTC (rev 643)
+@@ -622,8 +622,8 @@
+ 
+ 		# Make sure we don't add two thingies with the same name
+ 		if self.__dict__.has_key('name'):
+-			if self.name.find("-") > 1 or self.name.find(" ") > 1:
+-				return ("name", _("Name should not contain '-' or spaces"))
++			if not self.name.replace('_','').isalnum():
++				return ("name", _("Name should only contain characters, numbers or _"))
+ 			for o in configlet_tree:
+ 				if o==self: continue
+ 				try:
+
+
+
+From dasenjo at mail.berlios.de  Wed Mar 21 05:04:47 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Wed, 21 Mar 2007 05:04:47 +0100
+Subject: [Destar-dev] r644 - trunk
+Message-ID: <200703210404.l2L44lhI019133@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-03-21 05:04:46 +0100 (Wed, 21 Mar 2007)
+New Revision: 644
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_app_chanspy.py
+Log:
+* Allow to configure a scanspec string for ChanSpy
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-20 21:50:44 UTC (rev 643)
++++ trunk/CHANGELOG.txt	2007-03-21 04:04:46 UTC (rev 644)
+@@ -1,5 +1,6 @@
+ 2007-03-20:
+ * fixed a bug related with encoding in form widgets
++* Allow to configure a scanspec string for ChanSpy
+ 
+ 2007-03-16:
+ *session.py: added utf-8 in request.response, because quixote-2 uses ISO-8859-1 as default
+
+Modified: trunk/cfg_app_chanspy.py
+===================================================================
+--- trunk/cfg_app_chanspy.py	2007-03-20 21:50:44 UTC (rev 643)
++++ trunk/cfg_app_chanspy.py	2007-03-21 04:04:46 UTC (rev 644)
+@@ -38,6 +38,12 @@
+ 				title=_("Extension"),
+ 				len=6),
+ 
++			VarType("scanspec",
++				title=_("Channel pattern to scan?"),
++				hint="<scanspec>",
++				optional=True,
++				len=15),
++
+ 			VarType("password",
+ 				type="int",
+ 				title=_("Password"),
+@@ -60,6 +66,6 @@
+ 		if self.password:
+ 			c.appendExten(self.ext, "Authenticate(%s)" % self.password)
+ 		if self.quiet:
+-			c.appendExten(self.ext, "Chanspy(|q)")
++			c.appendExten(self.ext, "Chanspy(%s|q)" % self.scanspec)
+ 		else: 
+-			c.appendExten(self.ext, "Chanspy()")
++			c.appendExten(self.ext, "Chanspy(%s)" % self.scanspec)
+
+
+
+From admin at berlios.de  Thu Mar 22 21:36:51 2007
+From: admin at berlios.de (admin at berlios.de)
+Date: Thu, 22 Mar 2007 15:36:51 -0500 (COT)
+Subject: [Destar-dev] [Bug #10709] Manager access logged in twice
+Message-ID: <200703222036.l2MKapGh026891@unicorn.berlios.de>
+
+Bug #10709, was updated on 2007-Mar-22 15:36
+Here is a current snapshot of the bug.
+
+Project: DeStar
+Category: None
+Status: Open
+Resolution: None
+Bug Group: None
+Priority: 7
+Submitted by: dasenjo
+Assigned to : none
+Summary: Manager access logged in twice
+
+Details: After installing and running destar for the first time with the default destar_cfg.py the destarman manager access is logged twice in asterisk:
+
+macondo*CLI> show manager connected
+  Username         IP Address
+  destarman        127.0.0.1
+  destarman        127.0.0.1
+macondo*CLI>
+
+
+For detailed info, follow this link:
+http://developer.berlios.de/bugs/?func=detailbug&bug_id=10709&group_id=2112
+
+
+From dasenjo at mail.berlios.de  Thu Mar 22 21:40:23 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Thu, 22 Mar 2007 21:40:23 +0100
+Subject: [Destar-dev] r645 - branches/0.2.X branches/0.2.X/examples trunk
+	trunk/examples
+Message-ID: <200703222040.l2MKeNKp019679@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-03-22 21:40:22 +0100 (Thu, 22 Mar 2007)
+New Revision: 645
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/examples/destar_cfg.py
+   trunk/CHANGELOG.txt
+   trunk/examples/destar_cfg.py
+Log:
+* Fixed permissions for the default Manager API Access
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-21 04:04:46 UTC (rev 644)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-22 20:40:22 UTC (rev 645)
+@@ -1,3 +1,6 @@
++2007-03-22:
++* Fixed permissions for the default Manager API Access
++
+ 2007-03-05:
+ * Fixed crazy ids assignment, Patch by ceronman
+ 
+
+Modified: branches/0.2.X/examples/destar_cfg.py
+===================================================================
+--- branches/0.2.X/examples/destar_cfg.py	2007-03-21 04:04:46 UTC (rev 644)
++++ branches/0.2.X/examples/destar_cfg.py	2007-03-22 20:40:22 UTC (rev 645)
+@@ -299,6 +299,7 @@
+ 	name     = "destarman",
+ 	secret   = "9fYMbomD",
+ 	read     = ",system,call,log,verbose,command,agent,user",
++	write    = ",system,call,log,verbose,command,agent,user",
+ 	)
+ 
+ CfgOptOPPanel(
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-21 04:04:46 UTC (rev 644)
++++ trunk/CHANGELOG.txt	2007-03-22 20:40:22 UTC (rev 645)
+@@ -1,3 +1,6 @@
++2007-03-22:
++* Fixed permissions for the default Manager API Access
++
+ 2007-03-20:
+ * fixed a bug related with encoding in form widgets
+ * Allow to configure a scanspec string for ChanSpy
+
+Modified: trunk/examples/destar_cfg.py
+===================================================================
+--- trunk/examples/destar_cfg.py	2007-03-21 04:04:46 UTC (rev 644)
++++ trunk/examples/destar_cfg.py	2007-03-22 20:40:22 UTC (rev 645)
+@@ -303,6 +303,7 @@
+ 	name     = "destarman",
+ 	secret   = "9fYMbomD",
+ 	read     = ",system,call,log,verbose,command,agent,user",
++	write    = ",system,call,log,verbose,command,agent,user",
+ 	)
+ 
+ CfgOptOPPanel(
+
+
+
+From alerios at mail.berlios.de  Fri Mar 23 18:52:07 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Fri, 23 Mar 2007 18:52:07 +0100
+Subject: [Destar-dev] r646 - branches/0.2.X
+Message-ID: <200703231752.l2NHq7Gd009217@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-03-23 18:52:06 +0100 (Fri, 23 Mar 2007)
+New Revision: 646
+
+Added:
+   branches/0.2.X/page_stats_qcallback.ptl
+Modified:
+   branches/0.2.X/page_stats_queue.ptl
+Log:
+* Added page_stats_qcallback to provide a list of calls that entered a Queue but where not completed.
+* page_stats_queue.ptl:  changed wrong crdutils reference to queueutils.
+
+
+Added: branches/0.2.X/page_stats_qcallback.ptl
+===================================================================
+--- branches/0.2.X/page_stats_qcallback.ptl	2007-03-22 20:40:22 UTC (rev 645)
++++ branches/0.2.X/page_stats_qcallback.ptl	2007-03-23 17:52:06 UTC (rev 646)
+@@ -0,0 +1,232 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Destar has Copyright (C) 2004-2007 by Holger Schurig
++# This file has Copyright (C) 2007 by Alejandro Rios P.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++from Templates import *
++from quixote.form2 import *
++import queueutils
++import time
++from StatsHelper import *
++
++pychart_exists = True
++try:	
++	from pychart import *
++except ImportError:
++	pychart_exists = False
++	
++
++_q_parent = 'page_stats'
++_q_title  = _("Queue Callback")
++_q_desc   = _("Call Back List by Queue")
++_q_level  = 3
++_q_menupos = 30
++
++def _q_access(request):
++	if request.session.level < _q_level:
++		cantAccessPage()
++
++def _q_test():
++	return queueutils.db
++
++def N_(message): return message
++
++def getQueues():
++	import configlets
++	objs = configlets.configlet_tree.getConfigletsByName('CfgPhoneQueue')
++	queues=[]
++	for obj in objs:
++		queues.append(obj.name)		
++	return queues
++
++def makeForm():
++	form = Form()
++	form.name = "queryform"
++	form.add_single_select('queue', 
++							title=htmltext(_('Queue:')),
++							value="",
++							options=zip(getQueues(),getQueues(),getQueues()),
++							render_br=True )
++
++	form.add_single_select('year', 
++							title=htmltext(_('Day:')),
++							value="",
++							options=zip([all] + years, 
++										[_(all)] + years,
++										[all] + years),
++							render_br=False )
++							
++	form.add_single_select('month', 
++							options=zip([all] + months, 
++										[_(all)] + getMonthnames(),
++										[all] + months),
++
++							render_br=False )
++							
++	form.add_single_select('day',
++							options=zip([all] + days,
++										[_(all)] + daynames,
++										[all] + days),
++							render_br=True )
++							
++	form.add(SubmitWidget, '_submit', _("Submit"), render_br=True)
++	
++	return form
++		
++def perHourInDay [plain] (day, month, year, queue):
++	
++	date = "%s-%s-%s" % (year, month, day)
++	where = []
++	where.append("date(timestamp) = date('%s')" % date)
++	where.append("qname = '%s'" % queue)
++
++	where_uncompleted = where + [("( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)")]
++	cursor = queueutils.select(
++				fields = ['time(timestamp) as hour', 'callid'],
++				where = where_uncompleted,
++				order=['timestamp'])
++
++	htmltext("<p>%s: %s</p>" % (_("Period"), date))
++
++	htmltext("<br/><h3>%s</h3>" % _("List of uncompleted callers"))
++	makeCallBackTable(cursor, where).getHtml(border=1)
++
++
++def perDayInMonth [plain] (month, year, queue):
++	
++	date1 = "%s-%s-01" % (year, month)
++	date2 = "%s-%s-31" % (year, month)
++	where = []
++	where.append("date(timestamp) between date('%s') and date('%s')" % (date1, date2))
++	where.append("qname = '%s'" % queue)
++	
++	where_uncompleted = where + [("( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)")]
++	cursor = queueutils.select(
++				fields = ['time(timestamp)', 'callid'],
++				where = where_uncompleted,
++				order=['timestamp'])
++
++	htmltext("<p>%s: %s to %s</p>" % (_("Period"), date1, date2))
++
++	htmltext("<br/><h3>%s</h3>" % _("List of uncompleted callers"))
++	makeCallBackTable(cursor, where).getHtml(border=1)
++
++	
++def perMonthInYear [plain] (year, queue):
++	date1 = "%s-01-01" % (year)
++	date2 = "%s-12-31" % (year)
++	where = []
++	where.append("date(timestamp) between date('%s') and date('%s')" % (date1, date2))
++	where.append("qname = '%s'" % queue)
++
++	where_uncompleted = where + [("( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)")]
++	cursor = queueutils.select(
++				fields = ['time(timestamp)', 'callid'],
++				where = where_uncompleted,
++				order=['timestamp'])
++
++	htmltext("<p>%s: %s to %s</p>" % (_("Period"), date1, date2))
++
++	htmltext("<br/><h3>%s</h3>" % _("List of uncompleted callers"))
++	makeCallBackTable(cursor, where).getHtml(border=1)
++
++
++def perYear [plain] (queue):
++	where = []
++	where.append("qname = '%s'" % queue)
++
++	where_uncompleted = where + [("( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)")]
++	cursor = queueutils.select(
++				fields = ['time(timestamp)', 'callid'],
++				where = where_uncompleted,
++				order=['timestamp'])
++
++	htmltext("<p>%s: %s</p>" % (_("Period"), _("All Years")))
++
++	htmltext("<br/><h3>%s</h3>" % _("List of uncompleted callers"))
++	makeCallBackTable(cursor, where).getHtml(border=1)
++
++def showResults [plain] (day, month, year, queue):
++	all = N_("All")
++	if day != all and month != all and year != all:
++		perHourInDay(day, month, year, queue)
++	elif day == all and month != all and year != all:
++		perDayInMonth(month, year, queue)
++	elif day == all and month == all and year != all:
++		perMonthInYear(year, queue)
++	elif day == all and month == all and year == all:
++		perYear(queue)
++	else:
++		htmltext("<p style='color:red;'>\n")
++		htmltext("%s" % _("Sorry, this kind of query is not supported yet"))
++		htmltext("</p>")
++
++def makeCallBackTable (cursor, where):
++	table = HtmlTable(1,1)
++	table.setCell(0,0, _("Date"))
++	table.setCell(1,0, _("Caller"))
++	row = cursor.fetchone()
++	y = 1
++	while row:
++		where_caller = where + [("action like 'ENTERQUEUE'")]
++		where_caller.append("callid like '%s'" % row[1])
++		cursor2 = queueutils.select(
++				fields = ['timestamp', 'info2'],
++				where = where_caller,
++				order=['timestamp'])
++		row2 = cursor2.fetchone()
++		if row2:
++			table.setCell(0,y, "%s" % str(row2[0]))
++			table.setCell(1,y, "%s" % str(row2[1]))
++		row = cursor.fetchone()
++		y += 1
++	return table
++
++def cdrForm [plain] (request):
++	htmltext("<h3>%s</h3>" % _("List of calls that entered a Queue but where not completed, by date:"))
++	form = makeForm()
++	form.render()
++	
++	if form.is_submitted() and not form.has_errors():
++		htmltext("<h3>%s</h3>" % _("Results"))
++		showResults(form["day"], form["month"], form["year"], form["queue"])
++	
++def _q_index [plain] (request):
++	header(_q_desc)
++	if pychart_exists:
++		cdrForm(request)
++	else:
++		_("You need to install pychart and use a cdr with sqlite to get these statistics")
++	footer()
++	
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-03-22 20:40:22 UTC (rev 645)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-23 17:52:06 UTC (rev 646)
+@@ -42,7 +42,7 @@
+ 		cantAccessPage()
+ 
+ def _q_test():
+-	return cdrutils.db
++	return queueutils.db
+ 
+ def N_(message): return message
+ 
+
+
+

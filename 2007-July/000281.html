@@ -1,0 +1,311 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r761 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r761%20-%20trunk&In-Reply-To=%3C200707261712.l6QHC6TH014035%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000280.html">
+   <LINK REL="Next"  HREF="000282.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r761 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r761%20-%20trunk&In-Reply-To=%3C200707261712.l6QHC6TH014035%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r761 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul 26 19:12:06 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000280.html">[Destar-dev] r760 - in trunk: . static static/themes	static/themes/destar
+</A></li>
+        <LI>Next message: <A HREF="000282.html">[Destar-dev] r762 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#281">[ date ]</a>
+              <a href="thread.html#281">[ thread ]</a>
+              <a href="subject.html#281">[ subject ]</a>
+              <a href="author.html#281">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-07-26 19:12:05 +0200 (Thu, 26 Jul 2007)
+New Revision: 761
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/configlets.py
+Log:
+* configlets.py: appendExten() uses 'n' priority and doesn't reset the
+  priority when the extension changes.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-26 14:54:30 UTC (rev 760)
++++ trunk/CHANGELOG.txt	2007-07-26 17:12:05 UTC (rev 761)
+@@ -3,6 +3,8 @@
+ * Fixed some int values expected where strings types found.
+ * Added Themes support in Templates.ptl and CfgOptSettings.
+ * Added FileWidgwt to ConfigHelper and option to upload a logo image on CfgOptSettings.
++* configlets.py: appendExten() uses 'n' priority and doesn't reset the
++  priority when the extension changes.
+ 
+ 2007-07-10:
+ * Improved call-forwarding applications:
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-07-26 14:54:30 UTC (rev 760)
++++ trunk/configlets.py	2007-07-26 17:12:05 UTC (rev 761)
+@@ -58,7 +58,8 @@
+ 		self.extpriority = 1
+ 		self.section  = &quot;general&quot;
+ 		self.destar_comment = True
+-		self.lastext  = None
++		#self.lastext  = None
++		self.addedexts  = {}
+ 
+ 	def write(self, f=None):
+ 		&quot;Write myself into the config file&quot;
+@@ -104,28 +105,29 @@
+ 			self.order.append(self.section)
+ 		self.dirty = True
+ 
+-	def appendExten(self,ext,l,e=None, label=None):
++	def appendExten(self, ext, l, e=None, label=None, context=&quot;phones&quot;):
+ 		&quot;&quot;&quot;Append an extension line l to the current section. Append
+-		an optional error extenion e as well. Increments the priorty
+-		if the extension stays the same, resets the prio to 1 if the
+-		extension changes.&quot;&quot;&quot;
++		an optional error extenion e as well. Uses 'n' special
++		priority.&quot;&quot;&quot;
+ 
+-		if ext != self.lastext:
+-			self.extpriority = 1
+-		self.lastext = ext
++		priority = '1'
+ 
++		if not self.addedexts.has_key(context):
++			self.addedexts[context] = [ext]
++		else:
++			if ext in self.addedexts[context]:	
++				priority = 'n'
++			else:
++				self.addedexts[context].append(ext)
++
+ 		if label:
+-		    self.append(&quot;exten=%s,%d(%s),%s&quot; % (ext, self.extpriority, label, l))
++		    self.append(&quot;exten=%s,%s(%s),%s&quot; % (ext, priority, label, l))
+ 		else:
+-		    self.append(&quot;exten=%s,%d,%s&quot; % (ext, self.extpriority, l))
++		    self.append(&quot;exten=%s,%s,%s&quot; % (ext, priority, l))
+ 
+ 		if e:
+-			self.append(&quot;exten=%s,%d,%s&quot; % (ext, self.extpriority+101, e))
++			self.append(&quot;exten=%s,%s,%s&quot; % (ext, 'n+101', e))
+ 			
+-		ret = self.extpriority
+-		self.extpriority = self.extpriority + 1
+-		return ret
+-
+ 	def setPriority(self,n):
+ 		&quot;&quot;&quot;Manually set extension priority to an arbitrary number.&quot;&quot;&quot;
+ 		self.extpriority = n
+@@ -905,63 +907,63 @@
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		contextin = &quot;in-%s&quot; % self.name
+ 		c.setSection(contextin)
+-		c.appendExten(&quot;s&quot;,&quot;Set(CDR(intrunk)=%s)&quot; %  self.name)
++		c.appendExten(&quot;s&quot;,&quot;Set(CDR(intrunk)=%s)&quot; %  self.name, context=contextin)
+ 		if self.clid:
+ 			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid)
++			c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, context=contextin)
+ 		if self.clidnumin:
+ 			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin)
++			c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin, context=contextin)
+ 		global configlet_tree
+ 		if self.contextin == 'phone' and self.phone:
+ 			obj = configlet_tree.getConfigletByName(self.phone)
+ 			try:
+ 				pbx = obj.pbx
+-				c.appendExten(&quot;s&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.phone))
++				c.appendExten(&quot;s&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.phone), context=contextin)
+ 			except AttributeError:
+ 				pass
+ 		if self.contextin == 'ivr' and self.ivr:
+-			c.appendExten(&quot;s&quot;, &quot;Goto(%s,s,1)&quot; % self.ivr)
++			c.appendExten(&quot;s&quot;, &quot;Goto(%s,s,1)&quot; % self.ivr, context=contextin)
+ 		if self.contextin == 'pbx' and self.pbx:
+-			c.appendExten(&quot;s&quot;, &quot;Goto(%s,s,1)&quot; % self.pbx)
++			c.appendExten(&quot;s&quot;, &quot;Goto(%s,s,1)&quot; % self.pbx, context=contextin)
+ 
+-		c.appendExten(&quot;_X&quot;,&quot;Set(CDR(intrunk)=%s)&quot; %  self.name)
++		c.appendExten(&quot;_X&quot;,&quot;Set(CDR(intrunk)=%s)&quot; %  self.name, context=contextin)
+ 		if self.clid:
+ 			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;_X&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid)
++			c.appendExten(&quot;_X&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, context=contextin)
+ 		if self.clidnumin:
+ 			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;_X&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin)
++			c.appendExten(&quot;_X&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin, context=contextin)
+ 		if self.contextin == 'phone' and self.phone:
+ 			obj = configlet_tree.getConfigletByName(self.phone)
+ 			try:
+ 				pbx = obj.pbx
+-				c.appendExten(&quot;_X&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.phone))
++				c.appendExten(&quot;_X&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.phone), context=contextin)
+ 			except AttributeError:
+ 				pass
+ 		if self.contextin == 'ivr' and self.ivr:
+-			c.appendExten(&quot;_X&quot;, &quot;Goto(%s,s,1)&quot; % self.ivr)
++			c.appendExten(&quot;_X&quot;, &quot;Goto(%s,s,1)&quot; % self.ivr, context=contextin)
+ 		if self.contextin == 'pbx' and self.pbx:
+-			c.appendExten(&quot;_X&quot;, &quot;Goto(%s,${EXTEN},1)&quot; % self.pbx)
++			c.appendExten(&quot;_X&quot;, &quot;Goto(%s,${EXTEN},1)&quot; % self.pbx, context=contextin)
+ 
+-		c.appendExten(&quot;_X.&quot;,&quot;Set(CDR(intrunk)=%s)&quot; %  self.name)
++		c.appendExten(&quot;_X.&quot;,&quot;Set(CDR(intrunk)=%s)&quot; %  self.name, context=contextin)
+ 		if self.clid:
+ 			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;_X.&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid)
++			c.appendExten(&quot;_X.&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, context=contextin)
+ 		if self.clidnumin:
+ 			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(&quot;_X.&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin)
++			c.appendExten(&quot;_X.&quot;,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnumin, context=contextin)
+ 		if self.contextin == 'phone' and self.phone:
+ 			obj = configlet_tree.getConfigletByName(self.phone)
+ 			try:
+ 				pbx = obj.pbx
+-				c.appendExten(&quot;_X.&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.phone))
++				c.appendExten(&quot;_X.&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.phone), context=contextin)
+ 			except AttributeError:
+ 				pass
+ 		if self.contextin == 'ivr' and self.ivr:
+-			c.appendExten(&quot;_X.&quot;, &quot;Goto(%s,s,1)&quot; % self.ivr)
++			c.appendExten(&quot;_X.&quot;, &quot;Goto(%s,s,1)&quot; % self.ivr, context=contextin)
+ 		if self.contextin == 'pbx' and self.pbx:
+-			c.appendExten(&quot;_X.&quot;, &quot;Goto(%s,${EXTEN},1)&quot; % self.pbx)
++			c.appendExten(&quot;_X.&quot;, &quot;Goto(%s,${EXTEN},1)&quot; % self.pbx, context=contextin)
+ 
+ 		
+ class CfgPhone(Cfg):
+@@ -1009,7 +1011,7 @@
+ 			self.name,
+ 			ext,
+ 			pbx
+-			))
++			), context=pbx)
+ 
+ 	def createExtensionConfig(self):
+ 		needModule(&quot;res_adsi&quot;)
+@@ -1022,9 +1024,9 @@
+                 extensions.setSection(pbx)
+ 		extensions.append(&quot;exten=%s,hint,%s/%s&quot; % (self.ext, self.technology, self.name))
+ 		extensions.append(&quot;exten=%s,hint,%s/%s&quot; % (self.name, self.technology, self.name))
+-		extensions.appendExten(self.ext,&quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name))
++		extensions.appendExten(self.ext, &quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name), context=pbx)
++		extensions.appendExten(self.name, &quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name), context=pbx)
+ 		self.createDialEntry(extensions, self.ext, pbx, self.ext)
+-		extensions.appendExten(self.name,&quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name))
+ 		self.createDialEntry(extensions, self.name, pbx, self.ext)
+ 		for obj in configlet_tree:
+ 			if obj.__class__.__name__ == 'CfgAppCallFW':
+@@ -1082,13 +1084,14 @@
+ 
+ 	def createOutgoingContext(self):
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(&quot;out-%s&quot; % self.name)
++		contextout = &quot;out-%s&quot; % self.name 
++		c.setSection(contextout)
+ 		try:
+ 			pbx = self.pbx
+ 		except AttributeError:
+ 			pbx = &quot;phones&quot;
+ 		c.append(&quot;include=&gt;%s&quot; % pbx)
+-		c.appendExten(&quot;i&quot;,&quot;Playback(invalid)&quot;)
++		c.appendExten(&quot;i&quot;,&quot;Playback(invalid)&quot;, context=contextout)
+ 		try:
+ 			timeoutvalue = not self.timeout and &quot;0&quot; or &quot;1&quot;
+ 		except AttributeError:
+@@ -1098,11 +1101,11 @@
+ 			if obj.__class__.__name__ == 'CfgDialoutNormal':
+ 				try:
+ 					if self.__getitem__(&quot;dialout_&quot;+obj.name):
+-						c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CDR(pbx)=%s)&quot; % (self.pbx))
+-						c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CDR(userfield)=%s)&quot; % (self.name))
+-						c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CDR(dialout)=%s)&quot; % (obj.name))
++						c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CDR(pbx)=%s)&quot; % (self.pbx), context=contextout)
++						c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CDR(userfield)=%s)&quot; % (self.name), context=contextout)
++						c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CDR(dialout)=%s)&quot; % (obj.name), context=contextout)
+ 						if self.calleridnum:
+-							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CALLERID(number)=%s)&quot; % self.calleridnum)
++							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Set(CALLERID(number)=%s)&quot; % self.calleridnum, context=contextout)
+ 							
+ 						if self.monitor:
+ 							needModule(&quot;app_mixmonitor&quot;)	
+@@ -1116,21 +1119,21 @@
+ 							else:          
+ 								options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+ 							if self.monitorfilename:
+-								c.appendExten(&quot;%s&quot; % obj.pattern, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options))
++								c.appendExten(&quot;%s&quot; % obj.pattern, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=contextout)
+ 							else:
+-								c.appendExten(&quot;%s&quot; % obj.pattern, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options))
++								c.appendExten(&quot;%s&quot; % obj.pattern, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options), context=contextout)
+ 						
+ 						secret = self.__getitem__(&quot;dialout_%s_secret&quot; % obj.name)							
+ 						if secret:
+-							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Macro(%s,%s${EXTEN:%s},%s,%s)&quot; % (obj.name,obj.addprefix,obj.rmprefix,secret,timeoutvalue))
++							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Macro(%s,%s${EXTEN:%s},%s,%s)&quot; % (obj.name,obj.addprefix,obj.rmprefix,secret,timeoutvalue), context=contextout)
+ 						else:
+-							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Macro(%s,%s${EXTEN:%s},n,%s)&quot; % (obj.name,obj.addprefix,obj.rmprefix,timeoutvalue))
++							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Macro(%s,%s${EXTEN:%s},n,%s)&quot; % (obj.name,obj.addprefix,obj.rmprefix,timeoutvalue), context=contextout)
+ 				except KeyError:
+ 					pass
+ 			elif obj.__class__.__name__ == 'CfgAppPhoneQuickDial':
+ 				prefix = obj.dialprefix
+-				c.appendExten(&quot;_%sXX&quot; % prefix,&quot;Set(dest=${DB(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d})})&quot; % len(prefix), e=&quot;Playback(invalid)&quot;)
+-				c.appendExten(&quot;_%sXX&quot; % prefix,&quot;Goto(${dest},1)&quot;)
++				c.appendExten(&quot;_%sXX&quot; % prefix,&quot;Set(dest=${DB(QUICKDIALLIST/${CALLERIDNUM}/${EXTEN:%d})})&quot; % len(prefix), e=&quot;Playback(invalid)&quot;, context=contextout)
++				c.appendExten(&quot;_%sXX&quot; % prefix,&quot;Goto(${dest},1)&quot;, context=contextout)
+ 	
+ 	def createPanelConfig(self):
+ 		try:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000280.html">[Destar-dev] r760 - in trunk: . static static/themes	static/themes/destar
+</A></li>
+	<LI>Next message: <A HREF="000282.html">[Destar-dev] r762 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#281">[ date ]</a>
+              <a href="thread.html#281">[ thread ]</a>
+              <a href="subject.html#281">[ subject ]</a>
+              <a href="author.html#281">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

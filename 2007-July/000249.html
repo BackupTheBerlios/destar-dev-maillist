@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r738 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r738%20-%20trunk&In-Reply-To=%3C200707032053.l63Kra6I011361%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000248.html">
+   <LINK REL="Next"  HREF="000250.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r738 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r738%20-%20trunk&In-Reply-To=%3C200707032053.l63Kra6I011361%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r738 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Jul  3 22:53:36 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000248.html">[Destar-dev] r737 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000250.html">[Destar-dev] r739 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#249">[ date ]</a>
+              <a href="thread.html#249">[ thread ]</a>
+              <a href="subject.html#249">[ subject ]</a>
+              <a href="author.html#249">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-03 22:53:36 +0200 (Tue, 03 Jul 2007)
+New Revision: 738
+
+Modified:
+   trunk/cfg_opt_zappri.py
+Log:
+* cfg_opt_zappri: CRC is optional, CAS format is better with colons.
+
+
+Modified: trunk/cfg_opt_zappri.py
+===================================================================
+--- trunk/cfg_opt_zappri.py	2007-07-03 20:51:02 UTC (rev 737)
++++ trunk/cfg_opt_zappri.py	2007-07-03 20:53:36 UTC (rev 738)
+@@ -47,6 +47,7 @@
+ 								  options=[('d4',_('D4 (T1)')),('esf', _('ESF (T1)')),('ccs',_('CSS (E1)')),('cas',_('CAS (E1)'))]),
+ 			VarType(&quot;coding&quot;, title=_(&quot;Coding&quot;), type=&quot;choice&quot;,
+ 								  options=[('ami',_('AMI (T1/E1)')),('b8zs', _('B8ZF (T1)')),('hdb3',_('HDB3 (E1)'))]),
++			 VarType(&quot;crc&quot;, title=_(&quot;Enable CRC4 chacking?&quot;), type=&quot;bool&quot;, default=False),
+ 	
+ 			VarType(&quot;channels&quot;,    title=_(&quot;Channels&quot;), hint=_(&quot;i.e. 1-15,17-31&quot;), type=&quot;string&quot;, len=20),
+ 			VarType(&quot;dchannel&quot;,    title=_(&quot;Signaling channel&quot;), hint=_(&quot;i.e. 16&quot;), type=&quot;string&quot;, len=5),
+@@ -63,8 +64,16 @@
+ 		c.setSection(&quot;&quot;)
+ 		c.destar_comment = False
+ 		c.append(&quot;# %s&quot; % self.name)
+-		c.append(&quot;span=%s,%s,%s,%s,%s,crc4&quot; % (self.span,self.timing,self.distance,self.framing,self.coding))
+-		c.append(&quot;bchan=%s&quot; % self.channels)
++		if self.crc:
++			c.append(&quot;span=%s,%s,%s,%s,%s,crc4&quot; % (self.span,self.timing,self.distance,self.framing,self.coding))
++		else:
++			c.append(&quot;span=%s,%s,%s,%s,%s&quot; % (self.span,self.timing,self.distance,self.framing,self.coding))
+ 		c.append(&quot;dchan=%s&quot; % self.dchannel)
++		chan = self.channels.split(',')
++		for ch in chan:
++			if self.framing == 'cas':
++				c.append(&quot;cas=%s:1101&quot; % ch)
++			else:
++				c.append(&quot;bchan=%s&quot; % ch)
+ 		c.append(&quot;&quot;)
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000248.html">[Destar-dev] r737 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000250.html">[Destar-dev] r739 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#249">[ date ]</a>
+              <a href="thread.html#249">[ thread ]</a>
+              <a href="subject.html#249">[ subject ]</a>
+              <a href="author.html#249">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

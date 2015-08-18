@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r762 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r762%20-%20trunk&In-Reply-To=%3C200707261717.l6QHH3j3020545%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000281.html">
+   <LINK REL="Next"  HREF="000283.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r762 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r762%20-%20trunk&In-Reply-To=%3C200707261717.l6QHH3j3020545%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r762 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul 26 19:17:03 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000281.html">[Destar-dev] r761 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000283.html">[Destar-dev] r763 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#282">[ date ]</a>
+              <a href="thread.html#282">[ thread ]</a>
+              <a href="subject.html#282">[ subject ]</a>
+              <a href="author.html#282">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-07-26 19:17:02 +0200 (Thu, 26 Jul 2007)
+New Revision: 762
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/configlets.py
+Log:
+configlets.py: allows monitoring incoming calls
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-26 17:12:05 UTC (rev 761)
++++ trunk/CHANGELOG.txt	2007-07-26 17:17:02 UTC (rev 762)
+@@ -5,6 +5,7 @@
+ * Added FileWidgwt to ConfigHelper and option to upload a logo image on CfgOptSettings.
+ * configlets.py: appendExten() uses 'n' priority and doesn't reset the
+   priority when the extension changes.
++* configlets.py: allows monitoring incoming calls
+ 
+ 2007-07-10:
+ * Improved call-forwarding applications:
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-07-26 17:12:05 UTC (rev 761)
++++ trunk/configlets.py	2007-07-26 17:17:02 UTC (rev 762)
+@@ -1026,6 +1026,25 @@
+ 		extensions.append(&quot;exten=%s,hint,%s/%s&quot; % (self.name, self.technology, self.name))
+ 		extensions.appendExten(self.ext, &quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name), context=pbx)
+ 		extensions.appendExten(self.name, &quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name), context=pbx)
++
++		if self.monitorinbound:
++			needModule(&quot;app_mixmonitor&quot;)	
++			options = &quot;&quot;
++			if self.monitorappend:
++				options = 'a' 
++			if self.monitorwhenbridged:
++				options = options+'b'
++			if self.heardvol == self.spokenvol:
++				options = options+'W(%s)' % (self.heardvol)
++			else:          
++				options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
++			if self.monitorfilename:
++				extensions.appendExten(self.ext, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=pbx)
++				extensions.appendExten(self.name, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=pbx)
++			else:
++				extensions.appendExten(self.ext, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options), context=pbx)
++				extensions.appendExten(self.name, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options), context=pbx)
++
+ 		self.createDialEntry(extensions, self.ext, pbx, self.ext)
+ 		self.createDialEntry(extensions, self.name, pbx, self.ext)
+ 		for obj in configlet_tree:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000281.html">[Destar-dev] r761 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000283.html">[Destar-dev] r763 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#282">[ date ]</a>
+              <a href="thread.html#282">[ thread ]</a>
+              <a href="subject.html#282">[ subject ]</a>
+              <a href="author.html#282">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

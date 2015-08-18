@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r825 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r825%20-%20trunk&In-Reply-To=%3C200711271357.lARDv2Kh016043%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000367.html">
+   <LINK REL="Next"  HREF="000369.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r825 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r825%20-%20trunk&In-Reply-To=%3C200711271357.lARDv2Kh016043%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r825 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 27 14:57:02 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000367.html">[Destar-dev] r824 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000369.html">[Destar-dev] r826 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#368">[ date ]</a>
+              <a href="thread.html#368">[ thread ]</a>
+              <a href="subject.html#368">[ subject ]</a>
+              <a href="author.html#368">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-11-27 14:57:02 +0100 (Tue, 27 Nov 2007)
+New Revision: 825
+
+Modified:
+   trunk/cfg_trunk_zappri.py
+Log:
+Added pridialplan option to trunk zap pri.
+
+
+Modified: trunk/cfg_trunk_zappri.py
+===================================================================
+--- trunk/cfg_trunk_zappri.py	2007-11-27 13:56:23 UTC (rev 824)
++++ trunk/cfg_trunk_zappri.py	2007-11-27 13:57:02 UTC (rev 825)
+@@ -44,14 +44,25 @@
+ 			VarType(&quot;switchtype&quot;,
+ 				title=_(&quot;Switch type&quot;),
+ 				type=&quot;choice&quot;,
+-			      	options=[('national','National ISDN 2'),
+-					('dms100', 'Nortel DMS100'),
+-					('4ess', 'AT&amp;T 4ESS'),
+-					('5ess', 'Lucent 5ESS'),
+-					('euroisdn', 'Euro ISDN'),
+-					('ni1', 'Old National ISDN 1')],
++			      	options=[('national',_('National ISDN 2')),
++					('dms100', _('Nortel DMS100')),
++					('4ess', _('AT&amp;T 4ESS')),
++					('5ess', _('Lucent 5ESS')),
++					('euroisdn', _('Euro ISDN')),
++					('ni1', _('Old National ISDN 1'))],
+ 				default=&quot;euroisdn&quot;),
+ 				
++			VarType(&quot;pridialplan&quot;,
++				title=_(&quot;PRI Dialplan&quot;),
++				type=&quot;choice&quot;,
++			      	options=[('unknown',_('Unknown')),
++					('private', _('Private ISDN')),
++					('local', _('Local ISDN')),
++					('national', _('National ISDN')),
++					('international', _('International ISDN')),
++					('dynamic', _('Dynamically selects the appropriate dialplan'))],
++				default=&quot;unknown&quot;),
++
+ 			VarType(&quot;channels&quot;,
+ 				title=_(&quot;Channels&quot;),
+ 				hint=_(&quot;i.e. 1-15,17-31&quot;),
+@@ -201,7 +212,7 @@
+ 			c.appendValue(self, &quot;group&quot;)
+ 		c.appendValue(self, &quot;signalling&quot;)
+ 		c.appendValue(self, &quot;switchtype&quot;)
+-		c.append(&quot;pridialplan=unknown&quot;)
++		c.appendValue(self, &quot;pridialplan&quot;)
+ 		contextin = &quot;in-%s&quot; % self.name
+ 		c.append(&quot;context=%s&quot; % contextin)
+ 		c.append(&quot;usecallerid=yes&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000367.html">[Destar-dev] r824 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000369.html">[Destar-dev] r826 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#368">[ date ]</a>
+              <a href="thread.html#368">[ thread ]</a>
+              <a href="subject.html#368">[ subject ]</a>
+              <a href="author.html#368">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

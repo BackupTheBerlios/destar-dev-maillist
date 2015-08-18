@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r676 - branches/destar-callweaver
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r676%20-%20branches/destar-callweaver&In-Reply-To=%3C200705111557.l4BFv9mk028133%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000184.html">
+   <LINK REL="Next"  HREF="000186.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r676 - branches/destar-callweaver</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r676%20-%20branches/destar-callweaver&In-Reply-To=%3C200705111557.l4BFv9mk028133%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r676 - branches/destar-callweaver">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri May 11 17:57:09 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000184.html">[Destar-dev] r675 - in branches: . destar-callweaver
+</A></li>
+        <LI>Next message: <A HREF="000186.html">[Destar-dev] r677 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#185">[ date ]</a>
+              <a href="thread.html#185">[ thread ]</a>
+              <a href="subject.html#185">[ subject ]</a>
+              <a href="author.html#185">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-05-11 17:57:08 +0200 (Fri, 11 May 2007)
+New Revision: 676
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/backend.py
+   branches/destar-callweaver/cfg_dialout_normal.py
+   branches/destar-callweaver/cfg_phone_epygi.py
+   branches/destar-callweaver/cfg_phone_zap.py
+   branches/destar-callweaver/cfg_trunk_iaxtel.py
+   branches/destar-callweaver/configlets.py
+Log:
+Changing {M,m}acro for Proc and proc
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 15:57:08 UTC (rev 676)
+@@ -1,5 +1,6 @@
+ 2007-05-11:
+ * Branching destar for callweaver
++* Changing {M,m}acro for Proc and proc
+ 
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+
+Modified: branches/destar-callweaver/backend.py
+===================================================================
+--- branches/destar-callweaver/backend.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/backend.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -180,7 +180,7 @@
+ 	c.append(&quot;values =&gt; '${CDR(clid)}','${CDR(src)}','${CDR(dst)}','${CDR(dcontext)}','${CDR(channel)}','${CDR(dstchannel)}','${CDR(lastapp)}','${CDR(lastdata)}','${CDR(start)}','${CDR(answer)}','${CDR(end)}','${CDR(duration)}','${CDR(billsec)}','${CDR(disposition)}','${CDR(amaflags)}','${CDR(accountcode)}','${CDR(uniqueid)}','${CDR(userfield)}','${CDR(pbx)}','${CDR(intrunk)}','${CDR(outtrunk)}','${CDR(dialout)}'&quot;)
+ 
+ 	needModule(&quot;res_indications&quot;)
+-	c = AstConf(&quot;macros.inc&quot;)
++	c = AstConf(&quot;procs.inc&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Proc to dial a standard local extension&quot;)
+ 	c.append(&quot;;&quot;)
+
+Modified: branches/destar-callweaver/cfg_dialout_normal.py
+===================================================================
+--- branches/destar-callweaver/cfg_dialout_normal.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/cfg_dialout_normal.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -114,8 +114,8 @@
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		c = AstConf(&quot;macros.inc&quot;)
+-		c.setSection(&quot;macro-%s&quot; % self.name)
++		c = AstConf(&quot;procs.inc&quot;)
++		c.setSection(&quot;proc-%s&quot; % self.name)
+ 		c.append(&quot;; params: exten,secret,timeout&quot;)
+ 		needModule(&quot;app_authenticate&quot;)
+ 		if self.dis_transfer:
+
+Modified: branches/destar-callweaver/cfg_phone_epygi.py
+===================================================================
+--- branches/destar-callweaver/cfg_phone_epygi.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/cfg_phone_epygi.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -294,7 +294,7 @@
+ 		extensions = AstConf(&quot;extensions.conf&quot;)
+ 		extensions.setSection(self.pbx)
+ 		if self.ext:
+-			extensions.appendExten(self.ext, &quot;Macro(dial-std-exten,%s/%s@%s:5060,out-%s,%s,%s)&quot; % (self.technology,self.name,self.gw,self.name,self.pbx,self.ext))
++			extensions.appendExten(self.ext, &quot;Proc(dial-std-exten,%s/%s@%s:5060,out-%s,%s,%s)&quot; % (self.technology,self.name,self.gw,self.name,self.pbx,self.ext))
+ 
+ 		self.createVoicemailConfig(sip)
+ 		self.createOutgoingContext()
+
+Modified: branches/destar-callweaver/cfg_phone_zap.py
+===================================================================
+--- branches/destar-callweaver/cfg_phone_zap.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/cfg_phone_zap.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -289,7 +289,7 @@
+ 
+ 
+ 	def createDialEntry(self, extensions, exten, pbx, ext):
+-		ret = extensions.appendExten(exten, &quot;Macro(dial-std-exten,%s/%s,out-%s,%s,%s)&quot; % (
++		ret = extensions.appendExten(exten, &quot;Proc(dial-std-exten,%s/%s,out-%s,%s,%s)&quot; % (
+ 			self.technology,
+ 			self.channels,
+ 			self.name,
+
+Modified: branches/destar-callweaver/cfg_trunk_iaxtel.py
+===================================================================
+--- branches/destar-callweaver/cfg_trunk_iaxtel.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/cfg_trunk_iaxtel.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -92,4 +92,4 @@
+ 			c = AstConf(&quot;extensions.conf&quot;)
+ 			c.setSection(&quot;in-iaxtel&quot;)
+ 			# TODO: don't hardcode the &quot;SIP/&quot; here:
+-			c.appendExten(self.iaxtelid, &quot;Macro(exten-std,SIP/%s)&quot; % self.phone)
++			c.appendExten(self.iaxtelid, &quot;Proc(exten-std,SIP/%s)&quot; % self.phone)
+
+Modified: branches/destar-callweaver/configlets.py
+===================================================================
+--- branches/destar-callweaver/configlets.py	2007-05-11 15:45:03 UTC (rev 675)
++++ branches/destar-callweaver/configlets.py	2007-05-11 15:57:08 UTC (rev 676)
+@@ -225,7 +225,7 @@
+ 			app =	[
+ 				&quot;app_db&quot;,
+ 				&quot;app_dial&quot;, # needs res_musiconhold, res_parking
+-				&quot;app_macro&quot;,
++				&quot;app_proc&quot;,
+ 				&quot;app_playback&quot;,
+ 				&quot;app_cdr&quot;,
+ 				],
+@@ -983,7 +983,7 @@
+ 					v.hide = False
+ 
+ 	def createDialEntry(self, extensions, exten, pbx, ext):
+-		ret = extensions.appendExten(exten, &quot;Macro(dial-std-exten,%s/%s,out-%s,%s,%s)&quot; % (
++		ret = extensions.appendExten(exten, &quot;Proc(dial-std-exten,%s/%s,out-%s,%s,%s)&quot; % (
+ 			self.technology,
+ 			self.name,
+ 			self.name,
+@@ -1102,9 +1102,9 @@
+ 						
+ 						secret = self.__getitem__(&quot;dialout_%s_secret&quot; % obj.name)							
+ 						if secret:
+-							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Macro(%s,%s${EXTEN:%s},%s,%s)&quot; % (obj.name,obj.addprefix,obj.rmprefix,secret,timeoutvalue))
++							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Proc(%s,%s${EXTEN:%s},%s,%s)&quot; % (obj.name,obj.addprefix,obj.rmprefix,secret,timeoutvalue))
+ 						else:
+-							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Macro(%s,%s${EXTEN:%s},n,%s)&quot; % (obj.name,obj.addprefix,obj.rmprefix,timeoutvalue))
++							c.appendExten(&quot;%s&quot; % obj.pattern,&quot;Proc(%s,%s${EXTEN:%s},n,%s)&quot; % (obj.name,obj.addprefix,obj.rmprefix,timeoutvalue))
+ 				except KeyError:
+ 					pass
+ 			elif obj.__class__.__name__ == 'CfgAppPhoneQuickDial':
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000184.html">[Destar-dev] r675 - in branches: . destar-callweaver
+</A></li>
+	<LI>Next message: <A HREF="000186.html">[Destar-dev] r677 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#185">[ date ]</a>
+              <a href="thread.html#185">[ thread ]</a>
+              <a href="subject.html#185">[ subject ]</a>
+              <a href="author.html#185">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r669 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r669%20-%20trunk&In-Reply-To=%3C200704250429.l3P4TbVM028162%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000177.html">
+   <LINK REL="Next"  HREF="000179.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r669 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r669%20-%20trunk&In-Reply-To=%3C200704250429.l3P4TbVM028162%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r669 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Apr 25 06:29:37 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000177.html">[Destar-dev] r668 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000179.html">[Destar-dev] r670 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#178">[ date ]</a>
+              <a href="thread.html#178">[ thread ]</a>
+              <a href="subject.html#178">[ subject ]</a>
+              <a href="author.html#178">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-04-25 06:29:36 +0200 (Wed, 25 Apr 2007)
+New Revision: 669
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_phone_queue.py
+Log:
+* cfg_phone_queue: a few more order in the form variables.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-04-25 00:42:28 UTC (rev 668)
++++ trunk/CHANGELOG.txt	2007-04-25 04:29:36 UTC (rev 669)
+@@ -1,5 +1,6 @@
+ 2007-04-24:
+ * Use actual pbx instead pbx1 in cfg_app_agentcallbacklogin
++* cfg_phone_queue: a few more order in the form variables.
+ 
+ 2007-04-20:
+ * queues and agents general settings in cfg_opt_queuesagents.py.  
+
+Modified: trunk/cfg_phone_queue.py
+===================================================================
+--- trunk/cfg_phone_queue.py	2007-04-25 00:42:28 UTC (rev 668)
++++ trunk/cfg_phone_queue.py	2007-04-25 04:29:36 UTC (rev 669)
+@@ -46,10 +46,15 @@
+ 					len=6),
+ 
+ 			VarType(&quot;timeout&quot;,
+-					title=_(&quot;Phone timeout&quot;),
++					title=_(&quot;Agent timeout&quot;),
+ 					optional=True,
+ 					len=6),
+ 
++			VarType(&quot;retry&quot;,
++					title=_(&quot;How long to wait before trying all the members again?&quot;),
++					optional=True,
++					len=6),
++
+ 	                VarType(&quot;queuetimeout&quot;,
+         	            		title=_(&quot;Queue Timeout&quot;),
+                                 	optional=True,
+@@ -82,11 +87,6 @@
+ 						(&quot;rrmemory&quot;,_(&quot;Round robin with memory - remember where we left off last ring pass&quot;))), 
+ 					default=&quot;ringall&quot;),
+ 
+-			VarType(&quot;retry&quot;,
+-					title=_(&quot;How long to wait before trying all the members again?&quot;),
+-					optional=True,
+-					len=6),
+-	
+ 			VarType(&quot;Announces&quot;,
+ 					title=_(&quot;Announces&quot;),
+ 					type=&quot;label&quot;,
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000177.html">[Destar-dev] r668 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000179.html">[Destar-dev] r670 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#178">[ date ]</a>
+              <a href="thread.html#178">[ thread ]</a>
+              <a href="subject.html#178">[ subject ]</a>
+              <a href="author.html#178">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

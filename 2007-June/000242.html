@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r731 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r731%20-%20trunk&In-Reply-To=%3C200706290055.l5T0taEL022709%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000241.html">
+   <LINK REL="Next"  HREF="000243.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r731 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r731%20-%20trunk&In-Reply-To=%3C200706290055.l5T0taEL022709%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r731 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun 29 02:55:36 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000241.html">[Destar-dev] r730 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000243.html">[Destar-dev] r732 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#242">[ date ]</a>
+              <a href="thread.html#242">[ thread ]</a>
+              <a href="subject.html#242">[ subject ]</a>
+              <a href="author.html#242">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-06-29 02:55:35 +0200 (Fri, 29 Jun 2007)
+New Revision: 731
+
+Modified:
+   trunk/backend.py
+   trunk/page_login.ptl
+   trunk/page_logout.ptl
+   trunk/session.py
+Log:
+* Added logging information for destar's users sessions.
+
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-06-29 00:51:19 UTC (rev 730)
++++ trunk/backend.py	2007-06-29 00:55:35 UTC (rev 731)
+@@ -28,9 +28,15 @@
+ CONFIGLETS_DIR = os.getenv('CONFIGLETS_DIR', default='.') 
+ ASTERISK_MODULES_DIR = os.getenv('ASTERISK_MODULES_DIR', default='/usr/lib/asterisk/modules')
+ 
++frontend_sessions = 0
+ 
+-
+-
++def add_session():
++	global frontend_sessions
++	frontend_sessions += 1
++	
++def del_session():
++	global frontend_sessions
++	frontend_sessions -= 1
+ ####################################################################################
+ #
+ # We start with functions that work on the configuration file level:
+
+Modified: trunk/page_login.ptl
+===================================================================
+--- trunk/page_login.ptl	2007-06-29 00:51:19 UTC (rev 730)
++++ trunk/page_login.ptl	2007-06-29 00:55:35 UTC (rev 731)
+@@ -22,7 +22,7 @@
+ from quixote.form import *
+ from quixote import get_request, get_session, redirect
+ from quixote.directory import Directory, AccessControlled
+-import types, backend
++import types, backend, time
+ 
+ class Page(AccessControlled, Directory): 
+ 
+@@ -59,7 +59,7 @@
+ 
+ 	def notLoggedIn [plain] (self):
+ 		'&lt;p&gt;'
+-		htmltext(_('Invalid username or password'))
++		htmltext(_('Invalid username or password, or disabled account.'))
+ 		self.loginForm(render=1)
+ 		'.&lt;/p&gt;'
+ 
+@@ -77,12 +77,15 @@
+ 			# First search for a user entry
+ 			for obj in backend.getConfiglets(name=&quot;CfgOptUser&quot;):
+ 				if obj.name==res[0] and obj.secret==res[1]:
+-					self.session.user  = obj.name
+-					self.session.level = int(obj.level)
+-					self.session.phone = obj.phone
+-					self.session.language = obj.language
+-					self.session.pbx = obj.pbx
+-					return redirect('../user/info/')
++					if int(obj.level):
++						self.session.user  = obj.name
++						self.session.level = int(obj.level)
++						self.session.phone = obj.phone
++						self.session.language = obj.language
++						self.session.pbx = obj.pbx
++						print (&quot;[%s] User %s logged in from %s, port %s&quot; % (time.asctime(time.localtime()),self.session.user,self.session.ip,self.session.port))
++						backend.add_session()
++						return redirect('../user/info/')
+ 
+ 			# Now search for a phone entry with proper extension/voicemail pin
+ 			for obj in backend.getConfiglets(group=&quot;Phones&quot;):
+@@ -94,6 +97,8 @@
+ 					self.session.phone = obj.name
+ 					self.session.language = 'en'
+ 					self.session.pbx = obj.pbx
++					print (&quot;[%s] User %s logged in from %s, port %s&quot; % (time.asctime(time.localtime()),self.session.user,self.session.ip,self.session.port))
++					backend.add_session()
+ 					return redirect('../user/info/')
+ 			self.notLoggedIn()
+ 		footer()
+
+Modified: trunk/page_logout.ptl
+===================================================================
+--- trunk/page_logout.ptl	2007-06-29 00:51:19 UTC (rev 730)
++++ trunk/page_logout.ptl	2007-06-29 00:55:35 UTC (rev 731)
+@@ -21,6 +21,7 @@
+ from Templates import *
+ from quixote.directory import Directory, AccessControlled
+ from quixote import get_request, get_session, redirect
++import backend, time
+ 
+ class Page(AccessControlled, Directory): 
+ 
+@@ -42,7 +43,9 @@
+ 
+ 	def _q_index(self):
+ 		# TODO: move this into Publisher.py
++		print (&quot;[%s] User %s logged out from %s, port %s&quot; % (time.asctime(time.localtime()),self.session.user,self.session.ip,self.session.port))
+ 		self.session.user = ''
+ 		self.session.phone = ''
+ 		self.session.level = -1
++		backend.del_session()
+ 		return redirect('/')
+
+Modified: trunk/session.py
+===================================================================
+--- trunk/session.py	2007-06-29 00:51:19 UTC (rev 730)
++++ trunk/session.py	2007-06-29 00:55:35 UTC (rev 731)
+@@ -40,6 +40,7 @@
+ 			self.ip = request.environ['HTTP_X_FORWARDED_FOR']
+ 		except:
+ 			self.ip = request.environ['REMOTE_ADDR']
++		self.port = request.environ['REMOTE_PORT']
+ 
+ 
+ 		#session = sessions.setdefault(ip,
+@@ -64,6 +65,7 @@
+ 				self.user  = &quot;programmer&quot;
+ 				self.level = 4
+ 				self.language = 'en'
++				print (&quot;[%s] Logging in with user 'programmer' from ip %s, port %s&quot; % (time.asctime(time.localtime()), self.ip, self.port))
+ 			else:
+ 				for user in users:
+ 					if user.pc == self.ip:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000241.html">[Destar-dev] r730 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000243.html">[Destar-dev] r732 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#242">[ date ]</a>
+              <a href="thread.html#242">[ thread ]</a>
+              <a href="subject.html#242">[ subject ]</a>
+              <a href="author.html#242">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] [Patch #1807] some bugfix, new features
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20%5BPatch%20%231807%5D%20some%20bugfix%2C%20new%20features&In-Reply-To=%3C200701152352.l0FNq5sq013515%40unicorn.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000022.html">
+   <LINK REL="Next"  HREF="000025.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] [Patch #1807] some bugfix, new features</H1>
+    <B>admin at berlios.de</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20%5BPatch%20%231807%5D%20some%20bugfix%2C%20new%20features&In-Reply-To=%3C200701152352.l0FNq5sq013515%40unicorn.berlios.de%3E"
+       TITLE="[Destar-dev] [Patch #1807] some bugfix, new features">admin at berlios.de
+       </A><BR>
+    <I>Tue Jan 16 00:52:05 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000022.html">[Destar-dev] r559 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000025.html">[Destar-dev] [Bug #8996] Echo application configlet doesn't require	app_echo
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#23">[ date ]</a>
+              <a href="thread.html#23">[ thread ]</a>
+              <a href="subject.html#23">[ subject ]</a>
+              <a href="author.html#23">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Patch #1807 has been updated. 
+
+Project: destar
+Category: None
+Status: Accepted
+Submitted by: hholzer
+Assigned to : none
+Summary: some bugfix, new features
+
+Follow-Ups:
+
+Date: 2007-Jan-09 00:24
+By: hholzer
+
+Comment:
+Ok, today i didnt have that much time ;-)
+
+first attempt to support devstate module from bristaff.
+*) extended call forward option, for toggle switch
+added code for devstate hint (let the function led shine bright on your phone, when CF is on ;-)
+*) added petantic option at sip global configuration
+(newer snom firmware forces you to use this switch, if you want to use # in your dialplan :-()
+*) internal: added label support for appendexten
+
+-------------------------------------------------------
+
+Date: 2007-Jan-07 22:20
+By: hholzer
+
+Comment:
+*) changed some defaults (the default for max. call time to 5min, was not the best one ;-)
+*) added sip default moh setting
+*) added support for early media in dial macro
+  (todo add option at phone setting.)
+*) added parallel ringing support in dial macro
+  (todo add option at phone setting.)
+*) added cfbs and cfto for trunk lines (to support feature request, for cfbs/cfto only for external callers.)
+
+-------------------------------------------------------
+
+Date: 2007-Jan-07 00:43
+By: hholzer
+
+Comment:
+*) ignore modules if not exists (solves Bug #9708)
+*) fix recording
+*) add defineable callerid number on sip and iax trunks
+    (some provider will verify this.)
+*) add sip from domain options
+    (for some provider you need this option.)
+*) add callerid number change on incoming calls.
+    (this gives you the option to add a &quot;0&quot; in front of the number, so if your phone have a missed call list, you dont need to retype the number to call back.)
+*) added total timeout on queues, on timeout you can jump to a extension.
+*) add DID custom map.
+  (like 034562344XX -&gt; pbx/XX, not all provider will cut the leading numbers.)
+*) added TOS Field to sip options, making some inputs optional.
+
+-------------------------------------------------------
+
+-------------------------------------------------------
+For more info, visit:
+
+<A HREF="http://developer.berlios.de/patch/?func=detailpatch&amp;patch_id=1807&amp;group_id=2112">http://developer.berlios.de/patch/?func=detailpatch&amp;patch_id=1807&amp;group_id=2112</A>
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000022.html">[Destar-dev] r559 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000025.html">[Destar-dev] [Bug #8996] Echo application configlet doesn't require	app_echo
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#23">[ date ]</a>
+              <a href="thread.html#23">[ thread ]</a>
+              <a href="subject.html#23">[ subject ]</a>
+              <a href="author.html#23">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

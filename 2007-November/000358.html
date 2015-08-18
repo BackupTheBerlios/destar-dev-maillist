@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r817 - branches/0.2.X trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r817%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200711012121.lA1LLi3w025959%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000359.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r817 - branches/0.2.X trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r817%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200711012121.lA1LLi3w025959%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r817 - branches/0.2.X trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov  1 22:21:44 CET 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000359.html">[Destar-dev] r817 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#358">[ date ]</a>
+              <a href="thread.html#358">[ thread ]</a>
+              <a href="subject.html#358">[ subject ]</a>
+              <a href="author.html#358">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-11-01 22:21:43 +0100 (Thu, 01 Nov 2007)
+New Revision: 817
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/panelutils.py
+   trunk/CHANGELOG.txt
+   trunk/panelutils.py
+Log:
+* New way to restart panel daemon. 
+* Fixed tarball html directory in panelutils.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-10-25 17:25:02 UTC (rev 816)
++++ branches/0.2.X/CHANGELOG.txt	2007-11-01 21:21:43 UTC (rev 817)
+@@ -1,3 +1,7 @@
++2007-11-01:
++* New way to restart panel daemon. 
++* Fixed tarball html directory in panelutils.
++
+ 2007-10-25:
+ * cfg_opt_sip_network.py: added progressinband option, tos default changed to 0x18
+ 
+
+Modified: branches/0.2.X/panelutils.py
+===================================================================
+--- branches/0.2.X/panelutils.py	2007-10-25 17:25:02 UTC (rev 816)
++++ branches/0.2.X/panelutils.py	2007-11-01 21:21:43 UTC (rev 817)
+@@ -23,17 +23,14 @@
+ 
+ # To use with asternic.org op_panel tarball:
+ #PANEL_CONF_DIR	= &quot;/usr/local/op_panel&quot;
+-#PANEL_HTML_DIR	= &quot;/usr/local/op_panel/html&quot;
+-#PANEL_START_CMD	= &quot;/usr/local/op_panel/op_server.pl -d&quot;
+-#PANEL_STOP_CMD	= &quot;pkill op_server&quot;
++#PANEL_HTML_DIR	= &quot;/usr/local/op_panel/flash&quot;
++#PANEL_RESTART_CMD = &quot;killall -HUP op_server.pl&quot;
+ 
+ 
+ # Configuration to use with op-panel .deb package:
+ PANEL_CONF_DIR	= &quot;/etc/op-panel&quot;
+ PANEL_HTML_DIR	= &quot;/usr/share/op-panel/flash&quot;
+-PANEL_START_CMD	= &quot;/etc/init.d/op-panel start&quot;
+-PANEL_STOP_CMD	= &quot;/etc/init.d/op-panel stop&quot;
+-PANEL_RESTART_CMD = &quot;/etc/init.d/op-panel restart&quot;
++PANEL_RESTART_CMD = &quot;killall -HUP op_server&quot;
+ 
+ def isConfigured ():
+ 	import configlets
+@@ -154,12 +151,6 @@
+ 	p.append(&quot;Extension=-1&quot;)
+ 	p.append(&quot;Label=%s&quot; % obj.name)
+ 
+-def startPanelDaemon():
+-        return commands.getoutput(PANEL_START_CMD)
+-
+-def stopPanelDaemon():
+-        return commands.getoutput(PANEL_STOP_CMD)
+-
+ def restartPanelDaemon():
+ 	s = []
+ 	s.append(_(&quot;Restarting the panel daemon ...&quot;))
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-10-25 17:25:02 UTC (rev 816)
++++ trunk/CHANGELOG.txt	2007-11-01 21:21:43 UTC (rev 817)
+@@ -1,3 +1,7 @@
++2007-11-01:
++* New way to restart panel daemon. 
++* Fixed tarball html directory in panelutils.
++
+ 2007-10-04:
+ * Added special Trunk for Linksys SPA400 gateway
+ * Added special Trunk for Suncomm SC-375 Voip-GSM gateway
+
+Modified: trunk/panelutils.py
+===================================================================
+--- trunk/panelutils.py	2007-10-25 17:25:02 UTC (rev 816)
++++ trunk/panelutils.py	2007-11-01 21:21:43 UTC (rev 817)
+@@ -23,17 +23,14 @@
+ 
+ # To use with asternic.org op_panel tarball:
+ #PANEL_CONF_DIR	= &quot;/usr/local/op_panel&quot;
+-#PANEL_HTML_DIR	= &quot;/usr/local/op_panel/html&quot;
+-#PANEL_START_CMD	= &quot;/usr/local/op_panel/op_server.pl -d&quot;
+-#PANEL_STOP_CMD	= &quot;pkill op_server&quot;
++#PANEL_HTML_DIR	= &quot;/usr/local/op_panel/flash&quot;
++#PANEL_RESTART_CMD = &quot;killall -HUP op_server.pl&quot;
+ 
+ 
+ # Configuration to use with op-panel .deb package:
+ PANEL_CONF_DIR	= &quot;/etc/op-panel&quot;
+ PANEL_HTML_DIR	= &quot;/usr/share/op-panel/flash&quot;
+-PANEL_START_CMD	= &quot;/etc/init.d/op-panel start&quot;
+-PANEL_STOP_CMD	= &quot;/etc/init.d/op-panel stop&quot;
+-PANEL_RESTART_CMD = &quot;/etc/init.d/op-panel restart&quot;
++PANEL_RESTART_CMD = &quot;killall -HUP op_server&quot;
+ 
+ def N_(message): return message
+ 
+@@ -170,12 +167,6 @@
+ 	p.append('Label=&quot;%s&quot;' % obj.name)
+ 	p.append(&quot;Panel_context=%s&quot; % obj.pbx)
+ 
+-def startPanelDaemon():
+-        return commands.getoutput(PANEL_START_CMD)
+-
+-def stopPanelDaemon():
+-        return commands.getoutput(PANEL_STOP_CMD)
+-
+ def restartPanelDaemon():
+ 	s = []
+ 	s.append(_(&quot;Restarting the panel daemon ...&quot;))
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000359.html">[Destar-dev] r817 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#358">[ date ]</a>
+              <a href="thread.html#358">[ thread ]</a>
+              <a href="subject.html#358">[ subject ]</a>
+              <a href="author.html#358">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

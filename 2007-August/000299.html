@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r779 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r779%20-%20trunk&In-Reply-To=%3C200708102120.l7ALKS5L022574%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000298.html">
+   <LINK REL="Next"  HREF="000300.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r779 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r779%20-%20trunk&In-Reply-To=%3C200708102120.l7ALKS5L022574%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r779 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Aug 10 23:20:28 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000298.html">[Destar-dev] r778 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000300.html">[Destar-dev] r780 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#299">[ date ]</a>
+              <a href="thread.html#299">[ thread ]</a>
+              <a href="subject.html#299">[ subject ]</a>
+              <a href="author.html#299">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-10 23:20:28 +0200 (Fri, 10 Aug 2007)
+New Revision: 779
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_ivr_treenode.py
+Log:
+cfg_ivr_treenode: fixed context for appendExten
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-03 18:36:25 UTC (rev 778)
++++ trunk/CHANGELOG.txt	2007-08-10 21:20:28 UTC (rev 779)
+@@ -1,3 +1,6 @@
++2007-08-10:
++* cfg_ivr_treenode: fixed context for appendExten
++
+ 2007-08-03:
+ * cfg_trunk_zapdynamic: added panel, pridialplan configs and some default
+   settings.
+
+Modified: trunk/cfg_ivr_treenode.py
+===================================================================
+--- trunk/cfg_ivr_treenode.py	2007-08-03 18:36:25 UTC (rev 778)
++++ trunk/cfg_ivr_treenode.py	2007-08-10 21:20:28 UTC (rev 779)
+@@ -255,83 +255,84 @@
+ 		
+ 	def createAsteriskConfig(self):
+ 		s = AstConf(&quot;extensions.conf&quot;)
+-		s.setSection(self.name)
++		context = self.name
++		s.setSection(context)
+ 		if self.pbx:
+ 			pbx = self.pbx
+ 		else:	
+ 			pbx = &quot;phones&quot;
+ 		s.append(&quot;include=%s&quot; % pbx)
+-		s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(digit)=%d)&quot; % self.digittimeout, self.pbx)
++		s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(digit)=%d)&quot; % self.digittimeout, context)
+ 		if self.moh:
+-			s.appendExten(&quot;s&quot;,&quot;Setmusiconhold(%s)&quot; % self.moh, self.pbx)
+-			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=m)&quot;, self.pbx)
++			s.appendExten(&quot;s&quot;,&quot;Setmusiconhold(%s)&quot; % self.moh, context)
++			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=m)&quot;, context)
+ 		else:
+-			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=r)&quot;, self.pbx)
++			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=r)&quot;, context)
+ 		if self.ivrtime:
+ 			if self.times:
+ 				times=self.times.split(',')
+ 				for t in times:
+-					s.appendExten(&quot;s&quot;,&quot;GotoIfTime(%s?%s,s,1)&quot; % (t,self.ivrtime), self.pbx)
++					s.appendExten(&quot;s&quot;,&quot;GotoIfTime(%s?%s,s,1)&quot; % (t,self.ivrtime), context)
+ 		if self.timeout:
+-			s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(absolute)=%s)&quot; % self.timeout, self.pbx)
++			s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(absolute)=%s)&quot; % self.timeout, context)
+ 		for i in range(self.repeat):
+-			s.appendExten(&quot;s&quot;,&quot;Background(%s)&quot; % self.backgroundfile, self.pbx)	
++			s.appendExten(&quot;s&quot;,&quot;Background(%s)&quot; % self.backgroundfile, context)	
+ 			if self.pause:
+-				s.appendExten(&quot;s&quot;,&quot;WaitExten(%s)&quot; % self.pause, self.pbx)
+-		s.appendExten(&quot;s&quot;,&quot;WaitExten(%d)&quot; % self.waittime, self.pbx)
+-		s.appendExten(&quot;s&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), self.pbx)	
++				s.appendExten(&quot;s&quot;,&quot;WaitExten(%s)&quot; % self.pause, context)
++		s.appendExten(&quot;s&quot;,&quot;WaitExten(%d)&quot; % self.waittime, context)
++		s.appendExten(&quot;s&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), context)	
+ 		if self.ivr_1:
+-			s.appendExten(&quot;1&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_1, self.pbx)	
++			s.appendExten(&quot;1&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_1, context)	
+ 		if self.ivr_2:
+-			s.appendExten(&quot;2&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_2, self.pbx)	
++			s.appendExten(&quot;2&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_2, context)	
+ 		if self.ivr_3:
+-			s.appendExten(&quot;3&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_3, self.pbx)	
++			s.appendExten(&quot;3&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_3, context)	
+ 		if self.ivr_4:
+-			s.appendExten(&quot;4&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_4, self.pbx)	
++			s.appendExten(&quot;4&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_4, context)	
+ 		if self.ivr_5:
+-			s.appendExten(&quot;5&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_5, self.pbx)	
++			s.appendExten(&quot;5&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_5, context)	
+ 		if self.ivr_6:
+-			s.appendExten(&quot;6&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_6, self.pbx)	
++			s.appendExten(&quot;6&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_6, context)	
+ 		if self.ivr_7:
+-			s.appendExten(&quot;7&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_7, self.pbx)	
++			s.appendExten(&quot;7&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_7, context)	
+ 		if self.ivr_8:
+-			s.appendExten(&quot;8&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_8, self.pbx)	
++			s.appendExten(&quot;8&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_8, context)	
+ 		if self.ivr_9:
+-			s.appendExten(&quot;9&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_9, self.pbx)	
++			s.appendExten(&quot;9&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_9, context)	
+ 		if self.ivr_ast:
+-			s.appendExten(&quot;*&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_ast, self.pbx)	
++			s.appendExten(&quot;*&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_ast, context)	
+ 		if self.phone_1:
+-			s.appendExten(&quot;1&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_1), self.pbx)	
++			s.appendExten(&quot;1&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_1), context)	
+ 		if self.phone_2:
+-			s.appendExten(&quot;2&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_2), self.pbx)	
++			s.appendExten(&quot;2&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_2), context)	
+ 		if self.phone_3:
+-			s.appendExten(&quot;3&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_3), self.pbx)	
++			s.appendExten(&quot;3&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_3), context)	
+ 		if self.phone_4:
+-			s.appendExten(&quot;4&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_4), self.pbx)	
++			s.appendExten(&quot;4&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_4), context)	
+ 		if self.phone_5:
+-			s.appendExten(&quot;5&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_5), self.pbx)	
++			s.appendExten(&quot;5&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_5), context)	
+ 		if self.phone_6:
+-			s.appendExten(&quot;6&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_6), self.pbx)	
++			s.appendExten(&quot;6&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_6), context)	
+ 		if self.phone_7:
+-			s.appendExten(&quot;7&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_7), self.pbx)	
++			s.appendExten(&quot;7&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_7), context)	
+ 		if self.phone_8:
+-			s.appendExten(&quot;8&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_8), self.pbx)	
++			s.appendExten(&quot;8&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_8), context)	
+ 		if self.phone_9:
+-			s.appendExten(&quot;9&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_9), self.pbx)	
++			s.appendExten(&quot;9&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_9), context)	
+ 		if self.phone_ast:
+-			s.appendExten(&quot;*&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_ast), self.pbx)	
+-		s.appendExten(&quot;0&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), self.pbx)	
+-		s.appendExten(&quot;i&quot;,&quot;Playback(invalid)&quot;, self.pbx)	
+-		s.appendExten(&quot;i&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), self.pbx)	
+-		s.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;, self.pbx)
+-		s.appendExten(&quot;t&quot;,&quot;NoCDR&quot;, self.pbx)
+-		s.appendExten(&quot;t&quot;,&quot;Hangup&quot;, self.pbx)
+-		s.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;, self.pbx)
+-		s.appendExten(&quot;T&quot;,&quot;NoCDR&quot;, self.pbx)
+-		s.appendExten(&quot;T&quot;,&quot;Hangup&quot;, self.pbx)
+-		s.appendExten(&quot;#&quot;,&quot;ResetCDR(w)&quot;, self.pbx)
+-		s.appendExten(&quot;#&quot;,&quot;NoCDR&quot;, self.pbx)
+-		s.appendExten(&quot;#&quot;,&quot;Hangup&quot;, self.pbx)
++			s.appendExten(&quot;*&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_ast), context)	
++		s.appendExten(&quot;0&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), context)	
++		s.appendExten(&quot;i&quot;,&quot;Playback(invalid)&quot;, context)	
++		s.appendExten(&quot;i&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), context)	
++		s.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;, context)
++		s.appendExten(&quot;t&quot;,&quot;NoCDR&quot;, context)
++		s.appendExten(&quot;t&quot;,&quot;Hangup&quot;, context)
++		s.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;, context)
++		s.appendExten(&quot;T&quot;,&quot;NoCDR&quot;, context)
++		s.appendExten(&quot;T&quot;,&quot;Hangup&quot;, context)
++		s.appendExten(&quot;#&quot;,&quot;ResetCDR(w)&quot;, context)
++		s.appendExten(&quot;#&quot;,&quot;NoCDR&quot;, context)
++		s.appendExten(&quot;#&quot;,&quot;Hangup&quot;, context)
+ 	
+ 
+ 	def row(self):
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000298.html">[Destar-dev] r778 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000300.html">[Destar-dev] r780 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#299">[ date ]</a>
+              <a href="thread.html#299">[ thread ]</a>
+              <a href="subject.html#299">[ subject ]</a>
+              <a href="author.html#299">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

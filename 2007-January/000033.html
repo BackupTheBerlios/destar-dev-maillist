@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r565 - branches/quixote2
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r565%20-%20branches/quixote2&In-Reply-To=%3C200701162238.l0GMcGka000081%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000032.html">
+   <LINK REL="Next"  HREF="000034.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r565 - branches/quixote2</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r565%20-%20branches/quixote2&In-Reply-To=%3C200701162238.l0GMcGka000081%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r565 - branches/quixote2">santiago at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 16 23:38:16 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000032.html">[Destar-dev] r564 - branches/quixote2
+</A></li>
+        <LI>Next message: <A HREF="000034.html">[Destar-dev] r566 - branches/quixote2/po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#33">[ date ]</a>
+              <a href="thread.html#33">[ thread ]</a>
+              <a href="subject.html#33">[ subject ]</a>
+              <a href="author.html#33">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-01-16 23:38:15 +0100 (Tue, 16 Jan 2007)
+New Revision: 565
+
+Modified:
+   branches/quixote2/StatsHelper.ptl
+   branches/quixote2/Templates.ptl
+Log:
+merging Templates and StatsHelper
+
+
+
+Modified: branches/quixote2/StatsHelper.ptl
+===================================================================
+--- branches/quixote2/StatsHelper.ptl	2007-01-16 22:36:27 UTC (rev 564)
++++ branches/quixote2/StatsHelper.ptl	2007-01-16 22:38:15 UTC (rev 565)
+@@ -120,7 +120,7 @@
+ 	'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Not Answered Calls&quot;))
+ 	'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Busy Calls&quot;))
+ 	'&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;'+_(str(&quot;Failed Calls&quot;))
+-	'&lt;/td&gt;&lt;/tr&gt;\n'
++	'&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;\n'
+ 	for i in range(len(calls)):
+ 		'&lt;tr&gt;'
+ 		&quot;&lt;td&gt;%s&lt;/td&gt;&quot; % names[i]
+@@ -175,7 +175,7 @@
+ 	htmltext('&lt;/h3&gt;')
+ 	
+ 	htmltext('&lt;p&gt;')
+-	htmltext('&lt;img alt=&quot;table&quot; src=&quot;/graphs/%s&quot;&gt;' % filename)
++	htmltext('&lt;img alt=&quot;table&quot; src=&quot;/graphs/%s&quot; /&gt;' % filename)
+ 	htmltext('&lt;/p&gt;')				
+ 
+ def makeGraphic [plain] (names, values, title, labelx, labely, filename):
+@@ -211,6 +211,6 @@
+ 	htmltext('&lt;/h3&gt;')
+ 	
+ 	htmltext('&lt;p&gt;')
+-	htmltext('&lt;img alt=&quot;table&quot; src=&quot;/graphs/%s&quot;&gt;' % filename)
++	htmltext('&lt;img alt=&quot;table&quot; src=&quot;/graphs/%s&quot; /&gt;' % filename)
+ 	htmltext('&lt;/p&gt;')
+ 	
+
+Modified: branches/quixote2/Templates.ptl
+===================================================================
+--- branches/quixote2/Templates.ptl	2007-01-16 22:36:27 UTC (rev 564)
++++ branches/quixote2/Templates.ptl	2007-01-16 22:38:15 UTC (rev 565)
+@@ -26,7 +26,7 @@
+ import os, sys, copy
+ 
+ 
+-VERSION = _(&quot;QUIXOTE 2.X BRANCH&quot;)
++VERSION = 'DEVELOPMENT SNAPSHOT'
+ 
+ 
+ class HtmlTable:
+@@ -153,8 +153,8 @@
+ def header [html] (title, menu=None, refresh=None, scripts=None):
+ 
+ 	# Boilerplate
++  	'&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;<A HREF="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</A>&quot;&gt;\n'
+    	'&lt;html xmlns=&quot;<A HREF="http://www.w3.org/1999/xhtml">http://www.w3.org/1999/xhtml</A>&quot;&gt;\n'
+-  	'&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;<A HREF="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</A>&quot;&gt;\n'
+    	'&lt;head&gt;\n'
+    	if refresh:
+    		'&lt;meta http-equiv=&quot;Refresh&quot; content=&quot;%d;&quot; /&gt;\n' % refresh
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000032.html">[Destar-dev] r564 - branches/quixote2
+</A></li>
+	<LI>Next message: <A HREF="000034.html">[Destar-dev] r566 - branches/quixote2/po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#33">[ date ]</a>
+              <a href="thread.html#33">[ thread ]</a>
+              <a href="subject.html#33">[ subject ]</a>
+              <a href="author.html#33">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

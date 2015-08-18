@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r726 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r726%20-%20trunk&In-Reply-To=%3C200706212031.l5LKVI2c022862%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000236.html">
+   <LINK REL="Next"  HREF="000238.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r726 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r726%20-%20trunk&In-Reply-To=%3C200706212031.l5LKVI2c022862%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r726 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun 21 22:31:18 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000236.html">[Destar-dev] r725 - in branches/0.2.X: . lang/es/LC_MESSAGES po
+</A></li>
+        <LI>Next message: <A HREF="000238.html">[Destar-dev] r727 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#237">[ date ]</a>
+              <a href="thread.html#237">[ thread ]</a>
+              <a href="subject.html#237">[ subject ]</a>
+              <a href="author.html#237">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-21 22:31:17 +0200 (Thu, 21 Jun 2007)
+New Revision: 726
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_admin_cfwstate.ptl
+Log:
+* page_admin_cfwstate.ptl: updated to Quixote 2
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-18 05:40:09 UTC (rev 725)
++++ trunk/CHANGELOG.txt	2007-06-21 20:31:17 UTC (rev 726)
+@@ -1,3 +1,6 @@
++2007-06-21:
++* page_admin_cfwstate.ptl: updated to Quixote 2
++
+ 2007-06-15:
+ * cfg_phone_queue.py: queuetimeout works without queuetimeoutext
+ 
+
+Modified: trunk/page_admin_cfwstate.ptl
+===================================================================
+--- trunk/page_admin_cfwstate.ptl	2007-06-18 05:40:09 UTC (rev 725)
++++ trunk/page_admin_cfwstate.ptl	2007-06-21 20:31:17 UTC (rev 726)
+@@ -20,22 +20,12 @@
+ 
+ 
+ from Templates import *
+-from quixote.form2 import *
++from quixote.form import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
+ import backend, manager, configlets
+ import time,types
+ 
+-_q_parent  = 'page_admin'
+-_q_title   = _(&quot;Call forwarding state&quot;)
+-_q_desc    = _(&quot;Call forwarding state&quot;)
+-_q_link    = 'cfwstate'
+-_q_menupos = 10
+-_q_level   = 2
+-
+-
+-def _q_access(request):
+-        if request.session.level &lt; _q_level:
+-		cantAccessPage()
+-
+ def CFList [plain] (pbx):
+ 	cfimlist = manager.getVarFamily(&quot;CFIM/%s&quot; % pbx)
+ 	cfbslist = manager.getVarFamily(&quot;CFBS/%s&quot; % pbx)
+@@ -83,26 +73,42 @@
+ 		htmltext(_(&quot;No DND entries found&quot;))
+ 		'&lt;/span&gt;&lt;/p&gt;'
+ 
+-	
+-def _q_index [plain] (request):
+-	header(_q_desc,refresh=10)
+-	manager.connect()
+-	if not manager.isConnected():
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;Asterisk is not running!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	elif not manager.isLoggedIn():
+-		# TODO: describe how to set this up
+-		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-		htmltext(_(&quot;The manager access is not working!&quot;))
+-		'&lt;/span&gt;&lt;/p&gt;'
+-	elif self.session.pbx: 
+-			QDList(self.session.pbx)
+-		else:
++
++class Page(AccessControlled, Directory): 
++
++	_q_parent  = 'page_admin'
++	_q_title   = _(&quot;Call forwarding state&quot;)
++	_q_desc    = _(&quot;Call forwarding state&quot;)
++	_q_link    = 'cfwstate'
++	_q_menupos = 10
++	_q_level   = 2
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++		
++	def _q_index [plain] (self):
++		header(self._q_desc, refresh=10)
++		manager.connect()
++		if not manager.isConnected():
+ 			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;Asterisk is not running!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif not manager.isLoggedIn():
++			# TODO: describe how to set this up
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;The manager access is not working!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif not self.session.pbx: 
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+ 			htmltext(_(&quot;You don't have an associated pbx&quot;))
+ 			'&lt;/span&gt;&lt;/p&gt;'
+-else:
+-		CFList()
+-	footer()
++		else:
++			QDList(self.session.pbx)
++			CFList()
++		footer()
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000236.html">[Destar-dev] r725 - in branches/0.2.X: . lang/es/LC_MESSAGES po
+</A></li>
+	<LI>Next message: <A HREF="000238.html">[Destar-dev] r727 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#237">[ date ]</a>
+              <a href="thread.html#237">[ thread ]</a>
+              <a href="subject.html#237">[ subject ]</a>
+              <a href="author.html#237">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

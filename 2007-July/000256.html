@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r742 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r742%20-%20trunk&In-Reply-To=%3C200707032304.l63N4JOE001604%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000255.html">
+   <LINK REL="Next"  HREF="000257.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r742 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r742%20-%20trunk&In-Reply-To=%3C200707032304.l63N4JOE001604%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r742 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Wed Jul  4 01:04:19 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000255.html">[Destar-dev] [Bug #11497] Destar rewrites user's defined voicemail	pin
+</A></li>
+        <LI>Next message: <A HREF="000257.html">[Destar-dev] [Bug #11502] Destar rewrites user's defined voicemail	pins
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#256">[ date ]</a>
+              <a href="thread.html#256">[ thread ]</a>
+              <a href="subject.html#256">[ subject ]</a>
+              <a href="author.html#256">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-04 01:04:18 +0200 (Wed, 04 Jul 2007)
+New Revision: 742
+
+Modified:
+   trunk/ConfigHelper.ptl
+Log:
+* Safer log of configlet name.
+
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-07-03 21:26:35 UTC (rev 741)
++++ trunk/ConfigHelper.ptl	2007-07-03 23:04:18 UTC (rev 742)
+@@ -163,9 +163,12 @@
+ 
+ 	def saveConfig(withCallback=True):
+ 		&quot;&quot;&quot;Saves all values from the form into the configlet 'obj'.&quot;&quot;&quot;
++		try: 
++			obj_name = obj.name
++		except AttributeError:
++			obj_name = obj.shortName
++		sys.stderr.write (&quot;[%s] Saving configlet '%s' with id '%s' in group '%s'\n&quot; % (time.asctime(time.localtime()), obj_name, obj._id, obj.groupName))
+ 
+-		sys.stderr.write (&quot;[%s] Saving configlet '%s' with id '%s' in group '%s'&quot; % (time.asctime(time.localtime()), obj.name, obj._id, obj.groupName))
+-
+ 		#print &quot;action&quot;, obj
+ 		for v in obj.variables:
+ 			if v.hide:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000255.html">[Destar-dev] [Bug #11497] Destar rewrites user's defined voicemail	pin
+</A></li>
+	<LI>Next message: <A HREF="000257.html">[Destar-dev] [Bug #11502] Destar rewrites user's defined voicemail	pins
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#256">[ date ]</a>
+              <a href="thread.html#256">[ thread ]</a>
+              <a href="subject.html#256">[ subject ]</a>
+              <a href="author.html#256">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

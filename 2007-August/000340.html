@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r803 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r803%20-%20trunk&In-Reply-To=%3C200708312137.l7VLbhrE023501%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000339.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r803 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r803%20-%20trunk&In-Reply-To=%3C200708312137.l7VLbhrE023501%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r803 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Aug 31 23:37:43 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000339.html">[Destar-dev] r802 - trunk
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#340">[ date ]</a>
+              <a href="thread.html#340">[ thread ]</a>
+              <a href="subject.html#340">[ subject ]</a>
+              <a href="author.html#340">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-31 23:37:42 +0200 (Fri, 31 Aug 2007)
+New Revision: 803
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_phone_epygi.py
+   trunk/cfg_phone_iax.py
+   trunk/cfg_phone_mgcp.py
+   trunk/cfg_phone_sip.py
+   trunk/configlets.py
+   trunk/page_user_settings.ptl
+Log:
+Use the same length for phone secret
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-31 20:13:14 UTC (rev 802)
++++ trunk/CHANGELOG.txt	2007-08-31 21:37:42 UTC (rev 803)
+@@ -1,5 +1,6 @@
+ 2007-08-31:
+ * panelutils: use CallerID as label if it exists
++* Use the same length for phone secrets
+ 
+ 2007-08-26:
+ * cfg_phone_queue: Don't answer and set MoH if Ring is usedi. Thanks to
+
+Modified: trunk/cfg_phone_epygi.py
+===================================================================
+--- trunk/cfg_phone_epygi.py	2007-08-31 20:13:14 UTC (rev 802)
++++ trunk/cfg_phone_epygi.py	2007-08-31 21:37:42 UTC (rev 803)
+@@ -44,7 +44,7 @@
+ 			VarType(&quot;secret&quot;,
+ 					title=_(&quot;Password&quot;),
+ 					optional=True,
+-					len=15),
++					len=MAXSECRETLENGTH),
+ 
+ 			VarType(&quot;gw&quot;,
+ 					title=_(&quot;IP address of Epygi gateway&quot;),
+
+Modified: trunk/cfg_phone_iax.py
+===================================================================
+--- trunk/cfg_phone_iax.py	2007-08-31 20:13:14 UTC (rev 802)
++++ trunk/cfg_phone_iax.py	2007-08-31 21:37:42 UTC (rev 803)
+@@ -41,7 +41,7 @@
+ 			VarType(&quot;secret&quot;,
+ 					title=_(&quot;Password&quot;),
+ 					optional=True,
+-					len=15),
++					len=MAXSECRETLENGTH),
+ 
+ 			VarType(&quot;host&quot;,
+ 					title=_(&quot;IP address of phone&quot;),
+
+Modified: trunk/cfg_phone_mgcp.py
+===================================================================
+--- trunk/cfg_phone_mgcp.py	2007-08-31 20:13:14 UTC (rev 802)
++++ trunk/cfg_phone_mgcp.py	2007-08-31 21:37:42 UTC (rev 803)
+@@ -41,7 +41,7 @@
+ 			VarType(&quot;secret&quot;,
+ 					title=_(&quot;Password&quot;),
+ 					optional=True,
+-					len=15),
++					len=MAXSECRETLENGTH),
+ 
+ 			VarType(&quot;host&quot;,
+ 					title=_(&quot;IP address of phone&quot;),
+
+Modified: trunk/cfg_phone_sip.py
+===================================================================
+--- trunk/cfg_phone_sip.py	2007-08-31 20:13:14 UTC (rev 802)
++++ trunk/cfg_phone_sip.py	2007-08-31 21:37:42 UTC (rev 803)
+@@ -43,7 +43,7 @@
+ 
+ 			VarType(&quot;secret&quot;,
+ 					title=_(&quot;Password&quot;),
+-					len=15),
++					len=MAXSECRETLENGTH),
+ 
+ 			VarType(&quot;host&quot;,
+ 					title=_(&quot;IP address of phone&quot;),
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-08-31 20:13:14 UTC (rev 802)
++++ trunk/configlets.py	2007-08-31 21:37:42 UTC (rev 803)
+@@ -26,6 +26,7 @@
+ CONF_TAG = &quot;; Automatically created by DESTAR\n&quot;
+ ASTERISK_MODULES_DIR = os.getenv('ASTERISK_MODULES_DIR', default='/usr/lib/asterisk/modules') 
+ 
++MAXSECRETLENGTH = 15
+ 
+ class AsteriskConfigFile:
+ 	&quot;&quot;&quot;
+
+Modified: trunk/page_user_settings.ptl
+===================================================================
+--- trunk/page_user_settings.ptl	2007-08-31 20:13:14 UTC (rev 802)
++++ trunk/page_user_settings.ptl	2007-08-31 21:37:42 UTC (rev 803)
+@@ -57,7 +57,7 @@
+ 	form.add(IntWidget,       &quot;pin&quot;, phone.pin, title=_(&quot;Voicemail pin&quot;), maxlength=10)
+ 	try:
+ 		if phone.secret:
+-			form.add(StringWidget,  &quot;secret&quot;, phone.secret, title=_(&quot;Extension Password&quot;), maxlength=10)
++			form.add(StringWidget,  &quot;secret&quot;, phone.secret, title=_(&quot;Extension Password&quot;), maxlength=configlets.MAXSECRETLENGTH)
+ 	except AttributeError:
+ 		pass
+ 	form.add(SubmitWidget, '_submit', _(&quot;Submit&quot;), render_br=False)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000339.html">[Destar-dev] r802 - trunk
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#340">[ date ]</a>
+              <a href="thread.html#340">[ thread ]</a>
+              <a href="subject.html#340">[ subject ]</a>
+              <a href="author.html#340">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

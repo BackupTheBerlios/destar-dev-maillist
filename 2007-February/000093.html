@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r603 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r603%20-%20trunk&In-Reply-To=%3C200702281413.l1SED0ND003904%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000092.html">
+   <LINK REL="Next"  HREF="000094.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r603 - trunk</H1>
+    <B>imesper at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r603%20-%20trunk&In-Reply-To=%3C200702281413.l1SED0ND003904%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r603 - trunk">imesper at mail.berlios.de
+       </A><BR>
+    <I>Wed Feb 28 15:13:00 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000092.html">[Destar-dev] r602 - in trunk/misc: . debian
+</A></li>
+        <LI>Next message: <A HREF="000094.html">[Destar-dev] r604 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#93">[ date ]</a>
+              <a href="thread.html#93">[ thread ]</a>
+              <a href="subject.html#93">[ subject ]</a>
+              <a href="author.html#93">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: imesper
+Date: 2007-02-28 15:12:59 +0100 (Wed, 28 Feb 2007)
+New Revision: 603
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+Log:
+Removed backend.createAsteriskConfig() from __addit__ method, and added obj.createAsteriskConfig() and backend.createPythonConfig() on SaveConfig()
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-02-28 05:17:49 UTC (rev 602)
++++ trunk/CHANGELOG.txt	2007-02-28 14:12:59 UTC (rev 603)
+@@ -1,3 +1,7 @@
++2007-02-28:
++* ConfigHelper.ptl: Fix a problem in __addit__ method, when creating a new
++* object all createAsteriskConfig() from all objects where called.
++
+ 2007-02-27:
+ * languages.py: installing the gettext classes using unicode
+ * changing the file's encoding to utf-8, everybody should use unicode.
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-02-28 05:17:49 UTC (rev 602)
++++ trunk/ConfigHelper.ptl	2007-02-28 14:12:59 UTC (rev 603)
+@@ -107,7 +107,6 @@
+ 
+ def __addit__(obj):
+ 	backend.addConfiglet(obj)
+-	backend.createAsteriskConfig()
+ 
+ def lookupConfiglets(request,component):
+         if not component:
+@@ -179,6 +178,8 @@
+ 				obj.renameDependencies(_v)
+ 		if withCallback and actionCallback:
+ 			actionCallback(obj)
++			obj.createAsteriskConfig()
++			backend.createPythonConfig()
+ 			
+ 
+ 	def checkConfig():
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000092.html">[Destar-dev] r602 - in trunk/misc: . debian
+</A></li>
+	<LI>Next message: <A HREF="000094.html">[Destar-dev] r604 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#93">[ date ]</a>
+              <a href="thread.html#93">[ thread ]</a>
+              <a href="subject.html#93">[ subject ]</a>
+              <a href="author.html#93">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

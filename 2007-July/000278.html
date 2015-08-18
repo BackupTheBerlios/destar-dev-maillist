@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] Migration to asterisk 1.4
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20Migration%20to%20asterisk%201.4&In-Reply-To=%3C469FFB2D.7030900%40openboxltda.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000277.html">
+   <LINK REL="Next"  HREF="000279.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] Migration to asterisk 1.4</H1>
+    <B>Alejandro Rios Pe&#241;a</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20Migration%20to%20asterisk%201.4&In-Reply-To=%3C469FFB2D.7030900%40openboxltda.com%3E"
+       TITLE="[Destar-dev] Migration to asterisk 1.4">alejandro.rios at avatar.com.co
+       </A><BR>
+    <I>Fri Jul 20 02:00:46 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000277.html">[Destar-dev] r759 - trunk/po
+</A></li>
+        <LI>Next message: <A HREF="000279.html">[Destar-dev] [Bug #9117] Wrong single select variables html	generation for configlets
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#278">[ date ]</a>
+              <a href="thread.html#278">[ thread ]</a>
+              <a href="subject.html#278">[ subject ]</a>
+              <a href="author.html#278">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello.
+
+I'm checking the UPGRADE.txt [1] file to see how much work we need to do 
+before fully supporting Asterisk 1.4, and I came to this initial list:
+
+
+*Change ${TIMESTAMP} variable to ${STRFTIME(${EPOCH},,%Y%mNaVH%M%S)}
+
+*AgentCallBacklogin is depricated -&gt; See [2]
+
+*pbx_functions are now splited in several modules.
+
+*n+101 return code is depricated.
+
+*Use rfc2833compensate option in sip.conf to comunicate with 1.2 
+asterisk systems.
+
+*Set CALLERID(ANI) as well as CALLERID(num).
+
+*Check musicclass and  mohsuggest stuff.
+
+
+[1] <A HREF="http://svn.digium.com/view/asterisk/tags/1.4.2/UPGRADE.txt?view=markup">http://svn.digium.com/view/asterisk/tags/1.4.2/UPGRADE.txt?view=markup</A>
+[2] 
+<A HREF="http://svn.digium.com/view/asterisk/tags/1.4.2/doc/queues-with-callback-members.txt?view=markup">http://svn.digium.com/view/asterisk/tags/1.4.2/doc/queues-with-callback-members.txt?view=markup</A> 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000277.html">[Destar-dev] r759 - trunk/po
+</A></li>
+	<LI>Next message: <A HREF="000279.html">[Destar-dev] [Bug #9117] Wrong single select variables html	generation for configlets
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#278">[ date ]</a>
+              <a href="thread.html#278">[ thread ]</a>
+              <a href="subject.html#278">[ subject ]</a>
+              <a href="author.html#278">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

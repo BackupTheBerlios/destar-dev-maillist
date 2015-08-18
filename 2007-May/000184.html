@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r675 - in branches: . destar-callweaver
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r675%20-%20in%20branches%3A%20.%20destar-callweaver&In-Reply-To=%3C200705111545.l4BFj46l026866%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000183.html">
+   <LINK REL="Next"  HREF="000185.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r675 - in branches: . destar-callweaver</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r675%20-%20in%20branches%3A%20.%20destar-callweaver&In-Reply-To=%3C200705111545.l4BFj46l026866%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r675 - in branches: . destar-callweaver">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri May 11 17:45:04 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000183.html">[Destar-dev] r674 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000185.html">[Destar-dev] r676 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#184">[ date ]</a>
+              <a href="thread.html#184">[ thread ]</a>
+              <a href="subject.html#184">[ subject ]</a>
+              <a href="author.html#184">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-05-11 17:45:03 +0200 (Fri, 11 May 2007)
+New Revision: 675
+
+Added:
+   branches/destar-callweaver/
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/backend.py
+Log:
+branching destar for callweaver
+
+
+
+Copied: branches/destar-callweaver (from rev 674, trunk)
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-08 19:57:34 UTC (rev 674)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 15:45:03 UTC (rev 675)
+@@ -1,3 +1,6 @@
++2007-05-11:
++* Branching destar for callweaver
++
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+ 
+
+Modified: branches/destar-callweaver/backend.py
+===================================================================
+--- trunk/backend.py	2007-05-08 19:57:34 UTC (rev 674)
++++ branches/destar-callweaver/backend.py	2007-05-11 15:45:03 UTC (rev 675)
+@@ -26,7 +26,7 @@
+ 
+ DESTAR_CFG = &quot;destar_cfg.py&quot;
+ CONFIGLETS_DIR = os.getenv('CONFIGLETS_DIR', default='.') 
+-ASTERISK_MODULES_DIR = os.getenv('ASTERISK_MODULES_DIR', default='/usr/lib/asterisk/modules')
++CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/usr/lib/callweaver/modules')
+ 
+ 
+ 
+@@ -118,7 +118,7 @@
+ 	* sip.conf
+ 	* iax.conf
+ 	* zapata.conf
+-	* macros.inc
++	* procs.inc
+ 	&quot;&quot;&quot;
+ 
+ 	tapisupport = False
+@@ -145,7 +145,7 @@
+ 	c = AstConf(&quot;extensions.conf&quot;)
+ 	c.append(&quot;static=yes&quot;)
+ 	c.append(&quot;writeprotect=yes&quot;)
+-	c.append('#include &quot;macros.inc&quot;')
++	c.append('#include &quot;procs.inc&quot;')
+ 
+ 	c.setSection(&quot;default&quot;)
+ 	c.append(&quot;; This context should not be used directly&quot;)
+@@ -182,11 +182,11 @@
+ 	needModule(&quot;res_indications&quot;)
+ 	c = AstConf(&quot;macros.inc&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;; Macro to dial a standard local extension&quot;)
++	c.append(&quot;; Proc to dial a standard local extension&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;; format: Macro(stdexten,dest,ext,pbx)&quot;)
++	c.append(&quot;; format: Proc(stdexten,dest,ext,pbx)&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.setSection(&quot;macro-dial-std-exten&quot;)
++	c.setSection(&quot;proc-dial-std-exten&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; test for CFIM (Call Forwarding Immediate)&quot;)
+ 	c.append(&quot;exten=s,1,Set(fw_ext=${DB(CFIM/${ARG4}/${ARG3})})&quot;)
+@@ -261,10 +261,10 @@
+ 	c.append(&quot;exten=s,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append('exten=s,n(vmu),Set(vmopt=u)')
+-	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3}@${ARG4})&quot;)
++	c.append(&quot;exten=s,n,Proc(voicemail,${vmopt}${ARG3}@${ARG4})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append('exten=s,n(vmbs),Set(vmopt=b)')
+-	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3}@${ARG4})&quot;)
++	c.append(&quot;exten=s,n,Proc(voicemail,${vmopt}${ARG3}@${ARG4})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=s,n(hangup),Hangup()&quot;)
+ 	c.append(&quot;;&quot;)
+@@ -272,14 +272,14 @@
+         if tapisupport:
+                 c.append(&quot;exten=h,1,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;)
+ 
+-                c.append(&quot;[macro-tapi];&quot;)
++                c.append(&quot;[proc-tapi];&quot;)
+                 c.append(&quot;exten=s,1,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;${ARG2}] LINE_CALLSTATE LINECALLSTATE_CONNECTED)&quot;)
+                 c.append(&quot;exten=s,2,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)&quot;)
+ 
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;; format: Macro(voicemail,&lt;VoiceMail arguments&gt;)&quot;)
++	c.append(&quot;; format: Proc(voicemail,&lt;VoiceMail arguments&gt;)&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.setSection(&quot;macro-voicemail&quot;)
++	c.setSection(&quot;proc-voicemail&quot;)
+ 	c.append(&quot;exten =&gt; t,1,Hangup()&quot;)
+ 	c.append(&quot;exten =&gt; T,1,Hangup()&quot;)
+ 	c.append(&quot;exten =&gt; s,1,Answer&quot;)
+@@ -290,9 +290,9 @@
+ 
+ 
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;; format: Macro(dial-result,[&lt;cause&gt;])&quot;)
++	c.append(&quot;; format: Proc(dial-result,[&lt;cause&gt;])&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.setSection(&quot;macro-dial-result&quot;)
++	c.setSection(&quot;proc-dial-result&quot;)
+ 	c.append(&quot;exten =&gt; s,1,Set(TIMEOUT(absolute)=35)&quot;)
+ 	c.append(&quot;exten =&gt; s,2,GotoIf($[foo${ARG1} != foo]?cause_${ARG1},1:cause_${HANGUPCAUSE},1)&quot;)
+ 
+@@ -404,7 +404,7 @@
+ 		
+ 	available_modules = []
+ 	missing_modules = []
+-	for f in os.listdir(ASTERISK_MODULES_DIR):
++	for f in os.listdir(CALLWEAVER_MODULES_DIR):
+ 		if f.endswith('.so'): available_modules.append(f[:-3])
+ 	c = AstConf(&quot;modules.conf&quot;)
+ 	c.setSection(&quot;modules&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000183.html">[Destar-dev] r674 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000185.html">[Destar-dev] r676 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#184">[ date ]</a>
+              <a href="thread.html#184">[ thread ]</a>
+              <a href="subject.html#184">[ subject ]</a>
+              <a href="author.html#184">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

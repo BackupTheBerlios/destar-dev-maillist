@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r625 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r625%20-%20trunk&In-Reply-To=%3C200703060417.l264HE5w021760%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000118.html">
+   <LINK REL="Next"  HREF="000120.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r625 - trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r625%20-%20trunk&In-Reply-To=%3C200703060417.l264HE5w021760%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r625 - trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Tue Mar  6 05:17:14 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000118.html">[Destar-dev] r624 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000120.html">[Destar-dev] r625 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#119">[ date ]</a>
+              <a href="thread.html#119">[ thread ]</a>
+              <a href="subject.html#119">[ subject ]</a>
+              <a href="author.html#119">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-03-06 05:17:14 +0100 (Tue, 06 Mar 2007)
+New Revision: 625
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+   trunk/page_admin.ptl
+   trunk/page_admin_reload.ptl
+   trunk/page_config.ptl
+   trunk/page_stats.ptl
+   trunk/page_user.ptl
+Log:
+* Fixed some bugs &quot;introduced&quot; by the strict unicode handling
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/CHANGELOG.txt	2007-03-06 04:17:14 UTC (rev 625)
+@@ -1,5 +1,6 @@
+ 2007-03-05:
+ * Fixed crazy ids assignment, Patch by ceronman
++* Fixed some bugs &quot;introduced&quot; by the strict unicode handling
+ 
+ 2007-03-03
+ * Bad example line. Default values are not stored in destar_cfg.py
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/ConfigHelper.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -45,7 +45,7 @@
+ 		pass
+ 
+ 
+-def presentEditableConfiglets [plain] (configlets):
++def presentEditableConfiglets [html] (configlets):
+         if configlets:
+                 # Show currently defined configlets
+                 '&lt;table id=&quot;configureditems&quot;&gt;'
+@@ -55,7 +55,7 @@
+                 '&lt;th&gt;%s&lt;/th&gt;' % _(&quot;D&quot;)
+                 '&lt;th&gt;%s&lt;/th&gt;' % _(&quot;U&quot;)
+                 for f in configlets[0].head():
+-                        '&lt;th&gt;%s&lt;/th&gt;' % htmltext(_(f))
++                        '&lt;th&gt;%s&lt;/th&gt;' % _(f)
+                 '&lt;/tr&gt;'
+                 '&lt;/thead&gt;'
+                 n = 0
+@@ -73,12 +73,12 @@
+                         wrap = True
+                         for f in o.row():
+                                 if wrap:
+-                                        '&lt;td&gt;&lt;a href=&quot;../edit/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o._id, htmlescape(f))
++                                        '&lt;td&gt;&lt;a href=&quot;../edit/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o._id, f)
+                                         wrap = False
+ 				else:
+ 					if f == &quot;&quot;:
+ 						f = &quot; &quot;
+-	                                '&lt;td&gt;%s&lt;/td&gt;' % htmlescape(_(f))
++	                                '&lt;td&gt;%s&lt;/td&gt;' % _(f)
+                         '&lt;/tr&gt;'
+                         n = n + 1
+                 '&lt;/table&gt;'
+
+Modified: trunk/page_admin.ptl
+===================================================================
+--- trunk/page_admin.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/page_admin.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -38,10 +38,10 @@
+ 		if self.session.level &lt; self._q_level:
+ 			cantAccessPage()
+ 
+-	def showMenu [plain] (self):
++	def showMenu [html] (self):
+ 		'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+ 		'&lt;tr&gt;'
+-		for s in (htmltext(_('Action')), htmltext(_('Description'))):
++		for s in (_('Action'), _('Description')):
+ 			'&lt;th&gt;%s&lt;/th&gt;' % s
+ 		'&lt;/thead&gt;&lt;/tr&gt;'
+ 
+
+Modified: trunk/page_admin_reload.ptl
+===================================================================
+--- trunk/page_admin_reload.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/page_admin_reload.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -42,21 +42,21 @@
+ 		if self.session.level &lt; self._q_level:
+ 			cantAccessPage()
+ 
+-	def _q_index [plain] (self):
++	def _q_index [html] (self):
+ 		header(self._q_desc)
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			htmltext(_(&quot;Asterisk is not running!&quot;))
++			_(&quot;Asterisk is not running!&quot;)
+ 			'&lt;/span&gt;&lt;/p&gt;'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+ 			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			htmltext(_(&quot;The manager access is not working!&quot;))
++			_(&quot;The manager access is not working!&quot;)
+ 			'&lt;/span&gt;&lt;/p&gt;'
+ 		else:
+ 			'&lt;p&gt;'
+-			htmltext(_('Doing a reload, result is:'))
++			_('Doing a reload, result is:')
+ 			'&lt;/p&gt;'
+ 
+ 			'&lt;tt&gt;&lt;p&gt;'
+
+Modified: trunk/page_config.ptl
+===================================================================
+--- trunk/page_config.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/page_config.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -131,7 +131,7 @@
+ 		head
+ 		':&lt;/p&gt;&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+ 		'&lt;tr&gt;'
+-		for s in (htmltext(_('Configured')), htmltext(_('Category'))):
++		for s in (_('Configured'), _('Category')):
+ 			'&lt;th&gt;%s&lt;/th&gt;' % s
+ 		'&lt;/thead&gt;&lt;/tr&gt;'
+ 
+
+Modified: trunk/page_stats.ptl
+===================================================================
+--- trunk/page_stats.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/page_stats.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -38,10 +38,10 @@
+ 		if self.session.level &lt; self._q_level:
+ 			cantAccessPage()
+ 
+-	def showMenu [plain] (self):
++	def showMenu [html] (self):
+ 		'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+ 		'&lt;tr&gt;'
+-		for s in (htmltext(_('Statistics')), htmltext(_('Description'))):
++		for s in (_('Statistics'), _('Description')):
+ 			'&lt;th&gt;%s&lt;/th&gt;' % s
+ 		'&lt;/thead&gt;&lt;/tr&gt;'
+ 
+
+Modified: trunk/page_user.ptl
+===================================================================
+--- trunk/page_user.ptl	2007-03-05 17:25:15 UTC (rev 624)
++++ trunk/page_user.ptl	2007-03-06 04:17:14 UTC (rev 625)
+@@ -38,10 +38,10 @@
+ 		if self.session.level &lt; self._q_level:
+ 			cantAccessPage()
+ 
+-	def showMenu [plain] (self):
++	def showMenu [html] (self):
+ 		'&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+ 		'&lt;tr&gt;'
+-		for s in (htmltext(_('Available actions')), htmltext(_('Description'))):
++		for s in (_('Available actions'), _('Description')):
+ 			'&lt;th&gt;%s&lt;/th&gt;' % s
+ 		'&lt;/thead&gt;&lt;/tr&gt;'
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000118.html">[Destar-dev] r624 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000120.html">[Destar-dev] r625 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#119">[ date ]</a>
+              <a href="thread.html#119">[ thread ]</a>
+              <a href="subject.html#119">[ subject ]</a>
+              <a href="author.html#119">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

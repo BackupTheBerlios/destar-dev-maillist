@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r593 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r593%20-%20trunk&In-Reply-To=%3C200702162144.l1GLiOB7015009%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000078.html">
+   <LINK REL="Next"  HREF="000080.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r593 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r593%20-%20trunk&In-Reply-To=%3C200702162144.l1GLiOB7015009%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r593 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Feb 16 22:44:24 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000078.html">[Destar-dev] r592 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000080.html">[Destar-dev] r594 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#79">[ date ]</a>
+              <a href="thread.html#79">[ thread ]</a>
+              <a href="subject.html#79">[ subject ]</a>
+              <a href="author.html#79">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-02-16 22:44:23 +0100 (Fri, 16 Feb 2007)
+New Revision: 593
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_config.ptl
+   trunk/page_main.ptl
+Log:
+* Redirecting to login when no user is logged
+* Create PBX configuration tip
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-02-16 16:59:57 UTC (rev 592)
++++ trunk/CHANGELOG.txt	2007-02-16 21:44:23 UTC (rev 593)
+@@ -1,5 +1,7 @@
+ 2007-02-16:
+ * Added externhost support in sip.conf through SIP Options.
++* Redirecting to login when no user is logged
++* Create PBX configuration tip
+ 
+ 2007-02-08:
+ * Added DISA support (Patch #1878 by imesper)
+
+Modified: trunk/page_config.ptl
+===================================================================
+--- trunk/page_config.ptl	2007-02-16 16:59:57 UTC (rev 592)
++++ trunk/page_config.ptl	2007-02-16 21:44:23 UTC (rev 593)
+@@ -88,6 +88,12 @@
+ 				&quot;add/CfgOptManager&quot;,
+ 				[_(&quot;Configuration&quot;), _(&quot;Options&quot;), _(&quot;Management API access&quot;)] )
+ 
++		if not backend.countConfiglets(clazz=&quot;CfgOptPBX&quot;):
++			self.configurationTip(
++				_(&quot;You should create a PBX. Without a PBX, you can't create phones.&quot;),
++				&quot;pbx/&quot;,
++				[_(&quot;Configuration&quot;), _(&quot;PBX&quot;)] )
++
+ 		if not backend.countConfiglets(&quot;Phones&quot;):
+ 			self.configurationTip(
+ 				_(&quot;You should create a phone. Without defined phones you can't make and receive calls.&quot;),
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2007-02-16 16:59:57 UTC (rev 592)
++++ trunk/page_main.ptl	2007-02-16 21:44:23 UTC (rev 593)
+@@ -20,7 +20,7 @@
+ 
+ from Templates import *
+ import sys, os, quixote, backend
+-from quixote import get_session, get_session_manager
++from quixote import get_session, get_session_manager, redirect
+ from quixote.util import StaticDirectory
+ from quixote.directory import Directory, AccessControlled
+ 
+@@ -134,9 +134,8 @@
+ #######################################################################
+ 
+ 	def _q_index [plain] (self):
+-                #session = get_session()
+-		#if session.level &lt; 1:
+-		#	return get_request().redirect(str('/login'))
++		if get_session().level &lt; 1:
++			return redirect(str('/login'))
+ 		header(self._q_desc)
+ 		'&lt;p&gt;'
+ 		'This page is empty. Please select one option from the menu on the left side.'
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000078.html">[Destar-dev] r592 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000080.html">[Destar-dev] r594 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#79">[ date ]</a>
+              <a href="thread.html#79">[ thread ]</a>
+              <a href="subject.html#79">[ subject ]</a>
+              <a href="author.html#79">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

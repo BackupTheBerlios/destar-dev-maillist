@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r558 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r558%20-%20trunk&In-Reply-To=%3C200701152106.l0FL6mA2002301%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000047.html">
+   <LINK REL="Next"  HREF="000022.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r558 - trunk</H1>
+    <B>hholzer at mail.berlios.de</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r558%20-%20trunk&In-Reply-To=%3C200701152106.l0FL6mA2002301%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r558 - trunk">hholzer at mail.berlios.de
+       </A><BR>
+    <I>Mon Jan 15 22:06:48 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000047.html">[Destar-dev] [Feature #3051] Devstate support for CF, VM
+</A></li>
+        <LI>Next message: <A HREF="000022.html">[Destar-dev] r559 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#21">[ date ]</a>
+              <a href="thread.html#21">[ thread ]</a>
+              <a href="subject.html#21">[ subject ]</a>
+              <a href="author.html#21">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: hholzer
+Date: 2007-01-15 22:06:34 +0100 (Mon, 15 Jan 2007)
+New Revision: 558
+
+Modified:
+   trunk/cfg_app_callfw.py
+   trunk/cfg_phone_iax.py
+   trunk/cfg_phone_mgcp.py
+   trunk/cfg_phone_sip.py
+   trunk/cfg_phone_zap.py
+   trunk/configlets.py
+Log:
+fist attempt for devstate support at call forward
+cleanup hint support
+
+
+Modified: trunk/cfg_app_callfw.py
+===================================================================
+--- trunk/cfg_app_callfw.py	2007-01-15 17:21:41 UTC (rev 557)
++++ trunk/cfg_app_callfw.py	2007-01-15 21:06:34 UTC (rev 558)
+@@ -33,7 +33,9 @@
+ 			VarType(&quot;type&quot;, title=_(&quot;Type&quot;), type=&quot;choice&quot;, options=( (&quot;CFIM&quot;, _(&quot;Call Forwarding Unconditional&quot;)), \
+ 			(&quot;CFBS&quot;, _(&quot;Call Forwarding if Busy&quot;)), (&quot;CFTO&quot;, _(&quot;Call Forwarding if Timeout/Unavailable&quot;)) )),
+ 			VarType(&quot;set&quot;,      title=_(&quot;Setting preffix&quot;), len=6, default=&quot;*21&quot;),
+-			VarType(&quot;ext&quot;,   title=_(&quot;Unsetting extension&quot;), len=6, default=&quot;*22&quot;)
++			VarType(&quot;ext&quot;,   title=_(&quot;Unsetting extension&quot;), len=6, default=&quot;*22&quot;),
++			VarType(&quot;toggle&quot;,   title=_(&quot;Set function toggleable&quot;), type=&quot;bool&quot;),
++			VarType(&quot;devstateprefix&quot;,   title=_(&quot;Create Devstate extension. Devstate Prefix:&quot;), len=8, default=&quot;&quot;)
+ 		       	]
+ 
+ 		self.dependencies = [ DepType(&quot;pbx&quot;, 
+@@ -45,9 +47,17 @@
+ 		return (&quot;%s / %s&quot; % (self.set,self.ext),&quot;%s %s&quot; % (self.shortName, self.type), self.pbx)
+ 
+ 	def createAsteriskConfig(self):
++		if self.devstateprefix:
++		    needModule(&quot;app_devstate&quot;)
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
++		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Answer()&quot;)
++		if self.toggle:
++			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Set(testcf=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
++			c.appendExten(&quot;_%sX.&quot; % self.set, 'GotoIf($[&quot;${testcf}&quot; = &quot;&quot;]?:switchoff)')
+ 		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Set(DB(%s/%s/${CALLERIDNUM})=${EXTEN:%d})&quot; % (self.type, self.pbx,len(self.set)))
++		if self.devstateprefix:
++			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Devstate(%s${CALLERIDNUM},2)&quot; % self.devstateprefix)
+ 		if self.type == &quot;CFIM&quot;:
+ 			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-unconditional)&quot;)
+ 		elif self.type == &quot;CFTO&quot;:
+@@ -55,6 +65,10 @@
+ 		else:
+ 			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-on-busy)&quot;)
+ 		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type,self.pbx))
++		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;switchoff&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Answer()&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx))
++		if self.devstateprefix:
++			c.appendExten(&quot;%s&quot; % self.ext, &quot;Devstate(%s${CALLERIDNUM},0)&quot; % self.devstateprefix)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(call-fwd-cancelled)&quot;)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Hangup&quot;)
+
+Modified: trunk/cfg_phone_iax.py
+===================================================================
+--- trunk/cfg_phone_iax.py	2007-01-15 17:21:41 UTC (rev 557)
++++ trunk/cfg_phone_iax.py	2007-01-15 21:06:34 UTC (rev 558)
+@@ -283,7 +283,6 @@
+ 			iax.append(&quot;notransfer=yes&quot;)
+ 
+ 		self.createExtensionConfig()
+-		self.createHintConfig()
+ 		self.createVoicemailConfig(iax)
+ 		self.createOutgoingContext()
+ 		self.createPanelConfig()
+
+Modified: trunk/cfg_phone_mgcp.py
+===================================================================
+--- trunk/cfg_phone_mgcp.py	2007-01-15 17:21:41 UTC (rev 557)
++++ trunk/cfg_phone_mgcp.py	2007-01-15 21:06:34 UTC (rev 558)
+@@ -284,7 +284,6 @@
+ 			mgcp.append('pickupgroup=%s' % self.callgroup)
+ 
+ 		self.createExtensionConfig()
+-		self.createHintConfig()
+ 		self.createVoicemailConfig(mgcp)
+ 		self.createOutgoingContext()
+ 		self.createQueuesConfig()
+
+Modified: trunk/cfg_phone_sip.py
+===================================================================
+--- trunk/cfg_phone_sip.py	2007-01-15 17:21:41 UTC (rev 557)
++++ trunk/cfg_phone_sip.py	2007-01-15 21:06:34 UTC (rev 558)
+@@ -302,7 +302,6 @@
+ 		sip.append(&quot;subscribecontext=%s&quot; % pbx)
+ 
+ 		self.createExtensionConfig()
+-		self.createHintConfig()
+ 		self.createVoicemailConfig(sip)
+ 		self.createOutgoingContext()
+ 		self.createPanelConfig()
+
+Modified: trunk/cfg_phone_zap.py
+===================================================================
+--- trunk/cfg_phone_zap.py	2007-01-15 17:21:41 UTC (rev 557)
++++ trunk/cfg_phone_zap.py	2007-01-15 21:06:34 UTC (rev 558)
+@@ -284,7 +284,6 @@
+ 		c.append(&quot;&quot;)
+ 
+ 		self.createExtensionConfig()
+-		self.createHintConfig()
+ 		self.createVoicemailConfig(c)
+ 		self.createOutgoingContext()
+ 		self.createPanelConfig()
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-01-15 17:21:41 UTC (rev 557)
++++ trunk/configlets.py	2007-01-15 21:06:34 UTC (rev 558)
+@@ -104,7 +104,7 @@
+ 			self.order.append(self.section)
+ 		self.dirty = True
+ 
+-	def appendExten(self,ext,l,e=None):
++	def appendExten(self,ext,l,e=None, label=None):
+ 		&quot;&quot;&quot;Append an extension line l to the current section. Append
+ 		an optional error extenion e as well. Increments the priorty
+ 		if the extension stays the same, resets the prio to 1 if the
+@@ -113,7 +113,12 @@
+ 		if ext != self.lastext:
+ 			self.extpriority = 1
+ 		self.lastext = ext
+-		self.append(&quot;exten=%s,%d,%s&quot; % (ext, self.extpriority, l))
++
++		if label:
++		    self.append(&quot;exten=%s,%d(%s),%s&quot; % (ext, self.extpriority, label, l))
++		else:
++		    self.append(&quot;exten=%s,%d,%s&quot; % (ext, self.extpriority, l))
++
+ 		if e:
+ 			self.append(&quot;exten=%s,%d,%s&quot; % (ext, self.extpriority+101, e))
+ 			
+@@ -989,20 +994,17 @@
+                 except AttributeError:
+                         pbx = &quot;phones&quot;
+                 extensions.setSection(pbx)
++		extensions.append(&quot;exten=%s,hint,%s/%s&quot; % (self.ext, self.technology, self.name))
+ 		extensions.appendExten(self.ext,&quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name))
+ 		self.createDialEntry(extensions, self.ext, pbx, self.ext)
+ 		extensions.appendExten(self.name,&quot;Set(CDR(pbx)=%s,CDR(userfield)=%s)&quot; % (pbx,self.name))
+ 		self.createDialEntry(extensions, self.name, pbx, self.ext)
++		for obj in configlet_tree:
++			if obj.__class__.__name__ == 'CfgAppCallFW':
++				if obj.devstateprefix:
++					extensions.append(&quot;exten=%s%s,hint,DS/%s%s&quot; % (obj.devstateprefix, self.ext, obj.devstateprefix, self.ext))
++					extensions.appendExten(&quot;%s%s&quot; % (obj.devstateprefix, self.ext), &quot;Goto(%s,%s,1)&quot; % (pbx, obj.set))
+ 
+-	def createHintConfig(self):
+-		extensions = AstConf(&quot;extensions.conf&quot;)
+-        	try:
+-            		pbx = self.pbx
+-        	except AttributeError:
+-            		pbx = &quot;phones&quot;
+-        	extensions.setSection(pbx)
+-		extensions.append(&quot;exten=%s,hint,%s/%s&quot; % (self.ext, self.technology, self.name))
+-
+ 	def createVoicemailConfig(self, conf):
+ 		if self.ext and self.usevm:
+ 			needModule(&quot;res_adsi&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000047.html">[Destar-dev] [Feature #3051] Devstate support for CF, VM
+</A></li>
+	<LI>Next message: <A HREF="000022.html">[Destar-dev] r559 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#21">[ date ]</a>
+              <a href="thread.html#21">[ thread ]</a>
+              <a href="subject.html#21">[ subject ]</a>
+              <a href="author.html#21">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

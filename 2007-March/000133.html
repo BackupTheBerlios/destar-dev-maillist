@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r634 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r634%20-%20trunk&In-Reply-To=%3C200703141910.l2EJAkvN021529%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000134.html">
+   <LINK REL="Next"  HREF="000135.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r634 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r634%20-%20trunk&In-Reply-To=%3C200703141910.l2EJAkvN021529%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r634 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Mar 14 20:10:46 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000134.html">[Destar-dev] [Bug #10622] javascript in call details isn't working
+</A></li>
+        <LI>Next message: <A HREF="000135.html">[Destar-dev] r635 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#133">[ date ]</a>
+              <a href="thread.html#133">[ thread ]</a>
+              <a href="subject.html#133">[ subject ]</a>
+              <a href="author.html#133">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-03-14 20:10:45 +0100 (Wed, 14 Mar 2007)
+New Revision: 634
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_stats_cdr.ptl
+Log:
+* page_stats_cdr: added name attribute in the form. Fixes bug #10622
+- closed img tags
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-12 21:37:18 UTC (rev 633)
++++ trunk/CHANGELOG.txt	2007-03-14 19:10:45 UTC (rev 634)
+@@ -1,3 +1,7 @@
++2007-03-14:
++* page_stats_cdr: added name attribute in the form. Fixes bug #10622 
++- closed img tags
++
+ 2007-03-08:
+ * Fixed an unicode and select widgets problem
+ * Added _q_traverse() at page_main, to handle exceptions correctly
+
+Modified: trunk/page_stats_cdr.ptl
+===================================================================
+--- trunk/page_stats_cdr.ptl	2007-03-12 21:37:18 UTC (rev 633)
++++ trunk/page_stats_cdr.ptl	2007-03-14 19:10:45 UTC (rev 634)
+@@ -122,9 +122,7 @@
+ 	else:
+ 		localday = localtime[2]
+ 
+-	form = Form()
+-
+-	form.name = &quot;searchform&quot;
++	form = Form(name = &quot;searchform&quot;)
+ 	
+ 	form.add(StringWidget, &quot;pbx&quot;,  &quot;%s&quot; % pbx, title=htmltext(_(&quot;PBX&quot;)),hint=htmltext(_(&quot;Wildcards: % is the 'zero or more characters' wildcard, and _ is the 'exactly one character' wildcard&quot;)), render_br=True )
+ 	form.add(StringWidget, &quot;srcextension&quot;,  &quot;%s&quot; % srcextension, title=htmltext(_(&quot;Source &quot;)),hint=htmltext(_(&quot;Wildcards: % is the 'zero or more characters' wildcard, and _ is the 'exactly one character' wildcard&quot;)), render_br=True )
+@@ -252,9 +250,9 @@
+ 					neworder = (order=='ASC' and 'DESC') or 'ASC'
+ 					&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], neworder, M_(s[0]))
+ 					if order=='ASC':
+-						&quot; &lt;img src='/static/down.gif' border='0' alt='%s'&gt;\n&quot; % M_('Asc. Order')
++						&quot; &lt;img src='/static/down.gif' border='0' alt='%s' /&gt;\n&quot; % M_('Asc. Order')
+ 					else:
+-						&quot; &lt;img src='/static/up.gif' border='0' alt='%s'&gt;\n&quot; % M_('Desc. Order')
++						&quot; &lt;img src='/static/up.gif' border='0' alt='%s' /&gt;\n&quot; % M_('Desc. Order')
+ 				else:
+ 					&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], order, M_(s[0]))
+ 				'&lt;/th&gt;'
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000134.html">[Destar-dev] [Bug #10622] javascript in call details isn't working
+</A></li>
+	<LI>Next message: <A HREF="000135.html">[Destar-dev] r635 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#133">[ date ]</a>
+              <a href="thread.html#133">[ thread ]</a>
+              <a href="subject.html#133">[ subject ]</a>
+              <a href="author.html#133">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

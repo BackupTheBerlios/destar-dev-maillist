@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r671 - branches/0.2.X trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r671%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200704252012.l3PKCKMZ011198%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000179.html">
+   <LINK REL="Next"  HREF="000181.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r671 - branches/0.2.X trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r671%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200704252012.l3PKCKMZ011198%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r671 - branches/0.2.X trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Wed Apr 25 22:12:20 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000179.html">[Destar-dev] r670 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000181.html">[Destar-dev] r672 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#180">[ date ]</a>
+              <a href="thread.html#180">[ thread ]</a>
+              <a href="subject.html#180">[ subject ]</a>
+              <a href="author.html#180">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-04-25 22:12:19 +0200 (Wed, 25 Apr 2007)
+New Revision: 671
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/backend.py
+   trunk/CHANGELOG.txt
+   trunk/backend.py
+Log:
+* Fixed bug in macro-voicemail: added missing t and T extensions and a priority after calling VoiceMail application.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-04-25 20:02:44 UTC (rev 670)
++++ branches/0.2.X/CHANGELOG.txt	2007-04-25 20:12:19 UTC (rev 671)
+@@ -1,3 +1,6 @@
++2007-04-25:
++* Fixed bug in macro-voicemail: added missing t and T extensions and a priority after calling VoiceMail application.
++
+ 2007-04-19:
+ * Fixed bug in the login page.
+ 
+
+Modified: branches/0.2.X/backend.py
+===================================================================
+--- branches/0.2.X/backend.py	2007-04-25 20:02:44 UTC (rev 670)
++++ branches/0.2.X/backend.py	2007-04-25 20:12:19 UTC (rev 671)
+@@ -275,15 +275,14 @@
+ 	c.append(&quot;; format: Macro(voicemail,&lt;VoiceMail arguments&gt;)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.setSection(&quot;macro-voicemail&quot;)
++	c.append(&quot;exten =&gt; t,1,Hangup()&quot;)
++	c.append(&quot;exten =&gt; T,1,Hangup()&quot;)
+ 	c.append(&quot;exten =&gt; s,1,Answer&quot;)
+ 	c.append(&quot;exten =&gt; s,2,Set(TIMEOUT(absolute)=240)&quot;)
+ 	c.append(&quot;exten =&gt; s,3,Wait(1)&quot;)
+ 	c.append(&quot;exten =&gt; s,4,VoiceMail(${ARG1})&quot;)
+-	c.append(&quot;;exten =&gt; s,105,Macro(dial-result,3)&quot;)
++	c.append(&quot;exten =&gt; s,5,Hangup()&quot;)
+ 
+-	c.append(&quot;;exten =&gt; h,1,Macro(dial-result)&quot;)
+-	c.append(&quot;;exten =&gt; t,1,Macro(dial-result)&quot;)
+-
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; format: Macro(dial-result,[&lt;cause&gt;])&quot;)
+ 	c.append(&quot;;&quot;)
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-04-25 20:02:44 UTC (rev 670)
++++ trunk/CHANGELOG.txt	2007-04-25 20:12:19 UTC (rev 671)
+@@ -1,6 +1,7 @@
+ 2007-04-25
+ * Added panel buttons for agents. (still does not work at all)
+ * Allow configuring op_server debug level.
++* Fixed bug in macro-voicemail: added missing t and T extensions and a priority after calling VoiceMail application.
+ 
+ 2007-04-24:
+ * Use actual pbx instead pbx1 in cfg_app_agentcallbacklogin
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-04-25 20:02:44 UTC (rev 670)
++++ trunk/backend.py	2007-04-25 20:12:19 UTC (rev 671)
+@@ -280,14 +280,14 @@
+ 	c.append(&quot;; format: Macro(voicemail,&lt;VoiceMail arguments&gt;)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.setSection(&quot;macro-voicemail&quot;)
++	c.append(&quot;exten =&gt; t,1,Hangup()&quot;)
++	c.append(&quot;exten =&gt; T,1,Hangup()&quot;)
+ 	c.append(&quot;exten =&gt; s,1,Answer&quot;)
+ 	c.append(&quot;exten =&gt; s,2,Set(TIMEOUT(absolute)=240)&quot;)
+ 	c.append(&quot;exten =&gt; s,3,Wait(1)&quot;)
+ 	c.append(&quot;exten =&gt; s,4,VoiceMail(${ARG1})&quot;)
+-	c.append(&quot;;exten =&gt; s,105,Macro(dial-result,3)&quot;)
++	c.append(&quot;exten =&gt; s,5,Hangup()&quot;)
+ 
+-	c.append(&quot;;exten =&gt; h,1,Macro(dial-result)&quot;)
+-	c.append(&quot;;exten =&gt; t,1,Macro(dial-result)&quot;)
+ 
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; format: Macro(dial-result,[&lt;cause&gt;])&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000179.html">[Destar-dev] r670 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000181.html">[Destar-dev] r672 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#180">[ date ]</a>
+              <a href="thread.html#180">[ thread ]</a>
+              <a href="subject.html#180">[ subject ]</a>
+              <a href="author.html#180">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

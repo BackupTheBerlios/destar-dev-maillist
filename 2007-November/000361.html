@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r818 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r818%20-%20branches/0.2.X&In-Reply-To=%3C200711072058.lA7KwAMk005310%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000360.html">
+   <LINK REL="Next"  HREF="000362.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r818 - branches/0.2.X</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r818%20-%20branches/0.2.X&In-Reply-To=%3C200711072058.lA7KwAMk005310%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r818 - branches/0.2.X">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov  7 21:58:10 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000360.html">[Destar-dev] DeStar finalist in Les Troph&#233;es du Libre 2007
+</A></li>
+        <LI>Next message: <A HREF="000362.html">[Destar-dev] r819 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#361">[ date ]</a>
+              <a href="thread.html#361">[ thread ]</a>
+              <a href="subject.html#361">[ subject ]</a>
+              <a href="author.html#361">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-11-07 21:58:09 +0100 (Wed, 07 Nov 2007)
+New Revision: 818
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/StatsHelper.ptl
+   branches/0.2.X/page_stats_cdr.ptl
+Log:
+- Some old cdr modules store disposition values as integers. A little try to handle it.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-11-01 21:21:43 UTC (rev 817)
++++ branches/0.2.X/CHANGELOG.txt	2007-11-07 20:58:09 UTC (rev 818)
+@@ -1,3 +1,6 @@
++2007-11-07:
++- Some old cdr modules store disposition values as integers. A little try to handle it.
++
+ 2007-11-01:
+ * New way to restart panel daemon. 
+ * Fixed tarball html directory in panelutils.
+
+Modified: branches/0.2.X/StatsHelper.ptl
+===================================================================
+--- branches/0.2.X/StatsHelper.ptl	2007-11-01 21:21:43 UTC (rev 817)
++++ branches/0.2.X/StatsHelper.ptl	2007-11-07 20:58:09 UTC (rev 818)
+@@ -53,13 +53,13 @@
+ 		self.minutes += mins
+ 		self.cost += mins * cost_per_minute
+ 		
+-		if disp == &quot;ANSWERED&quot;:
++		if disp == &quot;ANSWERED&quot; or disp == 8:
+ 			self.answered += 1
+-		elif disp == &quot;NO ANSWER&quot;:
++		elif disp == &quot;NO ANSWER&quot; or disp == 4:
+ 			self.not_answered += 1
+-		elif disp == &quot;BUSY&quot;:
++		elif disp == &quot;BUSY&quot; or disp == 2:
+ 			self.busy += 1
+-		elif disp == &quot;FAILED&quot;:
++		elif disp == &quot;FAILED&quot; or disp == 1:
+ 			self.failed += 1
+ 	
+ 	def addQueueCall(self, holdtime=0, calltime=0, disp=&quot;&quot;):
+
+Modified: branches/0.2.X/page_stats_cdr.ptl
+===================================================================
+--- branches/0.2.X/page_stats_cdr.ptl	2007-11-01 21:21:43 UTC (rev 817)
++++ branches/0.2.X/page_stats_cdr.ptl	2007-11-07 20:58:09 UTC (rev 818)
+@@ -289,6 +289,17 @@
+ 						min = (s % 60) and ((s / 60) + 1) or (s / 60)
+                                                	totalmin += min
+ 						min
++					elif cursor.description[fieldIndex][0] == &quot;Result&quot;:
++						s = row[fieldIndex]
++						if s == 8:
++							s=&quot;ANSWERED&quot;
++						if s == 4:
++							s=&quot;NOT ANSWERED&quot;
++						if s == 2:
++							s=&quot;BUSY&quot;
++						if s == 1:
++							s=&quot;FAILED&quot;
++						s
+ 					else: 
+ 						row[fieldIndex]
+         	                       	'&lt;/center&gt;&lt;/td&gt;'
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000360.html">[Destar-dev] DeStar finalist in Les Troph&#233;es du Libre 2007
+</A></li>
+	<LI>Next message: <A HREF="000362.html">[Destar-dev] r819 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#361">[ date ]</a>
+              <a href="thread.html#361">[ thread ]</a>
+              <a href="subject.html#361">[ subject ]</a>
+              <a href="author.html#361">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

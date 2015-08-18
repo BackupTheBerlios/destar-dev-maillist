@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r693 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r693%20-%20trunk&In-Reply-To=%3C200706031712.l53HCeK1005369%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000204.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r693 - trunk</H1>
+    <B>hholzer at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r693%20-%20trunk&In-Reply-To=%3C200706031712.l53HCeK1005369%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r693 - trunk">hholzer at mail.berlios.de
+       </A><BR>
+    <I>Sun Jun  3 19:12:40 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000204.html">[Destar-dev] r694 - in trunk: . examples
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#203">[ date ]</a>
+              <a href="thread.html#203">[ thread ]</a>
+              <a href="subject.html#203">[ subject ]</a>
+              <a href="author.html#203">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: hholzer
+Date: 2007-06-03 19:12:39 +0200 (Sun, 03 Jun 2007)
+New Revision: 693
+
+Modified:
+   trunk/cfg_dialout_normal.py
+Log:
+* better defaults
+* send ring signal only when applicable
+
+
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-05-30 20:12:35 UTC (rev 692)
++++ trunk/cfg_dialout_normal.py	2007-06-03 17:12:39 UTC (rev 693)
+@@ -54,13 +54,13 @@
+ 			title=_(&quot;Maximum call time in seconds&quot;), 
+ 			type=&quot;int&quot;, 
+ 			len=15, 
+-			default=6000),
++			default=7200),
+ 
+ 		VarType(&quot;ringtime&quot;, 
+ 			title=_(&quot;Ringing time in seconds&quot;), 
+ 			type=&quot;int&quot;, 
+ 			len=15, 
+-			default=30),
++			default=600),
+ 
+ 		VarType(&quot;qlookup&quot;, 
+ 			title=_(&quot;Search on quick dial list?&quot;), 
+@@ -119,9 +119,9 @@
+ 		c.append(&quot;; params: exten,secret,timeout&quot;)
+ 		needModule(&quot;app_authenticate&quot;)
+ 		if self.dis_transfer:
+-		       opts=&quot;tWr&quot;
++		       opts=&quot;tW&quot;
+ 		else:
+-		       opts=&quot;TtWr&quot;
++		       opts=&quot;TtW&quot;
+ 		c.append(&quot;exten=&gt;s,1,SetVar(options=%s)&quot; % opts)
+ 		if self.qlookup:
+ 			c.append(&quot;exten=&gt;s,n(quickd),Set(dest=${DB(QUICKDIALLIST/GLOBAL/${ARG1})})&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000204.html">[Destar-dev] r694 - in trunk: . examples
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#203">[ date ]</a>
+              <a href="thread.html#203">[ thread ]</a>
+              <a href="subject.html#203">[ subject ]</a>
+              <a href="author.html#203">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

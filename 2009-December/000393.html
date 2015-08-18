@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r839 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r839%20-%20trunk&In-Reply-To=%3C200912150158.nBF1wVj6017742%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000392.html">
+   <LINK REL="Next"  HREF="000394.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r839 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r839%20-%20trunk&In-Reply-To=%3C200912150158.nBF1wVj6017742%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r839 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec 15 02:58:31 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000392.html">[Destar-dev] r838 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000394.html">[Destar-dev] r840 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#393">[ date ]</a>
+              <a href="thread.html#393">[ thread ]</a>
+              <a href="subject.html#393">[ subject ]</a>
+              <a href="author.html#393">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-15 02:58:31 +0100 (Tue, 15 Dec 2009)
+New Revision: 839
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_user_phonebook.ptl
+Log:
+* Added manager verification on page_user_phonebook.ptl
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-15 01:53:54 UTC (rev 838)
++++ trunk/CHANGELOG.txt	2009-12-15 01:58:31 UTC (rev 839)
+@@ -3,6 +3,7 @@
+ * Added page_stats_agents.ptl
+ * Added TRANSFER query on page_stats_queue.ptl
+ * Fixed missing argument to originateCallExt in page_user_dial.ptl
++* Added manager verification on page_user_phonebook.ptl
+ 
+ 2009-04-16
+ * Zap -&gt; DAHDI changes from branch icom-avatar
+
+Modified: trunk/page_user_phonebook.ptl
+===================================================================
+--- trunk/page_user_phonebook.ptl	2009-12-15 01:53:54 UTC (rev 838)
++++ trunk/page_user_phonebook.ptl	2009-12-15 01:58:31 UTC (rev 839)
+@@ -45,6 +45,16 @@
+ 
+ 	def _q_index [plain] (self):
+ 		header(self._q_desc)
++		manager.connect()
++		if not manager.isConnected():
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;Asterisk is not running!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif not manager.isLoggedIn():
++			# TODO: describe how to set this up
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			htmltext(_(&quot;The manager access is not working!&quot;))
++			'&lt;/span&gt;&lt;/p&gt;'
+         
+ 		'&lt;h3&gt;Phones&lt;/h3&gt;'
+ 		'&lt;table&gt;'
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000392.html">[Destar-dev] r838 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000394.html">[Destar-dev] r840 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#393">[ date ]</a>
+              <a href="thread.html#393">[ thread ]</a>
+              <a href="subject.html#393">[ subject ]</a>
+              <a href="author.html#393">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

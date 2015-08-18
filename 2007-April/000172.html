@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r663 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r663%20-%20trunk&In-Reply-To=%3C200704191700.l3JH03iU019110%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000171.html">
+   <LINK REL="Next"  HREF="000173.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r663 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r663%20-%20trunk&In-Reply-To=%3C200704191700.l3JH03iU019110%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r663 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Apr 19 19:00:03 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000171.html">[Destar-dev] r662 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000173.html">[Destar-dev] r664 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#172">[ date ]</a>
+              <a href="thread.html#172">[ thread ]</a>
+              <a href="subject.html#172">[ subject ]</a>
+              <a href="author.html#172">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-04-19 18:59:58 +0200 (Thu, 19 Apr 2007)
+New Revision: 663
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/configlets.py
+Log:
+persistent queues members
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-04-19 16:56:44 UTC (rev 662)
++++ trunk/CHANGELOG.txt	2007-04-19 16:59:58 UTC (rev 663)
+@@ -1,5 +1,5 @@
+ 2007-04-19:
+-* configlets.py: fixed technologies for agents
++* configlets.py: fixed technologies for agents, persistent queues members
+ * cfg_phone_agent.py: allow agents with no password
+ * cfg_app_agentcallbacklogin.py, added change location ext,
+   allow silent login, automatic logout
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-04-19 16:56:44 UTC (rev 662)
++++ trunk/configlets.py	2007-04-19 16:59:58 UTC (rev 663)
+@@ -1051,6 +1051,8 @@
+ 		try:
+ 			if self.queues:
+ 				c = AstConf(&quot;queues.conf&quot;)
++				c.setSection(&quot;general&quot;)
++				c.append(&quot;persistentmembers = yes&quot;)
+ 				for queue in self.queues.split(','):
+ 					c.setSection(queue)
+ 					if self.technology == 'SIP' or self.technology == 'IAX2' or self.technology == 'ZAP':
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000171.html">[Destar-dev] r662 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000173.html">[Destar-dev] r664 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#172">[ date ]</a>
+              <a href="thread.html#172">[ thread ]</a>
+              <a href="subject.html#172">[ subject ]</a>
+              <a href="author.html#172">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r642 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r642%20-%20trunk&In-Reply-To=%3C200703192018.l2JKIqBu016868%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000143.html">
+   <LINK REL="Next"  HREF="000145.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r642 - trunk</H1>
+    <B>imesper at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r642%20-%20trunk&In-Reply-To=%3C200703192018.l2JKIqBu016868%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r642 - trunk">imesper at mail.berlios.de
+       </A><BR>
+    <I>Mon Mar 19 21:18:52 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000143.html">[Destar-dev] r641 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000145.html">[Destar-dev] r643 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#144">[ date ]</a>
+              <a href="thread.html#144">[ thread ]</a>
+              <a href="subject.html#144">[ subject ]</a>
+              <a href="author.html#144">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: imesper
+Date: 2007-03-19 21:18:52 +0100 (Mon, 19 Mar 2007)
+New Revision: 642
+
+Modified:
+   trunk/ConfigHelper.ptl
+Log:
+My mistake
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-03-19 19:16:16 UTC (rev 641)
++++ trunk/ConfigHelper.ptl	2007-03-19 20:18:52 UTC (rev 642)
+@@ -83,7 +83,7 @@
+ 				else:
+ 					if f == &quot;&quot;:
+ 						f = &quot; &quot;
+-						'&lt;td&gt;%s&lt;/td&gt;' % _(f)
++					'&lt;td&gt;%s&lt;/td&gt;' % _(f)
+                         '&lt;/tr&gt;'
+                         n = n + 1
+                 '&lt;/table&gt;'
+@@ -286,6 +286,7 @@
+ 		elif v.type==&quot;text&quot;:
+ 			form.add(TextWidget,   v.name, _v, t, v.hint, r, render_br=v.render_br, rows=v.__dict__.setdefault(&quot;rows&quot;,8), cols=v.__dict__.setdefault(&quot;cols&quot;,65) )
+ 		elif v.type==&quot;choice&quot;:
++			op = v.options
+ 			if type(op) == types.FunctionType:
+ 				op = op()
+ 			elif not op:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000143.html">[Destar-dev] r641 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000145.html">[Destar-dev] r643 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#144">[ date ]</a>
+              <a href="thread.html#144">[ thread ]</a>
+              <a href="subject.html#144">[ subject ]</a>
+              <a href="author.html#144">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

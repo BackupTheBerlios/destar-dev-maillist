@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r819 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r819%20-%20trunk&In-Reply-To=%3C200711082315.lA8NFrId021600%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000361.html">
+   <LINK REL="Next"  HREF="000363.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r819 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r819%20-%20trunk&In-Reply-To=%3C200711082315.lA8NFrId021600%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r819 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov  9 00:15:53 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000361.html">[Destar-dev] r818 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000363.html">[Destar-dev] r820 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#362">[ date ]</a>
+              <a href="thread.html#362">[ thread ]</a>
+              <a href="subject.html#362">[ subject ]</a>
+              <a href="author.html#362">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-11-09 00:15:52 +0100 (Fri, 09 Nov 2007)
+New Revision: 819
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+Log:
+* Tentative fix of grave Bug #10513, &quot;Not updated/deleted dependencies&quot;, please test.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-11-07 20:58:09 UTC (rev 818)
++++ trunk/CHANGELOG.txt	2007-11-08 23:15:52 UTC (rev 819)
+@@ -1,3 +1,6 @@
++2007-11-08
++* Tentative fix of grave Bug #10513, &quot;Not updated/deleted dependencies&quot;, please test.
++
+ 2007-11-01:
+ * New way to restart panel daemon. 
+ * Fixed tarball html directory in panelutils.
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-11-07 20:58:09 UTC (rev 818)
++++ trunk/ConfigHelper.ptl	2007-11-08 23:15:52 UTC (rev 819)
+@@ -218,7 +218,7 @@
+ 		header(title, menu)
+ 		#render_desc()
+ 		form2 = Form()
+-		form2.add(SubmitWidget, '_cascade_delete', _(str(&quot;Cascade Delete&quot;)), render_br=False)
++		form2.add(SubmitWidget, '_cascade_delete', _(str(&quot;Delete Anyway&quot;)), render_br=False)
+ 		form2.add(SubmitWidget, '_cancel', _(str(&quot;Cancel&quot;)), render_br=False)
+ 		'&lt;h2&gt;'
+ 		_(str(&quot;Warning&quot;))
+@@ -269,11 +269,22 @@
+ 		return redirect(exitPath)
+ 	if request.form.has_key('_delete'):
+ 		if obj.hasDependencies():
+-			return showDependencies()
++                        # update dependencies once
++                        old_dependent_objs = obj.dependent_objs
++                        obj.dependent_objs = []
++                        for dep in old_dependent_objs:
++                                dep_obj = backend.getConfiglet(_id=dep.configlet._id)
++                                dep_obj.createDependencies()
++
++                if obj.hasDependencies():
++                        # if we still have dependencies, show them and ask
++                        return showDependencies()
+ 		else:
++			# delete it with no more questions
+ 			backend.deleteConfiglet(obj._id)
+ 			return redirect(exitPath)
+ 	if request.form.has_key('_cascade_delete'):
++		# go ahead and delete at user risk
+ 		backend.deleteConfiglet(obj._id)
+ 		return redirect(exitPath)
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000361.html">[Destar-dev] r818 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000363.html">[Destar-dev] r820 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#362">[ date ]</a>
+              <a href="thread.html#362">[ thread ]</a>
+              <a href="subject.html#362">[ subject ]</a>
+              <a href="author.html#362">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

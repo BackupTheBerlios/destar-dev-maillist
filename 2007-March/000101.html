@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r611 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r611%20-%20trunk&In-Reply-To=%3C200703020408.l2248mlh022846%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000100.html">
+   <LINK REL="Next"  HREF="000102.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r611 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r611%20-%20trunk&In-Reply-To=%3C200703020408.l2248mlh022846%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r611 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Mar  2 05:08:48 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000100.html">[Destar-dev] r610 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000102.html">[Destar-dev] r612 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#101">[ date ]</a>
+              <a href="thread.html#101">[ thread ]</a>
+              <a href="subject.html#101">[ subject ]</a>
+              <a href="author.html#101">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-03-02 05:08:48 +0100 (Fri, 02 Mar 2007)
+New Revision: 611
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/backend.py
+   trunk/manager.py
+Log:
+`Apply changes` relaods MoH
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-01 22:46:16 UTC (rev 610)
++++ trunk/CHANGELOG.txt	2007-03-02 04:08:48 UTC (rev 611)
+@@ -1,3 +1,6 @@
++2007-03-01:
++* `Apply changes` relaods MoH
++ 
+ 2007-02-28:
+ * ConfigHelper.ptl: Fix a problem in __addit__ method, when creating a new
+ * object all createAsteriskConfig() from all objects where called.
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-03-01 22:46:16 UTC (rev 610)
++++ trunk/backend.py	2007-03-02 04:08:48 UTC (rev 611)
+@@ -820,6 +820,8 @@
+ 	writeAsteriskConfig()
+ 	import manager
+ 	s = manager.reloadAsterisk()
++	if configlets.configlet_tree.hasConfiglet('CfgOptMusic'):
++		s += manager.reloadMoH()
+ 	if panelutils.isConfigured():
+ 		s += panelutils.restartPanelDaemon()
+ 	return &quot;&lt;br/&gt;&quot;.join(s)
+
+Modified: trunk/manager.py
+===================================================================
+--- trunk/manager.py	2007-03-01 22:46:16 UTC (rev 610)
++++ trunk/manager.py	2007-03-02 04:08:48 UTC (rev 611)
+@@ -636,6 +636,9 @@
+ def reloadAsterisk():
+ 	return conn.action('Command', Command='reload')
+ 
++def reloadMoH():
++	return conn.action('Command', Command='moh reload')
++
+ if __name__ == '__main__':
+ 	connect()
+ 	if not isConnected():
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000100.html">[Destar-dev] r610 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000102.html">[Destar-dev] r612 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#101">[ date ]</a>
+              <a href="thread.html#101">[ thread ]</a>
+              <a href="subject.html#101">[ subject ]</a>
+              <a href="author.html#101">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,684 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r837 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r837%20-%20trunk&In-Reply-To=%3C200912142225.nBEMPu1V019000%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000392.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r837 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r837%20-%20trunk&In-Reply-To=%3C200912142225.nBEMPu1V019000%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r837 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Mon Dec 14 23:25:56 CET 2009</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000392.html">[Destar-dev] r838 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#391">[ date ]</a>
+              <a href="thread.html#391">[ thread ]</a>
+              <a href="subject.html#391">[ subject ]</a>
+              <a href="author.html#391">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-14 23:25:56 +0100 (Mon, 14 Dec 2009)
+New Revision: 837
+
+Added:
+   trunk/page_stats_agents.ptl
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_stats.ptl
+   trunk/page_stats_calls.ptl
+   trunk/page_stats_cdr.ptl
+   trunk/page_stats_dialouts.ptl
+   trunk/page_stats_phone.ptl
+   trunk/page_stats_queue.ptl
+   trunk/page_stats_trunks.ptl
+Log:
+* page_stats_*.ptl: set _q_level = 2
+* Added page_stats_agents.ptl
+* Added TRANSFER query on page_stats_queue.ptl
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-11-18 22:17:30 UTC (rev 836)
++++ trunk/CHANGELOG.txt	2009-12-14 22:25:56 UTC (rev 837)
+@@ -1,3 +1,15 @@
++2009-12-14
++* page_stats_*.ptl: set _q_level = 2
++* Added page_stats_agents.ptl
++* Added TRANSFER query on page_stats_queue.ptl
++
++2009-04-16
++* Zap -&gt; DAHDI changes from branch icom-avatar
++* Manager API 1.1 (from branch icom-avatar). This only works on Asterisk 1.6
++With this reload will fail on Asterisk &lt; 1.6.0
++* If a module fails to load: warn. Don't Panic.
++* A first shot at Asterisk 1.6 compatibility: s/|/,/
++
+ 2007-11-27
+ * Added password field to Cfg Record.
+ * Fixed typo in cfg_trunk_zapdynamic.py
+
+Modified: trunk/page_stats.ptl
+===================================================================
+--- trunk/page_stats.ptl	2009-11-18 22:17:30 UTC (rev 836)
++++ trunk/page_stats.ptl	2009-12-14 22:25:56 UTC (rev 837)
+@@ -28,7 +28,7 @@
+ 	_q_title   = _(&quot;Statistics&quot;)
+ 	_q_desc    = _(&quot;Global PBX statistics and CDR&quot;)
+ 	_q_menupos = 20
+-	_q_level   = 3
++	_q_level   = 2
+ 
+ 	_q_exports = ['']
+ 
+
+Added: trunk/page_stats_agents.ptl
+===================================================================
+--- trunk/page_stats_agents.ptl	2009-11-18 22:17:30 UTC (rev 836)
++++ trunk/page_stats_agents.ptl	2009-12-14 22:25:56 UTC (rev 837)
+@@ -0,0 +1,330 @@
++# -*- coding: iso-8859-1 -*-
++#
++# Copyright (C) 2005 Holger Schurig
++# Copyright (C) 2005 Manuel Alejandro Cer&#243;n Estrada &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">ceronman at gmail.com</A>&gt;
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++# ToDo:
++# - improve the appearance and usability
++# - show the &quot;navigation&quot; buttons only when they are needed
++# - use the current date in the &quot;To:&quot; option
++# - glosary of the CDR terms, see README.cdr of asterisk
++
++# - improve the code and change the name of some variable
++# - ...
++
++
++from Templates import *
++from quixote.form import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
++import queueutils
++import time
++
++def M_(message): return _(str(message))
++
++def N_(message): return message
++
++def getQueues():
++	import configlets
++	objs = configlets.configlet_tree.getConfigletsByName('CfgPhoneQueue')
++	queues=[]
++	queues.append(N_(&quot;All&quot;))
++	for obj in objs:
++		queues.append(obj.name)		
++	return queues
++
++
++def formScript [html] ():
++	'&lt;script language=&quot;JavaScript&quot; type=&quot;text/javascript&quot;&gt; \n'
++	'&lt;!-- \n'
++	'function gotopage ( page ) \n'
++	'{ \n'
++	'  document.searchform.pagenumber.value = page; \n'
++	'  document.searchform.submit() ; \n'
++	'} \n'
++	'function orderby ( column, order ) \n'
++	'{ \n'
++	'  document.searchform.orderby.value = column; \n'
++	'  document.searchform.order.value = order; \n'
++	'  document.searchform.submit() ; \n'
++	'} \n'
++	'--&gt; \n'
++	'&lt;/script&gt; \n'
++
++def pageIndex [html] (pagenum, total, limit):
++	&quot;&lt;p&gt;&quot;
++	if limit == 0:
++		limit=1
++
++	lastpage = total/limit
++
++	if pagenum &gt; 1:
++		&quot;&lt;a href='javascript:gotopage(\&quot;_newest\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % M_(&quot;First&quot;)
++		&quot;&lt;a href='javascript:gotopage(\&quot;_newer\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % M_(&quot;Previous&quot;)
++	
++	pagelist = [i for i in range(pagenum-10, pagenum+10) if i &gt;= 0 and  i &lt; lastpage]
++
++	for i in pagelist:
++		if pagenum != (i+1):
++			&quot;&lt;a href='javascript:gotopage(\&quot;%d\&quot;)'&gt;%d&lt;/a&gt; &nbsp; \n&quot; % (i+1, i+1)
++		else:
++			&quot;%d &nbsp; \n&quot; % (i+1)
++
++	if pagenum &lt; lastpage:
++		&quot;&lt;a href='javascript:gotopage(\&quot;_older\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % M_(&quot;Next&quot;)
++		&quot;&lt;a href='javascript:gotopage(\&quot;_oldest\&quot;)'&gt;%s&lt;/a&gt; \n&quot; % M_(&quot;Last&quot;)
++	&quot;&lt;/p&gt;\n &lt;br /&gt;&quot;
++
++def     generateYearsNumbers():
++        years = range(2004,time.localtime()[0]+1)
++        return years
++
++def	generateMonthsNumbers():
++	months = range(1,13)
++	for i in range(0,9) :
++		months[i] = &quot;0%s&quot; % months[i]
++	return months
++
++def	generateDaysNumbers():
++	days = range(1,32)
++	for i in range(0,9) :
++		days[i] = &quot;0%s&quot; % days[i]
++	return days
++	
++def 	generateOptionSelect(text=False):
++	option = range (0,110,10)
++	if text:
++		option[0]=_(&quot;All&quot;)
++	return option
++
++	
++operands=['=','&lt;&gt;','&lt;=','&lt;','&gt;=','&gt;']
++	
++def cdrForm [plain] (request, srcextension=&quot;&quot;, dstextension=&quot;&quot;, mincost=&quot;&quot;, duration=&quot;&quot;, clid=&quot;&quot;, pbx=&quot;&quot;):
++
++	monthsnumbers = [ '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12' ]
++	monthsnames = [ _('January'), _('February'), _('March'), _('April'), _('May'), _('June'), _('July'), _('August'), _('September'), _('October'), _('November'), _('December') ]
++
++	localtime = time.localtime()
++	
++	localyear = localtime[0]
++	
++	# fix the month value for those smaller than 10 (january ... september) 1 -&gt; 01, 2 -&gt;02 
++	if localtime[1] &lt; 10:
++		localmonth = '0%s' % localtime[1] 
++	else:
++		localmonth = localtime[1]
++	
++	#the same for the day
++	if localtime[2] &lt; 10:
++		localday = '0%s' % localtime[2]
++	else:
++		localday = localtime[2]
++
++	form = Form(name = &quot;searchform&quot;)
++	form.add(StringWidget, &quot;agent&quot;,  
++					title=htmltext(_(&quot;Agent&quot;)),
++					hint=htmltext(_(&quot;Wildcards: % is the 'zero or more characters' wildcard, and _ is the 'exactly one character' wildcard&quot;)),
++					render_br=True )
++
++	form.add_single_select('queue', 
++							title=htmltext(_('Queue:')),
++							value=&quot;&quot;,
++							options=zip(getQueues(),getQueues(),getQueues()),
++							render_br=True )
++
++	form.add(OptionSelectWidget,'linesToShow', title=_('Number of records to show:'),options=zip( generateOptionSelect(), generateOptionSelect(text=True), generateOptionSelect() ), value=20)	
++	form.add_checkbox('searchBetweenDates',title= _(&quot;Search between the following dates&quot;), render_br=True)
++	form.add_single_select('fromyear', title=htmltext(_('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Start:')), value=&quot;&quot;, options=zip( generateYearsNumbers(), generateYearsNumbers() ), render_br=False )
++	form.add_single_select('frommonth', options=zip( generateMonthsNumbers(), monthsnames, generateMonthsNumbers() ), render_br=False )
++	form.add_single_select('fromday', options=zip( generateDaysNumbers() , range(1,32), generateDaysNumbers() ), render_br=True )
++	form.add_single_select('toyear', value=localyear, title=htmltext(_('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;End:')), options=zip( generateYearsNumbers(), generateYearsNumbers() ), render_br=False)
++	form.add_single_select('tomonth', value=localmonth, options=zip( generateMonthsNumbers(), monthsnames, generateMonthsNumbers() ), render_br=False)
++	form.add_single_select('today', value=localday, options=zip( generateDaysNumbers() , range(1,32), generateDaysNumbers()  ), render_br=True)
++		
++	form.add(HiddenWidget, 'pagenumber', value='_newest')
++	form.add(HiddenWidget, 'order', value='DESC')
++	form.add(HiddenWidget, 'orderby', value='timestamp')
++
++	form.add(SubmitWidget, '_submit', _(&quot;Search&quot;), render_br=True)
++
++	where = []
++	
++	def render [html] ():
++
++		name = form['pagenumber']
++		
++		global pagenum
++
++		if not name in ['_newest','_newer', '_older', '_oldest']:
++			pagenum = int(name)
++
++		cursor = queueutils.count(where = where)
++		total = cursor
++
++		global q
++		global p
++
++		p = form[&quot;linesToShow&quot;]
++
++		if p == 0:
++			p = total
++		
++		if (name == True or name == '1' or name == '_newest'):
++			pagenum = 1
++			q = 0
++	
++		elif name == '_newer': 
++			pagenum -= 1
++			q = q-form[&quot;linesToShow&quot;]
++			if q &lt; 0:
++				q=0
++							
++					
++		elif name == '_older': 
++			pagenum += 1
++			q += p
++			if q &gt;= total:
++				q = total - total % p
++		
++		elif name == '_oldest':
++			q = total - total % p
++			pagenum = total / p
++
++		elif name in [str(x+1) for x in range(total/p)]:
++			q = int(name) * p
++			
++			if q &gt;= total:
++				q = total - total % p
++			
++		elif p == total:
++			q = 0
++		else : 
++			p = 20
++			q = 0
++				
++		form.render()
++		pageIndex(pagenum, total, p)
++		cdrShowResults(where, p, q, total,form[&quot;orderby&quot;],form[&quot;order&quot;])
++
++	if not form.is_submitted() or form.has_errors():
++		return render()
++	
++	all = N_(&quot;All&quot;)
++	if form[&quot;queue&quot;] != all:
++		where.append(&quot;qname = '%s'&quot; %form[&quot;queue&quot;])
++	
++	if form[&quot;agent&quot;]:
++		where.append(&quot;agent like '%%%s%%'&quot; % form[&quot;agent&quot;])
++		where.append(&quot;(action like 'COMPLETE%' or action like 'TRANSFER')&quot;)
++				
++	if form[&quot;searchBetweenDates&quot;]:
++	
++		fromdate = &quot;%s-%s-%s&quot; % (form[&quot;fromyear&quot;], form[&quot;frommonth&quot;], form[&quot;fromday&quot;])
++		todate = &quot;%s-%s-%s&quot; % (form[&quot;toyear&quot;], form[&quot;tomonth&quot;], form[&quot;today&quot;])
++		where.append(&quot;date(timestamp) between date('%s') and date('%s')&quot; % (fromdate, todate))
++	
++	return render()
++
++def	cdrShowResults [html] (where=[], limit, offset, total = 0, field=&quot;start&quot;, order=&quot;DESC&quot;):
++	if total == 0:
++		'&lt;p&gt;'
++		'--No records to Show--'
++		'&lt;/p&gt;'
++	else:
++		orderby = '%s %s' % (N_(field), order)	
++		cursor = queueutils.select(order=[str(orderby)], where = where, limit = limit, offset = offset)
++	
++		totalcost = 0
++		totalmin = 0
++		
++		row = cursor.fetchone()
++		if row and int(offset) &gt;= 0 and int(offset) &lt;= total and cursor.description:
++		
++			'&lt;table border=&quot;1&quot;&gt;&lt;thead&gt;&lt;tr&gt;'
++                	for s in cursor.description:
++				'&lt;th&gt;'
++				if s[0] == field:
++					neworder = (order=='ASC' and 'DESC') or 'ASC'
++					&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], neworder, M_(s[0]))
++					if order=='ASC':
++						&quot; &lt;img src='/static/down.gif' border='0' alt='%s' /&gt;\n&quot; % M_('Asc. Order')
++					else:
++						&quot; &lt;img src='/static/up.gif' border='0' alt='%s' /&gt;\n&quot; % M_('Desc. Order')
++				else:
++					&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], order, M_(s[0]))
++				'&lt;/th&gt;'
++                	'&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;'
++		
++			if cursor.description:
++				fieldIndices = range(len(cursor.description))
++			else:
++				fieldIndices = []
++                	while row:
++	                	'&lt;tr&gt;'
++				for fieldIndex in fieldIndices:
++					'&lt;td&gt;&lt;center&gt;'
++					if row[fieldIndex] == &quot;1969-12-31 19:00:00&quot;:
++						'-'
++#					elif cursor.description[fieldIndex][0] == &quot;info2&quot;:
++#						s = int(row[fieldIndex])
++#						min = (s % 60) and ((s / 60) + 1) or (s / 60)
++#                                               	totalmin += min
++#						min
++					else: 
++						row[fieldIndex]
++        	                       	'&lt;/center&gt;&lt;/td&gt;'
++				'&lt;/tr&gt;'
++				row = cursor.fetchone()
++                	'&lt;/tbody&gt;&lt;/table&gt;&lt;br/&gt;'
++			'&lt;p&gt;'
++
++			f = offset + limit
++			if total &gt;= f:			
++				M_('Showing records from %s to %s of %s' % (offset+1, f, total))
++			else:
++				M_('Showing records from %s to %s of %s') % (offset+1, total, total)
++			'&lt;br /&gt;&lt;br /&gt;'
++
++	#	M_('Total Duration of shown calls: %s min.') % totalmin
++		'&lt;/p&gt;'
++
++
++class Page(AccessControlled, Directory): 
++
++	_q_parent = 'page_stats'
++	_q_title  = _(&quot;Agent Details&quot;)
++	_q_desc   = _(&quot;Get statistics about queue received calls by Agent&quot;)
++	_q_level  = 2
++	_q_menupos = 20
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	def _q_test(self):
++		return queueutils.db
++
++	def _q_index [plain] (self):
++		header(self._q_desc, scripts=[formScript])
++		cdrForm(self.request)
++		footer()
+
+Modified: trunk/page_stats_calls.ptl
+===================================================================
+--- trunk/page_stats_calls.ptl	2009-11-18 22:17:30 UTC (rev 836)
++++ trunk/page_stats_calls.ptl	2009-12-14 22:25:56 UTC (rev 837)
+@@ -232,7 +232,7 @@
+ 	_q_parent = 'page_stats'
+ 	_q_title  = _(&quot;Calls Statistics&quot;)
+ 	_q_desc   = _(&quot;Calls Statistics&quot;)
+-	_q_level  = 3
++	_q_level  = 2
+ 	_q_menupos = 30
+ 
+ 	_q_exports = ['']
+
+Modified: trunk/page_stats_cdr.ptl
+===================================================================
+--- trunk/page_stats_cdr.ptl	2009-11-18 22:17:30 UTC (rev 836)
++++ trunk/page_stats_cdr.ptl	2009-12-14 22:25:56 UTC (rev 837)
+@@ -58,7 +58,11 @@
+ 
+ def pageIndex [html] (pagenum, total, limit):
+ 	&quot;&lt;p&gt;&quot;
++	if limit == 0:
++		limit=1
++
+ 	lastpage = total/limit
++
+ 	if pagenum &gt; 1:
+ 		&quot;&lt;a href='javascript:gotopage(\&quot;_newest\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % M_(&quot;First&quot;)
+ 		&quot;&lt;a href='javascript:gotopage(\&quot;_newer\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % M_(&quot;Previous&quot;)
+@@ -297,7 +301,7 @@
+ 	_q_parent = 'page_stats'
+ 	_q_title  = _(&quot;Call Details&quot;)
+ 	_q_desc   = _(&quot;Get statistics about made and received calls&quot;)
+-	_q_level  = 3
++	_q_level  = 2
+ 	_q_menupos = 20
+ 
+ 	_q_exports = ['']
+
+Modified: trunk/page_stats_dialouts.ptl
+===================================================================
+--- trunk/page_stats_dialouts.ptl	2009-11-18 22:17:30 UTC (rev 836)
++++ trunk/page_stats_dialouts.ptl	2009-12-14 22:25:56 UTC (rev 837)
+@@ -171,7 +171,7 @@
+ 	_q_parent = 'page_stats'
+ 	_q_title  = _(&quot;Dialout Statistics&quot;)
+ 	_q_desc   = _(&quot;Statistics for Dialout Entries&quot;)
+-	_q_level  = 3
++	_q_level  = 2
+ 	_q_menupos = 32
+ 
+ 	_q_exports = ['']
+
+Modified: trunk/page_stats_phone.ptl
+===================================================================
+--- trunk/page_stats_phone.ptl	2009-11-18 22:17:30 UTC (rev 836)
++++ trunk/page_stats_phone.ptl	2009-12-14 22:25:56 UTC (rev 837)
+@@ -178,7 +178,7 @@
+ 	_q_parent = 'page_stats'
+ 	_q_title  = _(&quot;Extension Statistics&quot;)
+ 	_q_desc   = _(&quot;Statistics for an Extension&quot;)
+-	_q_level  = 3
++	_q_level  = 2
+ 	_q_menupos = 32
+ 
+ 	_q_exports = ['']
+
+Modified: trunk/page_stats_queue.ptl
+===================================================================
+--- trunk/page_stats_queue.ptl	2009-11-18 22:17:30 UTC (rev 836)
++++ trunk/page_stats_queue.ptl	2009-12-14 22:25:56 UTC (rev 837)
+@@ -37,7 +37,7 @@
+ 	_q_parent = 'page_stats'
+ 	_q_title  = _(&quot;Queue Statistics&quot;)
+ 	_q_desc   = _(&quot;Incoming Call Statistics by Queue&quot;)
+-	_q_level  = 3
++	_q_level  = 2
+ 	_q_menupos = 30
+ 
+ 	_q_exports = ['']
+@@ -110,7 +110,7 @@
+ 	where = []
+ 	where.append(&quot;date(timestamp) = date('%s')&quot; % date)
+ 	where.append(&quot;qname = '%s'&quot; % queue)
+-	where_completed = where + [(&quot;action like 'COMPLETE%'&quot;)]
++	where_completed = where + [(&quot;(action like 'COMPLETE%' or action like 'TRANSFER')&quot;)]
+ 	cursor = queueutils.select(
+ 				fields = ['time(timestamp) as hour', 'agent', 'action', 'info1', 'info2', 'info3'],
+ 				where = where_completed,
+@@ -153,7 +153,7 @@
+ 	where = []
+ 	where.append(&quot;date(timestamp) between date('%s') and date('%s')&quot; % (date1, date2))
+ 	where.append(&quot;qname = '%s'&quot; % queue)
+-	where_completed = where + [(&quot;action like 'COMPLETE%'&quot;)]
++	where_completed = where + [(&quot;(action like 'COMPLETE%' or action like 'TRANSFER')&quot;)]
+ 	cursor = queueutils.select(
+ 				fields = ['date(timestamp) as day', 'agent', 'action', 'info1', 'info2', 'info3'],
+ 				where = where_completed,
+@@ -196,7 +196,7 @@
+ 	where = []
+ 	where.append(&quot;date(timestamp) between date('%s') and date('%s')&quot; % (date1, date2))
+ 	where.append(&quot;qname = '%s'&quot; % queue)
+-	where_completed = where + [(&quot;action like 'COMPLETE%'&quot;)]
++	where_completed = where + [(&quot;(action like 'COMPLETE%' or action like 'TRANSFER')&quot;)]
+ 	cursor = queueutils.select(
+ 				fields = ['date(timestamp) as month', 'agent', 'action', 'info1', 'info2', 'info3'],
+ 				where = where_completed,
+@@ -236,7 +236,7 @@
+ def perYear [plain] (queue):
+ 	where = []
+ 	where.append(&quot;qname = '%s'&quot; % queue)
+-	where_completed = where + [(&quot;action like 'COMPLETE%'&quot;)]
++	where_completed = where + [(&quot;(action like 'COMPLETE%' or action like 'TRANSFER')&quot;)]
+ 	cursor = queueutils.select(
+ 				fields = ['date(timestamp) as year', 'agent', 'action', 'info1', 'info2', 'info3'],
+ 				where = where_completed,
+@@ -280,9 +280,14 @@
+ 	agentnames = []
+ 	total_completed_by_agent = 0
+ 	total_completed_by_caller = 0
++	total_transfered = 0
+ 	total_duration = 0
+ 	total_holdtime = 0
+-	holdtimes = ['&lt; 15','&lt; 30','&lt; 45','&lt; 60','&lt; 75','&lt; 90','&gt;= 90']
++	holdtimes = []
++	for h in range(5,95,5):
++		holdtimes.append('&lt; %s' % h)
++	holdtimes.append('&gt;= 90')
++
+ 	calls_per_holdtime = [CallData() for i in holdtimes]
+ 
+ 	if cursor.description:
+@@ -317,6 +322,8 @@
+ 					total_completed_by_agent += 1
+ 				if disposition == &quot;COMPLETECALLER&quot;:
+ 					total_completed_by_caller += 1
++				if disposition == &quot;TRANSFER&quot;:
++					total_transfered += 1
+ 			if c=='info1':
+ 				try:
+ 					holdtime = int(s)
+@@ -327,11 +334,26 @@
+ 					calltime = int(s)
+ 				except ValueError:
+ 					calltime = 0
+-			if c=='info2':
+-				try:
+-					origposition = int(s)
+-				except ValueError:
+-					origposition = 0
++			if c=='info3':
++				if disposition != &quot;TRANSFER&quot;:
++					try:
++						origposition = int(s)
++					except ValueError:
++						origposition = 0
++				else:
++					try:
++						holdtime = int(s)
++					except ValueError:
++						holdtime = 0
++#			if c=='info4':
++#				if disposition == &quot;TRANSFER&quot;:
++#					try:
++#						calltime = int(s)
++#					except ValueError:
++#						calltime = 0
++
++
++
+ 		total_duration += calltime
+ 		total_holdtime += holdtime
+ 		calls_per_period [period].addQueueCall(holdtime, calltime, disposition)
+@@ -342,8 +364,8 @@
+ 		calls_by_agent[agentnames.index(agent)].addQueueCall(holdtime, calltime, &quot;&quot;)
+ 		row = cursor.fetchone()
+ 
+-	completed_table = makeCompletedTable(total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime)
+-	service_table = makeServiceTable((total_completed_by_agent + total_completed_by_caller), calls_per_holdtime, holdtimes)
++	completed_table = makeCompletedTable(total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime, total_transfered)
++	service_table = makeServiceTable((total_completed_by_agent + total_completed_by_caller + total_transfered), calls_per_holdtime, holdtimes)
+ 
+ 	return [calls_per_period, calls_by_agent, agentnames, completed_table, service_table]
+ 	
+@@ -406,8 +428,8 @@
+ 
+ 	return [calls_per_period, calls_by_agent, agentnames, table]
+ 
+-def makeCompletedTable [plain] (total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime):
+-	total_completed = total_completed_by_agent + total_completed_by_caller
++def makeCompletedTable [plain] (total_completed_by_agent, total_completed_by_caller, total_duration, total_holdtime, total_transfered):
++	total_completed = total_completed_by_agent + total_completed_by_caller + total_transfered
+ 	table = HtmlTable(1,1)
+ 	table.setCell(0,0, _(&quot;Total completed calls&quot;))
+ 	table.setCell(1,0, &quot;%d&quot; % total_completed)
+@@ -415,12 +437,14 @@
+ 	table.setCell(1,1, &quot;%d&quot; % total_completed_by_agent)
+ 	table.setCell(0,2, _(&quot;Calls terminated by caller&quot;))
+ 	table.setCell(1,2, &quot;%d&quot; % total_completed_by_caller)
+-	table.setCell(0,3, _(&quot;Total call duration&quot;))
+-	table.setCell(1,3, &quot;%d&quot; % total_duration)
+-	table.setCell(0,4, _(&quot;Average call duration&quot;))
+-	table.setCell(1,4, &quot;%d&quot; % (total_completed and (total_duration / total_completed) or 0))
+-	table.setCell(0,5, _(&quot;Average hold time&quot;))
+-	table.setCell(1,5, &quot;%d&quot; % (total_completed and (total_holdtime / total_completed) or 0))
++	table.setCell(0,3, _(&quot;Calls transfered by agent&quot;))
++	table.setCell(1,3, &quot;%d&quot; % total_transfered)
++	table.setCell(0,4, _(&quot;Total call duration&quot;))
++	table.setCell(1,4, &quot;%d&quot; % total_duration)
++	table.setCell(0,5, _(&quot;Average call duration&quot;))
++	table.setCell(1,5, &quot;%d&quot; % (total_completed and (total_duration / total_completed) or 0))
++	table.setCell(0,6, _(&quot;Average hold time&quot;))
++	table.setCell(1,6, &quot;%d&quot; % (total_completed and (total_holdtime / total_completed) or 0))
+ 	return table
+ 	
+ def makeUncompletedTable [plain] (
+
+Modified: trunk/page_stats_trunks.ptl
+===================================================================
+--- trunk/page_stats_trunks.ptl	2009-11-18 22:17:30 UTC (rev 836)
++++ trunk/page_stats_trunks.ptl	2009-12-14 22:25:56 UTC (rev 837)
+@@ -184,7 +184,7 @@
+ 	_q_parent = 'page_stats'
+ 	_q_title  = _(&quot;Trunk Statistics&quot;)
+ 	_q_desc   = _(&quot;Statistics for Trunks&quot;)
+-	_q_level  = 3
++	_q_level  = 2
+ 	_q_menupos = 32
+ 
+ 	_q_exports = ['']
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000392.html">[Destar-dev] r838 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#391">[ date ]</a>
+              <a href="thread.html#391">[ thread ]</a>
+              <a href="subject.html#391">[ subject ]</a>
+              <a href="author.html#391">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,284 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r728 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r728%20-%20trunk&In-Reply-To=%3C200706272257.l5RMvSbr014526%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000238.html">
+   <LINK REL="Next"  HREF="000240.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r728 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r728%20-%20trunk&In-Reply-To=%3C200706272257.l5RMvSbr014526%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r728 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun 28 00:57:28 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000238.html">[Destar-dev] r727 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000240.html">[Destar-dev] r729 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#239">[ date ]</a>
+              <a href="thread.html#239">[ thread ]</a>
+              <a href="subject.html#239">[ subject ]</a>
+              <a href="author.html#239">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-28 00:57:28 +0200 (Thu, 28 Jun 2007)
+New Revision: 728
+
+Added:
+   trunk/cfg_trunk_zapdynamic.py
+Modified:
+   trunk/CHANGELOG.txt
+Log:
+Added zaptel dynamic spans support (TDMoE)
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-21 20:53:05 UTC (rev 727)
++++ trunk/CHANGELOG.txt	2007-06-27 22:57:28 UTC (rev 728)
+@@ -1,3 +1,6 @@
++2007-06-27:
++* Added zaptel dynamic spans support (TDMoE)
++
+ 2007-06-21:
+ * page_admin_cfwstate.ptl: updated to Quixote 2
+ * Added version.py
+
+Added: trunk/cfg_trunk_zapdynamic.py
+===================================================================
+--- trunk/cfg_trunk_zapdynamic.py	2007-06-21 20:53:05 UTC (rev 727)
++++ trunk/cfg_trunk_zapdynamic.py	2007-06-27 22:57:28 UTC (rev 728)
+@@ -0,0 +1,192 @@
++# -*- coding: utf-8 -*-
++#
++# Destar has Copyright (C) 2005 by Holger Schurig
++# This file has Copyright (C) 2005 by Alejandro Rios P.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++import panelutils
++
++
++class CfgiTrunkZapDynamic(CfgTrunk):
++
++	shortName = _(&quot;Zaptel dynamic span configuration&quot;)
++	newObjectTitle = _(&quot;Zaptel dynamic span configuration&quot;)
++	technology = &quot;ZAP&quot;
++
++	def createVariables(self):
++		self.variables = [
++			VarType(&quot;name&quot;,       
++				title=_(&quot;Name&quot;), 
++				len=35),
++
++			VarType(&quot;channels&quot;,    
++				title=_(&quot;Channels&quot;), 
++				hint=_(&quot;i.e. 1-15,17-31&quot;), 
++				default=&quot;1-15,17-31&quot;,
++				type=&quot;string&quot;, 
++				len=20),
++
++			VarType(&quot;dchannel&quot;,    
++				title=_(&quot;Signailing channel&quot;), 
++				hint=_(&quot;i.e. 16&quot;), 
++				default=&quot;16&quot;,
++				type=&quot;string&quot;, 
++				len=4),
++
++			VarType(&quot;signalling&quot;,
++				title=_(&quot;Signalling type&quot;),
++				type=&quot;choice&quot;,
++				options=[('pri_cpe',_('PRI signalling, CPE side')),
++					('pri_net', _('PRI signalling, Network side'))]),
++
++			VarType(&quot;group&quot;,
++				title=_(&quot;Callout group&quot;),
++				type=&quot;int&quot;,
++				optional=True),
++	
++			VarType(&quot;Inbound&quot;,
++				title=_(&quot;For incoming calls through this trunk:&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;clid&quot;,
++				title=_(&quot;Change Caller*Id to:&quot;),
++				len=25,
++				optional=True),
++
++ 			VarType(&quot;clidnumin&quot;,
++ 				title=_(&quot;Change Caller*Id Number to:&quot;),
++ 				len=40,
++ 				optional=True),
++			
++			VarType(&quot;contextin&quot;,
++				title=_(&quot;Go to&quot;),
++				type=&quot;radio&quot;,
++				default='phone',
++				options=[('phone',_(&quot;Phone&quot;)),
++					('ivr',_(&quot;IVR&quot;)),
++					('pbx',_(&quot;Virtual PBX&quot;))]),
++
++			VarType(&quot;phone&quot;,
++				title=_(&quot;Extension to ring&quot;),
++				type=&quot;choice&quot;,
++				optional=False,
++				options=getChoice(&quot;CfgPhone&quot;)),
++
++			VarType(&quot;ivr&quot;,
++				title=_(&quot;IVR to jump to&quot;),
++				type=&quot;choice&quot;,
++				optional=True,
++				options=getChoice(&quot;CfgIVR&quot;)),
++
++			VarType(&quot;pbx&quot;,
++				title=_(&quot;Allow dial extension from which Virtual PBX&quot;),
++				type=&quot;choice&quot;,
++				optional=True,
++				options=getChoice(&quot;CfgOptPBX&quot;)),
++
++			VarType(&quot;Outbound&quot;,
++				title=_(&quot;For outgoing calls through this trunk:&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;clidnameout&quot;,
++				title=_(&quot;Change Caller*Id Name to:&quot;),
++				len=40,
++				optional=True),
++
++			VarType(&quot;clidnumout&quot;,
++				title=_(&quot;Change Caller*Id Number to:&quot;),
++				len=40,
++				optional=True),
++
++			VarType(&quot;labeldynamic&quot;,
++				title=_(&quot;Dynamic span configuration&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;localdriver&quot;,    
++				title=_(&quot;Local driver&quot;), 
++				hint=_(&quot;i.e. eth0&quot;), 
++				type=&quot;string&quot;, 
++				len=5),
++
++			VarType(&quot;address&quot;,    
++				title=_(&quot;Remote driver address&quot;), 
++				hint=_(&quot;MAC address. Use span number if needed&quot;), 
++				type=&quot;string&quot;, 
++				len=20),
++
++			VarType(&quot;numchannels&quot;,    
++				title=_(&quot;Number of channels&quot;), 
++				hint=_(&quot;i.e. 31 for E1, 24 for T1&quot;), 
++				type=&quot;int&quot;, 
++				default=31),
++
++			VarType(&quot;timing&quot;,    
++				title=_(&quot;Zaptel timing parameter&quot;), 
++				hint=_(&quot;Read zaptel documentation&quot;), 
++				type=&quot;int&quot;, 
++				len=2),
++
++			VarType(&quot;dial&quot;,
++				hide=True,
++				len=50),
++			]
++
++	def checkConfig(self):
++                res = CfgTrunk.checkConfig(self)
++                if res:
++                        return res
++
++	def createAsteriskConfig(self):
++		needModule(&quot;chan_zap&quot;)
++
++		c = AstConf(&quot;zaptel.conf&quot;)
++		c.setSection(&quot;&quot;)
++		c.destar_comment = False
++		c.append(&quot;# %s&quot; % self.name)
++		c.append(&quot;dynamic=eth,%s/%s,%d,%d&quot; % (self.localdriver, self.address, self.numchannels, self.timing))
++		c.append(&quot;bchan=%s&quot; % self.channels)
++		c.append(&quot;dchan=%s&quot; % self.dchannel)
++		c.append(&quot;&quot;)
++
++		# Create config for chan_zap:
++		c = AstConf(&quot;zapata.conf&quot;)
++		c.append(&quot;&quot;)
++		c.append(&quot;; Zaptel Trunk %s&quot; % self.name)
++		c.appendValue(self, &quot;signalling&quot;)
++		c.append(&quot;context=in-%s&quot; % self.name)
++		c.append(&quot;transfer=yes&quot;)
++		c.append(&quot;callerid=asreceived&quot;)
++		if self.group:
++			c.appendValue(self, &quot;group&quot;)
++		c.append(&quot;channel=%s&quot; % self.channels)
++		c.append(&quot;&quot;)
++
++		#Dial part to use on dialout macro
++		self.dial = &quot;&quot;
++		if self.group:
++			self.dial = &quot;Zap/g%d/${ARG1}&quot; % (self.group)
++		else:
++			self.dial = &quot;Zap/%s/${ARG1}&quot; % (self.channels)
++		
++		#What to do with incoming calls
++		self.createIncomingContext()
++
++		#if panelutils.isConfigured() == 1 and self.panel:
++		#	panelutils.createTrunkButton(self)
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000238.html">[Destar-dev] r727 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000240.html">[Destar-dev] r729 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#239">[ date ]</a>
+              <a href="thread.html#239">[ thread ]</a>
+              <a href="subject.html#239">[ subject ]</a>
+              <a href="author.html#239">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

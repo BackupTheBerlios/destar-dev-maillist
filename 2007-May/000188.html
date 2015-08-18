@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r679 - branches/destar-callweaver
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r679%20-%20branches/destar-callweaver&In-Reply-To=%3C200705112147.l4BLlo4A008087%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000187.html">
+   <LINK REL="Next"  HREF="000189.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r679 - branches/destar-callweaver</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r679%20-%20branches/destar-callweaver&In-Reply-To=%3C200705112147.l4BLlo4A008087%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r679 - branches/destar-callweaver">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri May 11 23:47:50 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000187.html">[Destar-dev] r678 - branches/destar-callweaver
+</A></li>
+        <LI>Next message: <A HREF="000189.html">[Destar-dev] r680 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#188">[ date ]</a>
+              <a href="thread.html#188">[ thread ]</a>
+              <a href="subject.html#188">[ subject ]</a>
+              <a href="author.html#188">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-05-11 23:47:50 +0200 (Fri, 11 May 2007)
+New Revision: 679
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/backend.py
+Log:
+fixed apps names
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 21:10:37 UTC (rev 678)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 21:47:50 UTC (rev 679)
+@@ -2,6 +2,7 @@
+ * Branching destar for callweaver
+ * Changing {M,m}acro for Proc and proc
+ * moving /etc/asterisk to /opt/etc/callweaver
++* backend.py: Fixed apps names
+ 
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+
+Modified: branches/destar-callweaver/backend.py
+===================================================================
+--- branches/destar-callweaver/backend.py	2007-05-11 21:10:37 UTC (rev 678)
++++ branches/destar-callweaver/backend.py	2007-05-11 21:47:50 UTC (rev 679)
+@@ -255,7 +255,7 @@
+ 	c.append(&quot;exten=s,n,Set(vmbs=${DB(VMBS/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${vmbs}&quot; != &quot;&quot;]?vmbs)')
+ 	c.append(&quot;exten=s,n,Answer()&quot;)
+-	c.append(&quot;exten=s,n,Playtones(busy)&quot;)
++	c.append(&quot;exten=s,n,PlayTones(busy)&quot;)
+ 	c.append(&quot;exten=s,n,Busy()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=s,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
+@@ -359,7 +359,7 @@
+ 	c.append(&quot;exten =&gt; _cause_X.,4,Playback(an-error-has-occured,skip)&quot;)
+ 	c.append(&quot;exten =&gt; _cause_X.,5,Playback(error-number,skip)&quot;)
+ 	c.append(&quot;exten =&gt; _cause_X.,6,GotoIf($[foo${ARG1} != foo]?7:11)&quot;)
+-	c.append(&quot;exten =&gt; _cause_X.,7,Say_Number(${ARG1})&quot;)
++	c.append(&quot;exten =&gt; _cause_X.,7,SayNumber(${ARG1})&quot;)
+ 	c.append(&quot;exten =&gt; _cause_X.,8,Wait(1)&quot;)
+ 	c.append(&quot;exten =&gt; _cause_X.,9,Playback(please-contact-tech-supt,skip)&quot;)
+ 	c.append(&quot;exten =&gt; _cause_X.,10,Goto(14)&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000187.html">[Destar-dev] r678 - branches/destar-callweaver
+</A></li>
+	<LI>Next message: <A HREF="000189.html">[Destar-dev] r680 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#188">[ date ]</a>
+              <a href="thread.html#188">[ thread ]</a>
+              <a href="subject.html#188">[ subject ]</a>
+              <a href="author.html#188">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

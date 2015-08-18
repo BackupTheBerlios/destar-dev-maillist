@@ -1,0 +1,324 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r646 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r646%20-%20branches/0.2.X&In-Reply-To=%3C200703231752.l2NHq7Gd009217%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000148.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r646 - branches/0.2.X</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r646%20-%20branches/0.2.X&In-Reply-To=%3C200703231752.l2NHq7Gd009217%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r646 - branches/0.2.X">alerios at mail.berlios.de
+       </A><BR>
+    <I>Fri Mar 23 18:52:07 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000148.html">[Destar-dev] r645 - branches/0.2.X branches/0.2.X/examples trunk	trunk/examples
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#149">[ date ]</a>
+              <a href="thread.html#149">[ thread ]</a>
+              <a href="subject.html#149">[ subject ]</a>
+              <a href="author.html#149">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-03-23 18:52:06 +0100 (Fri, 23 Mar 2007)
+New Revision: 646
+
+Added:
+   branches/0.2.X/page_stats_qcallback.ptl
+Modified:
+   branches/0.2.X/page_stats_queue.ptl
+Log:
+* Added page_stats_qcallback to provide a list of calls that entered a Queue but where not completed.
+* page_stats_queue.ptl:  changed wrong crdutils reference to queueutils.
+
+
+Added: branches/0.2.X/page_stats_qcallback.ptl
+===================================================================
+--- branches/0.2.X/page_stats_qcallback.ptl	2007-03-22 20:40:22 UTC (rev 645)
++++ branches/0.2.X/page_stats_qcallback.ptl	2007-03-23 17:52:06 UTC (rev 646)
+@@ -0,0 +1,232 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Destar has Copyright (C) 2004-2007 by Holger Schurig
++# This file has Copyright (C) 2007 by Alejandro Rios P.
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++from Templates import *
++from quixote.form2 import *
++import queueutils
++import time
++from StatsHelper import *
++
++pychart_exists = True
++try:	
++	from pychart import *
++except ImportError:
++	pychart_exists = False
++	
++
++_q_parent = 'page_stats'
++_q_title  = _(&quot;Queue Callback&quot;)
++_q_desc   = _(&quot;Call Back List by Queue&quot;)
++_q_level  = 3
++_q_menupos = 30
++
++def _q_access(request):
++	if request.session.level &lt; _q_level:
++		cantAccessPage()
++
++def _q_test():
++	return queueutils.db
++
++def N_(message): return message
++
++def getQueues():
++	import configlets
++	objs = configlets.configlet_tree.getConfigletsByName('CfgPhoneQueue')
++	queues=[]
++	for obj in objs:
++		queues.append(obj.name)		
++	return queues
++
++def makeForm():
++	form = Form()
++	form.name = &quot;queryform&quot;
++	form.add_single_select('queue', 
++							title=htmltext(_('Queue:')),
++							value=&quot;&quot;,
++							options=zip(getQueues(),getQueues(),getQueues()),
++							render_br=True )
++
++	form.add_single_select('year', 
++							title=htmltext(_('Day:')),
++							value=&quot;&quot;,
++							options=zip([all] + years, 
++										[_(all)] + years,
++										[all] + years),
++							render_br=False )
++							
++	form.add_single_select('month', 
++							options=zip([all] + months, 
++										[_(all)] + getMonthnames(),
++										[all] + months),
++
++							render_br=False )
++							
++	form.add_single_select('day',
++							options=zip([all] + days,
++										[_(all)] + daynames,
++										[all] + days),
++							render_br=True )
++							
++	form.add(SubmitWidget, '_submit', _(&quot;Submit&quot;), render_br=True)
++	
++	return form
++		
++def perHourInDay [plain] (day, month, year, queue):
++	
++	date = &quot;%s-%s-%s&quot; % (year, month, day)
++	where = []
++	where.append(&quot;date(timestamp) = date('%s')&quot; % date)
++	where.append(&quot;qname = '%s'&quot; % queue)
++
++	where_uncompleted = where + [(&quot;( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)&quot;)]
++	cursor = queueutils.select(
++				fields = ['time(timestamp) as hour', 'callid'],
++				where = where_uncompleted,
++				order=['timestamp'])
++
++	htmltext(&quot;&lt;p&gt;%s: %s&lt;/p&gt;&quot; % (_(&quot;Period&quot;), date))
++
++	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;List of uncompleted callers&quot;))
++	makeCallBackTable(cursor, where).getHtml(border=1)
++
++
++def perDayInMonth [plain] (month, year, queue):
++	
++	date1 = &quot;%s-%s-01&quot; % (year, month)
++	date2 = &quot;%s-%s-31&quot; % (year, month)
++	where = []
++	where.append(&quot;date(timestamp) between date('%s') and date('%s')&quot; % (date1, date2))
++	where.append(&quot;qname = '%s'&quot; % queue)
++	
++	where_uncompleted = where + [(&quot;( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)&quot;)]
++	cursor = queueutils.select(
++				fields = ['time(timestamp)', 'callid'],
++				where = where_uncompleted,
++				order=['timestamp'])
++
++	htmltext(&quot;&lt;p&gt;%s: %s to %s&lt;/p&gt;&quot; % (_(&quot;Period&quot;), date1, date2))
++
++	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;List of uncompleted callers&quot;))
++	makeCallBackTable(cursor, where).getHtml(border=1)
++
++	
++def perMonthInYear [plain] (year, queue):
++	date1 = &quot;%s-01-01&quot; % (year)
++	date2 = &quot;%s-12-31&quot; % (year)
++	where = []
++	where.append(&quot;date(timestamp) between date('%s') and date('%s')&quot; % (date1, date2))
++	where.append(&quot;qname = '%s'&quot; % queue)
++
++	where_uncompleted = where + [(&quot;( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)&quot;)]
++	cursor = queueutils.select(
++				fields = ['time(timestamp)', 'callid'],
++				where = where_uncompleted,
++				order=['timestamp'])
++
++	htmltext(&quot;&lt;p&gt;%s: %s to %s&lt;/p&gt;&quot; % (_(&quot;Period&quot;), date1, date2))
++
++	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;List of uncompleted callers&quot;))
++	makeCallBackTable(cursor, where).getHtml(border=1)
++
++
++def perYear [plain] (queue):
++	where = []
++	where.append(&quot;qname = '%s'&quot; % queue)
++
++	where_uncompleted = where + [(&quot;( action like 'AGENTDUMP' \
++					or action like 'ABANDON' \
++					or action like 'EXITWITHKEY' \
++					or action like 'EXITWITHTIMEOUT' \
++					)&quot;)]
++	cursor = queueutils.select(
++				fields = ['time(timestamp)', 'callid'],
++				where = where_uncompleted,
++				order=['timestamp'])
++
++	htmltext(&quot;&lt;p&gt;%s: %s&lt;/p&gt;&quot; % (_(&quot;Period&quot;), _(&quot;All Years&quot;)))
++
++	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;List of uncompleted callers&quot;))
++	makeCallBackTable(cursor, where).getHtml(border=1)
++
++def showResults [plain] (day, month, year, queue):
++	all = N_(&quot;All&quot;)
++	if day != all and month != all and year != all:
++		perHourInDay(day, month, year, queue)
++	elif day == all and month != all and year != all:
++		perDayInMonth(month, year, queue)
++	elif day == all and month == all and year != all:
++		perMonthInYear(year, queue)
++	elif day == all and month == all and year == all:
++		perYear(queue)
++	else:
++		htmltext(&quot;&lt;p style='color:red;'&gt;\n&quot;)
++		htmltext(&quot;%s&quot; % _(&quot;Sorry, this kind of query is not supported yet&quot;))
++		htmltext(&quot;&lt;/p&gt;&quot;)
++
++def makeCallBackTable (cursor, where):
++	table = HtmlTable(1,1)
++	table.setCell(0,0, _(&quot;Date&quot;))
++	table.setCell(1,0, _(&quot;Caller&quot;))
++	row = cursor.fetchone()
++	y = 1
++	while row:
++		where_caller = where + [(&quot;action like 'ENTERQUEUE'&quot;)]
++		where_caller.append(&quot;callid like '%s'&quot; % row[1])
++		cursor2 = queueutils.select(
++				fields = ['timestamp', 'info2'],
++				where = where_caller,
++				order=['timestamp'])
++		row2 = cursor2.fetchone()
++		if row2:
++			table.setCell(0,y, &quot;%s&quot; % str(row2[0]))
++			table.setCell(1,y, &quot;%s&quot; % str(row2[1]))
++		row = cursor.fetchone()
++		y += 1
++	return table
++
++def cdrForm [plain] (request):
++	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;List of calls that entered a Queue but where not completed, by date:&quot;))
++	form = makeForm()
++	form.render()
++	
++	if form.is_submitted() and not form.has_errors():
++		htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Results&quot;))
++		showResults(form[&quot;day&quot;], form[&quot;month&quot;], form[&quot;year&quot;], form[&quot;queue&quot;])
++	
++def _q_index [plain] (request):
++	header(_q_desc)
++	if pychart_exists:
++		cdrForm(request)
++	else:
++		_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
++	footer()
++	
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-03-22 20:40:22 UTC (rev 645)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-23 17:52:06 UTC (rev 646)
+@@ -42,7 +42,7 @@
+ 		cantAccessPage()
+ 
+ def _q_test():
+-	return cdrutils.db
++	return queueutils.db
+ 
+ def N_(message): return message
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000148.html">[Destar-dev] r645 - branches/0.2.X branches/0.2.X/examples trunk	trunk/examples
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#149">[ date ]</a>
+              <a href="thread.html#149">[ thread ]</a>
+              <a href="subject.html#149">[ subject ]</a>
+              <a href="author.html#149">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

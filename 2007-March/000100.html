@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r610 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r610%20-%20branches/0.2.X&In-Reply-To=%3C200703012246.l21MkGx0000452%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000104.html">
+   <LINK REL="Next"  HREF="000101.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r610 - branches/0.2.X</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r610%20-%20branches/0.2.X&In-Reply-To=%3C200703012246.l21MkGx0000452%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r610 - branches/0.2.X">alerios at mail.berlios.de
+       </A><BR>
+    <I>Thu Mar  1 23:46:16 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000104.html">[Destar-dev] [Feature #2667] Upgrade to Quixote2
+</A></li>
+        <LI>Next message: <A HREF="000101.html">[Destar-dev] r611 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#100">[ date ]</a>
+              <a href="thread.html#100">[ thread ]</a>
+              <a href="subject.html#100">[ subject ]</a>
+              <a href="author.html#100">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-03-01 23:46:16 +0100 (Thu, 01 Mar 2007)
+New Revision: 610
+
+Modified:
+   branches/0.2.X/page_stats_queue.ptl
+   branches/0.2.X/queueutils.py
+Log:
+ * Fixed wrong execpt on queueutil.py
+ * Added more fields to page_stats_queue.ptl results.
+
+
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-03-01 19:14:36 UTC (rev 609)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-01 22:46:16 UTC (rev 610)
+@@ -1,7 +1,7 @@
+ # -*- coding: iso-latin-1 -*-
+ #
+ # Destar has Copyright (C) 2004-2007 by Holger Schurig
+-# This fila has Copyright (C) 2007 by Alejandro Rios P.
++# This file has Copyright (C) 2007 by Alejandro Rios P.
+ # 
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -33,7 +33,7 @@
+ 
+ _q_parent = 'page_stats'
+ _q_title  = _(&quot;Queue Statistics&quot;)
+-_q_desc   = _(&quot;Statistics by Queue&quot;)
++_q_desc   = _(&quot;Incoming Call Statistics by Queue&quot;)
+ _q_level  = 3
+ _q_menupos = 30
+ 
+@@ -103,7 +103,7 @@
+ 	calls_per_hour = [CallData() for i in hours]
+ 	calls_by_agent = []
+ 	agentnames = []
+-	total_completed = cursor.rowcount
++	total_completed = 0
+ 	total_completed_by_agent = 0
+ 	total_completed_by_caller = 0
+ 	total_duration = 0
+@@ -144,13 +144,21 @@
+ 					origposition = int(s)
+ 				except ValueError:
+ 					origposition = 0
++		total_completed += 1
+ 		calls_per_hour[hour].addQueueCall(holdtime, calltime, origposition, disposition)
+ 		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+ 		row = cursor.fetchone()
+ 		
+-	htmltext(&quot;&lt;h4&gt;%s&lt;/h4&gt;&quot; % _(&quot;Completed Calls&quot;))
++	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Completed Calls&quot;))
++	completed_table = HtmlTable(1,1)
++	completed_table.setCell(0,0, _(&quot;Total completed calls&quot;))
++	completed_table.setCell(1,0, &quot;%d&quot; % total_completed)
++	completed_table.getHtml(border=1)
++
++	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Completed Calls by Agent&quot;))
++	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
++	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Distribution of Completed Calls&quot;))
+ 	makeQueueCallsTable(_(&quot;Time&quot;), calls_per_hour, hournames)
+-	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
+ 	
+ def perDayInMonth [plain] (month, year, queue):
+ 	
+@@ -213,9 +221,10 @@
+ 		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+ 		row = cursor.fetchone()
+ 		
+-	htmltext(&quot;&lt;h4&gt;%s&lt;/h4&gt;&quot; % _(&quot;Completed Calls&quot;))
++	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Completed Calls by Agent&quot;))
++	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
++	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Distribution of Completed Calls&quot;))
+ 	makeQueueCallsTable(_(&quot;Day&quot;), calls_per_day, daynames)
+-	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
+ 
+ 	
+ def perMonthInYear [plain] (year, queue):
+@@ -278,9 +287,10 @@
+ 		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+ 		row = cursor.fetchone()
+ 		
+-	htmltext(&quot;&lt;h4&gt;%s&lt;/h4&gt;&quot; % _(&quot;Completed Calls&quot;))
++	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Completed Calls by Agent&quot;))
++	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
++	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Distribution of Completed Calls&quot;))
+ 	makeQueueCallsTable(_(&quot;Month&quot;), calls_per_month, monthnames)
+-	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
+ 
+ 
+ def perYear [plain] (queue):
+@@ -340,9 +350,10 @@
+ 		calls_by_agent[agentnames.index(agent)].addAgentCall(holdtime, calltime)
+ 		row = cursor.fetchone()
+ 		
+-	htmltext(&quot;&lt;h4&gt;%s&lt;/h4&gt;&quot; % _(&quot;Completed Calls&quot;))
++	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Completed Calls by Agent&quot;))
++	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
++	htmltext(&quot;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Distribution of Completed Calls&quot;))
+ 	makeQueueCallsTable(_(&quot;Year&quot;), calls_per_year, yearnames)
+-	makeAgentCallsTable(_(&quot;Agent&quot;), calls_by_agent, agentnames)
+ 
+ 	
+ def showResults [plain] (day, month, year, queue):
+
+Modified: branches/0.2.X/queueutils.py
+===================================================================
+--- branches/0.2.X/queueutils.py	2007-03-01 19:14:36 UTC (rev 609)
++++ branches/0.2.X/queueutils.py	2007-03-01 22:46:16 UTC (rev 610)
+@@ -63,7 +63,7 @@
+ 		try:
+ 			maxtime = datetime(*strptime(row[0], &quot;%Y-%m-%d %H:%M:%S&quot;)[0:6])
+ 		except:
+-			continue
++			pass
+ 
+ 	rows = 0
+ 	in_file = open(q_fn,&quot;r&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000104.html">[Destar-dev] [Feature #2667] Upgrade to Quixote2
+</A></li>
+	<LI>Next message: <A HREF="000101.html">[Destar-dev] r611 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#100">[ date ]</a>
+              <a href="thread.html#100">[ thread ]</a>
+              <a href="subject.html#100">[ subject ]</a>
+              <a href="author.html#100">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

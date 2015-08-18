@@ -1,0 +1,1196 @@
+From dasenjo at mail.berlios.de  Thu Nov  1 22:21:44 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Thu, 1 Nov 2007 22:21:44 +0100
+Subject: [Destar-dev] r817 - branches/0.2.X trunk
+Message-ID: <200711012121.lA1LLi3w025959@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-11-01 22:21:43 +0100 (Thu, 01 Nov 2007)
+New Revision: 817
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/panelutils.py
+   trunk/CHANGELOG.txt
+   trunk/panelutils.py
+Log:
+* New way to restart panel daemon. 
+* Fixed tarball html directory in panelutils.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-10-25 17:25:02 UTC (rev 816)
++++ branches/0.2.X/CHANGELOG.txt	2007-11-01 21:21:43 UTC (rev 817)
+@@ -1,3 +1,7 @@
++2007-11-01:
++* New way to restart panel daemon. 
++* Fixed tarball html directory in panelutils.
++
+ 2007-10-25:
+ * cfg_opt_sip_network.py: added progressinband option, tos default changed to 0x18
+ 
+
+Modified: branches/0.2.X/panelutils.py
+===================================================================
+--- branches/0.2.X/panelutils.py	2007-10-25 17:25:02 UTC (rev 816)
++++ branches/0.2.X/panelutils.py	2007-11-01 21:21:43 UTC (rev 817)
+@@ -23,17 +23,14 @@
+ 
+ # To use with asternic.org op_panel tarball:
+ #PANEL_CONF_DIR	= "/usr/local/op_panel"
+-#PANEL_HTML_DIR	= "/usr/local/op_panel/html"
+-#PANEL_START_CMD	= "/usr/local/op_panel/op_server.pl -d"
+-#PANEL_STOP_CMD	= "pkill op_server"
++#PANEL_HTML_DIR	= "/usr/local/op_panel/flash"
++#PANEL_RESTART_CMD = "killall -HUP op_server.pl"
+ 
+ 
+ # Configuration to use with op-panel .deb package:
+ PANEL_CONF_DIR	= "/etc/op-panel"
+ PANEL_HTML_DIR	= "/usr/share/op-panel/flash"
+-PANEL_START_CMD	= "/etc/init.d/op-panel start"
+-PANEL_STOP_CMD	= "/etc/init.d/op-panel stop"
+-PANEL_RESTART_CMD = "/etc/init.d/op-panel restart"
++PANEL_RESTART_CMD = "killall -HUP op_server"
+ 
+ def isConfigured ():
+ 	import configlets
+@@ -154,12 +151,6 @@
+ 	p.append("Extension=-1")
+ 	p.append("Label=%s" % obj.name)
+ 
+-def startPanelDaemon():
+-        return commands.getoutput(PANEL_START_CMD)
+-
+-def stopPanelDaemon():
+-        return commands.getoutput(PANEL_STOP_CMD)
+-
+ def restartPanelDaemon():
+ 	s = []
+ 	s.append(_("Restarting the panel daemon ..."))
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-10-25 17:25:02 UTC (rev 816)
++++ trunk/CHANGELOG.txt	2007-11-01 21:21:43 UTC (rev 817)
+@@ -1,3 +1,7 @@
++2007-11-01:
++* New way to restart panel daemon. 
++* Fixed tarball html directory in panelutils.
++
+ 2007-10-04:
+ * Added special Trunk for Linksys SPA400 gateway
+ * Added special Trunk for Suncomm SC-375 Voip-GSM gateway
+
+Modified: trunk/panelutils.py
+===================================================================
+--- trunk/panelutils.py	2007-10-25 17:25:02 UTC (rev 816)
++++ trunk/panelutils.py	2007-11-01 21:21:43 UTC (rev 817)
+@@ -23,17 +23,14 @@
+ 
+ # To use with asternic.org op_panel tarball:
+ #PANEL_CONF_DIR	= "/usr/local/op_panel"
+-#PANEL_HTML_DIR	= "/usr/local/op_panel/html"
+-#PANEL_START_CMD	= "/usr/local/op_panel/op_server.pl -d"
+-#PANEL_STOP_CMD	= "pkill op_server"
++#PANEL_HTML_DIR	= "/usr/local/op_panel/flash"
++#PANEL_RESTART_CMD = "killall -HUP op_server.pl"
+ 
+ 
+ # Configuration to use with op-panel .deb package:
+ PANEL_CONF_DIR	= "/etc/op-panel"
+ PANEL_HTML_DIR	= "/usr/share/op-panel/flash"
+-PANEL_START_CMD	= "/etc/init.d/op-panel start"
+-PANEL_STOP_CMD	= "/etc/init.d/op-panel stop"
+-PANEL_RESTART_CMD = "/etc/init.d/op-panel restart"
++PANEL_RESTART_CMD = "killall -HUP op_server"
+ 
+ def N_(message): return message
+ 
+@@ -170,12 +167,6 @@
+ 	p.append('Label="%s"' % obj.name)
+ 	p.append("Panel_context=%s" % obj.pbx)
+ 
+-def startPanelDaemon():
+-        return commands.getoutput(PANEL_START_CMD)
+-
+-def stopPanelDaemon():
+-        return commands.getoutput(PANEL_STOP_CMD)
+-
+ def restartPanelDaemon():
+ 	s = []
+ 	s.append(_("Restarting the panel daemon ..."))
+
+
+
+From dasenjo at unicauca.edu.co  Thu Nov  1 23:06:57 2007
+From: dasenjo at unicauca.edu.co (Diego =?ISO-8859-1?Q?Andr=E9s?= Asenjo G.)
+Date: Thu, 01 Nov 2007 17:06:57 -0500
+Subject: [Destar-dev] r817 - branches/0.2.X trunk
+In-Reply-To: <200711012121.lA1LLi3w025959@sheep.berlios.de>
+References: <200711012121.lA1LLi3w025959@sheep.berlios.de>
+Message-ID: <1193954817.3816.4.camel@localhost>
+
+Hi!
+
+As you can see, I have removed the startPanelDaemon and startPanelDaemon
+methods as thier variables. My point is that DeStar should not "deal"
+with the panel process at all in thi level. We just need to send a
+message (kill -HUP) to make it know (the panel) that the configuration
+files have changed and it must reload them. So, in this way, we are
+still but less OS dependant I think that the integration can be easier.
+
+What do you think about?
+
+
+Diego Andr?s.
+
+El jue, 01-11-2007 a las 22:21 +0100, dasenjo at BerliOS escribi?:
+> Author: dasenjo
+> Date: 2007-11-01 22:21:43 +0100 (Thu, 01 Nov 2007)
+> New Revision: 817
+> 
+> Modified:
+>    branches/0.2.X/CHANGELOG.txt
+>    branches/0.2.X/panelutils.py
+>    trunk/CHANGELOG.txt
+>    trunk/panelutils.py
+> Log:
+> * New way to restart panel daemon. 
+> * Fixed tarball html directory in panelutils.
+> 
+> 
+> 
+> Modified: branches/0.2.X/CHANGELOG.txt
+> ===================================================================
+> --- branches/0.2.X/CHANGELOG.txt	2007-10-25 17:25:02 UTC (rev 816)
+> +++ branches/0.2.X/CHANGELOG.txt	2007-11-01 21:21:43 UTC (rev 817)
+> @@ -1,3 +1,7 @@
+> +2007-11-01:
+> +* New way to restart panel daemon. 
+> +* Fixed tarball html directory in panelutils.
+> +
+>  2007-10-25:
+>  * cfg_opt_sip_network.py: added progressinband option, tos default changed to 0x18
+>  
+> 
+> Modified: branches/0.2.X/panelutils.py
+> ===================================================================
+> --- branches/0.2.X/panelutils.py	2007-10-25 17:25:02 UTC (rev 816)
+> +++ branches/0.2.X/panelutils.py	2007-11-01 21:21:43 UTC (rev 817)
+> @@ -23,17 +23,14 @@
+>  
+>  # To use with asternic.org op_panel tarball:
+>  #PANEL_CONF_DIR	= "/usr/local/op_panel"
+> -#PANEL_HTML_DIR	= "/usr/local/op_panel/html"
+> -#PANEL_START_CMD	= "/usr/local/op_panel/op_server.pl -d"
+> -#PANEL_STOP_CMD	= "pkill op_server"
+> +#PANEL_HTML_DIR	= "/usr/local/op_panel/flash"
+> +#PANEL_RESTART_CMD = "killall -HUP op_server.pl"
+>  
+> 
+>  # Configuration to use with op-panel .deb package:
+>  PANEL_CONF_DIR	= "/etc/op-panel"
+>  PANEL_HTML_DIR	= "/usr/share/op-panel/flash"
+> -PANEL_START_CMD	= "/etc/init.d/op-panel start"
+> -PANEL_STOP_CMD	= "/etc/init.d/op-panel stop"
+> -PANEL_RESTART_CMD = "/etc/init.d/op-panel restart"
+> +PANEL_RESTART_CMD = "killall -HUP op_server"
+>  
+>  def isConfigured ():
+>  	import configlets
+> @@ -154,12 +151,6 @@
+>  	p.append("Extension=-1")
+>  	p.append("Label=%s" % obj.name)
+>  
+> -def startPanelDaemon():
+> -        return commands.getoutput(PANEL_START_CMD)
+> -
+> -def stopPanelDaemon():
+> -        return commands.getoutput(PANEL_STOP_CMD)
+> -
+>  def restartPanelDaemon():
+>  	s = []
+>  	s.append(_("Restarting the panel daemon ..."))
+> 
+> Modified: trunk/CHANGELOG.txt
+> ===================================================================
+> --- trunk/CHANGELOG.txt	2007-10-25 17:25:02 UTC (rev 816)
+> +++ trunk/CHANGELOG.txt	2007-11-01 21:21:43 UTC (rev 817)
+> @@ -1,3 +1,7 @@
+> +2007-11-01:
+> +* New way to restart panel daemon. 
+> +* Fixed tarball html directory in panelutils.
+> +
+>  2007-10-04:
+>  * Added special Trunk for Linksys SPA400 gateway
+>  * Added special Trunk for Suncomm SC-375 Voip-GSM gateway
+> 
+> Modified: trunk/panelutils.py
+> ===================================================================
+> --- trunk/panelutils.py	2007-10-25 17:25:02 UTC (rev 816)
+> +++ trunk/panelutils.py	2007-11-01 21:21:43 UTC (rev 817)
+> @@ -23,17 +23,14 @@
+>  
+>  # To use with asternic.org op_panel tarball:
+>  #PANEL_CONF_DIR	= "/usr/local/op_panel"
+> -#PANEL_HTML_DIR	= "/usr/local/op_panel/html"
+> -#PANEL_START_CMD	= "/usr/local/op_panel/op_server.pl -d"
+> -#PANEL_STOP_CMD	= "pkill op_server"
+> +#PANEL_HTML_DIR	= "/usr/local/op_panel/flash"
+> +#PANEL_RESTART_CMD = "killall -HUP op_server.pl"
+>  
+> 
+>  # Configuration to use with op-panel .deb package:
+>  PANEL_CONF_DIR	= "/etc/op-panel"
+>  PANEL_HTML_DIR	= "/usr/share/op-panel/flash"
+> -PANEL_START_CMD	= "/etc/init.d/op-panel start"
+> -PANEL_STOP_CMD	= "/etc/init.d/op-panel stop"
+> -PANEL_RESTART_CMD = "/etc/init.d/op-panel restart"
+> +PANEL_RESTART_CMD = "killall -HUP op_server"
+>  
+>  def N_(message): return message
+>  
+> @@ -170,12 +167,6 @@
+>  	p.append('Label="%s"' % obj.name)
+>  	p.append("Panel_context=%s" % obj.pbx)
+>  
+> -def startPanelDaemon():
+> -        return commands.getoutput(PANEL_START_CMD)
+> -
+> -def stopPanelDaemon():
+> -        return commands.getoutput(PANEL_STOP_CMD)
+> -
+>  def restartPanelDaemon():
+>  	s = []
+>  	s.append(_("Restarting the panel daemon ..."))
+> 
+> _______________________________________________
+> Destar-dev mailing list
+> Destar-dev at lists.berlios.de
+> https://lists.berlios.de/mailman/listinfo/destar-dev
+
+
+
+From alejandro.rios at avatar.com.co  Tue Nov  6 00:31:56 2007
+From: alejandro.rios at avatar.com.co (=?ISO-8859-1?Q?Alejandro_Rios_Pe=F1a?=)
+Date: Mon, 05 Nov 2007 18:31:56 -0500
+Subject: [Destar-dev] =?iso-8859-1?q?DeStar_finalist_in_Les_Troph=E9es_du_?=
+ =?iso-8859-1?q?Libre_2007?=
+Message-ID: <472FA7EC.6050606@openboxltda.com>
+
+DeStar[1], a web configuration tool for Asterisk[2] currently sponsored 
+by Avatar Ltd.[3], has been chosen as a finalist[4] project on the 
+fourth anual edition of the free software contest ?Les Troph?es du 
+Libre?[5].
+
+
+DeStar is one of the 3 finalist projects on the company management 
+software category, where it was chosen over other 38 projects [5].
+
+
+Final jury debate will be held at 29th November in ch?teau de Villeneuve 
+Saint-Germain, Soissons [6].
+
+Alejandro R?os Pe?a.
+
+[1] http://destar.berlios.de
+[2] http://www.asterisk.org
+[3] http://www.avatar.com.co
+[4] http://www.tropheesdulibre.org/+Finalists-projects+.html?lang=en
+[5] http://www.tropheesdulibre.org/?lang=en
+[6] http://www.tropheesdulibre.org/-Categorie-Entreprise-.html?lang=en
+[7] http://www.tropheesdulibre.org/+Place-for-the-prize-ceremony+.html
+
+
+
+From dasenjo at mail.berlios.de  Wed Nov  7 21:58:10 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Wed, 7 Nov 2007 21:58:10 +0100
+Subject: [Destar-dev] r818 - branches/0.2.X
+Message-ID: <200711072058.lA7KwAMk005310@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-11-07 21:58:09 +0100 (Wed, 07 Nov 2007)
+New Revision: 818
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/StatsHelper.ptl
+   branches/0.2.X/page_stats_cdr.ptl
+Log:
+- Some old cdr modules store disposition values as integers. A little try to handle it.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-11-01 21:21:43 UTC (rev 817)
++++ branches/0.2.X/CHANGELOG.txt	2007-11-07 20:58:09 UTC (rev 818)
+@@ -1,3 +1,6 @@
++2007-11-07:
++- Some old cdr modules store disposition values as integers. A little try to handle it.
++
+ 2007-11-01:
+ * New way to restart panel daemon. 
+ * Fixed tarball html directory in panelutils.
+
+Modified: branches/0.2.X/StatsHelper.ptl
+===================================================================
+--- branches/0.2.X/StatsHelper.ptl	2007-11-01 21:21:43 UTC (rev 817)
++++ branches/0.2.X/StatsHelper.ptl	2007-11-07 20:58:09 UTC (rev 818)
+@@ -53,13 +53,13 @@
+ 		self.minutes += mins
+ 		self.cost += mins * cost_per_minute
+ 		
+-		if disp == "ANSWERED":
++		if disp == "ANSWERED" or disp == 8:
+ 			self.answered += 1
+-		elif disp == "NO ANSWER":
++		elif disp == "NO ANSWER" or disp == 4:
+ 			self.not_answered += 1
+-		elif disp == "BUSY":
++		elif disp == "BUSY" or disp == 2:
+ 			self.busy += 1
+-		elif disp == "FAILED":
++		elif disp == "FAILED" or disp == 1:
+ 			self.failed += 1
+ 	
+ 	def addQueueCall(self, holdtime=0, calltime=0, disp=""):
+
+Modified: branches/0.2.X/page_stats_cdr.ptl
+===================================================================
+--- branches/0.2.X/page_stats_cdr.ptl	2007-11-01 21:21:43 UTC (rev 817)
++++ branches/0.2.X/page_stats_cdr.ptl	2007-11-07 20:58:09 UTC (rev 818)
+@@ -289,6 +289,17 @@
+ 						min = (s % 60) and ((s / 60) + 1) or (s / 60)
+                                                	totalmin += min
+ 						min
++					elif cursor.description[fieldIndex][0] == "Result":
++						s = row[fieldIndex]
++						if s == 8:
++							s="ANSWERED"
++						if s == 4:
++							s="NOT ANSWERED"
++						if s == 2:
++							s="BUSY"
++						if s == 1:
++							s="FAILED"
++						s
+ 					else: 
+ 						row[fieldIndex]
+         	                       	'</center></td>'
+
+
+
+From alerios at mail.berlios.de  Fri Nov  9 00:15:53 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Fri, 9 Nov 2007 00:15:53 +0100
+Subject: [Destar-dev] r819 - trunk
+Message-ID: <200711082315.lA8NFrId021600@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-11-09 00:15:52 +0100 (Fri, 09 Nov 2007)
+New Revision: 819
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+Log:
+* Tentative fix of grave Bug #10513, "Not updated/deleted dependencies", please test.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-11-07 20:58:09 UTC (rev 818)
++++ trunk/CHANGELOG.txt	2007-11-08 23:15:52 UTC (rev 819)
+@@ -1,3 +1,6 @@
++2007-11-08
++* Tentative fix of grave Bug #10513, "Not updated/deleted dependencies", please test.
++
+ 2007-11-01:
+ * New way to restart panel daemon. 
+ * Fixed tarball html directory in panelutils.
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-11-07 20:58:09 UTC (rev 818)
++++ trunk/ConfigHelper.ptl	2007-11-08 23:15:52 UTC (rev 819)
+@@ -218,7 +218,7 @@
+ 		header(title, menu)
+ 		#render_desc()
+ 		form2 = Form()
+-		form2.add(SubmitWidget, '_cascade_delete', _(str("Cascade Delete")), render_br=False)
++		form2.add(SubmitWidget, '_cascade_delete', _(str("Delete Anyway")), render_br=False)
+ 		form2.add(SubmitWidget, '_cancel', _(str("Cancel")), render_br=False)
+ 		'<h2>'
+ 		_(str("Warning"))
+@@ -269,11 +269,22 @@
+ 		return redirect(exitPath)
+ 	if request.form.has_key('_delete'):
+ 		if obj.hasDependencies():
+-			return showDependencies()
++                        # update dependencies once
++                        old_dependent_objs = obj.dependent_objs
++                        obj.dependent_objs = []
++                        for dep in old_dependent_objs:
++                                dep_obj = backend.getConfiglet(_id=dep.configlet._id)
++                                dep_obj.createDependencies()
++
++                if obj.hasDependencies():
++                        # if we still have dependencies, show them and ask
++                        return showDependencies()
+ 		else:
++			# delete it with no more questions
+ 			backend.deleteConfiglet(obj._id)
+ 			return redirect(exitPath)
+ 	if request.form.has_key('_cascade_delete'):
++		# go ahead and delete at user risk
+ 		backend.deleteConfiglet(obj._id)
+ 		return redirect(exitPath)
+ 
+
+
+
+From dasenjo at mail.berlios.de  Tue Nov 13 23:43:05 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Tue, 13 Nov 2007 23:43:05 +0100
+Subject: [Destar-dev] r820 - branches/0.2.X
+Message-ID: <200711132243.lADMh50f025508@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-11-13 23:43:05 +0100 (Tue, 13 Nov 2007)
+New Revision: 820
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_app_meetme.py
+Log:
+* Recording capability for conference rooms.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-11-08 23:15:52 UTC (rev 819)
++++ branches/0.2.X/CHANGELOG.txt	2007-11-13 22:43:05 UTC (rev 820)
+@@ -1,5 +1,8 @@
++2007-11-13:
++* Recording capability for conference rooms.
++
+ 2007-11-07:
+-- Some old cdr modules store disposition values as integers. A little try to handle it.
++* Some old cdr modules store disposition values as integers. A little try to handle it.
+ 
+ 2007-11-01:
+ * New way to restart panel daemon. 
+
+Modified: branches/0.2.X/cfg_app_meetme.py
+===================================================================
+--- branches/0.2.X/cfg_app_meetme.py	2007-11-08 23:15:52 UTC (rev 819)
++++ branches/0.2.X/cfg_app_meetme.py	2007-11-13 22:43:05 UTC (rev 820)
+@@ -56,6 +56,62 @@
+ 				type="int",
+ 				len=6),
+ 			
++			VarType("recordLab",
++				title=_("Recording"),
++				type="label"),
++
++	                VarType("record",
++				title=_("Record conferences?"),
++				type="bool",
++				optional=True),
++			
++			VarType("recordfilename",
++					title=_("Monitor file name"),
++					hint=_("Otherwise it will use Date-CallerIdName(CallerIdNum)-Exten"),
++					len=25,
++					optional=True),
++
++			VarType("recordfileformat",
++					title=_("Monitor file format"),
++					type="choice",
++					options=(	("gsm",_("GSM")),
++							("wav",_("WAV")),
++							("wav49",_("WAV49"))), 
++					default="gsm"),
++
++			VarType("recordappend",
++					title=_("Append to existing file instead of overwriting it?"),
++					optional=True,
++					type="bool"),
++
++			VarType("heardvol",
++					title=_("Heard volume factor"),
++					type="choice",
++					options=(       ("+4",_("+4")),
++					("+3",_("+3")),
++					("+2",_("+2")),
++					("+1",_("+1")),
++					("0",_("0")),
++					("-1",_("-1")),
++					("-2",_("-2")),
++					("-3",_("-3")),                   
++					("-4",_("-4"))),	
++					default="0"),
++
++			VarType("spokenvol",
++					title=_("Spoken volume factor"),
++					type="choice",
++					options=(       ("+4",_("+4")),
++					("+3",_("+3")),
++					("+2",_("+2")),
++					("+1",_("+1")),
++					("0",_("0")),
++					("-1",_("-1")),
++					("-2",_("-2")),
++					("-3",_("-3")),                   
++					("-4",_("-4"))),
++					default="0"),
++					
+ 			VarType("panelLab",
+ 				title=_("Operator Panel"),
+ 				type="label",
+@@ -82,7 +138,25 @@
+ 
+ 		c = AstConf("extensions.conf")
+ 		c.setSection(self.pbx)
++
++		mon_line=""
++		if self.record:
++			needModule("app_mixmonitor")
++			options = ""
++			if self.recordappend:
++				options = 'a' 
++			if self.heardvol == self.spokenvol:
++				options = options+'W(%s)' % (self.heardvol)
++			else:          
++				options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
++			if self.recordfilename:
++				mon_line = "MixMonitor(%s.%s|%s)" % (self.recordfilename,self.recordfileformat,options)
++			else:
++				mon_line = "MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)" % (self.recordfileformat,options)
++
+ 		c.appendExten(self.ext, "Answer")
++		if mon_line:
++			c.appendExten(self.ext, mon_line)
+ 		c.appendExten(self.ext, "Set(TIMEOUT(absolute)=%d)" % self.timeout)
+ 		# 'd' -- dynamically add conference
+ 		# 'P' -- always prompt pin
+
+
+
+From dasenjo at mail.berlios.de  Tue Nov 13 23:44:35 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Tue, 13 Nov 2007 23:44:35 +0100
+Subject: [Destar-dev] r821 - branches/0.2.X
+Message-ID: <200711132244.lADMiZQC025551@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-11-13 23:44:35 +0100 (Tue, 13 Nov 2007)
+New Revision: 821
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_opt_codec.py
+Log:
+* Added 'disallow=all' as an option for the codecs confgiration.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-11-13 22:43:05 UTC (rev 820)
++++ branches/0.2.X/CHANGELOG.txt	2007-11-13 22:44:35 UTC (rev 821)
+@@ -1,5 +1,6 @@
+ 2007-11-13:
+ * Recording capability for conference rooms.
++* Added 'disallow=all' as an option for the codecs confgiration.
+ 
+ 2007-11-07:
+ * Some old cdr modules store disposition values as integers. A little try to handle it.
+
+Modified: branches/0.2.X/cfg_opt_codec.py
+===================================================================
+--- branches/0.2.X/cfg_opt_codec.py	2007-11-13 22:43:05 UTC (rev 820)
++++ branches/0.2.X/cfg_opt_codec.py	2007-11-13 22:44:35 UTC (rev 821)
+@@ -35,6 +35,7 @@
+ 			VarType("name", title=_("Allow codec"), type="choice",
+ 				options=(
+ 					("all",_("Use all codecs")),
++					("disallow",_("Disallow all codecs")),
+ 					("alaw",_("A Law (g711a)")),
+ 					("ulaw",_("U Law (g711u)")),
+ 					("gsm",_("GSM")),
+@@ -58,6 +59,8 @@
+ 			if self.name == "g723":
+ 				c.append("allow=%s.1" % self.name)
+ 				needModule("codec_%s_1" % self.name)
++			if self.name == "disallow":
++				c.append("disallow=all")
+ 			else:	
+ 				c.append("allow=%s" % self.name)
+ 				needModule("codec_%s" % self.name)
+
+
+
+From dasenjo at mail.berlios.de  Wed Nov 14 21:46:17 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Wed, 14 Nov 2007 21:46:17 +0100
+Subject: [Destar-dev] r822 - in branches/0.2.X: . misc/debian
+Message-ID: <200711142046.lAEKkHbP031640@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-11-14 21:46:15 +0100 (Wed, 14 Nov 2007)
+New Revision: 822
+
+Added:
+   branches/0.2.X/misc/debian/README.samba
+   branches/0.2.X/misc/debian/samba.patch
+   branches/0.2.X/misc/debian/sambautils.py
+   branches/0.2.X/misc/debian/sudoers-samba.sample
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+Log:
+* Basic and not very secure samba integration. Debian based. 
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-11-13 22:44:35 UTC (rev 821)
++++ branches/0.2.X/CHANGELOG.txt	2007-11-14 20:46:15 UTC (rev 822)
+@@ -1,3 +1,6 @@
++2007-11-14:
++* Basic and not very secure samba integration. Debian based. 
++
+ 2007-11-13:
+ * Recording capability for conference rooms.
+ * Added 'disallow=all' as an option for the codecs confgiration.
+
+Added: branches/0.2.X/misc/debian/README.samba
+===================================================================
+--- branches/0.2.X/misc/debian/README.samba	2007-11-13 22:44:35 UTC (rev 821)
++++ branches/0.2.X/misc/debian/README.samba	2007-11-14 20:46:15 UTC (rev 822)
+@@ -0,0 +1,16 @@
++To allow a basic and not very secure integration with samba you can follow
++these steps:
++
++* Copy the sambautils.py file from this folder to the destar root folder.
++* Grant write permissions to the users in the asterisk group for the 
++  /etc/samba/smb.conf file and the /usr/share/asterisk/mohmp3/ folder.
++* Configure sudo to allow the asterisk user (the same that should run
++  destar as) to execute the samba init script, adduser, userdel and
++  smbpasswd. See sudoers-samba.sample.
++* Apply the samba.patch to the destar code.
++* Restart destar and have fun! :)
++
++This patch creates a system user without password for each destar one, add
++the user to the smbpasswd database and the same destar password and create
++two shares: one for the mohmp3 and one for the monitor folder. Adding a new
++share is almost trivial.
+
+Added: branches/0.2.X/misc/debian/samba.patch
+===================================================================
+--- branches/0.2.X/misc/debian/samba.patch	2007-11-13 22:44:35 UTC (rev 821)
++++ branches/0.2.X/misc/debian/samba.patch	2007-11-14 20:46:15 UTC (rev 822)
+@@ -0,0 +1,91 @@
++Index: ConfigHelper.ptl
++===================================================================
++--- ConfigHelper.ptl	(revisi??n: 819)
+++++ ConfigHelper.ptl	(copia de trabajo)
++@@ -23,6 +23,8 @@
++ from quixote.html import htmlescape
++ import backend
++ import types, string
+++import sambautils
+++from cfg_opt_user import CfgOptUser
++ 
++ 
++ class ROStringWidget(StringWidget):
++@@ -249,6 +251,9 @@
++ 		if obj.hasDependencies():
++ 			return showDependencies()
++ 		else:
+++			if isinstance(obj, CfgOptUser):
+++				print "Deleting user %s from samba and from system" % obj.name
+++				sambautils.deleteUser(obj.name)
++ 			backend.deleteConfiglet(obj._id)
++ 			return request.redirect(exitPath)
++ 	if request.form.has_key('_cascade_delete'):
++Index: cfg_opt_user.py
++===================================================================
++--- cfg_opt_user.py	(revisi??n: 819)
+++++ cfg_opt_user.py	(copia de trabajo)
++@@ -17,7 +17,8 @@
++ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ #
++ 
++-import language
+++import language,sambautils
+++import backend
++ from configlets import *
++ 
++ class CfgOptUser(CfgOpt):
++@@ -68,7 +69,39 @@
++ 				pass
++ 
++ 	def createAsteriskConfig(self):
++-		pass
+++		users = ""
+++		for user in backend.getConfiglets(name="CfgOptUser"):
+++			if user.level == "3":
+++				users += "%s, " % user.name
+++		if users:
+++			users = users.strip(', ')
+++			c = AstConf("smb.conf")
+++			c.__init__("smb.conf")
++ 
+++			c.setSection("global")
+++			c.append("workgroup = DESTAR")
+++			c.append("server string = DeStar")
+++			c.append("security = user")
+++			c.append("socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192")
+++
+++			c.setSection("mohmp3")
+++			c.append("path = /usr/share/asterisk/mohmp3/")
+++			c.append("valid users = %s" % users)
+++			c.append("public = no")
+++			c.append("writable = yes")
+++			c.append("printable = no")
+++			c.append("create mask = 0770")
+++
+++			c.setSection("monitor")
+++			c.append("path = /var/spool/asterisk/monitor/")
+++			c.append("valid users = %s" % users)
+++			c.append("public = no")
+++			c.append("writable = yes")
+++			c.append("printable = no")
+++			c.append("create mask = 0770")
+++
+++			sambautils.setPassword(self.name, self.secret)
+++			sambautils.reloadDaemon()
+++
++ 	def row(self):
++ 		return (self.shortName, self.name)
++Index: configlets.py
++===================================================================
++--- configlets.py	(revisi??n: 819)
+++++ configlets.py	(copia de trabajo)
++@@ -45,6 +45,8 @@
++ 	def __init__(self, fn):
++ 		if fn == 'zaptel.conf':
++ 			fn = os.path.join("/etc", fn)
+++                if fn == 'smb.conf':
+++                        fn = os.path.join("/etc/samba", fn)
++ 		if fn == 'op_server.cfg' or \
++ 		   	fn == 'op_buttons.cfg' or\
++ 			fn == 'op_style.cfg' :
+
+Added: branches/0.2.X/misc/debian/sambautils.py
+===================================================================
+--- branches/0.2.X/misc/debian/sambautils.py	2007-11-13 22:44:35 UTC (rev 821)
++++ branches/0.2.X/misc/debian/sambautils.py	2007-11-14 20:46:15 UTC (rev 822)
+@@ -0,0 +1,43 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Copyright (C) 2005 by Diego Andr?s Asenjo
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++import os, commands
++
++SAMBA_RELOAD_CMD = "sudo /etc/init.d/samba reload"
++USERADD_CMD = "sudo adduser"
++USERDEL_CMD = "sudo userdel"
++SMBPASSWD_CMD = "sudo smbpasswd"
++
++def reloadDaemon():
++        return commands.getoutput(SAMBA_RELOAD_CMD)
++
++def setPassword(user, pswd):
++	(stat, out) = commands.getstatusoutput("id %s" % user)
++	if stat:
++		os.popen("%s --system %s" % (USERADD_CMD, user) )
++		os.popen("%s %s asterisk" % (USERADD_CMD, user) )
++			
++	p = os.popen("%s -s -a %s" % (SMBPASSWD_CMD, user), 'w')
++	p.write(pswd+"\n")
++	p.write(pswd+"\n")
++
++def deleteUser(name):
++	os.popen("%s -x %s" % (SMBPASSWD_CMD, name) )
++	os.popen("%s %s" % (USERDEL_CMD, name) )
++	
+
+Added: branches/0.2.X/misc/debian/sudoers-samba.sample
+===================================================================
+--- branches/0.2.X/misc/debian/sudoers-samba.sample	2007-11-13 22:44:35 UTC (rev 821)
++++ branches/0.2.X/misc/debian/sudoers-samba.sample	2007-11-14 20:46:15 UTC (rev 822)
+@@ -0,0 +1,20 @@
++# /etc/sudoers
++#
++# This file MUST be edited with the 'visudo' command as root.
++#
++# See the man page for details on how to write a sudoers file.
++#
++
++Defaults	env_reset
++
++# Host alias specification
++
++# User alias specification
++
++# Cmnd alias specification
++#
++Cmnd_Alias 	DESTAR_SAMBA = /etc/init.d/samba reload, /usr/sbin/adduser, /usr/sbin/userdel, /usr/bin/smbpasswd
++
++# User privilege specification
++root	ALL=(ALL) ALL
++asterisk	localhost=NOPASSWD: DESTAR_SAMBA
+
+
+
+From alerios at mail.berlios.de  Tue Nov 27 14:55:52 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Tue, 27 Nov 2007 14:55:52 +0100
+Subject: [Destar-dev] r823 - trunk
+Message-ID: <200711271355.lARDtqOx015911@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-11-27 14:55:51 +0100 (Tue, 27 Nov 2007)
+New Revision: 823
+
+Modified:
+   trunk/cfg_app_record.py
+Log:
+Added password field to Cfg Record.
+
+
+Modified: trunk/cfg_app_record.py
+===================================================================
+--- trunk/cfg_app_record.py	2007-11-14 20:46:15 UTC (rev 822)
++++ trunk/cfg_app_record.py	2007-11-27 13:55:51 UTC (rev 823)
+@@ -32,6 +32,7 @@
+ 		self.variables   = [
+ 			VarType("pbx",    title=_("Virtual PBX"), type="choice", options=getChoice("CfgOptPBX")),
+ 			VarType("ext",      title=_("Extension"), len=6),
++			VarType("password", type="int", title=_("Password"), len=6, optional=True),
+ 			VarType("max",      title=_("Max duration"), len=6, default=0),
+ 			VarType("filename", title=_("File name")),
+ 			VarType("format",   title=_("Sound format"), type="choice",
+@@ -63,6 +64,8 @@
+ 
+ 		c = AstConf("extensions.conf")
+ 		c.setSection(self.pbx)
++		if self.password:
++			c.appendExten(self.ext, "Authenticate(%s)" % self.password, self.pbx)
+ 		c.appendExten(self.ext, "Goto(record-%s,s,1)" % self.filename, self.pbx)
+ 		c.appendExten(self.ext, "Hangup", self.pbx)
+ 		c.setSection("record-%s" % self.filename)
+
+
+
+From alerios at mail.berlios.de  Tue Nov 27 14:56:23 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Tue, 27 Nov 2007 14:56:23 +0100
+Subject: [Destar-dev] r824 - trunk
+Message-ID: <200711271356.lARDuNmR015963@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-11-27 14:56:23 +0100 (Tue, 27 Nov 2007)
+New Revision: 824
+
+Modified:
+   trunk/cfg_trunk_zapdynamic.py
+Log:
+Fixed typo in cfg_trunk_zapdynamic.py
+
+
+Modified: trunk/cfg_trunk_zapdynamic.py
+===================================================================
+--- trunk/cfg_trunk_zapdynamic.py	2007-11-27 13:55:51 UTC (rev 823)
++++ trunk/cfg_trunk_zapdynamic.py	2007-11-27 13:56:23 UTC (rev 824)
+@@ -23,7 +23,7 @@
+ import panelutils
+ 
+ 
+-class CfgiTrunkZapDynamic(CfgTrunk):
++class CfgTrunkZapDynamic(CfgTrunk):
+ 
+ 	shortName = _("Zaptel dynamic span configuration")
+ 	newObjectTitle = _("Zaptel dynamic span configuration")
+
+
+
+From alerios at mail.berlios.de  Tue Nov 27 14:57:02 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Tue, 27 Nov 2007 14:57:02 +0100
+Subject: [Destar-dev] r825 - trunk
+Message-ID: <200711271357.lARDv2Kh016043@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-11-27 14:57:02 +0100 (Tue, 27 Nov 2007)
+New Revision: 825
+
+Modified:
+   trunk/cfg_trunk_zappri.py
+Log:
+Added pridialplan option to trunk zap pri.
+
+
+Modified: trunk/cfg_trunk_zappri.py
+===================================================================
+--- trunk/cfg_trunk_zappri.py	2007-11-27 13:56:23 UTC (rev 824)
++++ trunk/cfg_trunk_zappri.py	2007-11-27 13:57:02 UTC (rev 825)
+@@ -44,14 +44,25 @@
+ 			VarType("switchtype",
+ 				title=_("Switch type"),
+ 				type="choice",
+-			      	options=[('national','National ISDN 2'),
+-					('dms100', 'Nortel DMS100'),
+-					('4ess', 'AT&T 4ESS'),
+-					('5ess', 'Lucent 5ESS'),
+-					('euroisdn', 'Euro ISDN'),
+-					('ni1', 'Old National ISDN 1')],
++			      	options=[('national',_('National ISDN 2')),
++					('dms100', _('Nortel DMS100')),
++					('4ess', _('AT&T 4ESS')),
++					('5ess', _('Lucent 5ESS')),
++					('euroisdn', _('Euro ISDN')),
++					('ni1', _('Old National ISDN 1'))],
+ 				default="euroisdn"),
+ 				
++			VarType("pridialplan",
++				title=_("PRI Dialplan"),
++				type="choice",
++			      	options=[('unknown',_('Unknown')),
++					('private', _('Private ISDN')),
++					('local', _('Local ISDN')),
++					('national', _('National ISDN')),
++					('international', _('International ISDN')),
++					('dynamic', _('Dynamically selects the appropriate dialplan'))],
++				default="unknown"),
++
+ 			VarType("channels",
+ 				title=_("Channels"),
+ 				hint=_("i.e. 1-15,17-31"),
+@@ -201,7 +212,7 @@
+ 			c.appendValue(self, "group")
+ 		c.appendValue(self, "signalling")
+ 		c.appendValue(self, "switchtype")
+-		c.append("pridialplan=unknown")
++		c.appendValue(self, "pridialplan")
+ 		contextin = "in-%s" % self.name
+ 		c.append("context=%s" % contextin)
+ 		c.append("usecallerid=yes")
+
+
+
+From alerios at mail.berlios.de  Tue Nov 27 14:59:51 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Tue, 27 Nov 2007 14:59:51 +0100
+Subject: [Destar-dev] r826 - trunk
+Message-ID: <200711271359.lARDxpwt016291@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-11-27 14:59:51 +0100 (Tue, 27 Nov 2007)
+New Revision: 826
+
+Modified:
+   trunk/cfg_opt_zap_audio.py
+Log:
+Better verification of dependencies for ZapOptAudio and ZapOptTrunk.
+
+
+Modified: trunk/cfg_opt_zap_audio.py
+===================================================================
+--- trunk/cfg_opt_zap_audio.py	2007-11-27 13:57:02 UTC (rev 825)
++++ trunk/cfg_opt_zap_audio.py	2007-11-27 13:59:51 UTC (rev 826)
+@@ -44,7 +44,7 @@
+ 		# despite the "from configlets import *" above
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__ in ('CfgPhoneZap','CfgTrunkZap'):
++			if obj.__class__.__name__.startswith('CfgTrunkZap') or obj.__class__.__name__.startswith('CfgPhoneZap'):
+ 				return CfgOptSingle.isAddable(self)
+ 		return False
+ 	isAddable = classmethod(isAddable)
+
+
+
+From alerios at mail.berlios.de  Tue Nov 27 15:00:45 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Tue, 27 Nov 2007 15:00:45 +0100
+Subject: [Destar-dev] r827 - trunk
+Message-ID: <200711271400.lARE0jll016496@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-11-27 15:00:44 +0100 (Tue, 27 Nov 2007)
+New Revision: 827
+
+Modified:
+   trunk/cfg_opt_zap_trunk.py
+Log:
+Better verification of dependencies for ZapOptAudio and ZapOptTrunk.
+
+
+Modified: trunk/cfg_opt_zap_trunk.py
+===================================================================
+--- trunk/cfg_opt_zap_trunk.py	2007-11-27 13:59:51 UTC (rev 826)
++++ trunk/cfg_opt_zap_trunk.py	2007-11-27 14:00:44 UTC (rev 827)
+@@ -42,7 +42,7 @@
+ 		# despite the "from configlets import *" above
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__ == 'CfgTrunkZap':
++			if obj.__class__.__name__.startswith('CfgTrunkZap'):
+ 				return CfgOptSingle.isAddable(self)
+ 		return False
+ 	isAddable = classmethod(isAddable)
+
+
+
+From alerios at mail.berlios.de  Tue Nov 27 15:03:39 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Tue, 27 Nov 2007 15:03:39 +0100
+Subject: [Destar-dev] r828 - trunk
+Message-ID: <200711271403.lARE3dnD016725@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-11-27 15:03:39 +0100 (Tue, 27 Nov 2007)
+New Revision: 828
+
+Modified:
+   trunk/cfg_trunk_sip_spa400.py
+Log:
+* Added missing clidnum to cfg sip SPA400.
+
+
+Modified: trunk/cfg_trunk_sip_spa400.py
+===================================================================
+--- trunk/cfg_trunk_sip_spa400.py	2007-11-27 14:00:44 UTC (rev 827)
++++ trunk/cfg_trunk_sip_spa400.py	2007-11-27 14:03:39 UTC (rev 828)
+@@ -28,7 +28,7 @@
+ 	newObjectTitle  = _("New SPA400 SIP trunk")
+ 	description = _("""Used to setup a SIP trunk to a SPA400 gateway.""")
+ 	technology = "SIP"
+-	
++
+ 	def createVariables(self):
+ 		self.variables   = [
+ 			VarType("name",
+@@ -53,15 +53,20 @@
+ 				title=_("Show this trunk in the panel"),
+ 				type="bool",
+ 				hide=True),
+-	
++
+ 			VarType("Inbound",
+-				title=_("Calls from SIP trunk"),
++				title=_("For incoming calls through this trunk:"),
+ 				type="label"),
+ 				
+ 			VarType("clid",
+ 				title=_("Change Caller*Id to:"),
+ 				len=25,
+ 				optional=True),
++
++			VarType("clidnumin",
++				title=_("Change Caller*Id Number to:"),
++				len=40,
++				optional=True),
+ 			
+ 			VarType("contextin",
+ 				title=_("Go to"),
+@@ -72,7 +77,7 @@
+ 			VarType("phone",
+ 				title=_("Extension to ring"),
+ 				type="choice",
+-				optional=False,
++				optional=True,
+ 				options=getChoice("CfgPhone")),
+ 			
+ 			VarType("ivr",
+@@ -105,7 +110,7 @@
+ 		res = CfgTrunk.checkConfig(self)
+ 		if res:
+ 			return res
+-                
++		
+ 	def createAsteriskConfig(self):
+ 		needModule("res_crypto")
+ 		needModule("chan_sip")
+
+
+
+From alerios at mail.berlios.de  Tue Nov 27 15:10:11 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Tue, 27 Nov 2007 15:10:11 +0100
+Subject: [Destar-dev] r829 - trunk
+Message-ID: <200711271410.lAREABiu017125@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-11-27 15:10:11 +0100 (Tue, 27 Nov 2007)
+New Revision: 829
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/configlets.py
+Log:
+* Changed MAXPASSWORDLENGHT from 15 to 45.
+* Updated CHANGELOG
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-11-27 14:03:39 UTC (rev 828)
++++ trunk/CHANGELOG.txt	2007-11-27 14:10:11 UTC (rev 829)
+@@ -1,5 +1,13 @@
++2007-11-27
++* Added password field to Cfg Record.
++* Fixed typo in cfg_trunk_zapdynamic.py
++* Added pridialplan option to trunk zap pri.
++* Better verification of dependencies for ZapOptAudio and ZapOptTrunk.
++* Added missing clidnum to cfg sip SPA400.
++* Changed MAXPASSWORDLENGHT from 15 to 45.
++
+ 2007-11-08
+-* Tentative fix of grave Bug #10513, "Not updated/deleted dependencies", please test.
++* Tentative fix of grave Bug #10513, "Not updated/deleted dependencies".
+ 
+ 2007-11-01:
+ * New way to restart panel daemon. 
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-11-27 14:03:39 UTC (rev 828)
++++ trunk/configlets.py	2007-11-27 14:10:11 UTC (rev 829)
+@@ -26,7 +26,7 @@
+ CONF_TAG = "; Automatically created by DESTAR\n"
+ ASTERISK_MODULES_DIR = os.getenv('ASTERISK_MODULES_DIR', default='/usr/lib/asterisk/modules') 
+ 
+-MAXSECRETLENGTH = 15
++MAXSECRETLENGTH = 45
+ 
+ class AsteriskConfigFile:
+ 	"""
+
+
+

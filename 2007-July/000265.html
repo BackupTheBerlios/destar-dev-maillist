@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r749 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r749%20-%20trunk&In-Reply-To=%3C200707042133.l64LXOqW010594%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000264.html">
+   <LINK REL="Next"  HREF="000266.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r749 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r749%20-%20trunk&In-Reply-To=%3C200707042133.l64LXOqW010594%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r749 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Wed Jul  4 23:33:24 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000264.html">[Destar-dev] r748 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000266.html">[Destar-dev] r750 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#265">[ date ]</a>
+              <a href="thread.html#265">[ thread ]</a>
+              <a href="subject.html#265">[ subject ]</a>
+              <a href="author.html#265">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-04 23:33:23 +0200 (Wed, 04 Jul 2007)
+New Revision: 749
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_login.ptl
+   trunk/page_user_settings.ptl
+Log:
+* Always treat voicemail pin as int, not string.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-04 19:04:45 UTC (rev 748)
++++ trunk/CHANGELOG.txt	2007-07-04 21:33:23 UTC (rev 749)
+@@ -4,6 +4,7 @@
+ * Merged Queue Statistics from 0.2.X branch.
+ * Added routine to install initial queue.db
+ * Added https support
++* Always treat voicemail pin as int, not string.
+ 
+ 2007-07-03:
+ * Use configlet shortName on logs if name is not present.
+
+Modified: trunk/page_login.ptl
+===================================================================
+--- trunk/page_login.ptl	2007-07-04 19:04:45 UTC (rev 748)
++++ trunk/page_login.ptl	2007-07-04 21:33:23 UTC (rev 749)
+@@ -89,8 +89,8 @@
+ 
+ 			# Now search for a phone entry with proper extension/voicemail pin
+ 			for obj in backend.getConfiglets(group=&quot;Phones&quot;):
+-				if type(obj) == 'CfgPhoneExtension':
+-					continue
++				if obj.technology == 'virtual':
++					obj.secret = obj.pin
+ 				if (obj.ext==res[0] or obj.name==res[0]) and (obj.secret==res[1] or str(obj.pin)==res[1]):
+ 					self.session.user  = obj.name
+ 					self.session.level = 1
+
+Modified: trunk/page_user_settings.ptl
+===================================================================
+--- trunk/page_user_settings.ptl	2007-07-04 19:04:45 UTC (rev 748)
++++ trunk/page_user_settings.ptl	2007-07-04 21:33:23 UTC (rev 749)
+@@ -54,7 +54,7 @@
+ 	form.add(CheckboxWidget,     &quot;vmim&quot;, vmim, title=_(&quot;Immediate voice mailbox&quot;))
+ 	form.add(CheckboxWidget,     &quot;vmbs&quot;, vmbs, title=_(&quot;Voice mailbox on busy&quot;))
+ 	form.add(CheckboxWidget,     &quot;vmu&quot;,  vmu,  title=_(&quot;Voice mailbox on timeout/unavailable&quot;))
+-	form.add(StringWidget,       &quot;pin&quot;, phone.pin, title=_(&quot;Voicemail pin&quot;), maxlength=10)
++	form.add(IntWidget,       &quot;pin&quot;, phone.pin, title=_(&quot;Voicemail pin&quot;), maxlength=10)
+ 	try:
+ 		if phone.secret:
+ 			form.add(StringWidget,  &quot;secret&quot;, phone.secret, title=_(&quot;Extension Password&quot;), maxlength=10)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000264.html">[Destar-dev] r748 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000266.html">[Destar-dev] r750 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#265">[ date ]</a>
+              <a href="thread.html#265">[ thread ]</a>
+              <a href="subject.html#265">[ subject ]</a>
+              <a href="author.html#265">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

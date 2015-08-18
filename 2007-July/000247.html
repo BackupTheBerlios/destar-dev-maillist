@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r736 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r736%20-%20trunk&In-Reply-To=%3C200707031842.l63Igpwv003021%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000246.html">
+   <LINK REL="Next"  HREF="000248.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r736 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r736%20-%20trunk&In-Reply-To=%3C200707031842.l63Igpwv003021%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r736 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Jul  3 20:42:51 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000246.html">[Destar-dev] r735 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000248.html">[Destar-dev] r737 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#247">[ date ]</a>
+              <a href="thread.html#247">[ thread ]</a>
+              <a href="subject.html#247">[ subject ]</a>
+              <a href="author.html#247">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-03 20:42:50 +0200 (Tue, 03 Jul 2007)
+New Revision: 736
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_login.ptl
+   trunk/page_logout.ptl
+   trunk/session.py
+Log:
+* Changed 'print' for 'sys.stderr.write' on some log messages.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-03 18:39:44 UTC (rev 735)
++++ trunk/CHANGELOG.txt	2007-07-03 18:42:50 UTC (rev 736)
+@@ -1,3 +1,7 @@
++2007-07-03:
++* configlets.py: log configlet shortName if name is not present.
++* Changed 'print' for 'sys.stderr.write' on some log messages.
++
+ 2007-06-30:
+ * Added option to return to operator on macro-voicemail.
+ 
+
+Modified: trunk/page_login.ptl
+===================================================================
+--- trunk/page_login.ptl	2007-07-03 18:39:44 UTC (rev 735)
++++ trunk/page_login.ptl	2007-07-03 18:42:50 UTC (rev 736)
+@@ -22,7 +22,7 @@
+ from quixote.form import *
+ from quixote import get_request, get_session, redirect
+ from quixote.directory import Directory, AccessControlled
+-import types, backend, time
++import types, backend, time, sys
+ 
+ class Page(AccessControlled, Directory): 
+ 
+@@ -83,7 +83,7 @@
+ 						self.session.phone = obj.phone
+ 						self.session.language = obj.language
+ 						self.session.pbx = obj.pbx
+-						print (&quot;[%s] User %s logged in from %s, port %s&quot; % (time.asctime(time.localtime()),self.session.user,self.session.ip,self.session.port))
++						sys.stderr.write (&quot;[%s] User %s logged in from %s, port %s\n&quot; % (time.asctime(time.localtime()),self.session.user,self.session.ip,self.session.port))
+ 						backend.add_session()
+ 						return redirect('../user/info/')
+ 
+@@ -97,7 +97,7 @@
+ 					self.session.phone = obj.name
+ 					self.session.language = 'en'
+ 					self.session.pbx = obj.pbx
+-					print (&quot;[%s] User %s logged in from %s, port %s&quot; % (time.asctime(time.localtime()),self.session.user,self.session.ip,self.session.port))
++					sys.stderr.write (&quot;[%s] User %s logged in from %s, port %s\n&quot; % (time.asctime(time.localtime()),self.session.user,self.session.ip,self.session.port))
+ 					backend.add_session()
+ 					return redirect('../user/info/')
+ 			self.notLoggedIn()
+
+Modified: trunk/page_logout.ptl
+===================================================================
+--- trunk/page_logout.ptl	2007-07-03 18:39:44 UTC (rev 735)
++++ trunk/page_logout.ptl	2007-07-03 18:42:50 UTC (rev 736)
+@@ -21,7 +21,7 @@
+ from Templates import *
+ from quixote.directory import Directory, AccessControlled
+ from quixote import get_request, get_session, redirect
+-import backend, time
++import backend, time, sys
+ 
+ class Page(AccessControlled, Directory): 
+ 
+@@ -43,7 +43,7 @@
+ 
+ 	def _q_index(self):
+ 		# TODO: move this into Publisher.py
+-		print (&quot;[%s] User %s logged out from %s, port %s&quot; % (time.asctime(time.localtime()),self.session.user,self.session.ip,self.session.port))
++		sys.stderr.write (&quot;[%s] User %s logged out from %s, port %s\n&quot; % (time.asctime(time.localtime()),self.session.user,self.session.ip,self.session.port))
+ 		self.session.user = ''
+ 		self.session.phone = ''
+ 		self.session.level = -1
+
+Modified: trunk/session.py
+===================================================================
+--- trunk/session.py	2007-07-03 18:39:44 UTC (rev 735)
++++ trunk/session.py	2007-07-03 18:42:50 UTC (rev 736)
+@@ -21,7 +21,7 @@
+ from quixote.session import Session, SessionManager
+ from quixote import get_request
+ import configlets, backend, language
+-import time
++import time, sys
+ 
+ class DestarSession(Session):
+ 	def __init__(self, id):
+@@ -65,7 +65,7 @@
+ 				self.user  = &quot;programmer&quot;
+ 				self.level = 4
+ 				self.language = 'en'
+-				print (&quot;[%s] Logging in with user 'programmer' from ip %s, port %s&quot; % (time.asctime(time.localtime()), self.ip, self.port))
++				sys.stderr.write (&quot;[%s] Logging in with user 'programmer' from ip %s, port %s\n&quot; % (time.asctime(time.localtime()), self.ip, self.port))
+ 			else:
+ 				for user in users:
+ 					if user.pc == self.ip:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000246.html">[Destar-dev] r735 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000248.html">[Destar-dev] r737 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#247">[ date ]</a>
+              <a href="thread.html#247">[ thread ]</a>
+              <a href="subject.html#247">[ subject ]</a>
+              <a href="author.html#247">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

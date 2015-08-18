@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r719 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r719%20-%20branches/0.2.X&In-Reply-To=%3C200706132229.l5DMTWGt014395%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000230.html">
+   <LINK REL="Next"  HREF="000231.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r719 - branches/0.2.X</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r719%20-%20branches/0.2.X&In-Reply-To=%3C200706132229.l5DMTWGt014395%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r719 - branches/0.2.X">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun 14 00:29:32 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000230.html">[Destar-dev] r718 - in branches/0.2.X: . po
+</A></li>
+        <LI>Next message: <A HREF="000231.html">[Destar-dev] r720 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#228">[ date ]</a>
+              <a href="thread.html#228">[ thread ]</a>
+              <a href="subject.html#228">[ subject ]</a>
+              <a href="author.html#228">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-06-14 00:29:32 +0200 (Thu, 14 Jun 2007)
+New Revision: 719
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/backend.py
+   branches/0.2.X/page_config_down.ptl
+   branches/0.2.X/page_config_up.ptl
+   branches/0.2.X/page_owner_cdr.ptl
+   branches/0.2.X/page_stats_cdr.ptl
+Log:
+* Some strings adjustments. Needs revision, and .po updating and translation.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-06-13 22:23:01 UTC (rev 718)
++++ branches/0.2.X/CHANGELOG.txt	2007-06-13 22:29:32 UTC (rev 719)
+@@ -6,6 +6,7 @@
+ * Reverted po/es.po from revsion 708.
+ * Changed po/Makefile to create a .pot file, use msgmerge and have better variable names.
+ * Updated .po files with the new Makefile rules.
++* Some strings adjustments. Needs revision, and .po updating and translation.
+ 
+ 2007-06-12:
+ * Fixed bug in Zap trunks (clidnumin needed).
+
+Modified: branches/0.2.X/backend.py
+===================================================================
+--- branches/0.2.X/backend.py	2007-06-13 22:23:01 UTC (rev 718)
++++ branches/0.2.X/backend.py	2007-06-13 22:29:32 UTC (rev 719)
+@@ -60,7 +60,7 @@
+ 			try:
+ 				execfile(DESTAR_CFG)
+ 			except IOError:
+-				print _(&quot;Warning: There is no %s or %s file yet.&quot; % (fn,DESTAR_CFG))
++				print _(&quot;Warning: Configuration file could not be found.&quot;)
+ 	except NameError:
+ 		pass
+ 		
+
+Modified: branches/0.2.X/page_config_down.ptl
+===================================================================
+--- branches/0.2.X/page_config_down.ptl	2007-06-13 22:23:01 UTC (rev 718)
++++ branches/0.2.X/page_config_down.ptl	2007-06-13 22:29:32 UTC (rev 719)
+@@ -38,4 +38,4 @@
+ 	if obj:
+ 		return request.redirect(&quot;../&quot; + obj.groupName.lower())
+ 	else:
+-		return errorpage(_(&quot;Could not swap id's %s and %s&quot;) % (self._id-1,self._id))
++		return errorpage(_(&quot;Could not swap id's %(id-1)s and %(id)s&quot;) % {'id-1': self._id-1, 'id': self._id})
+
+Modified: branches/0.2.X/page_config_up.ptl
+===================================================================
+--- branches/0.2.X/page_config_up.ptl	2007-06-13 22:23:01 UTC (rev 718)
++++ branches/0.2.X/page_config_up.ptl	2007-06-13 22:29:32 UTC (rev 719)
+@@ -38,4 +38,4 @@
+ 	if obj:
+ 		return request.redirect(&quot;../&quot; + obj.groupName.lower())
+ 	else:
+-		return errorpage(_(&quot;Could not swap id's %s and %s&quot;) % (self._id-1,self._id))
++		return errorpage(_(&quot;Could not swap id's %(id-1)s and %(id)s&quot;) % {'id-1': self._id-1, 'id': self._id})
+
+Modified: branches/0.2.X/page_owner_cdr.ptl
+===================================================================
+--- branches/0.2.X/page_owner_cdr.ptl	2007-06-13 22:23:01 UTC (rev 718)
++++ branches/0.2.X/page_owner_cdr.ptl	2007-06-13 22:29:32 UTC (rev 719)
+@@ -297,9 +297,9 @@
+ 
+ 			f = offset + limit
+ 			if total &gt;= f:			
+-				M_('Showing records from %s to %s of %s' % (offset+1, f, total))
++				M_('Showing records from %(offset)s to %(f)s of %(total)s' % {'offset': offset+1, 'f': f, 'total': total})
+ 			else:
+-				M_('Showing records from %s to %s of %s' % (offset+1, total, total))
++				M_('Showing records from %(offset)s to %(total)s of %(total)s' % {'offset': offset+1, 'total': total})
+ 			'&lt;br /&gt;&lt;br /&gt;'
+ 
+ 		M_('Total Duration of shown calls: %s min.' % totalmin)
+
+Modified: branches/0.2.X/page_stats_cdr.ptl
+===================================================================
+--- branches/0.2.X/page_stats_cdr.ptl	2007-06-13 22:23:01 UTC (rev 718)
++++ branches/0.2.X/page_stats_cdr.ptl	2007-06-13 22:29:32 UTC (rev 719)
+@@ -299,9 +299,9 @@
+ 
+ 			f = offset + limit
+ 			if total &gt;= f:			
+-				M_('Showing records from %s to %s of %s' % (offset+1, f, total))
++				_('Showing records from %(offset)s to %(f)s of %(total)s' % {'offset': offset+1, 'f': f, 'total': total})
+ 			else:
+-				M_('Showing records from %s to %s of %s') % (offset+1, total, total)
++				_('Showing records from %(offset)s to %(total)s of %(total)s' % {'offset': offset+1, 'total': total})
+ 			'&lt;br /&gt;&lt;br /&gt;'
+ 
+ 		M_('Total Duration of shown calls: %s min.') % totalmin
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000230.html">[Destar-dev] r718 - in branches/0.2.X: . po
+</A></li>
+	<LI>Next message: <A HREF="000231.html">[Destar-dev] r720 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#228">[ date ]</a>
+              <a href="thread.html#228">[ thread ]</a>
+              <a href="subject.html#228">[ subject ]</a>
+              <a href="author.html#228">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

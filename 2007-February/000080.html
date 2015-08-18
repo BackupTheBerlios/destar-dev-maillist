@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r594 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r594%20-%20trunk&In-Reply-To=%3C200702220401.l1M41vls002354%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000079.html">
+   <LINK REL="Next"  HREF="000081.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r594 - trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r594%20-%20trunk&In-Reply-To=%3C200702220401.l1M41vls002354%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r594 - trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Thu Feb 22 05:01:57 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000079.html">[Destar-dev] r593 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000081.html">[Destar-dev] r595 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#80">[ date ]</a>
+              <a href="thread.html#80">[ thread ]</a>
+              <a href="subject.html#80">[ subject ]</a>
+              <a href="author.html#80">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-02-22 05:01:56 +0100 (Thu, 22 Feb 2007)
+New Revision: 594
+
+Added:
+   trunk/cfg_opt_iax.py
+Modified:
+   trunk/CHANGELOG.txt
+Log:
+* Added new configlet for configure some IAX general options.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-02-16 21:44:23 UTC (rev 593)
++++ trunk/CHANGELOG.txt	2007-02-22 04:01:56 UTC (rev 594)
+@@ -1,3 +1,6 @@
++2007-02-21:
++* Added new configlet for configure some IAX general options.
++
+ 2007-02-16:
+ * Added externhost support in sip.conf through SIP Options.
+ * Redirecting to login when no user is logged
+
+Added: trunk/cfg_opt_iax.py
+===================================================================
+--- trunk/cfg_opt_iax.py	2007-02-16 21:44:23 UTC (rev 593)
++++ trunk/cfg_opt_iax.py	2007-02-22 04:01:56 UTC (rev 594)
+@@ -0,0 +1,90 @@
++# -*- coding: iso-latin-1 -*-
++#
++# This module is Copyright (C) 2007 by dasenjo,
++# Destar is Copyright (C) 2005 by Holger Schurig,
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++
++
++class CfgOptIAX(CfgOptSingle):
++
++	shortName = _(&quot;IAX Options&quot;)
++	newObjectTitle = _(&quot;IAX Options&quot;)
++	
++	def createVariables(self):
++		self.variables = [
++			VarType(&quot;bindaddr&quot;,	
++					title=_(&quot;Bind address&quot;), 
++					len=25,
++					optional=True),
++
++			VarType(&quot;bindport&quot;,	
++					title=_(&quot;Bind port&quot;), 
++					type=&quot;int&quot;,
++					len=25,
++					optional=True),
++
++			VarType(&quot;jitterbuffer&quot;,	
++					title=_(&quot;Use jitterbuffer?&quot;), 
++					type=&quot;bool&quot;,
++					optional=True),
++
++			VarType(&quot;forcejitterbuffer&quot;,	
++					title=_(&quot;Force jitterbuffer?&quot;), 
++					type=&quot;bool&quot;,
++					optional=True),
++
++			VarType(&quot;tos&quot;,
++					title=_(&quot;TOS Field&quot;),
++					len=14,
++					optional=True,
++					default=&quot;lowdelay&quot;),]
++
++	def checkConfig(self):
++		res = CfgOpt.checkConfig(self)
++                if res:
++                        return res
++
++	def isAddable(self):
++		&quot;&quot;&quot;We can only add this configlet if we have at least one
++		IAX phone/trunk defined.&quot;&quot;&quot;
++
++		# BUG: it does somehow not work to simply write for obj in config_entries,
++		# despite the &quot;from configlets import *&quot; above
++		import configlets
++		for obj in configlets.configlet_tree:
++			if obj.__class__.__name__ in ('CfgPhoneIax','CfgTrunkIaxtrunk'):
++				return CfgOptSingle.isAddable(self)
++		return False
++	isAddable = classmethod(isAddable)
++
++
++	def createAsteriskConfig(self):
++		c = AstConf(&quot;iax.conf&quot;)
++		c.setSection(&quot;general&quot;)
++		if self.bindaddr:
++			c.append(&quot;bindaddr=%s&quot; % self.bindaddr)
++		if self.bindport:
++			c.append(&quot;bindport=%s&quot; % self.bindport)
++		if self.jitterbuffer:
++			c.append(&quot;jitterbuffer=yes&quot;)
++		if self.forcejitterbuffer:
++			c.append(&quot;forcejitterbuffer=yes&quot;)
++		if self.tos:
++			c.append(&quot;tos=%s&quot; % self.tos)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000079.html">[Destar-dev] r593 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000081.html">[Destar-dev] r595 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#80">[ date ]</a>
+              <a href="thread.html#80">[ thread ]</a>
+              <a href="subject.html#80">[ subject ]</a>
+              <a href="author.html#80">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

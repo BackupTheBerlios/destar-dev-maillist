@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r788 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r788%20-%20trunk&In-Reply-To=%3C200708152222.l7FMMQxo014340%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000321.html">
+   <LINK REL="Next"  HREF="000323.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r788 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r788%20-%20trunk&In-Reply-To=%3C200708152222.l7FMMQxo014340%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r788 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Aug 16 00:22:26 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000321.html">[Destar-dev] accepting parameters
+</A></li>
+        <LI>Next message: <A HREF="000323.html">[Destar-dev] [Patch #2144] use dtmfmode=auto for sip phones
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#322">[ date ]</a>
+              <a href="thread.html#322">[ thread ]</a>
+              <a href="subject.html#322">[ subject ]</a>
+              <a href="author.html#322">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-16 00:22:25 +0200 (Thu, 16 Aug 2007)
+New Revision: 788
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_phone_sip.py
+Log:
+cfg_phone_sip: dtmf auto by default. Patch by Tzafrir
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-14 06:00:09 UTC (rev 787)
++++ trunk/CHANGELOG.txt	2007-08-15 22:22:25 UTC (rev 788)
+@@ -1,3 +1,6 @@
++2007-08-15:
++* cfg_phone_sip: dtmf auto by default. Patch by Tzafrir
++
+ 2007-08-14:
+ * cfg_phone_iax: defaultip= line added if not empty value. Patch by Tzafrir
+ * Added page_user_phonebook.ptl. Thanks to Tzafrir
+
+Modified: trunk/cfg_phone_sip.py
+===================================================================
+--- trunk/cfg_phone_sip.py	2007-08-14 06:00:09 UTC (rev 787)
++++ trunk/cfg_phone_sip.py	2007-08-15 22:22:25 UTC (rev 788)
+@@ -63,9 +63,11 @@
+ 					title=_(&quot;DTMF mode:&quot;),
+ 					type=&quot;choice&quot;,
+ 					options=(
++						(&quot;auto&quot;,_(&quot;Find automatically&quot;)),
+ 						(&quot;rfc2833&quot;,_(&quot;RFC 2833 (RTP)&quot;)),
+ 						(&quot;inband&quot;,_(&quot;In Band (only with ulaw/alaw)&quot;)),
+-						(&quot;info&quot;,_(&quot;SIP INFO&quot;)) ), default=&quot;info&quot;),
++						(&quot;info&quot;,_(&quot;SIP INFO&quot;)) ), 
++					default=&quot;auto&quot;),
+ 	
+ 			VarType(&quot;Call Group&quot;,
+ 					title=_(&quot;Call group&quot;),
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000321.html">[Destar-dev] accepting parameters
+</A></li>
+	<LI>Next message: <A HREF="000323.html">[Destar-dev] [Patch #2144] use dtmfmode=auto for sip phones
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#322">[ date ]</a>
+              <a href="thread.html#322">[ thread ]</a>
+              <a href="subject.html#322">[ subject ]</a>
+              <a href="author.html#322">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

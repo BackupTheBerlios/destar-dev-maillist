@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r810 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r810%20-%20trunk&In-Reply-To=%3C200709102135.l8ALZpa2021503%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000346.html">
+   <LINK REL="Next"  HREF="000348.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r810 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r810%20-%20trunk&In-Reply-To=%3C200709102135.l8ALZpa2021503%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r810 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 10 23:35:51 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000346.html">[Destar-dev] r809 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000348.html">[Destar-dev] r811 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#347">[ date ]</a>
+              <a href="thread.html#347">[ thread ]</a>
+              <a href="subject.html#347">[ subject ]</a>
+              <a href="author.html#347">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-09-10 23:35:51 +0200 (Mon, 10 Sep 2007)
+New Revision: 810
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_dialout_normal.py
+Log:
+cfg_dialout_normal.py: Fixed dialouts when Dialing options were added
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-09-10 21:26:32 UTC (rev 809)
++++ trunk/CHANGELOG.txt	2007-09-10 21:35:51 UTC (rev 810)
+@@ -1,3 +1,6 @@
++2007-09-10:
++* cfg_dialout_normal.py: Fixed dialouts when Dialing options were added
++
+ 2007-09-09:
+ * Templates.ptl: missing quotes in ul tag
+ 
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-09-10 21:26:32 UTC (rev 809)
++++ trunk/cfg_dialout_normal.py	2007-09-10 21:35:51 UTC (rev 810)
+@@ -143,10 +143,10 @@
+ 			opts=&quot;tW&quot;
+ 		else:
+ 			opts=&quot;TtW&quot;
++		c.append(&quot;exten=&gt;s,1,Set(options=%s)&quot; % opts)
+ 		if self.otheropts:
+ 			opts += self.otheropts
+-			c.append(&quot;exten=&gt;s,n,Playback(llamadasiendotransferida)&quot;)
+-		c.append(&quot;exten=&gt;s,1,Set(options=%s)&quot; % opts)
++			#c.append(&quot;exten=&gt;s,n,Playback(llamadasiendotransferida)&quot;)
+ 		if self.qlookup:
+ 			c.append(&quot;exten=&gt;s,n(quickd),Set(dest=${DB(QUICKDIALLIST/GLOBAL/${ARG1})})&quot;)
+ 			c.append(&quot;exten=&gt;s,quickd+1,Goto(ifAuth)&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000346.html">[Destar-dev] r809 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000348.html">[Destar-dev] r811 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#347">[ date ]</a>
+              <a href="thread.html#347">[ thread ]</a>
+              <a href="subject.html#347">[ subject ]</a>
+              <a href="author.html#347">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

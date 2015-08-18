@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r764 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r764%20-%20trunk&In-Reply-To=%3C200707262004.l6QK4Tt3021798%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000283.html">
+   <LINK REL="Next"  HREF="000285.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r764 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r764%20-%20trunk&In-Reply-To=%3C200707262004.l6QK4Tt3021798%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r764 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul 26 22:04:29 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000283.html">[Destar-dev] r763 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000285.html">[Destar-dev] r765 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#284">[ date ]</a>
+              <a href="thread.html#284">[ thread ]</a>
+              <a href="subject.html#284">[ subject ]</a>
+              <a href="author.html#284">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-07-26 22:04:29 +0200 (Thu, 26 Jul 2007)
+New Revision: 764
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_phone_iax.py
+   trunk/cfg_phone_sip.py
+Log:
+cfg_phone_{sip,iax}: added inbound monitoring
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-26 18:55:56 UTC (rev 763)
++++ trunk/CHANGELOG.txt	2007-07-26 20:04:29 UTC (rev 764)
+@@ -6,6 +6,7 @@
+ * configlets.py, cfg_*: appendExten() uses 'n' priority and doesn't reset the
+   priority when the extension changes.
+ * configlets.py: allows monitoring incoming calls
++* cfg_phone_{sip,iax}: added inbound monitoring
+ 
+ 2007-07-10:
+ * Improved call-forwarding applications:
+
+Modified: trunk/cfg_phone_iax.py
+===================================================================
+--- trunk/cfg_phone_iax.py	2007-07-26 18:55:56 UTC (rev 763)
++++ trunk/cfg_phone_iax.py	2007-07-26 20:04:29 UTC (rev 764)
+@@ -148,6 +148,12 @@
+ 					optional=True,
+ 					type=&quot;bool&quot;),
+ 
++			VarType(&quot;monitorinbound&quot;,
++					title=_(&quot;Monitor calls made to this extension?&quot;),
++					optional=True,
++					default=False,
++					type=&quot;bool&quot;),
++
+ 			VarType(&quot;monitorfilename&quot;,
+ 					title=_(&quot;Monitor file name&quot;),
+ 					hint=_(&quot;Otherwise it will use Date-CallerIdName(CallerIdNum)-Exten&quot;),
+
+Modified: trunk/cfg_phone_sip.py
+===================================================================
+--- trunk/cfg_phone_sip.py	2007-07-26 18:55:56 UTC (rev 763)
++++ trunk/cfg_phone_sip.py	2007-07-26 20:04:29 UTC (rev 764)
+@@ -147,6 +147,12 @@
+ 					optional=True,
+ 					type=&quot;bool&quot;),
+ 
++			VarType(&quot;monitorinbound&quot;,
++					title=_(&quot;Monitor calls made to this extension?&quot;),
++					optional=True,
++					default=False,
++					type=&quot;bool&quot;),
++
+ 			VarType(&quot;monitorfilename&quot;,
+ 					title=_(&quot;Monitor file name&quot;),
+ 					hint=_(&quot;Otherwise it will use Date-CallerIdName(CallerIdNum)-Exten&quot;),
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000283.html">[Destar-dev] r763 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000285.html">[Destar-dev] r765 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#284">[ date ]</a>
+              <a href="thread.html#284">[ thread ]</a>
+              <a href="subject.html#284">[ subject ]</a>
+              <a href="author.html#284">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

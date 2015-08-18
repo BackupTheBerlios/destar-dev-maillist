@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r643 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r643%20-%20trunk&In-Reply-To=%3C200703202150.l2KLojwq018226%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000144.html">
+   <LINK REL="Next"  HREF="000146.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r643 - trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r643%20-%20trunk&In-Reply-To=%3C200703202150.l2KLojwq018226%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r643 - trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Tue Mar 20 22:50:45 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000144.html">[Destar-dev] r642 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000146.html">[Destar-dev] r644 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#145">[ date ]</a>
+              <a href="thread.html#145">[ thread ]</a>
+              <a href="subject.html#145">[ subject ]</a>
+              <a href="author.html#145">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-03-20 22:50:44 +0100 (Tue, 20 Mar 2007)
+New Revision: 643
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/backend.py
+   trunk/configlets.py
+Log:
+* fixed a bug related with encoding in form widgets
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-03-19 20:18:52 UTC (rev 642)
++++ trunk/CHANGELOG.txt	2007-03-20 21:50:44 UTC (rev 643)
+@@ -1,3 +1,6 @@
++2007-03-20:
++* fixed a bug related with encoding in form widgets
++
+ 2007-03-16:
+ *session.py: added utf-8 in request.response, because quixote-2 uses ISO-8859-1 as default
+ *ConfigHelper: had to do some converting to unicode
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-03-19 20:18:52 UTC (rev 642)
++++ trunk/backend.py	2007-03-20 21:50:44 UTC (rev 643)
+@@ -55,6 +55,8 @@
+ 	fn = os.path.join(configlets.CONF_DIR,DESTAR_CFG)
+ 	try:
+ 		try:
++			reload(sys)
++			sys.setdefaultencoding('utf-8')
+ 			execfile(fn)
+ 		except IOError:
+ 			try:
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-03-19 20:18:52 UTC (rev 642)
++++ trunk/configlets.py	2007-03-20 21:50:44 UTC (rev 643)
+@@ -622,8 +622,8 @@
+ 
+ 		# Make sure we don't add two thingies with the same name
+ 		if self.__dict__.has_key('name'):
+-			if self.name.find(&quot;-&quot;) &gt; 1 or self.name.find(&quot; &quot;) &gt; 1:
+-				return (&quot;name&quot;, _(&quot;Name should not contain '-' or spaces&quot;))
++			if not self.name.replace('_','').isalnum():
++				return (&quot;name&quot;, _(&quot;Name should only contain characters, numbers or _&quot;))
+ 			for o in configlet_tree:
+ 				if o==self: continue
+ 				try:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000144.html">[Destar-dev] r642 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000146.html">[Destar-dev] r644 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#145">[ date ]</a>
+              <a href="thread.html#145">[ thread ]</a>
+              <a href="subject.html#145">[ subject ]</a>
+              <a href="author.html#145">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

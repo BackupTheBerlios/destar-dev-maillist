@@ -1,0 +1,255 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r690 - branches/0.2.X trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r690%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200705300001.l4U01QPw030018%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000199.html">
+   <LINK REL="Next"  HREF="000201.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r690 - branches/0.2.X trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r690%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200705300001.l4U01QPw030018%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r690 - branches/0.2.X trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Wed May 30 02:01:26 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000199.html">[Destar-dev] r689 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000201.html">[Destar-dev] r691 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#200">[ date ]</a>
+              <a href="thread.html#200">[ thread ]</a>
+              <a href="subject.html#200">[ subject ]</a>
+              <a href="author.html#200">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-05-30 02:01:25 +0200 (Wed, 30 May 2007)
+New Revision: 690
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/Templates.ptl
+   trunk/CHANGELOG.txt
+   trunk/Templates.ptl
+Log:
+* Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-05-29 22:24:52 UTC (rev 689)
++++ branches/0.2.X/CHANGELOG.txt	2007-05-30 00:01:25 UTC (rev 690)
+@@ -1,3 +1,6 @@
++2007-05-29:
++* Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
++
+ 2007-05-27:
+ * Fixed bug in page_owner.ptl that made it forbidden.
+ 
+
+Modified: branches/0.2.X/Templates.ptl
+===================================================================
+--- branches/0.2.X/Templates.ptl	2007-05-29 22:24:52 UTC (rev 689)
++++ branches/0.2.X/Templates.ptl	2007-05-30 00:01:25 UTC (rev 690)
+@@ -238,42 +238,39 @@
+ 
+ def getMenu():
+ 	request = get_request()
+-	path = request.environ['PATH_INFO']
+-	path = path[1:].split('/')
+ 
+ 	stack = get_publisher().get_namespace_stack()
+ 
+-	def calcMenu(root='', n=0):
+-		m = []
+-		try:
+-			obj = stack[n]
+-		except IndexError:
+-			return
+-		try:
+-			prueba = obj._q_menu
+-		except AttributeError:
+-			return
+-		for e in obj._q_menu:
+-			if e._q_level&gt;request.session.level:
++	m = []
++	try:
++		obj = stack[0]
++	except IndexError:
++		return
++	try:
++		prueba = obj._q_menu
++	except AttributeError:
++		return
++	for e in obj._q_menu:
++		if e._q_level&gt;request.session.level:
++			continue
++		if e._q_level&lt;0:
++			if e._q_title == _(&quot;Logout&quot;) and request.session.level == 4:
+ 				continue
+ 			if e._q_level&lt;0:
+-				if e._q_title == _(&quot;Logout&quot;) and request.session.level == 4:
+-	                                continue
+-				if e._q_level&lt;0:
+-	                                if abs(e._q_level) &lt;= request.session.level:			
+-	                                	continue
+-			submenu = []
+-			if e._q_parent == sys.modules['page_main']:
+-				for sub in e._q_menu:
+-					parent_name = sub._q_parent.__name__[5:]
+-					submenu.append( (sub._q_menupos, '/'.join([root,parent_name,sub._q_link]), sub._q_title, []) )
+-			submenu.sort()
++				if abs(e._q_level) &lt;= request.session.level:			
++					continue
++		submenu = []
++		if e._q_parent == sys.modules['page_main']:
++			for sub in e._q_menu:
++				parent_name = sub._q_parent.__name__[5:]
++				submenu.append( (sub._q_menupos, '/'.join(['',parent_name,sub._q_link]), sub._q_title, []) )
++		submenu.sort()
+ 
+-			m.append( (e._q_menupos, '/'.join([root,e._q_link]), e._q_title, submenu) )
+-		m.sort()
+-		return m
+-
+-	m = calcMenu()
++		if request.session.level == 3 and e._q_title == _(&quot;Virtual PBX Owner&quot;):
++			continue
++		else:
++			m.append( (e._q_menupos, '/'.join(['',e._q_link]), e._q_title, submenu) )
++	m.sort()
+ 	return m
+ 
+ 
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-29 22:24:52 UTC (rev 689)
++++ trunk/CHANGELOG.txt	2007-05-30 00:01:25 UTC (rev 690)
+@@ -1,5 +1,6 @@
+ 2007-05-29:
+ * cfg_trunk_sip: Added port= setting in sip.conf 
++* Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+ 
+ 2007-05-27:
+ * Fixed bug in page_owner.ptl that made it forbidden.
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-05-29 22:24:52 UTC (rev 689)
++++ trunk/Templates.ptl	2007-05-30 00:01:25 UTC (rev 690)
+@@ -240,48 +240,42 @@
+ def getMenu():
+ 	request = get_request()
+ 	session = get_session()
+-	path = request.environ['PATH_INFO']
+-	path = path[1:].split('/')
+ 
+-	#stack = get_publisher().get_namespace_stack()
+ 	stack = get_directory_path()
+ 
+-	def calcMenu(root='', n=0):
+-		m = []
+-		try:
+-			obj = stack[n]
+-		except IndexError:
+-			return
+-		try:
+-			prueba = obj._q_menu
+-		except AttributeError:
+-			return
+-		for e in obj._q_menu:
+-			if e._q_level &gt; session.level:
++	m = []
++	try:
++		obj = stack[0]
++	except IndexError:
++		return
++	try:
++		prueba = obj._q_menu
++	except AttributeError:
++		return
++	for e in obj._q_menu:
++		if e._q_level &gt; session.level:
++			continue
++		if e._q_level&lt;0:
++			if e._q_title == _(&quot;Logout&quot;) and session.level == 4:
+ 				continue
+ 			if e._q_level&lt;0:
+-				if e._q_title == _(&quot;Logout&quot;) and session.level == 4:
+-	                                continue
+-				if e._q_level&lt;0:
+-	                                if abs(e._q_level) &lt;= session.level:			
+-	                                	continue
+-			submenu = []
+-			#if e._q_parent == sys.modules['page_main']:
+-			if e._q_parent == 'page_main':
+-				for sub in e._q_menu:
+-					parent_name = sub._q_parent[5:]
+-					submenu.append( (sub._q_menupos, '/'.join([root,parent_name,sub._q_link]), sub._q_title, []) )
+-			submenu.sort()
++				if abs(e._q_level) &lt;= session.level:			
++					continue
++		submenu = []
++		if e._q_parent == 'page_main':
++			for sub in e._q_menu:
++				parent_name = sub._q_parent[5:]
++				submenu.append( (sub._q_menupos, '/'.join(['',parent_name,sub._q_link]), sub._q_title, []) )
++		submenu.sort()
+ 
+-			m.append( (e._q_menupos, '/'.join([root,e._q_link]), e._q_title, submenu) )
+-		m.sort()
+-		return m
+-
+-	m = calcMenu()
++		if session.level == 3 and e._q_title == _(&quot;Virtual PBX Owner&quot;):
++			continue
++		else:
++			m.append( (e._q_menupos, '/'.join(['',e._q_link]), e._q_title, submenu) )
++	m.sort()
+ 	return m
+ 
+ 
+-
+ def errorpage [plain] (txt, menu=None):
+ 	header(htmltext(_('Error')), menu)
+ 	'&lt;p&gt;'
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000199.html">[Destar-dev] r689 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000201.html">[Destar-dev] r691 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#200">[ date ]</a>
+              <a href="thread.html#200">[ thread ]</a>
+              <a href="subject.html#200">[ subject ]</a>
+              <a href="author.html#200">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

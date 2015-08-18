@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r734 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r734%20-%20trunk&In-Reply-To=%3C200706301550.l5UFoDpL030072%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000244.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r734 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r734%20-%20trunk&In-Reply-To=%3C200706301550.l5UFoDpL030072%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r734 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sat Jun 30 17:50:13 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000244.html">[Destar-dev] r733 - in trunk: . misc
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#245">[ date ]</a>
+              <a href="thread.html#245">[ thread ]</a>
+              <a href="subject.html#245">[ subject ]</a>
+              <a href="author.html#245">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-06-30 17:50:11 +0200 (Sat, 30 Jun 2007)
+New Revision: 734
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/backend.py
+Log:
+* Added option to return to operator on macro-voicemail.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-29 01:04:20 UTC (rev 733)
++++ trunk/CHANGELOG.txt	2007-06-30 15:50:11 UTC (rev 734)
+@@ -1,3 +1,6 @@
++2007-06-30:
++* Added option to return to operator on macro-voicemail.
++
+ 2007-06-28:
+ * page_admin_cfwstate.ptl: small fix on subrutine call.
+ * page_user_info.ptl: _q_level should be 1.
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-06-29 01:04:20 UTC (rev 733)
++++ trunk/backend.py	2007-06-30 15:50:11 UTC (rev 734)
+@@ -179,6 +179,7 @@
+ 	c.append(&quot;language=%s&quot; % getSetting('language', 'en'))
+ 
+ 	needModule(&quot;pbx_functions&quot;)
++	needModule(&quot;cdr_sqlite3_custom&quot;)
+ 	c = AstConf(&quot;cdr_sqlite3_custom.conf&quot;)
+ 	c.setSection(&quot;master&quot;)
+ 	c.append(&quot;table =&gt; cdr&quot;)
+@@ -267,10 +268,10 @@
+ 	c.append(&quot;exten=s,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append('exten=s,n(vmu),Set(vmopt=u)')
+-	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3}@${ARG4})&quot;)
++	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append('exten=s,n(vmbs),Set(vmopt=b)')
+-	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3}@${ARG4})&quot;)
++	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=s,n(hangup),Hangup()&quot;)
+ 	c.append(&quot;;&quot;)
+@@ -283,15 +284,17 @@
+                 c.append(&quot;exten=s,2,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)&quot;)
+ 
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;; format: Macro(voicemail,&lt;VoiceMail arguments&gt;)&quot;)
++	c.append(&quot;; format: Macro(voicemail,&lt;VoiceMail arguments&gt;,PBX)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.setSection(&quot;macro-voicemail&quot;)
++	c.append(&quot;exten=o,1,Goto(${ARG2},0,1)&quot;)
++	c.append(&quot;exten=a,1,Goto(${ARG2},0,1)&quot;)
+ 	c.append(&quot;exten =&gt; t,1,Hangup()&quot;)
+ 	c.append(&quot;exten =&gt; T,1,Hangup()&quot;)
+ 	c.append(&quot;exten =&gt; s,1,Answer&quot;)
+ 	c.append(&quot;exten =&gt; s,2,Set(TIMEOUT(absolute)=240)&quot;)
+ 	c.append(&quot;exten =&gt; s,3,Wait(1)&quot;)
+-	c.append(&quot;exten =&gt; s,4,VoiceMail(${ARG1})&quot;)
++	c.append(&quot;exten =&gt; s,4,VoiceMail(${ARG1}@${ARG2})&quot;)
+ 	c.append(&quot;exten =&gt; s,5,Hangup()&quot;)
+ 
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000244.html">[Destar-dev] r733 - in trunk: . misc
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#245">[ date ]</a>
+              <a href="thread.html#245">[ thread ]</a>
+              <a href="subject.html#245">[ subject ]</a>
+              <a href="author.html#245">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

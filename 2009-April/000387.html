@@ -1,0 +1,609 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r834 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r834%20-%20trunk&In-Reply-To=%3C200904162154.n3GLs3vV011813%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000386.html">
+   <LINK REL="Next"  HREF="000388.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r834 - trunk</H1>
+    <B>tzafrir at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r834%20-%20trunk&In-Reply-To=%3C200904162154.n3GLs3vV011813%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r834 - trunk">tzafrir at mail.berlios.de
+       </A><BR>
+    <I>Thu Apr 16 23:54:03 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000386.html">[Destar-dev] r833 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000388.html">[Destar-dev] r835 - branches/icom-avatar
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#387">[ date ]</a>
+              <a href="thread.html#387">[ thread ]</a>
+              <a href="subject.html#387">[ subject ]</a>
+              <a href="author.html#387">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: tzafrir
+Date: 2009-04-16 23:54:03 +0200 (Thu, 16 Apr 2009)
+New Revision: 834
+
+Modified:
+   trunk/backend.py
+   trunk/cfg_opt_zap_audio.py
+   trunk/cfg_opt_zap_trunk.py
+   trunk/cfg_opt_zappri.py
+   trunk/cfg_phone_zap.py
+   trunk/cfg_trunk_zap.py
+   trunk/cfg_trunk_zapbri.py
+   trunk/cfg_trunk_zapdynamic.py
+   trunk/cfg_trunk_zappbx.py
+   trunk/cfg_trunk_zappri.py
+   trunk/page_config.ptl
+Log:
+Zap -&gt; DAHDI changes from branch icom-avatar
+
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/backend.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -123,7 +123,7 @@
+ 	* extensions.conf
+ 	* sip.conf
+ 	* iax.conf
+-	* zapata.conf
++	* chan_dahdi.conf
+ 	* macros.inc
+ 	&quot;&quot;&quot;
+ 
+@@ -168,7 +168,7 @@
+ 	c.append(&quot;language=%s&quot; % getSetting('language', 'en'))
+ 
+ 
+-	c = AstConf(&quot;zapata.conf&quot;)
++	c = AstConf(&quot;chan_dahdi.conf&quot;)
+ 	c.setSection(&quot;channels&quot;)
+ 	c.append(&quot;language=%s&quot; % getSetting('language', 'en'))
+ 	c.append(&quot;immediate=no&quot;)
+@@ -460,11 +460,11 @@
+ 	# test if all config files are OK to be written or overwritten
+ 	tmp_conf = []
+ 	for fn,cnf in configlets.asterisk_configfiles:
+-		# zaptel.conf can't have CONF_TAG at the top, so no need to search for it
++		# system.conf can't have CONF_TAG at the top, so no need to search for it
+ 		if os.path.exists(cnf.fn):
+ 			f = open(cnf.fn, &quot;r&quot;)
+ 			s = f.readline()
+-			if s != configlets.CONF_TAG or fn == 'zaptel.conf':
++			if s != configlets.CONF_TAG or fn == 'system.conf':
+ 				# Backup file not created by us
+ 				try:
+ 					backupAsteriskConfig(fn)
+
+Modified: trunk/cfg_opt_zap_audio.py
+===================================================================
+--- trunk/cfg_opt_zap_audio.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_opt_zap_audio.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -21,10 +21,10 @@
+ from configlets import *
+ 
+ 
+-class CfgOptZapAudio(CfgOptSingle):
++class CfgOptDAHDIAudio(CfgOptSingle):
+ 
+-	shortName = _(&quot;Zaptel Audio Options&quot;)
+-	newObjectTitle = _(&quot;Zaptel Audio Options&quot;)
++	shortName = _(&quot;DAHDItel Audio Options&quot;)
++	newObjectTitle = _(&quot;DAHDItel Audio Options&quot;)
+ 	
+ 	def createVariables(self):
+ 		self.variables = [
+@@ -44,14 +44,14 @@
+ 		# despite the &quot;from configlets import *&quot; above
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__.startswith('CfgTrunkZap') or obj.__class__.__name__.startswith('CfgPhoneZap'):
++			if obj.__class__.__name__.startswith('CfgTrunkDAHDI') or obj.__class__.__name__.startswith('CfgPhoneDAHDI'):
+ 				return CfgOptSingle.isAddable(self)
+ 		return False
+ 	isAddable = classmethod(isAddable)
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		c = AstConf(&quot;zapata.conf&quot;)
++		c = AstConf(&quot;chan_dahdi.conf&quot;)
+ 		c.setSection(&quot;channels&quot;)
+ 
+ 		c.append(&quot;&quot;)
+
+Modified: trunk/cfg_opt_zap_trunk.py
+===================================================================
+--- trunk/cfg_opt_zap_trunk.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_opt_zap_trunk.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -21,10 +21,10 @@
+ from configlets import *
+ 
+ 
+-class CfgOptZapTrunk(CfgOptSingle):
++class CfgOptDAHDITrunk(CfgOptSingle):
+ 
+-	shortName = _(&quot;Zaptel Trunk Options&quot;)
+-	newObjectTitle = _(&quot;Zaptel Trunk Options&quot;)
++	shortName = _(&quot;DAHDItel Trunk Options&quot;)
++	newObjectTitle = _(&quot;DAHDItel Trunk Options&quot;)
+ 	
+ 	def createVariables(self):
+ 		self.variables = [
+@@ -42,14 +42,14 @@
+ 		# despite the &quot;from configlets import *&quot; above
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__.startswith('CfgTrunkZap'):
++			if obj.__class__.__name__.startswith('CfgTrunkDAHDI'):
+ 				return CfgOptSingle.isAddable(self)
+ 		return False
+ 	isAddable = classmethod(isAddable)
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		c = AstConf(&quot;zapata.conf&quot;)
++		c = AstConf(&quot;chan_dahdi.conf&quot;)
+ 		c.setSection(&quot;channels&quot;)
+ 
+ 		c.append(&quot;&quot;)
+
+Modified: trunk/cfg_opt_zappri.py
+===================================================================
+--- trunk/cfg_opt_zappri.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_opt_zappri.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -23,15 +23,15 @@
+ import panelutils
+ 
+ 
+-class CfgOptZapPRI(CfgOpt):
++class CfgOptDAHDIPRI(CfgOpt):
+ 
+-	shortName = _(&quot;Zaptel configuration for PRI&quot;)
+-	newObjectTitle = _(&quot;Zaptel configuration for PRI&quot;)
++	shortName = _(&quot;DAHDItel configuration for PRI&quot;)
++	newObjectTitle = _(&quot;DAHDItel configuration for PRI&quot;)
+ 	def createVariables(self):
+ 		self.variables = [
+ 			VarType(&quot;name&quot;,       title=_(&quot;Name&quot;), len=35),
+-			VarType(&quot;span&quot;,    title=_(&quot;Zaptel span&quot;), hint=_(&quot;i.e. 1 if 1st card&quot;), type=&quot;string&quot;, len=5),
+-			VarType(&quot;timing&quot;,    title=_(&quot;Zaptel timing parameter&quot;), hint=_(&quot;Read zaptel documentation&quot;), type=&quot;string&quot;, len=5),
++			VarType(&quot;span&quot;,    title=_(&quot;DAHDItel span&quot;), hint=_(&quot;i.e. 1 if 1st card&quot;), type=&quot;string&quot;, len=5),
++			VarType(&quot;timing&quot;,    title=_(&quot;DAHDItel timing parameter&quot;), hint=_(&quot;Read dahditel documentation&quot;), type=&quot;string&quot;, len=5),
+ 			VarType(&quot;distance&quot;,    title=_(&quot;Line Build Out (dB)&quot;), hint=_(&quot;Power level based on distance from the card to the service provider's gateway.&quot;), type=&quot;choice&quot;, 
+ 					options=[
+ 						('0',_(&quot;0: 0 db (CSU) / 0-133 feet (DSX-1)&quot;)),
+@@ -58,9 +58,9 @@
+ 		return (self.shortName, self.name)
+ 
+ 	def createAsteriskConfig(self):
+-		needModule(&quot;chan_zap&quot;)
++		needModule(&quot;chan_dahdi&quot;)
+ 
+-		c = AstConf(&quot;zaptel.conf&quot;)
++		c = AstConf(&quot;system.conf&quot;)
+ 		c.setSection(&quot;&quot;)
+ 		c.destar_comment = False
+ 		c.append(&quot;# %s&quot; % self.name)
+
+Modified: trunk/cfg_phone_zap.py
+===================================================================
+--- trunk/cfg_phone_zap.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_phone_zap.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -22,7 +22,7 @@
+ import panelutils
+ 
+ 
+-class CfgPhoneZap(CfgPhone):
++class CfgPhoneDAHDI(CfgPhone):
+ 
+ 	shortName = _(&quot;Normal ZAP phone&quot;)
+ 	newObjectTitle = _(&quot;New ZAP phone&quot;)
+@@ -40,7 +40,7 @@
+ 				len=35),
+ 
+ 			VarType(&quot;channels&quot;,
+-				title=_(&quot;Zaptel channel number&quot;),
++				title=_(&quot;DAHDItel channel number&quot;),
+ 				type=&quot;string&quot;,
+ 				len=5),
+ 
+@@ -244,10 +244,10 @@
+ 	isAddable = classmethod(isAddable)
+ 
+ 	def createAsteriskConfig(self):
+-		needModule(&quot;chan_zap&quot;)
++		needModule(&quot;chan_dahdi&quot;)
+ 
+-		# Create config for chan_zap:
+-		c = AstConf(&quot;zapata.conf&quot;)
++		# Create config for chan_dahdi:
++		c = AstConf(&quot;chan_dahdi.conf&quot;)
+ 		c.append(&quot;signalling=fxo_%s&quot; % self.sigtype)
+ 
+ 		if self.calleridname and self.calleridnum:
+@@ -272,7 +272,7 @@
+ 		c.append(&quot;channel=%s&quot; % self.channels)
+ 		c.append(&quot;&quot;)
+ 
+-		c = AstConf(&quot;zaptel.conf&quot;)
++		c = AstConf(&quot;system.conf&quot;)
+ 		c.setSection(&quot;&quot;)
+ 		c.destar_comment = False
+ 		c.append(&quot;fxo%s=%s&quot; % (self.sigtype, self.channels))
+
+Modified: trunk/cfg_trunk_zap.py
+===================================================================
+--- trunk/cfg_trunk_zap.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_trunk_zap.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -22,7 +22,7 @@
+ import panelutils
+ 
+ 
+-class CfgTrunkZap(CfgTrunk):
++class CfgTrunkDAHDI(CfgTrunk):
+ 
+ 	shortName = _(&quot;Standard ZAP trunk&quot;)
+ 	newObjectTitle = _(&quot;New standard ZAP trunk&quot;)
+@@ -34,14 +34,15 @@
+ 				len=35),
+ 
+ 			VarType(&quot;channels&quot;,
+-				title=_(&quot;Zaptel channel number&quot;),
++				title=_(&quot;DAHDItel channel number&quot;),
+ 				type=&quot;string&quot;,
+ 				len=5),
+ 
+ 			VarType(&quot;signalling&quot;,
+ 				title=_(&quot;Signalling type&quot;),
+ 				type=&quot;choice&quot;,
+-				options=[('fxs_ls','loopstart'),('fxs_ks', 'kewlstart')]),
++				options=[('fxs_ls',_('loopstart')),
++					('fxs_ks',_('kewlstart'))]),
+ 
+ 			VarType(&quot;group&quot;,
+ 				title=_(&quot;Callout group&quot;),
+@@ -148,18 +149,18 @@
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		needModule(&quot;chan_zap&quot;)
++		needModule(&quot;chan_dahdi&quot;)
+ 
+-		c = AstConf(&quot;zaptel.conf&quot;)
++		c = AstConf(&quot;system.conf&quot;)
+ 		c.setSection(&quot;&quot;)
+ 		c.destar_comment = False
+ 		c.append(&quot;fxs%s=%s&quot; % (self.signalling[4:], self.channels))
+ 		c.append(&quot;&quot;)
+ 
+-		# Create config for chan_zap:
+-		c = AstConf(&quot;zapata.conf&quot;)
++		# Create config for chan_dahdi:
++		c = AstConf(&quot;chan_dahdi.conf&quot;)
+ 		c.append(&quot;&quot;)
+-		c.append(&quot;; Zaptel Trunk %s&quot; % self.name)
++		c.append(&quot;; DAHDItel Trunk %s&quot; % self.name)
+ 		c.append(&quot;context=in-%s&quot; % self.name)
+ 		c.append(&quot;callerid=asreceived&quot;)
+                 c.append(&quot;busydetect=yes&quot;)
+@@ -174,9 +175,9 @@
+ 
+ 		#Dial part to use on dialout macro
+ 		if self.group:
+-			self.dial = &quot;Zap/g%d/${ARG1}&quot; % (self.group)
++			self.dial = &quot;DAHDI/g%d/${ARG1}&quot; % (self.group)
+ 		else:
+-			self.dial = &quot;Zap/%s/${ARG1}&quot; % (self.channels)
++			self.dial = &quot;DAHDI/%s/${ARG1}&quot; % (self.channels)
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+Modified: trunk/cfg_trunk_zapbri.py
+===================================================================
+--- trunk/cfg_trunk_zapbri.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_trunk_zapbri.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -22,7 +22,7 @@
+ import panelutils
+ 
+ 
+-class CfgTrunkZapBRI(CfgTrunk):
++class CfgTrunkDAHDIBRI(CfgTrunk):
+ 
+ 	shortName = _(&quot;Standard ZAP BRI trunk&quot;)
+ 	newObjectTitle = _(&quot;New standard ZAP BRI trunk&quot;)
+@@ -35,7 +35,7 @@
+ 				len=35),
+ 
+ 			VarType(&quot;channels&quot;,
+-				title=_(&quot;Zaptel channel number&quot;),
++				title=_(&quot;DAHDItel channel number&quot;),
+ 				type=&quot;int&quot;,
+ 				len=2,
+ 				default = 1),
+@@ -139,9 +139,9 @@
+                         return res
+ 
+ 	def createAsteriskConfig(self):
+-		needModule(&quot;chan_zap&quot;)
++		needModule(&quot;chan_dahdi&quot;)
+ 
+-		c = AstConf(&quot;zaptel.conf&quot;)
++		c = AstConf(&quot;system.conf&quot;)
+ 		c.setSection(&quot;&quot;)
+ 		c.destar_comment = False
+ 		for n in range(self.cards):
+@@ -152,8 +152,8 @@
+ 		c.append(&quot;alaw=%d-%d&quot; % (self.channels + n * 3, self.channels + n * 3 + 2))
+ 		c.append(&quot;&quot;)
+ 
+-		# Create config for chan_zap:
+-		c = AstConf(&quot;zapata.conf&quot;)
++		# Create config for chan_dahdi:
++		c = AstConf(&quot;chan_dahdi.conf&quot;)
+ 		c.append(&quot;&quot;)
+ 		c.append(&quot;nationalprefix = 0&quot;)
+ 		c.append(&quot;internationalprefix = 00&quot;)
+@@ -181,7 +181,7 @@
+ 
+ 		#Dial part to use on dialout macro
+ 		if self.group:
+-			self.dial = &quot;Zap/g%d/${ARG1}&quot; % (self.group)
++			self.dial = &quot;DAHDI/g%d/${ARG1}&quot; % (self.group)
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+Modified: trunk/cfg_trunk_zapdynamic.py
+===================================================================
+--- trunk/cfg_trunk_zapdynamic.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_trunk_zapdynamic.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -23,10 +23,10 @@
+ import panelutils
+ 
+ 
+-class CfgTrunkZapDynamic(CfgTrunk):
++class CfgTrunkDAHDIDynamic(CfgTrunk):
+ 
+-	shortName = _(&quot;Zaptel dynamic span configuration&quot;)
+-	newObjectTitle = _(&quot;Zaptel dynamic span configuration&quot;)
++	shortName = _(&quot;DAHDItel dynamic span configuration&quot;)
++	newObjectTitle = _(&quot;DAHDItel dynamic span configuration&quot;)
+ 	technology = &quot;ZAP&quot;
+ 
+ 	def createVariables(self):
+@@ -174,8 +174,8 @@
+ 				default=31),
+ 
+ 			VarType(&quot;timing&quot;,    
+-				title=_(&quot;Zaptel timing parameter&quot;), 
+-				hint=_(&quot;Read zaptel documentation&quot;), 
++				title=_(&quot;DAHDItel timing parameter&quot;), 
++				hint=_(&quot;Read system documentation&quot;), 
+ 				type=&quot;int&quot;, 
+ 				len=2),
+ 
+@@ -201,9 +201,9 @@
+                         return res
+ 
+ 	def createAsteriskConfig(self):
+-		needModule(&quot;chan_zap&quot;)
++		needModule(&quot;chan_dahdi&quot;)
+ 
+-		c = AstConf(&quot;zaptel.conf&quot;)
++		c = AstConf(&quot;system.conf&quot;)
+ 		c.setSection(&quot;&quot;)
+ 		c.destar_comment = False
+ 		c.append(&quot;# %s&quot; % self.name)
+@@ -214,10 +214,10 @@
+ 		c.append(&quot;dchan=%s&quot; % self.dchannel)
+ 		c.append(&quot;&quot;)
+ 
+-		# Create config for chan_zap:
+-		c = AstConf(&quot;zapata.conf&quot;)
++		# Create config for chan_dahdi:
++		c = AstConf(&quot;chan_dahdi.conf&quot;)
+ 		c.append(&quot;&quot;)
+-		c.append(&quot;; Zaptel Trunk %s&quot; % self.name)
++		c.append(&quot;; DAHDItel Trunk %s&quot; % self.name)
+ 		c.appendValue(self, &quot;signalling&quot;)
+ 		c.append(&quot;context=in-%s&quot; % self.name)
+ 		c.append(&quot;usecallerid=yes&quot;)
+@@ -250,9 +250,9 @@
+ 		#Dial part to use on dialout macro
+ 		self.dial = &quot;&quot;
+ 		if self.group:
+-			self.dial = &quot;Zap/g%d/${ARG1}&quot; % (self.group)
++			self.dial = &quot;DAHDI/g%d/${ARG1}&quot; % (self.group)
+ 		else:
+-			self.dial = &quot;Zap/%s/${ARG1}&quot; % (self.channels)
++			self.dial = &quot;DAHDI/%s/${ARG1}&quot; % (self.channels)
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+Modified: trunk/cfg_trunk_zappbx.py
+===================================================================
+--- trunk/cfg_trunk_zappbx.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_trunk_zappbx.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -22,7 +22,7 @@
+ import panelutils
+ 
+ 
+-class CfgTrunkZapPBX(CfgTrunk):
++class CfgTrunkDAHDIPBX(CfgTrunk):
+ 
+ 	shortName = _(&quot;PBX ZAP trunk&quot;)
+ 	newObjectTitle = _(&quot;New PBX ZAP trunk&quot;)
+@@ -35,7 +35,7 @@
+ 				len=35),
+ 
+ 			VarType(&quot;channels&quot;,
+-				title=_(&quot;Zaptel channel number&quot;),
++				title=_(&quot;DAHDItel channel number&quot;),
+ 				type=&quot;string&quot;,
+ 				len=5),
+ 
+@@ -161,18 +161,18 @@
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		needModule(&quot;chan_zap&quot;)
++		needModule(&quot;chan_dahdi&quot;)
+ 
+-		c = AstConf(&quot;zaptel.conf&quot;)
++		c = AstConf(&quot;system.conf&quot;)
+ 		c.setSection(&quot;&quot;)
+ 		c.destar_comment = False
+ 		c.append(&quot;fxs%s=%s&quot; % (self.signalling[4:], self.channels))
+ 		c.append(&quot;&quot;)
+ 
+-		# Create config for chan_zap:
+-		c = AstConf(&quot;zapata.conf&quot;)
++		# Create config for chan_dahdi:
++		c = AstConf(&quot;chan_dahdi.conf&quot;)
+ 		c.append(&quot;&quot;)
+-		c.append(&quot;; Zaptel Trunk %s&quot; % self.name)
++		c.append(&quot;; DAHDItel Trunk %s&quot; % self.name)
+ 		c.append(&quot;context=in-%s&quot; % self.name)
+ 		c.append(&quot;callerid=asreceived&quot;)
+ 		c.appendValue(self, &quot;signalling&quot;)
+@@ -185,9 +185,9 @@
+ 
+ 		#Dial part to use on dialout macro
+ 		if self.group:
+-			self.dial = &quot;Zap/g%d/%sww${ARG1}&quot; % (self.group, self.prefix)
++			self.dial = &quot;DAHDI/g%d/%sww${ARG1}&quot; % (self.group, self.prefix)
+ 		else:
+-			self.dial = &quot;Zap/%s/%sww${ARG1}&quot; % (self.channels, self.prefix)
++			self.dial = &quot;DAHDI/%s/%sww${ARG1}&quot; % (self.channels, self.prefix)
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+Modified: trunk/cfg_trunk_zappri.py
+===================================================================
+--- trunk/cfg_trunk_zappri.py	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/cfg_trunk_zappri.py	2009-04-16 21:54:03 UTC (rev 834)
+@@ -23,7 +23,7 @@
+ import panelutils
+ 
+ 
+-class CfgTrunkZapPRI(CfgTrunk):
++class CfgTrunkDAHDIPRI(CfgTrunk):
+ 
+ 	shortName = _(&quot;Standard ZAP PRI trunk&quot;)
+ 	newObjectTitle = _(&quot;New standard ZAP PRI trunk&quot;)
+@@ -167,13 +167,13 @@
+ 
+ 	def isAddable(self):
+ 		&quot;&quot;&quot;We can only add this configlet if we have at least one
+-		ZapPRI option defined.&quot;&quot;&quot;
++		DAHDIPRI option defined.&quot;&quot;&quot;
+ 
+ 		# BUG: it does somehow not work to simply write for obj in config_entries,
+ 		# despite the &quot;from configlets import *&quot; above
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__ == 'CfgOptZapPRI':
++			if obj.__class__.__name__ == 'CfgOptDAHDIPRI':
+ 				return True
+ 		return False 
+ 	isAddable = classmethod(isAddable)
+@@ -184,7 +184,7 @@
+                         return res
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__ == 'CfgTrunkZapPRI':
++			if obj.__class__.__name__ == 'CfgTrunkDAHDIPRI':
+ 				if obj==self: continue
+ 				try:
+ 					if obj.group == self.group and obj.group:
+@@ -202,12 +202,12 @@
+ 
+ 
+ 	def createAsteriskConfig(self):
+-		needModule(&quot;chan_zap&quot;)
++		needModule(&quot;chan_dahdi&quot;)
+ 
+-		# Create config for chan_zap:
+-		c = AstConf(&quot;zapata.conf&quot;)
++		# Create config for chan_dahdi:
++		c = AstConf(&quot;chan_dahdi.conf&quot;)
+ 		c.append(&quot;&quot;)
+-		c.append(&quot;; Zaptel Trunk %s&quot; % self.name)
++		c.append(&quot;; DAHDItel Trunk %s&quot; % self.name)
+ 		if self.group:
+ 			c.appendValue(self, &quot;group&quot;)
+ 		c.appendValue(self, &quot;signalling&quot;)
+@@ -238,9 +238,9 @@
+ 
+ 		#Dial part to use on dialout macro
+ 		if self.group:
+-			self.dial = &quot;Zap/g%s/${ARG1}&quot; % (self.group)
++			self.dial = &quot;DAHDI/g%s/${ARG1}&quot; % (self.group)
+ 		else:
+-			self.dial = &quot;Zap/%s/${ARG1}&quot; % (self.channels)
++			self.dial = &quot;DAHDI/%s/${ARG1}&quot; % (self.channels)
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+Modified: trunk/page_config.ptl
+===================================================================
+--- trunk/page_config.ptl	2009-04-16 21:20:29 UTC (rev 833)
++++ trunk/page_config.ptl	2009-04-16 21:54:03 UTC (rev 834)
+@@ -106,9 +106,9 @@
+ 				&quot;trunks/&quot;,
+ 				[_(&quot;Configuration&quot;), _(&quot;Trunks&quot;)] )
+ 
+-		if not os.access(&quot;/etc/zaptel.conf&quot;, os.O_RDWR):
++		if not os.access(&quot;/etc/dahdi/system.conf&quot;, os.O_RDWR):
+ 			self.configurationTip(
+-				_(&quot;You should enable write access to /etc/zaptel.conf. Without write access to this file you cannot configure Zaptel devices, e.g. FXO/FXS cards, T1/E1 cards, ZapHFC ISDN cards, etc. You should 'chmod g+rw' this file and set it's group to one of '%s'.&quot;) % groups,
++				_(&quot;You should enable write access to /etc/dahdi/system.conf. Without write access to this file you cannot configure Zaptel devices, e.g. FXO/FXS cards, T1/E1 cards, ZapHFC ISDN cards, etc. You should 'chmod g+rw' this file and set it's group to one of '%s'.&quot;) % groups,
+ 				&quot;&quot;,
+ 				[])
+ 		if not os.access(panelutils.PANEL_CONF_DIR, os.O_RDWR):
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000386.html">[Destar-dev] r833 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000388.html">[Destar-dev] r835 - branches/icom-avatar
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#387">[ date ]</a>
+              <a href="thread.html#387">[ thread ]</a>
+              <a href="subject.html#387">[ subject ]</a>
+              <a href="author.html#387">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

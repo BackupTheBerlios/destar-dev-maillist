@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r802 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r802%20-%20trunk&In-Reply-To=%3C200708312013.l7VKDElR019265%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000338.html">
+   <LINK REL="Next"  HREF="000340.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r802 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r802%20-%20trunk&In-Reply-To=%3C200708312013.l7VKDElR019265%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r802 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Aug 31 22:13:14 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000338.html">[Destar-dev] r801 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000340.html">[Destar-dev] r803 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#339">[ date ]</a>
+              <a href="thread.html#339">[ thread ]</a>
+              <a href="subject.html#339">[ subject ]</a>
+              <a href="author.html#339">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-31 22:13:14 +0200 (Fri, 31 Aug 2007)
+New Revision: 802
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/panelutils.py
+Log:
+panelutils: use CallerID as label if it exists
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-26 05:25:15 UTC (rev 801)
++++ trunk/CHANGELOG.txt	2007-08-31 20:13:14 UTC (rev 802)
+@@ -1,3 +1,6 @@
++2007-08-31:
++* panelutils: use CallerID as label if it exists
++
+ 2007-08-26:
+ * cfg_phone_queue: Don't answer and set MoH if Ring is usedi. Thanks to
+   Joan-Carles Samaranch 
+
+Modified: trunk/panelutils.py
+===================================================================
+--- trunk/panelutils.py	2007-08-26 05:25:15 UTC (rev 801)
++++ trunk/panelutils.py	2007-08-31 20:13:14 UTC (rev 802)
+@@ -119,7 +119,11 @@
+ 	p.append(&quot;Position=n&quot;)
+ 	p.append(&quot;Icon=1&quot;)
+ 	p.append(&quot;Extension=%s&quot; % obj.ext)
+-	p.append('Label=&quot;%s&quot;' % obj.name)
++	if obj.calleridname:
++		label = &quot;%s %s&quot; % (obj.ext, obj.calleridname)
++	else:
++		label = &quot;%s %s&quot; % (obj.ext, obj.name)
++	p.append('Label=&quot;%s&quot;' % label)
+ 	p.append(&quot;Astdbkey=%s/%s&quot; % (obj.pbx, obj.ext))
+ 	p.append(&quot;Panel_context=%s&quot; % obj.pbx)
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000338.html">[Destar-dev] r801 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000340.html">[Destar-dev] r803 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#339">[ date ]</a>
+              <a href="thread.html#339">[ thread ]</a>
+              <a href="subject.html#339">[ subject ]</a>
+              <a href="author.html#339">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

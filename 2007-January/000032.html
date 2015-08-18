@@ -1,0 +1,840 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r564 - branches/quixote2
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r564%20-%20branches/quixote2&In-Reply-To=%3C200701162236.l0GMaUJr032611%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000031.html">
+   <LINK REL="Next"  HREF="000033.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r564 - branches/quixote2</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r564%20-%20branches/quixote2&In-Reply-To=%3C200701162236.l0GMaUJr032611%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r564 - branches/quixote2">santiago at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 16 23:36:30 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000031.html">[Destar-dev] r563 - branches/quixote2
+</A></li>
+        <LI>Next message: <A HREF="000033.html">[Destar-dev] r565 - branches/quixote2
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#32">[ date ]</a>
+              <a href="thread.html#32">[ thread ]</a>
+              <a href="subject.html#32">[ subject ]</a>
+              <a href="author.html#32">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-01-16 23:36:27 +0100 (Tue, 16 Jan 2007)
+New Revision: 564
+
+Added:
+   branches/quixote2/cfg_app_chanspy.py
+   branches/quixote2/cfg_app_voicemailsettings.py
+Modified:
+   branches/quixote2/cfg_app_callfw.py
+   branches/quixote2/cfg_dialout_normal.py
+   branches/quixote2/cfg_opt_did.py
+   branches/quixote2/cfg_opt_monitor.py
+   branches/quixote2/cfg_opt_sip_network.py
+   branches/quixote2/cfg_opt_voicemail.py
+   branches/quixote2/cfg_phone_epygi.py
+   branches/quixote2/cfg_phone_iax.py
+   branches/quixote2/cfg_phone_mgcp.py
+   branches/quixote2/cfg_phone_queue.py
+   branches/quixote2/cfg_phone_sip.py
+   branches/quixote2/cfg_phone_zap.py
+   branches/quixote2/cfg_trunk_iax.py
+   branches/quixote2/cfg_trunk_sip.py
+Log:
+merging configlets
+
+
+
+Modified: branches/quixote2/cfg_app_callfw.py
+===================================================================
+--- branches/quixote2/cfg_app_callfw.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_app_callfw.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -33,7 +33,9 @@
+ 			VarType(&quot;type&quot;, title=_(&quot;Type&quot;), type=&quot;choice&quot;, options=( (&quot;CFIM&quot;, _(&quot;Call Forwarding Unconditional&quot;)), \
+ 			(&quot;CFBS&quot;, _(&quot;Call Forwarding if Busy&quot;)), (&quot;CFTO&quot;, _(&quot;Call Forwarding if Timeout/Unavailable&quot;)) )),
+ 			VarType(&quot;set&quot;,      title=_(&quot;Setting preffix&quot;), len=6, default=&quot;*21&quot;),
+-			VarType(&quot;ext&quot;,   title=_(&quot;Unsetting extension&quot;), len=6, default=&quot;*22&quot;)
++			VarType(&quot;ext&quot;,   title=_(&quot;Unsetting extension&quot;), len=6, default=&quot;*22&quot;),
++			VarType(&quot;toggle&quot;,   title=_(&quot;Set function toggleable&quot;), type=&quot;bool&quot;),
++			VarType(&quot;devstateprefix&quot;,   title=_(&quot;Create Devstate extension. Devstate Prefix:&quot;), len=8, default=&quot;&quot;)
+ 		       	]
+ 
+ 		self.dependencies = [ DepType(&quot;pbx&quot;, 
+@@ -45,16 +47,30 @@
+ 		return (&quot;%s / %s&quot; % (self.set,self.ext),&quot;%s %s&quot; % (self.shortName, self.type), self.pbx)
+ 
+ 	def createAsteriskConfig(self):
++		if self.devstateprefix:
++		    needModule(&quot;app_devstate&quot;)
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
++		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Answer()&quot;)
++		if self.toggle:
++			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Set(testcf=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
++			c.appendExten(&quot;_%sX.&quot; % self.set, 'GotoIf($[&quot;${testcf}&quot; = &quot;&quot;]?:switchoff)')
+ 		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Set(DB(%s/%s/${CALLERIDNUM})=${EXTEN:%d})&quot; % (self.type, self.pbx,len(self.set)))
++		if self.devstateprefix:
++			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx))
+ 		if self.type == &quot;CFIM&quot;:
+ 			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-unconditional)&quot;)
+ 		elif self.type == &quot;CFTO&quot;:
+ 			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-no-ans)&quot;)
+ 		else:
+ 			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-on-busy)&quot;)
++		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Wait(1)&quot;)
+ 		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type,self.pbx))
++		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;switchoff&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Answer()&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx))
++		if self.devstateprefix:
++			c.appendExten(&quot;%s&quot; % self.ext, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type.lower(), self.pbx))
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(call-fwd-cancelled)&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Wait(1)&quot;)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Hangup&quot;)
+
+Added: branches/quixote2/cfg_app_chanspy.py
+===================================================================
+--- branches/quixote2/cfg_app_chanspy.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_app_chanspy.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -0,0 +1,65 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Copyright (C) 2006 by Diego Andr&#233;s Asenjo G.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++
++
++class CfgAppChanspy(CfgApp):
++
++	shortName   = _(&quot;Listen calls&quot;)
++	newObjectTitle  = _(&quot;New spy extension&quot;)
++	description = _(&quot;Listen all calls on the Asterisk server. Jump through calls pressing *.&quot;)
++	
++	def createVariables(self):
++		self.variables   = [ 
++			VarType(&quot;pbx&quot;,
++				title=_(&quot;Virtual PBX&quot;),
++				type=&quot;choice&quot;,
++				options=getChoice(&quot;CfgOptPBX&quot;)),
++			
++			VarType(&quot;ext&quot;,
++				title=_(&quot;Extension&quot;),
++				len=6),
++
++			VarType(&quot;password&quot;,
++				type=&quot;int&quot;,
++				title=_(&quot;Password&quot;),
++				len=6),
++
++			VarType(&quot;quiet&quot;,
++				title=_(&quot;Be quiet?&quot;),
++				type=&quot;bool&quot;,
++				default=True)]
++
++		self.dependencies = [ 
++			DepType(&quot;pbx&quot;,
++			type=&quot;hard&quot;,
++			message = _(&quot;This is a Dependency&quot;)),]
++
++	def createAsteriskConfig(self):
++		needModule(&quot;app_chanspy&quot;)
++		c = AstConf(&quot;extensions.conf&quot;)
++		c.setSection(self.pbx)
++		if self.password:
++			c.appendExten(self.ext, &quot;Authenticate(%s)&quot; % self.password)
++		if self.quiet:
++			c.appendExten(self.ext, &quot;Chanspy(|q)&quot;)
++		else: 
++			c.appendExten(self.ext, &quot;Chanspy()&quot;)
+
+Copied: branches/quixote2/cfg_app_voicemailsettings.py (from rev 559, trunk/cfg_app_voicemailsettings.py)
+
+Modified: branches/quixote2/cfg_dialout_normal.py
+===================================================================
+--- branches/quixote2/cfg_dialout_normal.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_dialout_normal.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -35,8 +35,8 @@
+ 		VarType(&quot;pattern&quot;, title=_(&quot;Pattern&quot;), len=55),
+ 		VarType(&quot;rmprefix&quot;, title=_(&quot;Remove Prefix of length&quot;), len=10, default=&quot;0&quot;),
+ 		VarType(&quot;addprefix&quot;, title=_(&quot;Add Prefix&quot;), len=10, optional=True, default=&quot;&quot;),
+-		VarType(&quot;maxtime&quot;, title=_(&quot;Maximum call time in seconds&quot;), type=&quot;int&quot;, len=15, default=300),
+-		VarType(&quot;ringtime&quot;, title=_(&quot;Ringing time in seconds&quot;), type=&quot;int&quot;, len=15, default=25),
++		VarType(&quot;maxtime&quot;, title=_(&quot;Maximum call time in seconds&quot;), type=&quot;int&quot;, len=15, default=6000),
++		VarType(&quot;ringtime&quot;, title=_(&quot;Ringing time in seconds&quot;), type=&quot;int&quot;, len=15, default=300),
+ 		VarType(&quot;qlookup&quot;, title=_(&quot;Search on quick dial list?&quot;), type=&quot;bool&quot;),
+ 
+ 		VarType(&quot;dis_transfer&quot;, title=_(&quot;Disallow calling user transfer?&quot;), type=&quot;bool&quot;),
+@@ -84,9 +84,9 @@
+ 		c.append(&quot;; params: exten,secret,timeout&quot;)
+ 		needModule(&quot;app_authenticate&quot;)
+ 		if self.dis_transfer:
+-		       opts=&quot;t&quot;
++		       opts=&quot;tW&quot;
+ 		else:
+-		       opts=&quot;Tt&quot;
++		       opts=&quot;TtW&quot;
+ 		if self.qlookup:
+ 			c.appendExten(&quot;s&quot;,&quot;Set(dest=${DB(QUICKDIALLIST/GLOBAL/${ARG1})})&quot;,e=&quot;Goto(3)&quot;)
+ 			c.appendExten(&quot;s&quot;,'Set(ARG1=${dest})')
+@@ -113,9 +113,13 @@
+ 					c.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(absolute)=${timeout})&quot;)
+ 					c.appendExten(&quot;s&quot;,&quot;Set(CDR(outtrunk)=%s)&quot; % obj.name)
+ 					if self.__getitem__(&quot;trunk_%s_price&quot; % obj.name):
+-						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=%s)&quot; % self.__getitem__(&quot;trunk_%s_price&quot; % obj.name))	
++						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=%s)&quot; % self.__getitem__(&quot;trunk_%s_price&quot; % obj.name))
+ 					else:
+-						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=0)&quot;)	
++						c.appendExten(&quot;s&quot;,&quot;Set(CDR(accountcode)=0)&quot;)
++					if obj.clidnameout:
++						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; % obj.clidnameout)
++					if obj.clidnumout:
++						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; % obj.clidnumout)
+ 					c.appendExten(&quot;s&quot;,&quot;Dial(%s,%d|${options})&quot; % (obj.dial,self.ringtime))
+ 			except KeyError:
+ 				pass
+
+Modified: branches/quixote2/cfg_opt_did.py
+===================================================================
+--- branches/quixote2/cfg_opt_did.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_opt_did.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -45,7 +45,7 @@
+ 					title = _(&quot;Go to&quot;),
+ 					type = &quot;radio&quot;,
+ 					default = 'phone',
+-					options = [('phone', _(&quot;Phone&quot;)), ('ivr', _(&quot;IVR&quot;))]),
++					options = [('phone', _(&quot;Phone&quot;)), ('ivr', _(&quot;IVR&quot;)), (&quot;custommap&quot;, _(&quot;Custom map&quot;))]),
+ 
+ 			VarType(&quot;phone&quot;,
+ 					title = _(&quot;Phone to ring&quot;),
+@@ -59,10 +59,31 @@
+ 					type = &quot;choice&quot;, 
+ 					options = getChoice(&quot;CfgIVR&quot;)),
+ 
++			VarType(&quot;custommappbx&quot;,
++                                        title=_(&quot;Custom map, PBX&quot;),
++                                        type=&quot;choice&quot;,
++                                        optional = True,
++                                        options=getChoice(&quot;CfgOptPBX&quot;)),
++
++    			VarType(&quot;custommapdest&quot;,
++                                        title = _(&quot;Custom map, destination&quot;),
++                                        len = 30,
++                                        optional = True),
++
++			VarType(&quot;callerid&quot;,
++					title=_(&quot;CallerID:&quot;),
++					type=&quot;label&quot;),
++
+ 			VarType(&quot;clid&quot;,
+-					title = _(&quot;Change Caller*Id to:&quot;), 
++					title = _(&quot;Change Caller*Id Name to:&quot;),
+ 					len = 25,
+-					optional = True)]
++					optional = True),
++
++			VarType(&quot;clidnum&quot;,
++					title = _(&quot;Change Caller*Id Number to:&quot;),
++					len = 25,
++					optional = True),
++					]
+ 					
+ 		self.dependencies = [
+ 			DepType(&quot;trunk&quot;, 
+@@ -104,6 +125,9 @@
+ 		if self.clid:
+ 			needModule(&quot;func_callerid&quot;)
+ 			c.appendExten(self.did,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid)
++		if self.clidnum:
++			needModule(&quot;func_callerid&quot;)
++			c.appendExten(self.did,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnum)
+ 		if self.contextin == 'phone' and self.phone:
+ 			import configlets
+ 			obj = configlets.configlet_tree.getConfigletByName(self.phone)
+@@ -113,5 +137,5 @@
+ 				pass
+ 		elif self.contextin == 'ivr' and self.ivr:
+ 			c.appendExten(self.did,&quot;Goto(%s,s,1)&quot; % self.ivr)
+-
+-
++        	elif self.contextin == 'custommap' and self.custommapdest:
++        		c.appendExten(self.did,&quot;Goto(%s,%s,1)&quot; % (self.custommappbx, self.custommapdest))
+
+Modified: branches/quixote2/cfg_opt_monitor.py
+===================================================================
+--- branches/quixote2/cfg_opt_monitor.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_opt_monitor.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -36,6 +36,11 @@
+ 		return (self.shortName, self.ext)
+ 		
+ 	def createAsteriskConfig(self):
++		needModule(&quot;res_monitor&quot;)
++		needModule(&quot;app_record&quot;)
++		c = AstConf(&quot;extensions.conf&quot;)
++        	c.setSection(&quot;globals&quot;)
++		c.append(&quot;DYNAMIC_FEATURES=&gt;automon&quot;)
+ 		c = AstConf(&quot;features.conf&quot;)
+         	c.setSection(&quot;featuremap&quot;)
+ 		c.append(&quot;automon=&gt;%s&quot; % self.ext)
+
+Modified: branches/quixote2/cfg_opt_sip_network.py
+===================================================================
+--- branches/quixote2/cfg_opt_sip_network.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_opt_sip_network.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -25,18 +25,73 @@
+ 
+ class CfgOptSipNetwork(CfgOptSingle):
+ 
+-	shortName = _(&quot;SIP Network Options&quot;)
+-	newObjectTitle = _(&quot;SIP Network Options&quot;)
++	shortName = _(&quot;SIP Options&quot;)
++	newObjectTitle = _(&quot;SIP Options&quot;)
+ 	
+ 	def createVariables(self):
+ 		self.variables = [
+-			VarType(&quot;doBind&quot;,	title=_(&quot;Bind specific address?&quot;), type=&quot;bool&quot;),
+-			VarType(&quot;bindaddr&quot;,	title=_(&quot;Bind address&quot;), len=25),
+-			VarType(&quot;extintnet&quot;,	title=_(&quot;External/Internal IP&quot;), type=&quot;label&quot;),
+-			VarType(&quot;setExt&quot;,	title=_(&quot;Force external ip/internel network?&quot;),	type=&quot;bool&quot;),
+-			VarType(&quot;extip&quot;,	title=_(&quot;External ip&quot;), len=25),
+-			VarType(&quot;intnet&quot;,	title=_(&quot;Internal network&quot;), len=25),
+-			VarType(&quot;intnetmask&quot;,	title=_(&quot;Netmask&quot;), len=25),
++			VarType(&quot;doBind&quot;,	
++					title=_(&quot;Bind specific address?&quot;), 
++					type=&quot;bool&quot;),
++
++			VarType(&quot;bindaddr&quot;,	
++					title=_(&quot;Bind address&quot;), 
++					len=25,
++					optional=True),
++
++			VarType(&quot;globalnat&quot;,
++					title=_(&quot;Global NAT&quot;),
++					type=&quot;choice&quot;,
++					options=( (&quot;no&quot;,_(&quot;No&quot;)),
++						  (&quot;yes&quot;,_(&quot;Yes&quot;)),
++						  (&quot;always&quot;,_(&quot;Always&quot;)), 
++						  (&quot;route&quot;,_(&quot;Route&quot;)) ), 
++					default=&quot;no&quot;),
++
++			# Hell, what a mess in Asterisk and Snom FW &gt;6.2.2, pedantic is needed to get &quot;#&quot; working
++			VarType(&quot;pedantic&quot;,	
++					title=_(&quot;SIP Pedantic checking of Call-ID&quot;),	
++					type=&quot;bool&quot;,
++					optional=True),
++
++			VarType(&quot;extintnet&quot;,	
++					title=_(&quot;External/Internal IP&quot;), 
++					type=&quot;label&quot;),
++
++			VarType(&quot;setExt&quot;,	
++					title=_(&quot;Force external ip/internel network?&quot;),	
++					type=&quot;bool&quot;),
++
++			VarType(&quot;extip&quot;,	
++					title=_(&quot;External ip&quot;), 
++					len=25,
++					optional=True),
++
++			VarType(&quot;intnet&quot;,	
++					title=_(&quot;Internal network&quot;), 
++					len=25,
++					optional=True),
++
++			VarType(&quot;intnetmask&quot;,	
++					title=_(&quot;Netmask&quot;), 
++					len=25,
++					optional=True),
++
++			VarType(&quot;tos&quot;,
++					title=_(&quot;TOS Field&quot;),
++					len=10,
++					optional=True,
++					default=&quot;184&quot;),
++
++			VarType(&quot;sipdefaults&quot;,
++					title=_(&quot;Defaults&quot;), 
++					type=&quot;label&quot;),
++
++			VarType(&quot;moh&quot;,
++                                        title=_(&quot;Music on hold&quot;),
++                                        type=&quot;choice&quot;,
++                                        optional = True,
++                                        options=getChoice(&quot;CfgOptMusic&quot;)),
+ 		]
+ 
+ 	def checkConfig(self):
+@@ -60,8 +115,18 @@
+ 
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;sip.conf&quot;)
++		c.setSection(&quot;general&quot;)
+ 		if self.doBind:
+ 			c.append(&quot;bindaddr=%s&quot; % self.bindaddr)
+ 		if self.setExt:
+-			c.append(&quot;externip=%s&quot; % self.extip)
+-			c.append(&quot;localnet=%s/%s&quot; % (self.intnet,self.intnetmask))
++			if self.extip:
++				c.append(&quot;externip=%s&quot; % self.extip)
++			if self.intnet:
++				c.append(&quot;localnet=%s/%s&quot; % (self.intnet,self.intnetmask))
++		if self.tos:
++			c.append(&quot;tos=%s&quot; % self.tos)
++		if self.moh:
++			c.append(&quot;musiconhold=%s&quot; % self.moh)
++     		if self.pedantic:
++             		c.append(&quot;pedantic=yes&quot;)
++		c.append(&quot;nat=%s&quot; % self.globalnat)
+
+Modified: branches/quixote2/cfg_opt_voicemail.py
+===================================================================
+--- branches/quixote2/cfg_opt_voicemail.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_opt_voicemail.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -27,7 +27,9 @@
+ 	newObjectTitle = _(&quot;Voicemail settings&quot;)
+ 	
+ 	def createVariables(self):
+-		self.variables = [VarType(&quot;recording&quot;, title=_(&quot;Recording settings&quot;), type=&quot;label&quot;),
++		self.variables = [
++				 VarType(&quot;enable&quot;, title=_(&quot;Enable Voicemail on phones&quot;), type=&quot;bool&quot;, default=True),
++				 VarType(&quot;recording&quot;, title=_(&quot;Recording settings&quot;), type=&quot;label&quot;),
+ 				 VarType(&quot;format&quot;, title=_(&quot;File format for voicemail messages&quot;), type=&quot;choice&quot;,
+ 								   options=[('wav49','WAV (common sound format)'),('gsm','GSM (smaller)')], default=&quot;wav49&quot;),
+ 				 VarType(&quot;maxmessage&quot;, title=_(&quot;Maximal message length (in seconds)&quot;), type=&quot;int&quot;, default=180, len=3),
+@@ -64,6 +66,10 @@
+ 		c.appendValue(self, &quot;silencethreshold&quot;)
+ 		c.appendValue(self, &quot;maxlogins&quot;)
+ 		c.append(&quot;skipms=%d&quot; % (self.skipms * 1000))
++		
++		if self.enable:
++			needModule(&quot;res_adsi&quot;)
++			needModule(&quot;app_voicemail&quot;)
+ 
+ 		if self.emailintegration and self.serveremail:
+ 			c.appendValue(self,&quot;serveremail&quot;)
+
+Modified: branches/quixote2/cfg_phone_epygi.py
+===================================================================
+--- branches/quixote2/cfg_phone_epygi.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_phone_epygi.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -120,6 +120,7 @@
+ 
+ 			VarType(&quot;pin&quot;,
+ 					title=_(&quot;Voicemail PIN&quot;),
++					type=&quot;int&quot;,
+ 					optional=True,
+ 					len=6),
+ 
+
+Modified: branches/quixote2/cfg_phone_iax.py
+===================================================================
+--- branches/quixote2/cfg_phone_iax.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_phone_iax.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -71,7 +71,20 @@
+ 			VarType(&quot;callgroup&quot;,
+ 					title=_(&quot;Call group number&quot;),
+ 					optional=True),
++
++			VarType(&quot;QueueLab&quot;,
++					title=_(&quot;Call Queues&quot;),
++					type=&quot;label&quot;,
++					hide=True),
++			
++			VarType(&quot;queues&quot;,
++					title=_(&quot;Agent of queues:&quot;),
++					type=&quot;mchoice&quot;,
++					optional=True,
++					options=getChoice(&quot;CfgPhoneQueue&quot;),
++					hide=True),
+ 	
++	
+ 			VarType(&quot;panelLab&quot;,
+ 					title=_(&quot;Operator Panel&quot;),
+ 					type=&quot;label&quot;,
+@@ -99,9 +112,16 @@
+ 
+ 			VarType(&quot;pin&quot;,
+ 					title=_(&quot;Voicemail PIN&quot;),
++					type=&quot;int&quot;,
+ 					optional=True,
+ 					len=6),
+ 
++			VarType(&quot;email&quot;,
++					title=_(&quot;Voicemail email&quot;),
++					optional=True,
++					len=60),
++			
++
+ 			VarType(&quot;notransfer&quot;,
+ 					title=_(&quot;Skip asterisk media path?&quot;),
+ 					type=&quot;bool&quot;),
+@@ -266,3 +286,4 @@
+ 		self.createVoicemailConfig(iax)
+ 		self.createOutgoingContext()
+ 		self.createPanelConfig()
++		self.createQueuesConfig()
+
+Modified: branches/quixote2/cfg_phone_mgcp.py
+===================================================================
+--- branches/quixote2/cfg_phone_mgcp.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_phone_mgcp.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -91,6 +91,18 @@
+ 			VarType(&quot;callgroup&quot;,
+ 					title=_(&quot;Call group number&quot;),
+ 					optional=True),
++	
++			VarType(&quot;QueueLab&quot;,
++					title=_(&quot;Call Queues&quot;),
++					type=&quot;label&quot;,
++					hide=True),
++			
++			VarType(&quot;queues&quot;,
++					title=_(&quot;Agent of queues:&quot;),
++					type=&quot;mchoice&quot;,
++					optional=True,
++					options=getChoice(&quot;CfgPhoneQueue&quot;),
++					hide=True),
+ 
+ 			VarType(&quot;Voicemail&quot;,
+ 					title=_(&quot;Voicemail settings&quot;),
+@@ -112,6 +124,11 @@
+ 					optional=True,
+ 					len=6),
+ 
++			VarType(&quot;email&quot;,
++					title=_(&quot;Voicemail email&quot;),
++					optional=True,
++					len=60),
++			
+ 			VarType(&quot;Outbound&quot;,
+ 					title=_(&quot;Calls from the phone&quot;),
+ 					type=&quot;label&quot;),
+@@ -269,3 +286,4 @@
+ 		self.createExtensionConfig()
+ 		self.createVoicemailConfig(mgcp)
+ 		self.createOutgoingContext()
++		self.createQueuesConfig()
+
+Modified: branches/quixote2/cfg_phone_queue.py
+===================================================================
+--- branches/quixote2/cfg_phone_queue.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_phone_queue.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -26,7 +26,7 @@
+ 
+ 	shortName = _(&quot;Normal Call Queue&quot;)
+ 	newObjectTitle = _(&quot;New Call Queue&quot;)
+-	technology = &quot;Virtual&quot;
++	technology = &quot;QUEUE&quot;
+ 	
+ 	def createVariables(self):
+ 		self.variables = [
+@@ -45,10 +45,21 @@
+ 					len=6),
+ 
+ 			VarType(&quot;timeout&quot;,
+-					title=_(&quot;Timeout&quot;),
++					title=_(&quot;Phone timeout&quot;),
+ 					optional=True,
+ 					len=6),
+ 
++	                VarType(&quot;queuetimeout&quot;,
++        	            		title=_(&quot;Queue Timeout&quot;),
++                                	optional=True,
++                                	len=6),
++
++                	VarType(&quot;queuetimeoutext&quot;,
++                        		title=_(&quot;On queue timeout forward to extension&quot;),
++                        		type=&quot;choice&quot;,
++                        		optional=True,
++                        		options=getChoice(&quot;CfgPhone&quot;)),
++
+ 			VarType(&quot;moh&quot;,
+ 					title=_(&quot;Music-on-hold class&quot;),
+ 					type=&quot;choice&quot;,
+@@ -229,26 +240,35 @@
+ 			else:
+ 				mon_line = &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options)
+ 
++		qnames = []
+ 		if self.ext:
+-                        extensions.appendExten(self.ext, &quot;Answer&quot;)
++		    qnames.append(self.ext)
++		if self.name:
++		    qnames.append(self.name)
++
++		for qname in qnames:
++			opt = &quot;Tth&quot;
+ 			if mon_line:
+-				extensions.appendExten(self.ext, mon_line)
++				extensions.appendExten(qname, mon_line)
+ 
+ 			if self.ring:
+-				extensions.appendExten(self.ext, &quot;Queue(%s|Tthr)&quot; % self.name)
+-			elif self.moh:
+-				extensions.appendExten(self.ext, &quot;SetMusicOnHold(%s)&quot; % self.moh)
+-				extensions.appendExten(self.ext, &quot;Queue(%s|Tth)&quot; % self.name)
++				opt = opt + &quot;r&quot;
++				
++			if self.moh:
++				extensions.appendExten(qname, &quot;Answer&quot;)
++				extensions.appendExten(qname, &quot;SetMusicOnHold(%s)&quot; % self.moh)
+ 
++			if self.queuetimeout and self.queuetimeoutext:
++				opt = opt + &quot;n&quot;
++				extensions.appendExten(qname, &quot;Queue(%s|%s|||%s)&quot; % (self.name, opt, self.queuetimeout))
++				import configlets
++				obj = configlets.configlet_tree.getConfigletByName(self.queuetimeoutext)
++				try:
++					extensions.appendExten(qname, &quot;Goto(%s,%s,1)&quot; %  (obj.pbx, self.queuetimeoutext))
++				except AttributeError:
++					pass
++			else:
++				extensions.appendExten(qname, &quot;Queue(%s|%s)&quot; % (self.name, opt))
++		self.createPanelConfig()
+ 
+-		extensions.appendExten(self.name, &quot;Answer&quot;)
+-		if mon_line:
+-			extensions.appendExten(self.name, mon_line)
+-		
+-		if self.ring:
+-			extensions.appendExten(self.name, &quot;Queue(%s|Tthr)&quot; % self.name)
+-		elif self.moh:
+-			extensions.appendExten(self.name, &quot;SetMusicOnHold(%s)&quot; % self.moh)
+-			extensions.appendExten(self.name, &quot;Queue(%s|Tth)&quot; % self.name)
+ 
+-
+
+Modified: branches/quixote2/cfg_phone_sip.py
+===================================================================
+--- branches/quixote2/cfg_phone_sip.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_phone_sip.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -121,6 +121,7 @@
+ 			
+ 			VarType(&quot;pin&quot;,
+ 					title=_(&quot;Voicemail PIN&quot;),
++					type=&quot;int&quot;,
+ 					optional=True,
+ 					len=6),
+ 			
+@@ -301,7 +302,6 @@
+ 		sip.append(&quot;subscribecontext=%s&quot; % pbx)
+ 
+ 		self.createExtensionConfig()
+-		self.createHintConfig()
+ 		self.createVoicemailConfig(sip)
+ 		self.createOutgoingContext()
+ 		self.createPanelConfig()
+
+Modified: branches/quixote2/cfg_phone_zap.py
+===================================================================
+--- branches/quixote2/cfg_phone_zap.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_phone_zap.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -78,7 +78,19 @@
+ 			VarType(&quot;callgroup&quot;,
+ 				title=_(&quot;Call group number&quot;),
+ 				optional=True),
++	
++			VarType(&quot;QueueLab&quot;,
++					title=_(&quot;Call Queues&quot;),
++					type=&quot;label&quot;,
++					hide=True),
+ 			
++			VarType(&quot;queues&quot;,
++					title=_(&quot;Agent of queues:&quot;),
++					type=&quot;mchoice&quot;,
++					optional=True,
++					options=getChoice(&quot;CfgPhoneQueue&quot;),
++					hide=True),
++			
+ 			VarType(&quot;panelLab&quot;,
+ 				title=_(&quot;Operator Panel&quot;),
+ 				type=&quot;label&quot;,
+@@ -107,9 +119,15 @@
+ 
+ 			VarType(&quot;pin&quot;,
+ 				title=_(&quot;Voicemail PIN&quot;),
++				type=&quot;int&quot;,
+ 				optional=True,
+ 				len=6),
+ 	
++			VarType(&quot;email&quot;,
++					title=_(&quot;Voicemail email&quot;),
++					optional=True,
++					len=60),
++			
+ 			VarType(&quot;Outbound&quot;,
+ 				title=_(&quot;Calls from the phone&quot;),
+ 				type=&quot;label&quot;),
+@@ -269,6 +287,7 @@
+ 		self.createVoicemailConfig(c)
+ 		self.createOutgoingContext()
+ 		self.createPanelConfig()
++		self.createQueuesConfig()
+ 
+ 	def channelString(self):
+ 		return &quot;%s/%s&quot; % (self.technology, self.channels)
+
+Modified: branches/quixote2/cfg_trunk_iax.py
+===================================================================
+--- branches/quixote2/cfg_trunk_iax.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_trunk_iax.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -99,6 +99,11 @@
+ 				len=40,
+ 				optional=True),
+ 
++			VarType(&quot;clidnumin&quot;,
++				title=_(&quot;Change Caller*Id Number to:&quot;),
++				len=40,
++				optional=True),
++
+ 			VarType(&quot;contextin&quot;,
+ 				title=_(&quot;Go to&quot;),
+ 				type=&quot;radio&quot;,
+@@ -123,9 +128,24 @@
+ 				optional=True,
+ 				options=getChoice(&quot;CfgOptPBX&quot;)),
+ 
++			VarType(&quot;Outbound&quot;,
++				title=_(&quot;Outgoing calls to IAX trunk&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;clidnameout&quot;,
++				title=_(&quot;Change Caller*Id Name to:&quot;),
++				len=40,
++				optional=True),
++
++			VarType(&quot;clidnumout&quot;,
++				title=_(&quot;Change Caller*Id Number to:&quot;),
++				len=40,
++				optional=True),
++
+ 			VarType(&quot;dial&quot;,
+ 				hide=True,
+-				len=50),]
++				len=50),
++				]
+ 	
+ 		self.dependencies = [
+ 			DepType(&quot;phone&quot;, 
+
+Modified: branches/quixote2/cfg_trunk_sip.py
+===================================================================
+--- branches/quixote2/cfg_trunk_sip.py	2007-01-16 22:34:47 UTC (rev 563)
++++ branches/quixote2/cfg_trunk_sip.py	2007-01-16 22:36:27 UTC (rev 564)
+@@ -73,6 +73,11 @@
+ 				title=_(&quot;Show this trunk in the panel&quot;),
+ 				type=&quot;bool&quot;,
+ 				hide=True),
++
++	    		VarType(&quot;fromdomain&quot;,
++                               title=_(&quot;Sip domain:&quot;),
++                               len=40,
++                               optional=True),
+ 	
+ 			VarType(&quot;Inbound&quot;,
+ 				title=_(&quot;Calls from SIP trunk&quot;),
+@@ -82,6 +87,11 @@
+ 				title=_(&quot;Change Caller*Id to:&quot;),
+ 				len=25,
+ 				optional=True),
++
++ 			VarType(&quot;clidnumin&quot;,
++ 				title=_(&quot;Change Caller*Id Number to:&quot;),
++ 				len=40,
++ 				optional=True),
+ 			
+ 			VarType(&quot;contextin&quot;,
+ 				title=_(&quot;Go to&quot;),
+@@ -107,9 +117,24 @@
+ 				optional=True,
+ 				options=getChoice(&quot;CfgOptPBX&quot;)),
+ 
++ 			VarType(&quot;Outbound&quot;,
++ 				title=_(&quot;Outgoing calls to IAX trunk&quot;),
++ 				type=&quot;label&quot;),
++ 
++ 			VarType(&quot;clidnameout&quot;,
++ 				title=_(&quot;Change Caller*Id Name to:&quot;),
++ 				len=40,
++ 				optional=True),
++ 
++ 			VarType(&quot;clidnumout&quot;,
++ 				title=_(&quot;Change Caller*Id Number to:&quot;),
++ 				len=40,
++ 				optional=True),
++
+ 			VarType(&quot;dial&quot;,
+ 				hide=True,
+-				len=80),]
++				len=80),
++				]
+ 
+ 		self.dependencies = [
+ 			DepType(&quot;phone&quot;, 
+@@ -156,6 +181,8 @@
+ 			c.append(&quot;host=%s&quot; % self.host)
+ 			c.append(&quot;context=in-%s&quot; % self.name)
+ 			c.append(&quot;canreinvite=no&quot;)
++			if self.fromdomain:
++				c.append(&quot;fromdomain=%s&quot; % self.fromdomain)
+ 			if self.nat:
+ 				c.append(&quot;nat=yes&quot;)
+ 			if self.insecure:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000031.html">[Destar-dev] r563 - branches/quixote2
+</A></li>
+	<LI>Next message: <A HREF="000033.html">[Destar-dev] r565 - branches/quixote2
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#32">[ date ]</a>
+              <a href="thread.html#32">[ thread ]</a>
+              <a href="subject.html#32">[ subject ]</a>
+              <a href="author.html#32">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r700 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r700%20-%20trunk&In-Reply-To=%3C200706062222.l56MM376008362%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000210.html">
+   <LINK REL="Next"  HREF="000212.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r700 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r700%20-%20trunk&In-Reply-To=%3C200706062222.l56MM376008362%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r700 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun  7 00:22:04 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000210.html">[Destar-dev] r699 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000212.html">[Destar-dev] r701 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#211">[ date ]</a>
+              <a href="thread.html#211">[ thread ]</a>
+              <a href="subject.html#211">[ subject ]</a>
+              <a href="author.html#211">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-07 00:22:03 +0200 (Thu, 07 Jun 2007)
+New Revision: 700
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_trunk_sip.py
+Log:
+Fixed typo in cfg_trunk_sip Dial cmd
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-06 22:20:50 UTC (rev 699)
++++ trunk/CHANGELOG.txt	2007-06-06 22:22:03 UTC (rev 700)
+@@ -2,6 +2,7 @@
+ * Removed default op-panel config in destar_cfg.py sample.
+ * Added srvlookup setting for sip.conf
+ * Fixed op-panel button config for queues
++* Fixed typo in cfg_trunk_sip Dial cmd
+ 
+ 2007-05-30:
+ * Menu adjustment for other languages, _() is not needed.
+
+Modified: trunk/cfg_trunk_sip.py
+===================================================================
+--- trunk/cfg_trunk_sip.py	2007-06-06 22:20:50 UTC (rev 699)
++++ trunk/cfg_trunk_sip.py	2007-06-06 22:22:03 UTC (rev 700)
+@@ -169,7 +169,7 @@
+ 		else:
+ 			self.dial = &quot;SIP/${ARG1}@%s&quot; % (self.host)
+ 		if self.forward:
+-			self.dial += &quot;/{$ARG1}&quot; 
++			self.dial += &quot;/${ARG1}&quot; 
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000210.html">[Destar-dev] r699 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000212.html">[Destar-dev] r701 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#211">[ date ]</a>
+              <a href="thread.html#211">[ thread ]</a>
+              <a href="subject.html#211">[ subject ]</a>
+              <a href="author.html#211">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

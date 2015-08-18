@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r617 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r617%20-%20branches/0.2.X&In-Reply-To=%3C200703022341.l22NfSuB017631%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000108.html">
+   <LINK REL="Next"  HREF="000110.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r617 - branches/0.2.X</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r617%20-%20branches/0.2.X&In-Reply-To=%3C200703022341.l22NfSuB017631%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r617 - branches/0.2.X">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sat Mar  3 00:41:28 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000108.html">[Destar-dev] r616 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000110.html">[Destar-dev] r618 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#109">[ date ]</a>
+              <a href="thread.html#109">[ thread ]</a>
+              <a href="subject.html#109">[ subject ]</a>
+              <a href="author.html#109">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-03-03 00:41:27 +0100 (Sat, 03 Mar 2007)
+New Revision: 617
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/StatsHelper.ptl
+   branches/0.2.X/page_stats_queue.ptl
+Log:
+- Added service level graphic.
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-03-02 22:52:10 UTC (rev 616)
++++ branches/0.2.X/CHANGELOG.txt	2007-03-02 23:41:27 UTC (rev 617)
+@@ -4,6 +4,7 @@
+ 	- Added general completed calls stats.
+ 	- Added uncompleted calls stats.
+ 	- Added service level table.
++	- Added service level graphic.
+  * Removed depricated method from StatsHelper.ptl
+ 
+ 2007-03-01:
+
+Modified: branches/0.2.X/StatsHelper.ptl
+===================================================================
+--- branches/0.2.X/StatsHelper.ptl	2007-03-02 22:52:10 UTC (rev 616)
++++ branches/0.2.X/StatsHelper.ptl	2007-03-02 23:41:27 UTC (rev 617)
+@@ -117,7 +117,7 @@
+ 		'&lt;/tr&gt;\n'
+ 	'&lt;/table&gt;\n&lt;br/&gt;'
+ 
+-#def makeAgentCallsTable [plain] (label, names, completed, dumped, transfered):
++#def makeAgentCallsTable [plain] (label, completed, dumped, transfered, names):
+ def makeAgentCallsTable [plain] (label, completed, dumped, names):
+ 	'&lt;table border=&quot;1&quot;&gt; \n'
+ 	'&lt;tr&gt; &lt;td&gt;&lt;b&gt;'+ label
+@@ -241,11 +241,13 @@
+ 	ar.draw(can)
+ 	can.close()
+ 	
+-	htmltext('&lt;br/&gt;&lt;br/&gt;&lt;h3&gt;')
+-	htmltext(title)
+-	htmltext('&lt;/h3&gt;')
++	html = htmltext('&lt;br/&gt;&lt;br/&gt;&lt;h3&gt;')
++	html += htmltext(title)
++	html += htmltext('&lt;/h3&gt;')
+ 	
+-	htmltext('&lt;p&gt;')
+-	htmltext('&lt;img alt=&quot;table&quot; src=&quot;/graphs/%s&quot; /&gt;' % filename)
+-	htmltext('&lt;/p&gt;')
++	html += htmltext('&lt;p&gt;')
++	html += htmltext('&lt;img alt=&quot;table&quot; src=&quot;/graphs/%s&quot; /&gt;' % filename)
++	html += htmltext('&lt;/p&gt;')
++
++	return html
+ 	
+
+Modified: branches/0.2.X/page_stats_queue.ptl
+===================================================================
+--- branches/0.2.X/page_stats_queue.ptl	2007-03-02 22:52:10 UTC (rev 616)
++++ branches/0.2.X/page_stats_queue.ptl	2007-03-02 23:41:27 UTC (rev 617)
+@@ -118,7 +118,7 @@
+ 	completed[3].getHtml(border=1)
+ 
+ 	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Service Level&quot;))
+-	completed[4].getHtml(border=1)
++	completed[4]
+ 
+ 	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Uncompleted Calls&quot;))
+ 	uncompleted[3].getHtml(border=1)
+@@ -161,7 +161,7 @@
+ 	completed[3].getHtml(border=1)
+ 
+ 	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Service Level&quot;))
+-	completed[4].getHtml(border=1)
++	completed[4]
+ 
+ 	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Uncompleted Calls&quot;))
+ 	uncompleted[3].getHtml(border=1)
+@@ -204,7 +204,7 @@
+ 	completed[3].getHtml(border=1)
+ 
+ 	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Service Level&quot;))
+-	completed[4].getHtml(border=1)
++	completed[4]
+ 
+ 	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Uncompleted Calls&quot;))
+ 	uncompleted[3].getHtml(border=1)
+@@ -244,7 +244,7 @@
+ 	completed[3].getHtml(border=1)
+ 
+ 	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Service Level&quot;))
+-	completed[4].getHtml(border=1)
++	completed[4]
+ 
+ 	htmltext(&quot;&lt;br/&gt;&lt;h3&gt;%s&lt;/h3&gt;&quot; % _(&quot;Uncompleted Calls&quot;))
+ 	uncompleted[3].getHtml(border=1)
+@@ -442,8 +442,11 @@
+ 		table.setCell(1,y, &quot;%d&quot; % calls_per_holdtime[i].calls_number)
+ 		table.setCell(2,y, &quot;%f&quot; % (total_completed and (float(calls_per_holdtime[i].calls_number)*100 / float(total_completed)) or 0))
+ 		y += 1
+-	return table
++	graph = makeGraphic(holdtimes, [i.calls_number for i in calls_per_holdtime], _(&quot;Service Level&quot;),_(&quot;Time of Answer&quot;), _(&quot;Number of calls&quot;), &quot;service_level.png&quot;)
++	table_html = table.getHtml(border=1)
+ 
++	return table_html+graph
++
+ def showResults [plain] (day, month, year, queue):
+ 	all = N_(&quot;All&quot;)
+ 	if day != all and month != all and year != all:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000108.html">[Destar-dev] r616 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000110.html">[Destar-dev] r618 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#109">[ date ]</a>
+              <a href="thread.html#109">[ thread ]</a>
+              <a href="subject.html#109">[ subject ]</a>
+              <a href="author.html#109">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

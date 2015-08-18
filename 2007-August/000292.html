@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r772 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r772%20-%20trunk&In-Reply-To=%3C200707312244.l6VMiXq5015229%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000297.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r772 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r772%20-%20trunk&In-Reply-To=%3C200707312244.l6VMiXq5015229%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r772 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Aug  1 00:44:33 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000297.html">[Destar-dev] r773 - in trunk: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#292">[ date ]</a>
+              <a href="thread.html#292">[ thread ]</a>
+              <a href="subject.html#292">[ subject ]</a>
+              <a href="author.html#292">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-01 00:44:21 +0200 (Wed, 01 Aug 2007)
+New Revision: 772
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/configlets.py
+Log:
+configlets.py: fixed bug in appendExten
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-30 21:05:12 UTC (rev 771)
++++ trunk/CHANGELOG.txt	2007-07-31 22:44:21 UTC (rev 772)
+@@ -1,3 +1,6 @@
++2007-07-31:
++* configlets.py: fixed bug in appendExten
++
+ 2007-07-30:
+ * fixed awful bug on cascade deletion of configlets due to circular dependencies.
+ * updated agentes and general settings in destar_cfg.py
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-07-30 21:05:12 UTC (rev 771)
++++ trunk/configlets.py	2007-07-31 22:44:21 UTC (rev 772)
+@@ -105,7 +105,7 @@
+ 			self.order.append(self.section)
+ 		self.dirty = True
+ 
+-	def appendExten(self, ext, l, e=None, label=None, context=&quot;phones&quot;):
++	def appendExten(self, ext, l, context=&quot;phones&quot;, e=None, label=None):
+ 		&quot;&quot;&quot;Append an extension line l to the current section. Append
+ 		an optional error extenion e as well. Uses 'n' special
+ 		priority.&quot;&quot;&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000297.html">[Destar-dev] r773 - in trunk: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#292">[ date ]</a>
+              <a href="thread.html#292">[ thread ]</a>
+              <a href="subject.html#292">[ subject ]</a>
+              <a href="author.html#292">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

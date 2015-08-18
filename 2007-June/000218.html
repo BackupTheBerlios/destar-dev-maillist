@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r707 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r707%20-%20branches/0.2.X&In-Reply-To=%3C200706122128.l5CLSWoK004157%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000217.html">
+   <LINK REL="Next"  HREF="000219.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r707 - branches/0.2.X</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r707%20-%20branches/0.2.X&In-Reply-To=%3C200706122128.l5CLSWoK004157%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r707 - branches/0.2.X">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Tue Jun 12 23:28:32 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000217.html">[Destar-dev] r706 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000219.html">[Destar-dev] r708 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#218">[ date ]</a>
+              <a href="thread.html#218">[ thread ]</a>
+              <a href="subject.html#218">[ subject ]</a>
+              <a href="author.html#218">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-06-12 23:28:31 +0200 (Tue, 12 Jun 2007)
+New Revision: 707
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_trunk_zap.py
+   branches/0.2.X/cfg_trunk_zappbx.py
+   branches/0.2.X/cfg_trunk_zappri.py
+Log:
+* Fixed bug in Zap trunks (clidnumin needed).
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-06-08 22:23:51 UTC (rev 706)
++++ branches/0.2.X/CHANGELOG.txt	2007-06-12 21:28:31 UTC (rev 707)
+@@ -1,3 +1,6 @@
++2007-06-12:
++* Fixed bug in Zap trunks (clidnumin needed).
++
+ 2007-06-07:
+ * cfg_dialout_normal.py: Moved (reverted) SetVar to Set
+ * cfg_trunk_sip.py: Some changes in register and cmd lines to be compatible with budgetone.nl 
+
+Modified: branches/0.2.X/cfg_trunk_zap.py
+===================================================================
+--- branches/0.2.X/cfg_trunk_zap.py	2007-06-08 22:23:51 UTC (rev 706)
++++ branches/0.2.X/cfg_trunk_zap.py	2007-06-12 21:28:31 UTC (rev 707)
+@@ -84,6 +84,11 @@
+ 				len=25,
+ 				optional=True),
+ 
++			VarType(&quot;clidnumin&quot;,
++				title=_(&quot;Change Caller*Id Number to:&quot;),
++				len=40,
++				optional=True),
++
+ 			VarType(&quot;contextin&quot;,
+ 				title=_(&quot;Go to&quot;),
+ 				type=&quot;radio&quot;,
+
+Modified: branches/0.2.X/cfg_trunk_zappbx.py
+===================================================================
+--- branches/0.2.X/cfg_trunk_zappbx.py	2007-06-08 22:23:51 UTC (rev 706)
++++ branches/0.2.X/cfg_trunk_zappbx.py	2007-06-12 21:28:31 UTC (rev 707)
+@@ -91,6 +91,11 @@
+ 				len=25,
+ 				optional=True),
+ 
++			VarType(&quot;clidnumin&quot;,
++				title=_(&quot;Change Caller*Id Number to:&quot;),
++				len=40,
++				optional=True),
++
+ 			VarType(&quot;contextin&quot;,
+ 				title=_(&quot;Go to&quot;),
+ 				type=&quot;radio&quot;,
+
+Modified: branches/0.2.X/cfg_trunk_zappri.py
+===================================================================
+--- branches/0.2.X/cfg_trunk_zappri.py	2007-06-08 22:23:51 UTC (rev 706)
++++ branches/0.2.X/cfg_trunk_zappri.py	2007-06-12 21:28:31 UTC (rev 707)
+@@ -99,6 +99,11 @@
+ 				len=25,
+ 				optional=True),
+ 
++			VarType(&quot;clidnumin&quot;,
++				title=_(&quot;Change Caller*Id Number to:&quot;),
++				len=40,
++				optional=True),
++
+ 			VarType(&quot;contextin&quot;,
+ 				title=_(&quot;Go to&quot;),
+ 				type=&quot;radio&quot;,
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000217.html">[Destar-dev] r706 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000219.html">[Destar-dev] r708 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#218">[ date ]</a>
+              <a href="thread.html#218">[ thread ]</a>
+              <a href="subject.html#218">[ subject ]</a>
+              <a href="author.html#218">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

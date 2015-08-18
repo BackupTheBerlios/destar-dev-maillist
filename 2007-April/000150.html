@@ -1,0 +1,324 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r647 - branches/0.2.X trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r647%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200704010923.l319NW1u030854%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000151.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r647 - branches/0.2.X trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r647%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200704010923.l319NW1u030854%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r647 - branches/0.2.X trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Sun Apr  1 11:23:32 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000151.html">[Destar-dev] r648 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#150">[ date ]</a>
+              <a href="thread.html#150">[ thread ]</a>
+              <a href="subject.html#150">[ subject ]</a>
+              <a href="author.html#150">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-04-01 11:23:31 +0200 (Sun, 01 Apr 2007)
+New Revision: 647
+
+Modified:
+   branches/0.2.X/cfg_app_meetme.py
+   branches/0.2.X/configlets.py
+   trunk/cfg_app_meetme.py
+   trunk/configlets.py
+Log:
+* Meetme configuration adjustments. Pin an dynamic rooms work.
+* Added __init__ and fixup methods th CfgApp in configlets.py
+
+
+
+Modified: branches/0.2.X/cfg_app_meetme.py
+===================================================================
+--- branches/0.2.X/cfg_app_meetme.py	2007-03-23 17:52:06 UTC (rev 646)
++++ branches/0.2.X/cfg_app_meetme.py	2007-04-01 09:23:31 UTC (rev 647)
+@@ -25,22 +25,55 @@
+ 
+ 	shortName   = _(&quot;Meeting room&quot;)
+ 	newObjectTitle  = _(&quot;New meeting room&quot;)
++	description= _(&quot;Application that let create dynamic conferencing rooms&quot;)
+ 	
+ 	def createVariables(self):
+-		self.variables   = [	VarType(&quot;pbx&quot;,    title=_(&quot;Virtual PBX&quot;), type=&quot;choice&quot;, options=getChoice(&quot;CfgOptPBX&quot;)),
+-			VarType(&quot;ext&quot;,      title=_(&quot;Extension&quot;), len=6),
+-		       	VarType(&quot;confno&quot;,   title=_(&quot;Conference number&quot;), hint=_(&quot;If empty, will be the same as the extension&quot;), optional=True, len=6),
+-		       	VarType(&quot;pin&quot;,      title=_(&quot;PIN&quot;), optional=True, len=6),
++		self.variables   = [
++			VarType(&quot;pbx&quot;,
++				title=_(&quot;Virtual PBX&quot;),
++				type=&quot;choice&quot;,
++				options=getChoice(&quot;CfgOptPBX&quot;)),
++
++			VarType(&quot;ext&quot;,
++				title=_(&quot;Extension&quot;),
++				len=6),
++
++			VarType(&quot;timeout&quot;,
++				title=_(&quot;Maximun duration in seconds?&quot;),
++				type=&quot;int&quot;,
++				default=1200,
++				len=6),
++
++		       	VarType(&quot;confno&quot;,
++				title=_(&quot;Conference number&quot;),
++				optional=True,
++				type=&quot;int&quot;,
++				len=6),
++
++		       	VarType(&quot;pin&quot;,
++				title=_(&quot;PIN&quot;),
++				optional=True,
++				type=&quot;int&quot;,
++				len=6),
+ 			
+-			VarType(&quot;panelLab&quot;,   title=_(&quot;Operator Panel&quot;), type=&quot;label&quot;, hide=True),
+-	                VarType(&quot;panel&quot;,      title=_(&quot;Show this trunk in the panel&quot;), type=&quot;bool&quot;, hide=True, optional=True)
+-		]
++			VarType(&quot;panelLab&quot;,
++				title=_(&quot;Operator Panel&quot;),
++				type=&quot;label&quot;,
++				hide=True),
++
++	                VarType(&quot;panel&quot;,
++				title=_(&quot;Show this trunk in the panel&quot;),
++				type=&quot;bool&quot;,
++				hide=True,
++				optional=True)]
++			
+ 		self.dependencies = [ DepType(&quot;pbx&quot;, 
+ 					type=&quot;hard&quot;,
+ 					message = _(&quot;This is a Dependency&quot;)),
+ 					]
+ 	
+ 	def fixup(self):
++		Cfg.fixup(self)
+ 		self.lookPanel()
+ 
+ 	def createAsteriskConfig(self):
+@@ -50,23 +83,24 @@
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+ 		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Wait(1)&quot;)
++		c.appendExten(self.ext, &quot;Set(TIMEOUT(absolute)=%d)&quot; % self.timeout)
+ 		# 'd' -- dynamically add conference
+-		# 'p' -- allow user to exit the conference by pressing '#'
+-		if not self.confno:
+-			self.confno = self.ext
+-		c.appendExten(self.ext, &quot;MeetMe(%s,dp)&quot; % self.confno)
++		# 'P' -- always prompt pin
++		args=&quot;&quot;
++		if self.confno:
++			args += &quot;%d&quot; % self.confno
++		args += &quot;|d&quot;
++		if self.pin:
++			args += &quot;P|%d&quot; % self.pin
++		c.appendExten(self.ext, &quot;MeetMe(%s)&quot; % args)
+ 
+-		c = AstConf(&quot;meetme.conf&quot;)
+-		c.setSection(&quot;rooms&quot;)
+-		try:
++		if self.confno:
++			c = AstConf(&quot;meetme.conf&quot;)
++			c.setSection(&quot;rooms&quot;)
++			room = str(self.confno)
+ 			if self.pin:
+-				c.append(&quot;conf=%s,%s&quot; % (self.confno, self.pin))
+-			else:
+-				c.append(&quot;conf=%s&quot; % self.confno)
+-		except AttributeError:
+-			pass
+-		
++				room += &quot;,%d&quot; % self.pin
++			c.append(&quot;conf=%s&quot; % room)
+ 		try:
+ 			if panelutils.isConfigured() == 1 and self.panel:
+ 				panelutils.createMeetmeButton(self)
+
+Modified: branches/0.2.X/configlets.py
+===================================================================
+--- branches/0.2.X/configlets.py	2007-03-23 17:52:06 UTC (rev 646)
++++ branches/0.2.X/configlets.py	2007-04-01 09:23:31 UTC (rev 647)
+@@ -1118,6 +1118,12 @@
+ 
+ 	groupName =&quot;Applications&quot;
+ 
++	def __init__(self,**kw):
++		Cfg.__init__(self,**kw)
++
++	def fixup(self):
++		Cfg.fixup(self)
++
+ 	def head(self):
+ 		return (_(&quot;Extension&quot;), _(&quot;Type&quot;), _(&quot;Virtual PBX&quot;))
+ 
+
+Modified: trunk/cfg_app_meetme.py
+===================================================================
+--- trunk/cfg_app_meetme.py	2007-03-23 17:52:06 UTC (rev 646)
++++ trunk/cfg_app_meetme.py	2007-04-01 09:23:31 UTC (rev 647)
+@@ -25,22 +25,55 @@
+ 
+ 	shortName   = _(&quot;Meeting room&quot;)
+ 	newObjectTitle  = _(&quot;New meeting room&quot;)
++	description= _(&quot;Application that let create dynamic conferencing rooms&quot;)
+ 	
+ 	def createVariables(self):
+-		self.variables   = [	VarType(&quot;pbx&quot;,    title=_(&quot;Virtual PBX&quot;), type=&quot;choice&quot;, options=getChoice(&quot;CfgOptPBX&quot;)),
+-			VarType(&quot;ext&quot;,      title=_(&quot;Extension&quot;), len=6),
+-		       	VarType(&quot;confno&quot;,   title=_(&quot;Conference number&quot;), hint=_(&quot;If empty, will be the same as the extension&quot;), optional=True, len=6),
+-		       	VarType(&quot;pin&quot;,      title=_(&quot;PIN&quot;), optional=True, len=6),
++		self.variables   = [
++			VarType(&quot;pbx&quot;,
++				title=_(&quot;Virtual PBX&quot;),
++				type=&quot;choice&quot;,
++				options=getChoice(&quot;CfgOptPBX&quot;)),
++
++			VarType(&quot;ext&quot;,
++				title=_(&quot;Extension&quot;),
++				len=6),
++
++			VarType(&quot;timeout&quot;,
++				title=_(&quot;Maximun duration in seconds?&quot;),
++				type=&quot;int&quot;,
++				default=1200,
++				len=6),
++
++		       	VarType(&quot;confno&quot;,
++				title=_(&quot;Conference number&quot;),
++				optional=True,
++				type=&quot;int&quot;,
++				len=6),
++
++		       	VarType(&quot;pin&quot;,
++				title=_(&quot;PIN&quot;),
++				optional=True,
++				type=&quot;int&quot;,
++				len=6),
+ 			
+-			VarType(&quot;panelLab&quot;,   title=_(&quot;Operator Panel&quot;), type=&quot;label&quot;, hide=True),
+-	                VarType(&quot;panel&quot;,      title=_(&quot;Show this trunk in the panel&quot;), type=&quot;bool&quot;, hide=True, optional=True)
+-		]
++			VarType(&quot;panelLab&quot;,
++				title=_(&quot;Operator Panel&quot;),
++				type=&quot;label&quot;,
++				hide=True),
++
++	                VarType(&quot;panel&quot;,
++				title=_(&quot;Show this trunk in the panel&quot;),
++				type=&quot;bool&quot;,
++				hide=True,
++				optional=True)]
++			
+ 		self.dependencies = [ DepType(&quot;pbx&quot;, 
+ 					type=&quot;hard&quot;,
+ 					message = _(&quot;This is a Dependency&quot;)),
+ 					]
+ 	
+ 	def fixup(self):
++		Cfg.fixup(self)
+ 		self.lookPanel()
+ 
+ 	def createAsteriskConfig(self):
+@@ -50,23 +83,24 @@
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+ 		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Wait(1)&quot;)
++		c.appendExten(self.ext, &quot;Set(TIMEOUT(absolute)=%d)&quot; % self.timeout)
+ 		# 'd' -- dynamically add conference
+-		# 'p' -- allow user to exit the conference by pressing '#'
+-		if not self.confno:
+-			self.confno = self.ext
+-		c.appendExten(self.ext, &quot;MeetMe(%s,dp)&quot; % self.confno)
++		# 'P' -- always prompt pin
++		args=&quot;&quot;
++		if self.confno:
++			args += &quot;%d&quot; % self.confno
++		args += &quot;|d&quot;
++		if self.pin:
++			args += &quot;P|%d&quot; % self.pin
++		c.appendExten(self.ext, &quot;MeetMe(%s)&quot; % args)
+ 
+-		c = AstConf(&quot;meetme.conf&quot;)
+-		c.setSection(&quot;rooms&quot;)
+-		try:
++		if self.confno:
++			c = AstConf(&quot;meetme.conf&quot;)
++			c.setSection(&quot;rooms&quot;)
++			room = str(self.confno)
+ 			if self.pin:
+-				c.append(&quot;conf=%s,%s&quot; % (self.confno, self.pin))
+-			else:
+-				c.append(&quot;conf=%s&quot; % self.confno)
+-		except AttributeError:
+-			pass
+-		
++				room += &quot;,%d&quot; % self.pin
++			c.append(&quot;conf=%s&quot; % room)
+ 		try:
+ 			if panelutils.isConfigured() == 1 and self.panel:
+ 				panelutils.createMeetmeButton(self)
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-03-23 17:52:06 UTC (rev 646)
++++ trunk/configlets.py	2007-04-01 09:23:31 UTC (rev 647)
+@@ -1122,6 +1122,12 @@
+ 
+ 	groupName =&quot;Applications&quot;
+ 
++	def __init__(self,**kw):
++		Cfg.__init__(self,**kw)
++
++	def fixup(self):
++		Cfg.fixup(self)
++
+ 	def head(self):
+ 		return (_(&quot;Extension&quot;), _(&quot;Type&quot;), _(&quot;Virtual PBX&quot;))
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000151.html">[Destar-dev] r648 - branches/0.2.X trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#150">[ date ]</a>
+              <a href="thread.html#150">[ thread ]</a>
+              <a href="subject.html#150">[ subject ]</a>
+              <a href="author.html#150">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

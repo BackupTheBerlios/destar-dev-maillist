@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r743 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r743%20-%20trunk&In-Reply-To=%3C200707041522.l64FMuMN000249%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000258.html">
+   <LINK REL="Next"  HREF="000260.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r743 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r743%20-%20trunk&In-Reply-To=%3C200707041522.l64FMuMN000249%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r743 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Wed Jul  4 17:22:56 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000258.html">[Destar-dev] [Bug] Destar rewrites user's defined voicemail pins
+</A></li>
+        <LI>Next message: <A HREF="000260.html">[Destar-dev] r744 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#259">[ date ]</a>
+              <a href="thread.html#259">[ thread ]</a>
+              <a href="subject.html#259">[ subject ]</a>
+              <a href="author.html#259">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-04 17:22:56 +0200 (Wed, 04 Jul 2007)
+New Revision: 743
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/backend.py
+   trunk/cfg_app_record.py
+Log:
+* Improved Record-Sound Application.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-03 23:04:18 UTC (rev 742)
++++ trunk/CHANGELOG.txt	2007-07-04 15:22:56 UTC (rev 743)
+@@ -1,3 +1,6 @@
++2007-07-04:
++* Improved Record-Sound Application.
++
+ 2007-07-03:
+ * Use configlet shortName on logs if name is not present.
+ * Changed 'print' for 'sys.stderr.write' on some log messages.
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-07-03 23:04:18 UTC (rev 742)
++++ trunk/backend.py	2007-07-04 15:22:56 UTC (rev 743)
+@@ -297,6 +297,18 @@
+ 	c.append(&quot;exten =&gt; s,4,VoiceMail(${ARG1}@${ARG2})&quot;)
+ 	c.append(&quot;exten =&gt; s,5,Hangup()&quot;)
+ 
++	c.append(&quot;;&quot;)
++	c.append(&quot;; format: Macro(record,filename,format,maxduration)&quot;)
++	c.append(&quot;;&quot;)
++	c.setSection(&quot;macro-record&quot;)
++	c.append(&quot;exten =&gt; s,1,Answer&quot;)
++	c.append(&quot;exten =&gt; s,n,Wait(1)&quot;)
++	c.append(&quot;exten =&gt; s,n,Playback(vm-message)&quot;)
++	c.append(&quot;exten =&gt; s,n,Playback(is-now-being-recorded)&quot;)
++	c.append(&quot;exten =&gt; s,n,Playback(after-the-tone)&quot;)
++	c.append(&quot;exten =&gt; s,n,Record(${ARG1}.${ARG2}|1|${ARG3})&quot;)
++	c.append(&quot;exten =&gt; s,n,Playback(vm-message)&quot;)
++	c.append(&quot;exten =&gt; s,n,Playback(recorded)&quot;)
+ 
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; format: Macro(dial-result,[&lt;cause&gt;])&quot;)
+
+Modified: trunk/cfg_app_record.py
+===================================================================
+--- trunk/cfg_app_record.py	2007-07-03 23:04:18 UTC (rev 742)
++++ trunk/cfg_app_record.py	2007-07-04 15:22:56 UTC (rev 743)
+@@ -25,22 +25,23 @@
+ 
+ 	shortName   = _(&quot;Record sound&quot;)
+ 	newObjectTitle  = _(&quot;New recording extension&quot;)
+-	description = _(&quot;&quot;&quot;Allows you to record a sound file. You can hang up, be silent for
++	description = _(&quot;&quot;&quot;Allows you to record a sound file. You can be silent for
+ 			a second or dial '#' to stop the recording.&quot;&quot;&quot;)
+ 			
+ 	def createVariables(self):
+ 		self.variables   = [
+ 			VarType(&quot;pbx&quot;,    title=_(&quot;Virtual PBX&quot;), type=&quot;choice&quot;, options=getChoice(&quot;CfgOptPBX&quot;)),
+ 			VarType(&quot;ext&quot;,      title=_(&quot;Extension&quot;), len=6),
++			VarType(&quot;max&quot;,      title=_(&quot;Max duration&quot;), len=6, default=0),
+ 			VarType(&quot;filename&quot;, title=_(&quot;File name&quot;)),
+ 			VarType(&quot;format&quot;,   title=_(&quot;Sound format&quot;), type=&quot;choice&quot;,
+ 				options=((&quot;gsm&quot;, _(&quot;GSM compression&quot;)),
+ 					 (&quot;ulaw&quot;,_(&quot;PCM format 'ulaw'&quot;)),
+ 					 (&quot;alaw&quot;,_(&quot;alaw&quot;)),
+-									 (&quot;vox&quot;, _(&quot;vox&quot;)),
+-									 (&quot;wav&quot;, _(&quot;WAV-File with Microsoft PCM, 16 bit, mono 8000 Hz&quot;)),
+-									 (&quot;WAV&quot;, _(&quot;WAV-File with GSM 6.10 compression, mono 8000 Hz&quot;)),
+-									),
++					 (&quot;vox&quot;, _(&quot;vox&quot;)),
++					 (&quot;wav&quot;, _(&quot;WAV-File with Microsoft PCM, 16 bit, mono 8000 Hz&quot;)),
++					 (&quot;WAV&quot;, _(&quot;WAV-File with GSM 6.10 compression, mono 8000 Hz&quot;)),
++					),
+ 				default=&quot;WAV&quot;)
+ 		]
+ 		self.dependencies = [ DepType(&quot;pbx&quot;, 
+@@ -62,9 +63,13 @@
+ 
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(self.ext, &quot;Set(TIMEOUT(absolute)=20)&quot;)
+-		c.appendExten(self.ext, &quot;Answer&quot;)
+-		c.appendExten(self.ext, &quot;Wait(1)&quot;)
+-		# TODO: don't hardcode &quot;:gsm&quot; here
+-		c.appendExten(self.ext, &quot;Record(%s:%s)&quot; % (self.filename, self.format) )
++		c.appendExten(self.ext, &quot;Goto(record-%s,s,1)&quot; % self.filename)
+ 		c.appendExten(self.ext, &quot;Hangup&quot;)
++		c.setSection(&quot;record-%s&quot; % self.filename)
++		c.append(&quot;exten =&gt; s,1,Macro(record,%s,%s,%s)&quot; % (self.filename, self.format, self.max))
++		c.append(&quot;exten =&gt; s,n(menu),Background(press-1&amp;to-listen-to-it&amp;or&amp;press-2&amp;to-rerecord-yr-message)&quot;)
++		c.append(&quot;exten =&gt; s,n,WaitExten(5)&quot;)
++		c.append(&quot;exten =&gt; s,n,Hangup()&quot;)
++		c.append(&quot;exten =&gt; 1,1,Playback(%s)&quot; % self.filename)
++		c.append(&quot;exten =&gt; 1,n,Goto(s,menu)&quot;)
++		c.append(&quot;exten =&gt; 2,1,Goto(s,1)&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000258.html">[Destar-dev] [Bug] Destar rewrites user's defined voicemail pins
+</A></li>
+	<LI>Next message: <A HREF="000260.html">[Destar-dev] r744 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#259">[ date ]</a>
+              <a href="thread.html#259">[ thread ]</a>
+              <a href="subject.html#259">[ subject ]</a>
+              <a href="author.html#259">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

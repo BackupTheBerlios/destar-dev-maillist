@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r654 - branches/0.2.X trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r654%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200704170008.l3H089U0031172%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000159.html">
+   <LINK REL="Next"  HREF="000160.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r654 - branches/0.2.X trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r654%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200704170008.l3H089U0031172%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r654 - branches/0.2.X trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Tue Apr 17 02:08:09 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000159.html">[Destar-dev] [Bug #8932] Single options
+</A></li>
+        <LI>Next message: <A HREF="000160.html">[Destar-dev] [Bug #10641] Unicode should be turned off
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#158">[ date ]</a>
+              <a href="thread.html#158">[ thread ]</a>
+              <a href="subject.html#158">[ subject ]</a>
+              <a href="author.html#158">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-04-17 02:08:07 +0200 (Tue, 17 Apr 2007)
+New Revision: 654
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/ConfigHelper.ptl
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+Log:
+* Fixed Bug #8932 (CfgOptSingle configlets could not be deleted)
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-04-14 18:34:30 UTC (rev 653)
++++ branches/0.2.X/CHANGELOG.txt	2007-04-17 00:08:07 UTC (rev 654)
+@@ -1,3 +1,7 @@
++2001-04-16:
++* Configlets that extends from CfgOptSingle now can be deleted.
++* Fixed Bug #8932
++
+ 2007-04-10:
+ * Added port option in sip trunks
+ 
+
+Modified: branches/0.2.X/ConfigHelper.ptl
+===================================================================
+--- branches/0.2.X/ConfigHelper.ptl	2007-04-14 18:34:30 UTC (rev 653)
++++ branches/0.2.X/ConfigHelper.ptl	2007-04-17 00:08:07 UTC (rev 654)
+@@ -320,7 +320,7 @@
+ 		else:
+ 			form.add(StringWidget,   v.name, &quot;Unknown type %s&quot; % v.type)
+ 	
+-	if new or not obj.isAddable():
++	if new:
+ 		txt_submit = _(&quot;Submit&quot;)
+ 		txt_delete = &quot;&quot;
+ 	else:
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-04-14 18:34:30 UTC (rev 653)
++++ trunk/CHANGELOG.txt	2007-04-17 00:08:07 UTC (rev 654)
+@@ -1,3 +1,7 @@
++2007-04-16:
++* Configlets that extends from CfgOptSingle now can be deleted.
++* Fixed Bug #8932
++
+ 2007-04-11:
+ * Added support for queue agents (not just phones) and an agent login extension.
+ 
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-04-14 18:34:30 UTC (rev 653)
++++ trunk/ConfigHelper.ptl	2007-04-17 00:08:07 UTC (rev 654)
+@@ -370,7 +370,7 @@
+ 		else:
+ 			form.add(StringWidget,   v.name, &quot;Unknown type %s&quot; % v.type)
+ 	
+-	if new or not obj.isAddable():
++	if new:
+ 		txt_submit = _(&quot;Submit&quot;)
+ 		txt_delete = &quot;&quot;
+ 	else:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000159.html">[Destar-dev] [Bug #8932] Single options
+</A></li>
+	<LI>Next message: <A HREF="000160.html">[Destar-dev] [Bug #10641] Unicode should be turned off
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#158">[ date ]</a>
+              <a href="thread.html#158">[ thread ]</a>
+              <a href="subject.html#158">[ subject ]</a>
+              <a href="author.html#158">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

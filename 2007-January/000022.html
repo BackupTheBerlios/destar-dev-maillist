@@ -1,0 +1,417 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r559 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r559%20-%20trunk&In-Reply-To=%3C200701152346.l0FNkO9g011807%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000021.html">
+   <LINK REL="Next"  HREF="000023.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r559 - trunk</H1>
+    <B>hholzer at mail.berlios.de</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r559%20-%20trunk&In-Reply-To=%3C200701152346.l0FNkO9g011807%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r559 - trunk">hholzer at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 16 00:46:24 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000021.html">[Destar-dev] r558 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000023.html">[Destar-dev] [Patch #1807] some bugfix, new features
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#22">[ date ]</a>
+              <a href="thread.html#22">[ thread ]</a>
+              <a href="subject.html#22">[ subject ]</a>
+              <a href="author.html#22">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: hholzer
+Date: 2007-01-16 00:46:08 +0100 (Tue, 16 Jan 2007)
+New Revision: 559
+
+Added:
+   trunk/cfg_app_voicemailsettings.py
+Modified:
+   trunk/backend.py
+   trunk/cfg_app_callfw.py
+   trunk/cfg_opt_voicemail.py
+   trunk/configlets.py
+   trunk/page_user_settings.ptl
+Log:
+make voicemail setting dynamic (Feature Request #3052)
+devstate virtual pbx support
+
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-01-15 21:06:34 UTC (rev 558)
++++ trunk/backend.py	2007-01-15 23:46:08 UTC (rev 559)
+@@ -169,6 +169,7 @@
+ 	c.append(&quot;columns =&gt; clid,src,dst,dcontext,channel,dstchannel,lastapp,lastdata,start,answer,end,duration,billsec,disposition,amaflags,accountcode,uniqueid,userfield,pbx,intrunk,outtrunk,dialout&quot;)
+ 	c.append(&quot;values =&gt; '${CDR(clid)}','${CDR(src)}','${CDR(dst)}','${CDR(dcontext)}','${CDR(channel)}','${CDR(dstchannel)}','${CDR(lastapp)}','${CDR(lastdata)}','${CDR(start)}','${CDR(answer)}','${CDR(end)}','${CDR(duration)}','${CDR(billsec)}','${CDR(disposition)}','${CDR(amaflags)}','${CDR(accountcode)}','${CDR(uniqueid)}','${CDR(userfield)}','${CDR(pbx)}','${CDR(intrunk)}','${CDR(outtrunk)}','${CDR(dialout)}'&quot;)
+ 
++	needModule(&quot;res_indications&quot;)
+ 	c = AstConf(&quot;macros.inc&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Macro to dial a standard local extension&quot;)
+@@ -181,21 +182,25 @@
+ 	c.append(&quot;exten=s,1,Set(fw_ext=${DB(CFIM/${ARG5}/${ARG4})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append(&quot;;&quot;)
++	c.append(&quot;; test for VMIM (VM Immediate)&quot;)
++	c.append(&quot;exten=s,n,Set(vmim=${DB(VMIM/${ARG5}/${ARG4})})&quot;)
++	c.append('exten=s,n,GotoIf($[&quot;${vmim}&quot; != &quot;&quot;]?vmu)')
++	c.append(&quot;;&quot;)
+ 	c.append(&quot;; test for DND (Do Not Disturb)&quot;)
+-	c.append(&quot;exten=s,n,Set(temp=${DB(DND/${ARG5}/${ARG4})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${temp}&quot; = &quot;True&quot;]?testvmu)')
++	c.append(&quot;exten=s,n,Set(dnd=${DB(DND/${ARG5}/${ARG4})})&quot;)
++	c.append('exten=s,n,GotoIf($[&quot;${dnd}&quot; != &quot;&quot;]?busy)')
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get dial seconds&quot;)
+ 	c.append(&quot;exten=s,n,Set(dsec=${DB(DSEC/${ARG5}/${ARG4})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${dsec}&quot; = &quot;&quot;]?:dsecEnd)')
++	c.append('exten=s,n,GotoIf($[&quot;${dsec}&quot; != &quot;&quot;]?dsecEnd)')
+ 	c.append(&quot;exten=s,n,Set(dsec=45)&quot;)
+ 	c.append(&quot;exten=s,n(dsecEnd),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get global dial options&quot;)
+ 	c.append(&quot;exten=s,n,Set(dopt=${DIAL_OPTIONS})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${dopt}&quot; = &quot;&quot;]?:doptEnd)')
+-	c.append(&quot;exten=s,n,Set(dopt=r)&quot;)
+-	c.append(&quot;exten=s,n(doptEnd),NoOp()&quot;)
++	#c.append('exten=s,n,GotoIf($[&quot;${dopt}&quot; != &quot;&quot;]?doptEnd)')
++	#c.append(&quot;exten=s,n,Set(dopt=r)&quot;)
++	#c.append(&quot;exten=s,n(doptEnd),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get early media&quot;)
+ 	c.append(&quot;exten=s,n,Set(emedia=${DB(EMEDIA/${ARG5}/${ARG4})})&quot;)
+@@ -211,7 +216,7 @@
+ 	c.append(&quot;exten=s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWw${dopt})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'timeout'&quot;)
+-	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFTO/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG5}/${ARG4})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append('exten=s,n,GotoIf($[&quot;{CDR(intrunk)}&quot; = &quot;&quot;]?cftoend)')
+ 	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFTO-TRUNK/${ARG5}/${ARG4})})&quot;)
+@@ -219,10 +224,12 @@
+ 	c.append(&quot;exten=s,n(cftoend),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; no CFTO (Call Forward Timeout), test VM U.&quot;)
+-	c.append(&quot;exten=s,n,Goto(testvmu)&quot;)
++	c.append(&quot;exten=s,n,Set(vmu=${DB(VMU/${ARG5}/${ARG4})})&quot;)
++	c.append('exten=s,n,GotoIf($[&quot;${vmu}&quot; != &quot;&quot;]?vmu)')
++	c.append(&quot;exten=s,n,Goto(hangup)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'busy'&quot;)
+-	c.append(&quot;exten=s,MainDial+101,Set(fw_ext=${DB(CFBS/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,MainDial+101(busy),Set(fw_ext=${DB(CFBS/${ARG5}/${ARG4})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append('exten=s,n,GotoIf($[&quot;{CDR(intrunk)}&quot; = &quot;&quot;]?cfbsend)')
+ 	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFBS-TRUNK/${ARG5}/${ARG4})})&quot;)
+@@ -230,16 +237,18 @@
+ 	c.append(&quot;exten=s,n(cfbsend),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; no CFBS (Call Forward Busy), test VM Busy&quot;)
+-	c.append(&quot;exten=s,n,Goto(testvmb)&quot;)
++	c.append(&quot;exten=s,n,Set(vmbs=${DB(VMBS/${ARG5}/${ARG4})})&quot;)
++	c.append('exten=s,n,GotoIf($[&quot;${vmbs}&quot; != &quot;&quot;]?vmbs)')
++	c.append(&quot;exten=s,n,Answer()&quot;)
++	c.append(&quot;exten=s,n,Playtones(busy)&quot;)
++	c.append(&quot;exten=s,n,Busy()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=s,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append('exten=s,n(testvmu),GotoIf($[&quot;${ARG3}&quot; = &quot;1&quot;]?:hangup)')
+-	c.append('exten=s,n,Set(vmopt=u)')
++	c.append('exten=s,n(vmu),Set(vmopt=u)')
+ 	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG4}@${ARG5})&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append('exten=s,n(testvmb),GotoIf($[&quot;${ARG3}&quot; = &quot;1&quot;]?:hangup)')
+-	c.append('exten=s,n,Set(vmopt=b)')
++	c.append('exten=s,n(vmbs),Set(vmopt=b)')
+ 	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG4}@${ARG5})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=s,n(hangup),Hangup()&quot;)
+
+Modified: trunk/cfg_app_callfw.py
+===================================================================
+--- trunk/cfg_app_callfw.py	2007-01-15 21:06:34 UTC (rev 558)
++++ trunk/cfg_app_callfw.py	2007-01-15 23:46:08 UTC (rev 559)
+@@ -57,18 +57,20 @@
+ 			c.appendExten(&quot;_%sX.&quot; % self.set, 'GotoIf($[&quot;${testcf}&quot; = &quot;&quot;]?:switchoff)')
+ 		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Set(DB(%s/%s/${CALLERIDNUM})=${EXTEN:%d})&quot; % (self.type, self.pbx,len(self.set)))
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Devstate(%s${CALLERIDNUM},2)&quot; % self.devstateprefix)
++			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx))
+ 		if self.type == &quot;CFIM&quot;:
+ 			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-unconditional)&quot;)
+ 		elif self.type == &quot;CFTO&quot;:
+ 			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-no-ans)&quot;)
+ 		else:
+ 			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-on-busy)&quot;)
++		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Wait(1)&quot;)
+ 		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Hangup&quot;)
+ 		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;switchoff&quot;)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Answer()&quot;)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx))
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;%s&quot; % self.ext, &quot;Devstate(%s${CALLERIDNUM},0)&quot; % self.devstateprefix)
++			c.appendExten(&quot;%s&quot; % self.ext, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type.lower(), self.pbx))
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(call-fwd-cancelled)&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Wait(1)&quot;)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Hangup&quot;)
+
+Added: trunk/cfg_app_voicemailsettings.py
+===================================================================
+--- trunk/cfg_app_voicemailsettings.py	2007-01-15 21:06:34 UTC (rev 558)
++++ trunk/cfg_app_voicemailsettings.py	2007-01-15 23:46:08 UTC (rev 559)
+@@ -0,0 +1,98 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Destar has Copyright (C) 2005 by Holger Schurig
++# This file has Copyright (C) 2005 by Alejandro Rios
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++
++class CfgAppVoicemailSettings(CfgApp):
++
++	shortName   = _(&quot;Voicemail settings&quot;)
++	description = _(&quot;Extensions to set/unset voicemail.&quot;)
++	newObjectTitle = _(&quot;New extensions to set/unset voicemail&quot;)
++
++	def createVariables(self):
++		self.variables = [ 
++			VarType(&quot;pbx&quot;,
++				title=_(&quot;Virtual PBX&quot;),
++				type=&quot;choice&quot;,
++				options=getChoice(&quot;CfgOptPBX&quot;)),
++			VarType(&quot;type&quot;,
++				title=_(&quot;Type&quot;),
++				type=&quot;choice&quot;,
++					options=( (&quot;VMIM&quot;, _(&quot;Voicemail Unconditional&quot;)), \
++					(&quot;VMBS&quot;, _(&quot;Voicemail if Busy&quot;)),
++					(&quot;VMU&quot;, _(&quot;Voicemail if Timeout/Unavailable&quot;)) )),
++			VarType(&quot;set&quot;,
++				title=_(&quot;Setting preffix&quot;),
++				len=6,
++				default=&quot;*94&quot;),
++			VarType(&quot;ext&quot;,
++				title=_(&quot;Unsetting extension&quot;),
++				len=6,
++				default=&quot;*95&quot;),
++			VarType(&quot;toggle&quot;,
++				title=_(&quot;Set function toggleable&quot;),
++				type=&quot;bool&quot;),
++			VarType(&quot;devstateprefix&quot;,
++				title=_(&quot;Create Devstate extension. Devstate Prefix:&quot;),
++				len=8,
++				default=&quot;&quot;)
++		       	]
++
++		self.dependencies = [ DepType(&quot;pbx&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;)),
++					]
++	
++	def row(self):
++		return (&quot;%s / %s&quot; % (self.set,self.ext),&quot;%s %s&quot; % (self.shortName, self.type), self.pbx)
++
++	def createAsteriskConfig(self):
++		if self.devstateprefix:
++		    needModule(&quot;app_devstate&quot;)
++		c = AstConf(&quot;extensions.conf&quot;)
++		c.setSection(self.pbx)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Answer()&quot;)
++		if self.toggle:
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Set(togglestate=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
++			c.appendExten(&quot;%s&quot; % self.set, 'GotoIf($[&quot;${togglestate}&quot; != &quot;&quot;]?switchoff)')
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Set(DB(%s/%s/${CALLERIDNUM})=1)&quot; % (self.type, self.pbx))
++		if self.devstateprefix:
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx))
++		if self.type == &quot;VMIM&quot;:
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(voice-mail-system)&quot;)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;)
++		elif self.type == &quot;VMU&quot;:
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(voice-mail-system)&quot;)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;)
++		else:
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(voice-mail-system)&quot;)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Wait(1)&quot;)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Hangup&quot;)
++		c.appendExten(&quot;%s&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;switchoff&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Answer()&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx))
++		if self.devstateprefix:
++			c.appendExten(&quot;%s&quot; % self.ext, &quot;Devstate(%s_%s_${CALLERIDNUM},0)&quot; % (self.type.lower(), self.pbx))
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(voice-mail-system)&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Playback(cancelled)&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Wait(1)&quot;)
++		c.appendExten(&quot;%s&quot; % self.ext, &quot;Hangup&quot;)
+
+Modified: trunk/cfg_opt_voicemail.py
+===================================================================
+--- trunk/cfg_opt_voicemail.py	2007-01-15 21:06:34 UTC (rev 558)
++++ trunk/cfg_opt_voicemail.py	2007-01-15 23:46:08 UTC (rev 559)
+@@ -27,7 +27,9 @@
+ 	newObjectTitle = _(&quot;Voicemail settings&quot;)
+ 	
+ 	def createVariables(self):
+-		self.variables = [VarType(&quot;recording&quot;, title=_(&quot;Recording settings&quot;), type=&quot;label&quot;),
++		self.variables = [
++				 VarType(&quot;enable&quot;, title=_(&quot;Enable Voicemail on phones&quot;), type=&quot;bool&quot;, default=True),
++				 VarType(&quot;recording&quot;, title=_(&quot;Recording settings&quot;), type=&quot;label&quot;),
+ 				 VarType(&quot;format&quot;, title=_(&quot;File format for voicemail messages&quot;), type=&quot;choice&quot;,
+ 								   options=[('wav49','WAV (common sound format)'),('gsm','GSM (smaller)')], default=&quot;wav49&quot;),
+ 				 VarType(&quot;maxmessage&quot;, title=_(&quot;Maximal message length (in seconds)&quot;), type=&quot;int&quot;, default=180, len=3),
+@@ -64,6 +66,10 @@
+ 		c.appendValue(self, &quot;silencethreshold&quot;)
+ 		c.appendValue(self, &quot;maxlogins&quot;)
+ 		c.append(&quot;skipms=%d&quot; % (self.skipms * 1000))
++		
++		if self.enable:
++			needModule(&quot;res_adsi&quot;)
++			needModule(&quot;app_voicemail&quot;)
+ 
+ 		if self.emailintegration and self.serveremail:
+ 			c.appendValue(self,&quot;serveremail&quot;)
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-01-15 21:06:34 UTC (rev 558)
++++ trunk/configlets.py	2007-01-15 23:46:08 UTC (rev 559)
+@@ -1002,13 +1002,22 @@
+ 		for obj in configlet_tree:
+ 			if obj.__class__.__name__ == 'CfgAppCallFW':
+ 				if obj.devstateprefix:
+-					extensions.append(&quot;exten=%s%s,hint,DS/%s%s&quot; % (obj.devstateprefix, self.ext, obj.devstateprefix, self.ext))
++					extensions.append(&quot;exten=%s%s,hint,DS/%s_%s_%s&quot; % (obj.devstateprefix, self.ext, obj.type.lower(), pbx, self.ext))
+ 					extensions.appendExten(&quot;%s%s&quot; % (obj.devstateprefix, self.ext), &quot;Goto(%s,%s,1)&quot; % (pbx, obj.set))
++		for obj in configlet_tree:
++			if obj.__class__.__name__ == 'CfgAppVoicemailSettings':
++				if obj.devstateprefix:
++					extensions.append(&quot;exten=%s%s,hint,DS/%s_%s_%s&quot; % (obj.devstateprefix, self.ext, obj.type.lower(), pbx, self.ext))
++					extensions.appendExten(&quot;%s%s&quot; % (obj.devstateprefix, self.ext), &quot;Goto(%s,%s,1)&quot; % (pbx, obj.set))
+ 
+ 	def createVoicemailConfig(self, conf):
+-		if self.ext and self.usevm:
+-			needModule(&quot;res_adsi&quot;)
+-			needModule(&quot;app_voicemail&quot;)
++		vmconfig = False;
++		for obj in configlet_tree:
++			if obj.__class__.__name__ == 'CfgOptVoicemail':
++				if obj.enable:
++				    vmconfig = True;
++				break
++		if vmconfig:
+ 			if self.usemwi:
+ 				conf.append(&quot;mailbox=%s@%s&quot; % (self.ext,self.pbx))
+ 
+
+Modified: trunk/page_user_settings.ptl
+===================================================================
+--- trunk/page_user_settings.ptl	2007-01-15 21:06:34 UTC (rev 558)
++++ trunk/page_user_settings.ptl	2007-01-15 23:46:08 UTC (rev 559)
+@@ -41,12 +41,14 @@
+ 		return request.redirect(exitPath)
+ 	form = Form()
+ 
+-#	vm   = int(manager.getVar('VM',   phone.ext, True))
+ 	dnd  = manager.getVar('DND/%s' % phone.pbx,  phone.ext, False)
+ 	dsec = int(manager.getVar('DSEC/%s' % phone.pbx, phone.ext, 45))
+ 	cfim = manager.getVar('CFIM/%s' % phone.pbx, phone.ext, '')
+ 	cfbs = manager.getVar('CFBS/%s' % phone.pbx, phone.ext, '')
+ 	cfto = manager.getVar('CFTO/%s' % phone.pbx, phone.ext, '')
++	vmim = manager.getVar('VMIM/%s' % phone.pbx,  phone.ext, False)
++	vmbs = manager.getVar('VMBS/%s' % phone.pbx,  phone.ext, False)
++	vmu  = manager.getVar('VMU/%s' % phone.pbx,  phone.ext, False)
+ 
+ 	phones = backend.getChoice(&quot;CfgPhone&quot;)
+ 	if type(phones) == types.FunctionType:
+@@ -54,12 +56,14 @@
+ 	phones.remove( (phone.name,phone.name) )
+ 	phones.insert(0, ('',''))
+ 
+-	form.add(CheckboxWidget,     &quot;dnd&quot;,  dnd,          title=_(&quot;Enable 'do not disturb'&quot;))
++	form.add(CheckboxWidget,     &quot;dnd&quot;,  dnd,  title=_(&quot;Enable 'do not disturb'&quot;))
+ 	form.add(StringWidget, 	     &quot;cfim&quot;, cfim, title=_(&quot;Immediate call forwarding to&quot;))
+ 	form.add(StringWidget,       &quot;cfbs&quot;, cfbs, title=_(&quot;Forward call when busy to&quot;))
+ 	form.add(StringWidget,       &quot;cfto&quot;, cfto, title=_(&quot;Forward call when timeout/unavailable to&quot;))
+-	form.add(IntWidget,          &quot;dsec&quot;, dsec,         title=_(&quot;Seconds of incoming ring time&quot;), maxlength=3, size=3)
+-#	form.add(CheckboxWidget,     &quot;vm&quot;,   vm,           title=_(&quot;Use voice mailbox&quot;))
++	form.add(IntWidget,          &quot;dsec&quot;, dsec, title=_(&quot;Seconds of incoming ring time&quot;), maxlength=3, size=3)
++	form.add(CheckboxWidget,     &quot;vmim&quot;, vmim, title=_(&quot;Immediate voice mailbox&quot;))
++	form.add(CheckboxWidget,     &quot;vmbs&quot;, vmbs, title=_(&quot;Voice mailbox on busy&quot;))
++	form.add(CheckboxWidget,     &quot;vmu&quot;,  vmu,  title=_(&quot;Voice mailbox on timeout/unavailable&quot;))
+ 	form.add(StringWidget,       &quot;pin&quot;, phone.pin, title=_(&quot;Voicemail pin&quot;), maxlength=10)
+ 	try:
+ 		if phone.secret:
+@@ -72,12 +76,14 @@
+ 	if not form.is_submitted() or form.has_errors():
+ 		return form.render()
+ 
+-#	manager.setVar('VM/%s' % phone.pbx,   phone.ext, form['vm'])
+ 	manager.setVar('DND/%s' % phone.pbx,  phone.ext, form['dnd'])
+ 	manager.setVar('DSEC/%s' % phone.pbx, phone.ext, form['dsec'])
+ 	manager.setVar('CFIM/%s' % phone.pbx, phone.ext, form['cfim'] or '')
+ 	manager.setVar('CFBS/%s' % phone.pbx, phone.ext, form['cfbs'] or '')
+ 	manager.setVar('CFTO/%s' % phone.pbx, phone.ext, form['cfto'] or '')
++	manager.setVar('VMIM/%s' % phone.pbx, phone.ext, form['vmim'])
++	manager.setVar('VMBS/%s' % phone.pbx, phone.ext, form['vmbs'])
++	manager.setVar('VMU/%s' % phone.pbx,  phone.ext, form['vmu'])
+ 
+ 	if form[&quot;pin&quot;]:
+ 		phone.pin = form[&quot;pin&quot;]
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000021.html">[Destar-dev] r558 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000023.html">[Destar-dev] [Patch #1807] some bugfix, new features
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#22">[ date ]</a>
+              <a href="thread.html#22">[ thread ]</a>
+              <a href="subject.html#22">[ subject ]</a>
+              <a href="author.html#22">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

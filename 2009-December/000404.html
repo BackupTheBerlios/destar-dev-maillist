@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r850 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r850%20-%20trunk&In-Reply-To=%3C200912201732.nBKHW3oA000744%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000403.html">
+   <LINK REL="Next"  HREF="000405.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r850 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r850%20-%20trunk&In-Reply-To=%3C200912201732.nBKHW3oA000744%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r850 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 20 18:32:03 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000403.html">[Destar-dev] r849 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000405.html">[Destar-dev] r851 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#404">[ date ]</a>
+              <a href="thread.html#404">[ thread ]</a>
+              <a href="subject.html#404">[ subject ]</a>
+              <a href="author.html#404">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-20 18:32:03 +0100 (Sun, 20 Dec 2009)
+New Revision: 850
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_phone_ext.py
+Log:
+* cfg_phone_ext.py: in 1.6, set only accepts one variable at a time.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-20 16:28:21 UTC (rev 849)
++++ trunk/CHANGELOG.txt	2009-12-20 17:32:03 UTC (rev 850)
+@@ -1,6 +1,7 @@
+ 2009-12-20
+ * page_admin_cfwstate.ptl: Added CFTO, VMU and VMBS.
+ * page_admin_pbxstate.ptl: changed table distribution.
++* cfg_phone_ext.py: in 1.6, set only accepts one variable at a time.
+ 
+ 2009-12-16
+ * cfg_opt_pbx.py, cfg_app_*: separate context for all apps.
+
+Modified: trunk/cfg_phone_ext.py
+===================================================================
+--- trunk/cfg_phone_ext.py	2009-12-20 16:28:21 UTC (rev 849)
++++ trunk/cfg_phone_ext.py	2009-12-20 17:32:03 UTC (rev 850)
+@@ -98,9 +98,13 @@
+ 	def createAsteriskConfig(self):
+ 		extensions = AstConf(&quot;extensions.conf&quot;)
+ 		extensions.setSection(self.pbx)
+-		extensions.appendExten(self.ext,&quot;Set(CDR(pbx)=%s,CDR(userfield)=%s,CALLERID(num)=${CALLERIDNUM}-%s)&quot; % (self.pbx,self.name,self.ext), self.pbx)
++		extensions.appendExten(self.ext,&quot;Set(CDR(pbx)=%s)&quot; % (self.pbx), self.pbx)
++		extensions.appendExten(self.ext,&quot;Set(CDR(userfield)=%s)&quot; % (self.name), self.pbx)
++		extensions.appendExten(self.ext,&quot;Set(CALLERID(num)=${CALLERID(num)}-%s)&quot; % (self.ext), self.pbx)
+ 		self.createDialEntry(extensions, self.ext, self.pbx, self.ext)
+-		extensions.appendExten(self.name,&quot;Set(CDR(pbx)=%s,CDR(userfield)=%s,CALLERID(num)=${CALLERIDNUM}-%s)&quot; % (self.pbx,self.name,self.ext), self.pbx)
++		extensions.appendExten(self.name,&quot;Set(CDR(pbx)=%s)&quot; % (self.pbx), self.pbx)
++		extensions.appendExten(self.name,&quot;Set(CDR(userfield)=%s)&quot; % (self.name), self.pbx)
++		extensions.appendExten(self.name,&quot;Set(CALLERID(num)=${CALLERID(num)}-%s)&quot; % (self.ext), self.pbx)
+ 		self.createDialEntry(extensions, self.name, self.pbx, self.ext)
+ 		self.usemwi = False
+ 		self.createVoicemailConfig(extensions)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000403.html">[Destar-dev] r849 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000405.html">[Destar-dev] r851 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#404">[ date ]</a>
+              <a href="thread.html#404">[ thread ]</a>
+              <a href="subject.html#404">[ subject ]</a>
+              <a href="author.html#404">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

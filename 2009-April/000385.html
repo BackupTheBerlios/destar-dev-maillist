@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r831 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r831%20-%20trunk&In-Reply-To=%3C200904161511.n3GFBI4L026868%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000384.html">
+   <LINK REL="Next"  HREF="000386.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r831 - trunk</H1>
+    <B>tzafrir at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r831%20-%20trunk&In-Reply-To=%3C200904161511.n3GFBI4L026868%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r831 - trunk">tzafrir at mail.berlios.de
+       </A><BR>
+    <I>Thu Apr 16 17:11:18 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000384.html">[Destar-dev] r830 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000386.html">[Destar-dev] r833 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#385">[ date ]</a>
+              <a href="thread.html#385">[ thread ]</a>
+              <a href="subject.html#385">[ subject ]</a>
+              <a href="author.html#385">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: tzafrir
+Date: 2009-04-16 17:11:18 +0200 (Thu, 16 Apr 2009)
+New Revision: 831
+
+Modified:
+   trunk/page_main.ptl
+Log:
+If a module fails to load: warn. Don't Panic.
+
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2009-04-16 13:06:56 UTC (rev 830)
++++ trunk/page_main.ptl	2009-04-16 15:11:18 UTC (rev 831)
+@@ -69,7 +69,11 @@
+ 			m = None
+ 			if s.endswith('.ptl'):
+ 				s= s[:-4]
+-				m = __import__(s)
++				try:
++					m = __import__(s)
++				except SyntaxError, e:
++					sys.stderr.write('Warning: Module %s failed to compile. Disabling.\n' % s)
++					continue
+ 			elif s.endswith('.py'):
+ 				s = s[:-3]
+ 				m =  __import__(s)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000384.html">[Destar-dev] r830 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000386.html">[Destar-dev] r833 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#385">[ date ]</a>
+              <a href="thread.html#385">[ thread ]</a>
+              <a href="subject.html#385">[ subject ]</a>
+              <a href="author.html#385">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

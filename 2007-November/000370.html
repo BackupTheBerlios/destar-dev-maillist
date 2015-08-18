@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r827 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r827%20-%20trunk&In-Reply-To=%3C200711271400.lARE0jll016496%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000369.html">
+   <LINK REL="Next"  HREF="000371.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r827 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r827%20-%20trunk&In-Reply-To=%3C200711271400.lARE0jll016496%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r827 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 27 15:00:45 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000369.html">[Destar-dev] r826 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000371.html">[Destar-dev] r828 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#370">[ date ]</a>
+              <a href="thread.html#370">[ thread ]</a>
+              <a href="subject.html#370">[ subject ]</a>
+              <a href="author.html#370">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-11-27 15:00:44 +0100 (Tue, 27 Nov 2007)
+New Revision: 827
+
+Modified:
+   trunk/cfg_opt_zap_trunk.py
+Log:
+Better verification of dependencies for ZapOptAudio and ZapOptTrunk.
+
+
+Modified: trunk/cfg_opt_zap_trunk.py
+===================================================================
+--- trunk/cfg_opt_zap_trunk.py	2007-11-27 13:59:51 UTC (rev 826)
++++ trunk/cfg_opt_zap_trunk.py	2007-11-27 14:00:44 UTC (rev 827)
+@@ -42,7 +42,7 @@
+ 		# despite the &quot;from configlets import *&quot; above
+ 		import configlets
+ 		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__ == 'CfgTrunkZap':
++			if obj.__class__.__name__.startswith('CfgTrunkZap'):
+ 				return CfgOptSingle.isAddable(self)
+ 		return False
+ 	isAddable = classmethod(isAddable)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000369.html">[Destar-dev] r826 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000371.html">[Destar-dev] r828 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#370">[ date ]</a>
+              <a href="thread.html#370">[ thread ]</a>
+              <a href="subject.html#370">[ subject ]</a>
+              <a href="author.html#370">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

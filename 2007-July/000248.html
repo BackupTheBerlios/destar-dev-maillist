@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r737 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r737%20-%20trunk&In-Reply-To=%3C200707032051.l63Kp3b7011212%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000247.html">
+   <LINK REL="Next"  HREF="000249.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r737 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r737%20-%20trunk&In-Reply-To=%3C200707032051.l63Kp3b7011212%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r737 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Jul  3 22:51:03 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000247.html">[Destar-dev] r736 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000249.html">[Destar-dev] r738 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#248">[ date ]</a>
+              <a href="thread.html#248">[ thread ]</a>
+              <a href="subject.html#248">[ subject ]</a>
+              <a href="author.html#248">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-03 22:51:02 +0200 (Tue, 03 Jul 2007)
+New Revision: 737
+
+Modified:
+   trunk/ConfigHelper.ptl
+Log:
+* Changed 'print' for 'sys.stderr.write' on some log messages.
+
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-07-03 18:42:50 UTC (rev 736)
++++ trunk/ConfigHelper.ptl	2007-07-03 20:51:02 UTC (rev 737)
+@@ -23,7 +23,7 @@
+ from quixote.html import htmlescape
+ from quixote import redirect
+ import backend
+-import types, string, time
++import types, string, time, sys
+ 
+ 
+ class ROStringWidget(StringWidget):
+@@ -164,7 +164,7 @@
+ 	def saveConfig(withCallback=True):
+ 		&quot;&quot;&quot;Saves all values from the form into the configlet 'obj'.&quot;&quot;&quot;
+ 
+-		print (&quot;[%s] Saving configlet '%s' with id '%s' in group '%s'&quot; % (time.asctime(time.localtime()), obj.name, obj._id, obj.groupName))
++		sys.stderr.write (&quot;[%s] Saving configlet '%s' with id '%s' in group '%s'&quot; % (time.asctime(time.localtime()), obj.name, obj._id, obj.groupName))
+ 
+ 		#print &quot;action&quot;, obj
+ 		for v in obj.variables:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000247.html">[Destar-dev] r736 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000249.html">[Destar-dev] r738 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#248">[ date ]</a>
+              <a href="thread.html#248">[ thread ]</a>
+              <a href="subject.html#248">[ subject ]</a>
+              <a href="author.html#248">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

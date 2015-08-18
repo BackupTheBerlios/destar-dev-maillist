@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r807 - branches/santiago
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r807%20-%20branches/santiago&In-Reply-To=%3C200709102124.l8ALOcI8020874%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000343.html">
+   <LINK REL="Next"  HREF="000345.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r807 - branches/santiago</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r807%20-%20branches/santiago&In-Reply-To=%3C200709102124.l8ALOcI8020874%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r807 - branches/santiago">santiago at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 10 23:24:38 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000343.html">[Destar-dev] r806 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000345.html">[Destar-dev] r808 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#344">[ date ]</a>
+              <a href="thread.html#344">[ thread ]</a>
+              <a href="subject.html#344">[ subject ]</a>
+              <a href="author.html#344">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-09-10 23:24:38 +0200 (Mon, 10 Sep 2007)
+New Revision: 807
+
+Modified:
+   branches/santiago/CHANGELOG.txt
+   branches/santiago/backend.py
+Log:
+Improvements in macro-dial-std-exten
+
+Modified: branches/santiago/CHANGELOG.txt
+===================================================================
+--- branches/santiago/CHANGELOG.txt	2007-09-08 18:21:12 UTC (rev 806)
++++ branches/santiago/CHANGELOG.txt	2007-09-10 21:24:38 UTC (rev 807)
+@@ -1,3 +1,6 @@
++2007-09-10:
++* Improvements in macro-dial-std-exten
++
+ 2007-08-31:
+ * panelutils: use CallerID as label if it exists
+ * Use the same length for phone secrets
+
+Modified: branches/santiago/backend.py
+===================================================================
+--- branches/santiago/backend.py	2007-09-08 18:21:12 UTC (rev 806)
++++ branches/santiago/backend.py	2007-09-10 21:24:38 UTC (rev 807)
+@@ -160,8 +160,8 @@
+ 
+ 	c = AstConf(&quot;sip.conf&quot;)
+ 	c.append(&quot;language=%s&quot; % getSetting('language', 'en'))
+-	c.append(&quot;maxexpirey=3600&quot;)
+-	c.append(&quot;defaultexpirey=3600&quot;)
++	c.append(&quot;maxexpirey=45&quot;)
++	c.append(&quot;defaultexpirey=30&quot;)
+ 	c.append(&quot;disallow=all&quot;)
+ 
+ 	c = AstConf(&quot;iax.conf&quot;)
+@@ -238,45 +238,60 @@
+ 	c.append(&quot;exten =&gt; s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWwr${dopt})&quot;)
+ 	c.append(&quot;exten =&gt; s,n,Goto(s-${DIALSTATUS},1)&quot;)
+ 	c.append(&quot;;&quot;)
++	c.append(&quot;exten =&gt; s,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
++	c.append('exten =&gt; s,n(vmu),Set(vmopt=u)')
++	c.append(&quot;exten =&gt; s,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
++	c.append('exten =&gt; s,n(vmbs),Set(vmopt=b)')
++	c.append(&quot;exten =&gt; s,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
++	c.append(&quot;exten =&gt; s,n(operator),Goto(${ARG4},0,1)&quot;)
++	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'timeout'&quot;)
+-	c.append(&quot;exten =&gt; s,n(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten =&gt; s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+-	c.append('exten =&gt; s,n,GotoIf($[&quot;${CDR(intrunk)}&quot; = &quot;&quot;]?cftoend)')
+-	c.append(&quot;exten =&gt; s,n,Set(fw_ext=${DB(CFTO-TRUNK/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten =&gt; s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+-	c.append(&quot;exten =&gt; s,n(cftoend),NoOp()&quot;)
++	c.append(&quot;exten =&gt; s-NOANSWER,1(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s-NOANSWER,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
++	c.append('exten =&gt; s-NOANSWER,n,GotoIf($[&quot;${CDR(intrunk)}&quot; = &quot;&quot;]?cftoend)')
++	c.append(&quot;exten =&gt; s-NOANSWER,n,Set(fw_ext=${DB(CFTO-TRUNK/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s-NOANSWER,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
++	c.append(&quot;exten =&gt; s-NOANSWER,n(cftoend),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; no CFTO (Call Forward Timeout), test VM U.&quot;)
+-	c.append(&quot;exten =&gt; s,n,Set(vmu=${DB(VMU/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten =&gt; s,n,GotoIf($[&quot;${vmu}&quot; != &quot;&quot;]?vmu)')
+-	c.append(&quot;exten =&gt; s,n,Goto(hangup)&quot;)
++	c.append(&quot;exten =&gt; s-NOANSWER,n,Set(vmu=${DB(VMU/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s-NOANSWER,n,GotoIf($[&quot;${vmu}&quot; != &quot;&quot;]?vmu)')
++	c.append('exten =&gt; s-NOANSWER,n,GotoIf($[&quot;${CDR(intrunk)}&quot; != &quot;&quot;]?operator)')
++	c.append(&quot;exten =&gt; s-NOANSWER,n,Goto(hangup)&quot;)
+ 	c.append(&quot;;&quot;)
++	c.append('exten =&gt; s-NOANSWER,n(vmu),Set(vmopt=u)')
++	c.append(&quot;exten =&gt; s-NOANSWER,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
++	c.append(&quot;;&quot;)
++	c.append(&quot;exten =&gt; s-NOANSWER,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
++	c.append(&quot;;&quot;)
++	c.append(&quot;exten =&gt; s-NOANSWER,n(hangup),Hangup()&quot;)
++	c.append(&quot;exten =&gt; s-NOANSWER,n(operator),Goto(${ARG4},0,1)&quot;)
++	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'busy'&quot;)
+-	c.append(&quot;exten =&gt; s,MainDial+101(busy),Goto(s-NOANSWER,1)&quot;)
+-	#c.append(&quot;exten =&gt; s,MainDial+101(busy),Set(fw_ext=${DB(CFBS/${ARG4}/${ARG3})})&quot;)
+-	#c.append('exten =&gt; s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+-	#c.append('exten =&gt; s,n,GotoIf($[&quot;${CDR(intrunk)}&quot; = &quot;&quot;]?cfbsend)')
+-	#c.append(&quot;exten =&gt; s,n,Set(fw_ext=${DB(CFBS-TRUNK/${ARG4}/${ARG3})})&quot;)
+-	#c.append('exten =&gt; s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+-	#c.append(&quot;exten =&gt; s,n(cfbsend),NoOp()&quot;)
++	c.append(&quot;exten =&gt; s-BUSY,1,Set(fw_ext=${DB(CFBS/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s-BUSY,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
++	c.append('exten =&gt; s-BUSY,n,GotoIf($[&quot;${CDR(intrunk)}&quot; = &quot;&quot;]?cfbsend)')
++	c.append(&quot;exten =&gt; s-BUSY,n,Set(fw_ext=${DB(CFBS-TRUNK/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s-BUSY,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
++	c.append(&quot;exten =&gt; s-BUSY,n(cfbsend),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; no CFBS (Call Forward Busy), test VM Busy&quot;)
+-	c.append(&quot;exten =&gt; s,n,Set(vmbs=${DB(VMBS/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten =&gt; s,n,GotoIf($[&quot;${vmbs}&quot; != &quot;&quot;]?vmbs)')
+-	c.append(&quot;exten =&gt; s,n,Answer()&quot;)
+-	c.append(&quot;exten =&gt; s,n,PlayTones(busy)&quot;)
+-	c.append(&quot;exten =&gt; s,n,Busy()&quot;)
++	c.append(&quot;exten =&gt; s-BUSY,n,Set(vmbs=${DB(VMBS/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s-BUSY,n,GotoIf($[&quot;${vmbs}&quot; != &quot;&quot;]?vmbs)')
++	c.append('exten =&gt; s-BUSY,n,GotoIf($[&quot;${CDR(intrunk)}&quot; != &quot;&quot;]?operator)')
++	c.append(&quot;exten =&gt; s-BUSY,n,Answer()&quot;)
++	c.append(&quot;exten =&gt; s-BUSY,n,PlayTones(busy)&quot;)
++	c.append(&quot;exten =&gt; s-BUSY,n,Busy(30)&quot;)
++	c.append(&quot;exten =&gt; s-BUSY,n,Hungup&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;exten =&gt; s,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
++	c.append('exten =&gt; s-BUSY,n(vmbs),Set(vmopt=b)')
++	c.append(&quot;exten =&gt; s-BUSY,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append('exten =&gt; s-NOANSWER,1,Set(vmopt=u)')
+-	c.append(&quot;exten =&gt; s-NOANSWER,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
++	c.append(&quot;exten =&gt; s-BUSY,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append('exten =&gt; s-BUSY,1,Set(vmopt=b)')
+-	c.append(&quot;exten =&gt; s-BUSY,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
++	c.append(&quot;exten =&gt; s-BUSY,n(hangup),Hangup()&quot;)
++	c.append(&quot;exten =&gt; s-BUSY,n(operator),Goto(${ARG4},0,1)&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;exten =&gt; s,n(hangup),Hangup()&quot;)
+-	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten =&gt; _s-.,1,Goto(s-NOANSWER,1)&quot;)
+ 	c.append(&quot;exten =&gt; i,0,Hangup&quot;)
+         if tapisupport:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000343.html">[Destar-dev] r806 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000345.html">[Destar-dev] r808 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#344">[ date ]</a>
+              <a href="thread.html#344">[ thread ]</a>
+              <a href="subject.html#344">[ subject ]</a>
+              <a href="author.html#344">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

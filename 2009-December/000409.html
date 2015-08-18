@@ -1,0 +1,4357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r855 - in trunk: . dahdi-gen dahdi-gen/Dahdi	dahdi-gen/Dahdi/Config dahdi-gen/Dahdi/Config/Gen	dahdi-gen/Dahdi/Hardware dahdi-gen/Dahdi/Xpp
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r855%20-%20in%20trunk%3A%20.%20dahdi-gen%20dahdi-gen/Dahdi%0A%09dahdi-gen/Dahdi/Config%20dahdi-gen/Dahdi/Config/Gen%0A%09dahdi-gen/Dahdi/Hardware%20dahdi-gen/Dahdi/Xpp&In-Reply-To=%3C200912202144.nBKLiLeL005778%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000408.html">
+   <LINK REL="Next"  HREF="000410.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r855 - in trunk: . dahdi-gen dahdi-gen/Dahdi	dahdi-gen/Dahdi/Config dahdi-gen/Dahdi/Config/Gen	dahdi-gen/Dahdi/Hardware dahdi-gen/Dahdi/Xpp</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r855%20-%20in%20trunk%3A%20.%20dahdi-gen%20dahdi-gen/Dahdi%0A%09dahdi-gen/Dahdi/Config%20dahdi-gen/Dahdi/Config/Gen%0A%09dahdi-gen/Dahdi/Hardware%20dahdi-gen/Dahdi/Xpp&In-Reply-To=%3C200912202144.nBKLiLeL005778%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r855 - in trunk: . dahdi-gen dahdi-gen/Dahdi	dahdi-gen/Dahdi/Config dahdi-gen/Dahdi/Config/Gen	dahdi-gen/Dahdi/Hardware dahdi-gen/Dahdi/Xpp">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 20 22:44:21 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000408.html">[Destar-dev] r854 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000410.html">[Destar-dev] r856 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#409">[ date ]</a>
+              <a href="thread.html#409">[ thread ]</a>
+              <a href="subject.html#409">[ subject ]</a>
+              <a href="author.html#409">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-20 22:44:13 +0100 (Sun, 20 Dec 2009)
+New Revision: 855
+
+Added:
+   trunk/dahdi-gen/
+   trunk/dahdi-gen/Dahdi.pm
+   trunk/dahdi-gen/Dahdi/
+   trunk/dahdi-gen/Dahdi/Chans.pm
+   trunk/dahdi-gen/Dahdi/Config/
+   trunk/dahdi-gen/Dahdi/Config/Gen.pm
+   trunk/dahdi-gen/Dahdi/Config/Gen/
+   trunk/dahdi-gen/Dahdi/Config/Gen/Chandahdi.pm
+   trunk/dahdi-gen/Dahdi/Config/Gen/Destar.pm
+   trunk/dahdi-gen/Dahdi/Config/Gen/Modules.pm
+   trunk/dahdi-gen/Dahdi/Config/Gen/System.pm
+   trunk/dahdi-gen/Dahdi/Config/Gen/Unicall.pm
+   trunk/dahdi-gen/Dahdi/Config/Gen/Users.pm
+   trunk/dahdi-gen/Dahdi/Config/Gen/Xpporder.pm
+   trunk/dahdi-gen/Dahdi/Config/Params.pm
+   trunk/dahdi-gen/Dahdi/Hardware.pm
+   trunk/dahdi-gen/Dahdi/Hardware/
+   trunk/dahdi-gen/Dahdi/Hardware/PCI.pm
+   trunk/dahdi-gen/Dahdi/Hardware/USB.pm
+   trunk/dahdi-gen/Dahdi/Span.pm
+   trunk/dahdi-gen/Dahdi/Utils.pm
+   trunk/dahdi-gen/Dahdi/Xpp.pm
+   trunk/dahdi-gen/Dahdi/Xpp/
+   trunk/dahdi-gen/Dahdi/Xpp/Line.pm
+   trunk/dahdi-gen/Dahdi/Xpp/Mpp.pm
+   trunk/dahdi-gen/Dahdi/Xpp/Xbus.pm
+   trunk/dahdi-gen/Dahdi/Xpp/Xpd.pm
+   trunk/dahdi-gen/dahdi_genconf
+Modified:
+   trunk/CHANGELOG.txt
+Log:
+* Added dahdi-gen and created dahdi-gen/Dahdi/Config/Gen/Destar.pm
+  as a proof-of-concept (thanks tzafrir).
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/CHANGELOG.txt	2009-12-20 21:44:13 UTC (rev 855)
+@@ -12,6 +12,8 @@
+ * cfg_opt_user.py: Added SAMBA_ENABLED option.
+ * Added sambautils.py
+ * cfg_phone_zap.py: added missing monitorinbound variable.
++* Added dahdi-gen and created dahdi-gen/Dahdi/Config/Gen/Destar.pm
++  as a proof-of-concept (thanks tzafrir).
+ 
+ 2009-12-16
+ * cfg_opt_pbx.py, cfg_app_*: separate context for all apps.
+
+Added: trunk/dahdi-gen/Dahdi/Chans.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Chans.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Chans.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,260 @@
++package Dahdi::Chans;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Chans.pm 6613 2009-05-13 10:37:08Z tzafrir $
++#
++use strict;
++use Dahdi::Utils;
++
++=head1 NAME
++
++Dahdi::Chans - Perl interface to a Dahdi channel information
++
++This package allows access from perl to information about a Dahdi
++channel. It is part of the Dahdi Perl package.
++
++=head1 alarms()
++
++In an array context returns a list of alarm strings (RED, BLUE, etc.)
++for this channel (an empty list == false if there are no alarms).
++In scalar context returns the number of alarms for a specific channel.
++
++=head1 battery()
++
++Returns 1 if channel reports to have battery (A remote PBX connected to
++an FXO port), 0 if channel reports to not have battery and C&lt;undef&gt;
++otherwise.
++
++Currently only wcfxo and Astribank FXO modules report battery. For the
++rest of the channels 
++
++=head1 fqn()
++
++(Fully Qualified Name) Returns the full &quot;name&quot; of the channel.
++
++=head1 index()
++
++Returns the number of this channel (in the span).
++
++=head1 num()
++
++Returns the number of this channel as a Dahdi channel.
++
++=head signalling()
++
++Returns the signalling set for this channel through /etc/dahdi/system.conf .
++This is always empty before dahdi_cfg was run. And shows the &quot;other&quot; type
++for FXS and for FXO.
++
++=head1 span()
++
++Returns a reference to the span to which this channel belongs.
++
++=head1 type()
++
++Returns the type of the channel: 'FXS', 'FXO', 'EMPTY', etc.
++
++=cut
++
++my @alarm_types = qw(BLUE YELLOW RED LOOP RECOVERING NOTOPEN);
++
++# Taken from dahdi-base.c
++my @sigtypes = (
++	&quot;FXSLS&quot;,
++	&quot;FXSKS&quot;,
++	&quot;FXSGS&quot;,
++	&quot;FXOLS&quot;,
++	&quot;FXOKS&quot;,
++	&quot;FXOGS&quot;,
++	&quot;E&amp;M&quot;,
++	&quot;E&amp;M-E1&quot;,
++	&quot;Clear&quot;,
++	&quot;HDLCRAW&quot;,
++	&quot;HDLCFCS&quot;,
++	&quot;HDLCNET&quot;,
++	&quot;Hardware-assisted HDLC&quot;,
++	&quot;MTP2&quot;,
++	&quot;Slave&quot;,
++	&quot;CAS&quot;,
++	&quot;DACS&quot;,
++	&quot;DACS+RBS&quot;,
++	&quot;SF (ToneOnly)&quot;,
++	&quot;Unconfigured&quot;
++	);
++
++sub new($$$$$$) {
++	my $pack = shift or die &quot;Wasn't called as a class method\n&quot;;
++	my $span = shift or die &quot;Missing a span parameter\n&quot;;
++	my $index = shift;
++	my $line = shift or die &quot;Missing an input line\n&quot;;
++	defined $index or die &quot;Missing an index parameter\n&quot;;
++	my $self = {
++			'SPAN' =&gt; $span,
++			'INDEX' =&gt; $index,
++		};
++	bless $self, $pack;
++	my ($num, $fqn, $rest) = split(/\s+/, $line, 3);
++	$num or die &quot;Missing a channel number parameter\n&quot;;
++	$fqn or die &quot;Missing a channel fqn parameter\n&quot;;
++	my $signalling = '';
++	my @alarms = ();
++	my $info = '';
++	if(defined $rest) {
++		# remarks in parenthesis (In use), (no pcm)
++		while($rest =~ s/\s*(\([^)]+\))\s*/ /) {
++			$info .= &quot; $1&quot;;
++		}
++		# Alarms
++		foreach my $alarm (@alarm_types) {
++			if($rest =~ s/\s*(\b${alarm}\b)\s*/ /) {
++				push(@alarms, $1);
++			}
++		}
++		foreach my $sig (@sigtypes) {
++			if($rest =~ s/^\Q$sig\E/ /) {
++				$signalling = $sig;
++				last;
++			}
++		}
++		warn &quot;Unrecognized garbage '$rest' in $fqn\n&quot;
++			if $rest =~ /\S/;
++	}
++	$self-&gt;{NUM} = $num;
++	$self-&gt;{FQN} = $fqn;
++	$self-&gt;{SIGNALLING} = $signalling;
++	$self-&gt;{ALARMS} = \@alarms;
++	$self-&gt;{INFO} = $info;
++	my $type;
++	if($fqn =~ m|\bXPP_(\w+)/.*$|) {
++		$type = $1;		# An Astribank
++	} elsif ($fqn =~ m{\bWCFXO/.*}) {
++		$type = &quot;FXO&quot;; # wcfxo - x100p and relatives.
++		# A single port card. The driver issue RED alarm when
++		# There's no better
++		$self-&gt;{BATTERY} = !($span-&gt;description =~ /\bRED\b/);
++	} elsif ($fqn =~ m{\bFXS/.*}) {
++		$type = &quot;FXS&quot;; # likely Rhino
++	} elsif ($fqn =~ m{\bFXO/.*}) {
++		$type = &quot;FXO&quot;; # likely Rhino
++	} elsif ($fqn =~ m{---/.*}) {
++		$type = &quot;EMPTY&quot;; # likely Rhino, empty slot.
++	} elsif ($fqn =~ m{\b(TE[24]|WCT1|Tor2|TorISA|WP[TE]1|cwain[12]|R[124]T1)/.*}) {
++		# TE[24]: Digium wct4xxp
++		# WCT1: Digium single span card drivers?
++		# Tor2: Tor PCI cards
++		# TorISA: ISA ones (still used?) 
++		# WP[TE]1: Sangoma. TODO: this one tells us if it is TE or NT.
++		# cwain: Junghanns E1 card.
++		# R[124]: Rhino r1t1/rxt1 cards
++		$type = &quot;PRI&quot;;
++	} elsif ($fqn =~ m{\b(B4|ZTHFC\d*|ztqoz\d*)/.*}) {
++		# B4: The Digium wcb4xxp DAHDI driver
++		# ZTHFC: HFC-s single-port card (zaphfc/vzaphfc)
++		# ztqoz: qozap (Junghanns) multi-port HFC card
++		$type = &quot;BRI&quot;;
++        } elsif ($fqn =~ m{\bDYN/.*}) {
++                # DYN : Dynamic span (TDMOE)
++                $type = &quot;DYN&quot;
++	} elsif ($fqn =~ m{\bztgsm/.*}) {
++		# Junghanns GSM card
++		$type = &quot;GSM&quot;;
++	} elsif($signalling ne '') {
++		$type = 'FXO' if $signalling =~ /^FXS/;
++		$type = 'FXS' if $signalling =~ /^FXO/;
++	} else {
++		$type = $self-&gt;probe_type();
++	}
++	$self-&gt;type($type);
++	$self-&gt;span()-&gt;type($type)
++		if ! defined($self-&gt;span()-&gt;type()) ||
++			$self-&gt;span()-&gt;type() eq 'UNKNOWN';
++	return $self;
++}
++
++=head1 probe_type()
++
++In the case of some cards, the information in /proc/dahdi is not good
++enough to tell the type of each channel. In this case an extra explicit
++probe is needed.
++
++Currently this is implemented by using some invocations of dahdi_cfg(8).
++
++It may later be replaced by dahdi_scan(8).
++
++=cut
++
++my $dahdi_cfg = $ENV{DAHDI_CFG} || '/usr/sbin/dahdi_cfg';
++sub probe_type($) {
++	my $self = shift;
++	my $fqn = $self-&gt;fqn;
++	my $num = $self-&gt;num;
++	my $type;
++
++	if($fqn =~ m:WCTDM/|WRTDM/|OPVXA1200/:) {
++		my %maybe;
++
++		undef %maybe;
++		foreach my $sig (qw(fxo fxs)) {
++			my $cmd = &quot;echo ${sig}ks=$num | $dahdi_cfg -c /dev/fd/0&quot;;
++
++			$maybe{$sig} = system(&quot;$cmd &gt;/dev/null 2&gt;&amp;1&quot;) == 0;
++		}
++		if($maybe{fxo} and $maybe{fxs}) {
++			$type = 'EMPTY';
++		} elsif($maybe{fxo}) {
++			$type = 'FXS';
++		} elsif($maybe{fxs}) {
++			$type = 'FXO';
++		} else {
++			$type = 'EMPTY';
++		}
++	} else {
++		$type = $self-&gt;type;
++	}
++	return $type;
++}
++
++sub battery($) {
++	my $self = shift or die;
++	my $span = $self-&gt;span or die;
++
++	return undef unless defined $self-&gt;type &amp;&amp; $self-&gt;type eq 'FXO';
++	return $self-&gt;{BATTERY} if defined $self-&gt;{BATTERY};
++
++	my $xpd = $span-&gt;xpd;
++	my $index = $self-&gt;index;
++	return undef if !$xpd;
++
++	# It's an XPD (FXO)
++	my @lines = @{$xpd-&gt;lines};
++	my $line = $lines[$index];
++	return $line-&gt;battery;
++}
++
++sub alarms($) {
++	my $self = shift or die;
++	my @alarms = @{$self-&gt;{ALARMS}};
++
++	return @alarms;
++}
++
++sub blink($$) {
++	my $self = shift or die;
++	my $on = shift;
++	my $span = $self-&gt;span or die;
++
++	my $xpd = $span-&gt;xpd;
++	my $index = $self-&gt;index;
++	return undef if !$xpd;
++
++	my @lines = @{$xpd-&gt;lines};
++	my $line = $lines[$index];
++	return $line-&gt;blink($on);
++}
++
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Config/Gen/Chandahdi.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Gen/Chandahdi.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Config/Gen/Chandahdi.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,215 @@
++package Dahdi::Config::Gen::Chandahdi;
++use strict;
++
++use Dahdi::Config::Gen qw(is_true);
++
++sub new($$$) {
++	my $pack = shift || die;
++	my $gconfig = shift || die;
++	my $genopts = shift || die;
++	my $file = $ENV{CHAN_DAHDI_CHANNELS_FILE} || &quot;/etc/asterisk/dahdi-channels.conf&quot;;
++	my $self = {
++			FILE	=&gt; $file,
++			GCONFIG	=&gt; $gconfig,
++			GENOPTS	=&gt; $genopts,
++		};
++	bless $self, $pack;
++	return $self;
++}
++
++# Since chan_dahdi definitions &quot;leak&quot; to the next ones, we try
++# To reset some important definitions to their chan_dahdi defaults.
++my %chan_dahdi_defaults = (
++	context =&gt; 'default',
++	group =&gt; '63', # FIXME: should not be needed. 
++	overlapdial =&gt; 'no',
++	busydetect =&gt; 'no',
++	rxgain =&gt; 0,
++	txgain =&gt; 0,
++);
++
++sub reset_chandahdi_values {
++	foreach my $arg (@_) {
++		if (exists $chan_dahdi_defaults{$arg}) {
++			print &quot;$arg = $chan_dahdi_defaults{$arg}\n&quot;;
++		} else {
++			print &quot;$arg =\n&quot;;
++		}
++	}
++}
++
++sub gen_digital($$) {
++	my $self = shift || die;
++	my $span = shift || die;
++	my $gconfig = $self-&gt;{GCONFIG};
++	my $num = $span-&gt;num() || die;
++	die &quot;Span #$num is analog&quot; unless $span-&gt;is_digital();
++	if($span-&gt;is_pri &amp;&amp; $gconfig-&gt;{'pri_connection_type'} eq 'R2') {
++		printf &quot;; Skipped: $gconfig-&gt;{'pri_connection_type'}\n\n&quot;;
++		return;
++	}
++	my $type = $span-&gt;type() || die &quot;$0: Span #$num -- unkown type\n&quot;;
++	my $termtype = $span-&gt;termtype() || die &quot;$0: Span #$num -- unkown termtype [NT/TE]\n&quot;;
++	my $group = $gconfig-&gt;{'group'}{&quot;$type&quot;};
++	my $context = $gconfig-&gt;{'context'}{&quot;$type&quot;};
++	my @to_reset = qw/context group/;
++
++	die &quot;$0: missing default group (termtype=$termtype)\n&quot; unless defined($group);
++	die &quot;$0: missing default context\n&quot; unless $context;
++
++	my $sig = $span-&gt;signalling || die &quot;missing signalling info for span #$num type $type&quot;;
++	grep($gconfig-&gt;{'bri_sig_style'} eq $_, 'bri', 'bri_ptmp', 'pri') or die &quot;unknown signalling style for BRI&quot;;
++	if($span-&gt;is_bri() and $gconfig-&gt;{'bri_sig_style'} eq 'bri_ptmp') {
++		$sig .= '_ptmp';
++	}
++	if ($span-&gt;is_bri() &amp;&amp; $termtype eq 'NT' &amp;&amp; is_true($gconfig-&gt;{'brint_overlap'})) {
++		print &quot;overlapdial = yes\n&quot;;
++		push(@to_reset, qw/overlapdial/);
++	}
++		
++	$group .= &quot;,&quot; . (10 + $num);	# Invent unique group per span
++	printf &quot;group=$group\n&quot;;
++	printf &quot;context=$context\n&quot;;
++	printf &quot;switchtype = %s\n&quot;, $span-&gt;switchtype;
++	printf &quot;signalling = %s\n&quot;, $sig;
++	printf &quot;channel =&gt; %s\n&quot;, Dahdi::Config::Gen::bchan_range($span);
++	reset_chandahdi_values(@to_reset);
++}
++
++sub gen_channel($$) {
++	my $self = shift || die;
++	my $chan = shift || die;
++	my $gconfig = $self-&gt;{GCONFIG};
++	my $type = $chan-&gt;type;
++	my $num = $chan-&gt;num;
++	die &quot;channel $num type $type is not an analog channel\n&quot; if $chan-&gt;span-&gt;is_digital();
++	my $exten = $gconfig-&gt;{'base_exten'} + $num;
++	my $sig = $gconfig-&gt;{'chan_dahdi_signalling'}{$type};
++	my $context = $gconfig-&gt;{'context'}{$type};
++	my $group = $gconfig-&gt;{'group'}{$type};
++	my $callerid;
++	my $immediate;
++
++	return if $type eq 'EMPTY';
++	die &quot;missing default_chan_dahdi_signalling for chan #$num type $type&quot; unless $sig;
++	$callerid = ($type eq 'FXO')
++			? 'asreceived'
++			: sprintf &quot;\&quot;Channel %d\&quot; &lt;%04d&gt;&quot;, $num, $exten;
++	if($type eq 'IN') {
++		$immediate = 'yes';
++	}
++	# FIXME: $immediage should not be set for 'OUT' channels, but meanwhile
++	#        it's better to be compatible with genzaptelconf
++	$immediate = 'yes' if $gconfig-&gt;{'fxs_immediate'} eq 'yes' and $sig =~ /^fxo_/;
++	my $signalling = $chan-&gt;signalling;
++	$signalling = &quot; &quot; . $signalling if $signalling;
++	my $info = $chan-&gt;info;
++	$info = &quot; &quot; . $info if $info;
++	printf &quot;;;; line=\&quot;%d %s%s%s\&quot;\n&quot;, $num, $chan-&gt;fqn, $signalling, $info;
++	printf &quot;signalling=$sig\n&quot;;
++	printf &quot;callerid=$callerid\n&quot;;
++	printf &quot;mailbox=%04d\n&quot;, $exten unless $type eq 'FXO';
++	if(defined $group) {
++		printf &quot;group=$group\n&quot;;
++	}
++	printf &quot;context=$context\n&quot;;
++	printf &quot;immediate=$immediate\n&quot; if defined $immediate;
++	printf &quot;channel =&gt; %d\n&quot;, $num;
++	# Reset following values to default
++	printf &quot;callerid=\n&quot;;
++	printf &quot;mailbox=\n&quot; unless $type eq 'FXO';
++	if(defined $group) {
++		printf &quot;group=\n&quot;;
++	}
++	printf &quot;context=default\n&quot;;
++	printf &quot;immediate=no\n&quot; if defined $immediate;
++	print &quot;\n&quot;;
++}
++
++sub generate($) {
++	my $self = shift || die;
++	my $file = $self-&gt;{FILE};
++	my $gconfig = $self-&gt;{GCONFIG};
++	my $genopts = $self-&gt;{GENOPTS};
++	#$gconfig-&gt;dump;
++	my @spans = @_;
++	warn &quot;Empty configuration -- no spans\n&quot; unless @spans;
++	rename &quot;$file&quot;, &quot;$file.bak&quot;
++		or $! == 2	# ENOENT (No dependency on Errno.pm)
++		or die &quot;Failed to backup old config: $!\n&quot;;
++	print &quot;Generating $file\n&quot; if $genopts-&gt;{verbose};
++	open(F, &quot;&gt;$file&quot;) || die &quot;$0: Failed to open $file: $!\n&quot;;
++	my $old = select F;
++	printf &quot;; Autogenerated by $0 on %s\n&quot;, scalar(localtime);
++	print  &quot;; If you edit this file and execute $0 again,\n&quot;;
++	print  &quot;; your manual changes will be LOST.\n&quot;;
++	print &lt;&lt;&quot;HEAD&quot;;
++; Dahdi Channels Configurations (chan_dahdi.conf)
++;
++; This is not intended to be a complete chan_dahdi.conf. Rather, it is intended
++; to be #include-d by /etc/chan_dahdi.conf that will include the global settings
++;
++
++HEAD
++	foreach my $span (@spans) {
++		printf &quot;; Span %d: %s %s\n&quot;, $span-&gt;num, $span-&gt;name, $span-&gt;description;
++		if($span-&gt;is_digital()) {
++			$self-&gt;gen_digital($span);
++		} else {
++			foreach my $chan ($span-&gt;chans()) {
++				if(is_true($genopts-&gt;{'freepbx'}) || is_true($gconfig-&gt;{'freepbx'})) {
++					# Freepbx has its own idea about channels
++					my $type = $chan-&gt;type;
++					if($type eq 'FXS' || $type eq 'OUT' || $type eq 'IN') {
++						printf &quot;; Skip channel=%s($type) -- freepbx option.\n&quot;,
++							$chan-&gt;num;
++						next;
++					}
++				}
++				$self-&gt;gen_channel($chan);
++			}
++		}
++		print &quot;\n&quot;;
++	}
++	close F;
++	select $old;
++}
++
++1;
++
++__END__
++
++=head1 NAME
++
++chandahdi - Generate configuration for chan_dahdi channels.
++
++=head1 SYNOPSIS
++
++ use Dahdi::Config::Gen::Chandahdi;
++
++ my $cfg = new Dahdi::Config::Gen::Chandahdi(\%global_config, \%genopts);
++ $cfg-&gt;generate(@span_list);
++
++=head1 DESCRIPTION
++
++Generate the F&lt;/etc/asterisk/dahdi-channels.conf&gt;
++This is used as a configuration for asterisk(1).
++It should be included in the main F&lt;/etc/asterisk/chan_dahdi.conf&gt;.
++
++Its location may be overriden via the environment variable 
++C&lt;CHAN_DAHDI_CHANNELS_FILE&gt;.
++
++=head1 OPTIONS
++
++=over 4
++
++=item freepbx
++
++With this option we do not generate channel definitions for FXS, Input and
++Output ports. This is done because these channel definitions need to be
++generated and inserted into I&lt;freepbx&gt; database anyway.
++
++=back
++
++The I&lt;freepbx&gt; option may be activated also by adding a C&lt;freepbx yes&gt; line
++to the C&lt;genconf_parameters&gt; file.
+
+Added: trunk/dahdi-gen/Dahdi/Config/Gen/Destar.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Gen/Destar.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Config/Gen/Destar.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,168 @@
++package Dahdi::Config::Gen::Destar;
++#
++# This file was written by Alejandro Rios &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">alerios at debian.org</A>&gt;
++# Based on Dahdi's perl_modules by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++
++use strict;
++
++use Dahdi::Config::Gen qw(is_true);
++
++sub new($$$) {
++	my $pack = shift || die;
++	my $gconfig = shift || die;
++	my $genopts = shift || die;
++	my $file = $ENV{DESTAR_FILE} || &quot;/etc/asterisk/destar_channels.py&quot;;
++	my $self = {
++			FILE	=&gt; $file,
++			GCONFIG	=&gt; $gconfig,
++			GENOPTS	=&gt; $genopts,
++		};
++	bless $self, $pack;
++	return $self;
++}
++
++# Since chan_dahdi definitions &quot;leak&quot; to the next ones, we try
++# To reset some important definitions to their chan_dahdi defaults.
++my %destar_defaults = (
++        group    =&gt; '&quot;1&quot;',
++);
++
++sub reset_destar_values {
++	foreach my $arg (@_) {
++		if (exists $destar_defaults{$arg}) {
++			print &quot;\t$arg = $destar_defaults{$arg},\n&quot;;
++		} else {
++			print &quot;\t$arg = None,\n&quot;;
++		}
++	}
++}
++
++sub gen_openr2($$$) {
++	printf &quot;#coming soon\n&quot;;
++}
++
++sub gen_cas($$$) {
++	printf &quot;#coming soon\n&quot;;
++}
++
++sub gen_digital($$$) {
++	my $self = shift || die;
++	my $gconfig = shift || die;
++	my $span = shift || die;
++	my $num = $span-&gt;num() || die;
++	die &quot;Span #$num is analog&quot; unless $span-&gt;is_digital();
++	if($span-&gt;is_pri &amp;&amp; $gconfig-&gt;{'pri_connection_type'} eq 'R2') {
++		printf &quot;; Skipped: $gconfig-&gt;{'pri_connection_type'}\n\n&quot;;
++		return;
++	}
++	my $type = $span-&gt;type() || die &quot;$0: Span #$num -- unkown type\n&quot;;
++	my $termtype = $span-&gt;termtype() || die &quot;$0: Span #$num -- unkown termtype [NT/TE]\n&quot;;
++	my $group = $gconfig-&gt;{'group'}{&quot;$type&quot;};
++	my $context = $gconfig-&gt;{'context'}{&quot;$type&quot;};
++	my @to_reset = qw/context group/;
++
++	die &quot;$0: missing default group (termtype=$termtype)\n&quot; unless defined($group);
++	die &quot;$0: missing default context\n&quot; unless $context;
++
++	my $sig = $span-&gt;signalling || die &quot;missing signalling info for span #$num type $type&quot;;
++	grep($gconfig-&gt;{'bri_sig_style'} eq $_, 'bri', 'bri_ptmp', 'pri') or die &quot;unknown signalling style for BRI&quot;;
++
++	if($span-&gt;is_bri() and $gconfig-&gt;{'bri_sig_style'} eq 'bri_ptmp') {
++		$sig .= '_ptmp';
++	}
++
++	printf &quot;CfgTrunkDAHDIPRI(\n&quot;;
++	printf &quot;\tname = \&quot;Span_%d\&quot;,\n&quot;, $span-&gt;num, $span-&gt;name, $span-&gt;description;
++	printf &quot;\tdescription = \&quot;%s\&quot;,\n&quot;, $span-&gt;name;
++	if ($span-&gt;is_bri() &amp;&amp; $termtype eq 'NT' &amp;&amp; is_true($gconfig-&gt;{'brint_overlap'})) {
++		print &quot;\toverlapdial = True\n&quot;;
++		push(@to_reset, qw/overlapdial/);
++	}
++
++	printf &quot;\tswitchtype = \&quot;%s\&quot;,\n&quot;, $span-&gt;switchtype;
++	printf &quot;\tsignalling = \&quot;%s\&quot;,\n&quot;, $sig;
++	printf &quot;\tchannels = \&quot;%s\&quot;,\n&quot;, Dahdi::Config::Gen::bchan_range($span);
++	reset_destar_values(@to_reset);
++	printf &quot;\t)\n&quot;;
++}
++
++sub gen_channel($$) {
++	printf &quot;#coming soon\n&quot;;
++}
++
++sub generate($) {
++	my $self = shift || die;
++	my $file = $self-&gt;{FILE};
++	my $gconfig = $self-&gt;{GCONFIG};
++	my $genopts = $self-&gt;{GENOPTS};
++	#$gconfig-&gt;dump;
++	my @spans = @_;
++	warn &quot;Empty configuration -- no spans\n&quot; unless @spans;
++	rename &quot;$file&quot;, &quot;$file.bak&quot;
++		or $! == 2	# ENOENT (No dependency on Errno.pm)
++		or die &quot;Failed to backup old config: $!\n&quot;;
++	print &quot;Generating $file\n&quot; if $genopts-&gt;{verbose};
++	open(F, &quot;&gt;$file&quot;) || die &quot;$0: Failed to open $file: $!\n&quot;;
++	my $old = select F;
++	printf &quot;# Autogenerated by $0 on %s\n&quot;, scalar(localtime);
++        print  &quot;# If you edit this file and execute $0 again,\n&quot;;
++        print  &quot;# your manual changes will be LOST.\n&quot;;
++        print &lt;&lt;&quot;HEAD&quot;;
++# Destar's Dahdi Channels Configurations (destar_channels.py)
++#
++# This is not intended to be a complete destar_cfg.py. Rather, it is intended
++# to be loaded at runtime by destar to provide autodetection for Dahdi trunks.
++#
++
++HEAD
++	foreach my $span (@spans) {
++		printf &quot;# Span %d: %s %s\n&quot;, $span-&gt;num, $span-&gt;name, $span-&gt;description;
++		if($span-&gt;is_digital) {
++			if($span-&gt;is_pri) {
++				if($gconfig-&gt;{'pri_connection_type'} eq 'R2') {
++					$self-&gt;gen_openr2($gconfig, $span);
++				} elsif($gconfig-&gt;{'pri_connection_type'} eq 'CAS') {
++					$self-&gt;gen_cas($gconfig, $span);
++				} else {
++					$self-&gt;gen_digital($gconfig, $span);
++				}
++			} elsif($span-&gt;is_bri) {
++				$self-&gt;gen_digital($gconfig, $span);
++			}
++		} else {
++			foreach my $chan ($span-&gt;chans()) {
++				$self-&gt;gen_channel($chan);
++			}
++		}
++		print &quot;\n&quot;;
++	}
++	close F;
++	select $old;
++}
++
++1;
++
++__END__
++
++=head1 NAME
++
++destar - Generate DeStar's configuration for chan_dahdi channels.
++
++=head1 SYNOPSIS
++
++ use Dahdi::Config::Gen::Destar;
++
++ my $cfg = new Dahdi::Config::Gen::Destar(\%global_config, \%genopts);
++ $cfg-&gt;generate(@span_list);
++
++=head1 DESCRIPTION
++
++Generate the F&lt;/etc/asterisk/destar_channels.py&gt;
++This is used as a configuration for destar(1) at runtime.
++
++Its location may be overriden via the environment variable 
++C&lt;DESTAR_FILE&gt;.
+
+Added: trunk/dahdi-gen/Dahdi/Config/Gen/Modules.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Gen/Modules.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Config/Gen/Modules.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,62 @@
++package Dahdi::Config::Gen::Modules;
++use strict;
++
++use Dahdi::Config::Gen qw(is_true);
++
++sub new($$$) {
++	my $pack = shift || die;
++	my $gconfig = shift || die;
++	my $genopts = shift || die;
++	my $file = $ENV{DAHDI_MODULES_FILE} || &quot;/etc/dahdi/modules&quot;;
++	my $self = {
++			FILE	=&gt; $file,
++			GCONFIG	=&gt; $gconfig,
++			GENOPTS	=&gt; $genopts,
++		};
++	bless $self, $pack;
++	return $self;
++}
++
++sub generate($$$) {
++	my $self = shift || die;
++	my $file = $self-&gt;{FILE};
++	my $gconfig = $self-&gt;{GCONFIG};
++	my $genopts = $self-&gt;{GENOPTS};
++	rename &quot;$file&quot;, &quot;$file.bak&quot;
++		or $! == 2	# ENOENT (No dependency on Errno.pm)
++		or die &quot;Failed to backup old config: $!\n&quot;;
++	#$gconfig-&gt;dump;
++	print &quot;Generating $file\n&quot; if $genopts-&gt;{verbose};
++	open(F, &quot;&gt;$file&quot;) || die &quot;$0: Failed to open $file: $!\n&quot;;
++	my $old = select F;
++	printf &quot;# Autogenerated by $0 (%s) on %s\n&quot;, __PACKAGE__, scalar(localtime);
++	print  &quot;# If you edit this file and execute $0 again,\n&quot;;
++	print  &quot;# your manual changes will be LOST.\n&quot;;
++	my @drivers = Dahdi::Hardware-&gt;drivers;
++	print join(&quot;\n&quot;, @drivers),&quot;\n&quot;;
++	close F;
++	select $old;
++}
++
++1;
++
++__END__
++
++=head1 NAME
++
++modules - Generate list of dahdi drivers to load at startup
++
++=head1 SYNOPSIS
++
++ use Dahdi::Config::Gen::Dahdi;
++
++ my $cfg = new Dahdi::Config::Gen::Modules(\%global_config, \%genopts);
++ $cfg-&gt;generate(@span_list);
++
++=head1 DESCRIPTION
++
++Generate the F&lt;/etc/dahdi/modules&gt;. This is a list of modules, one per
++line. This list is normally used by F&lt;/etc/init.d/dahdi&gt;.
++
++Its location may be overriden via the environment variable
++F&lt;DAHDI_MODULES_FILE&gt;.
+
+Added: trunk/dahdi-gen/Dahdi/Config/Gen/System.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Gen/System.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Config/Gen/System.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,194 @@
++package Dahdi::Config::Gen::System;
++use strict;
++
++use Dahdi::Config::Gen qw(is_true);
++
++sub new($$$) {
++	my $pack = shift || die;
++	my $gconfig = shift || die;
++	my $genopts = shift || die;
++	my $file = $ENV{DAHDI_CONF_FILE} || &quot;/etc/dahdi/system.conf&quot;;
++	my $self = {
++			FILE	=&gt; $file,
++			GCONFIG	=&gt; $gconfig,
++			GENOPTS	=&gt; $genopts,
++		};
++	bless $self, $pack;
++	return $self;
++}
++
++my $bri_te_last_timing = 1;
++
++sub print_echo_can($$) {
++	my $gconfig = shift || die;
++	my $chans = shift || die; # channel or range of channels.
++	my $echo_can = $gconfig-&gt;{'echo_can'};
++	return if !defined($echo_can) || $echo_can eq 'none';
++
++	print &quot;echocanceller=$echo_can,$chans\n&quot;;
++}
++
++sub gen_digital($$) {
++	my $gconfig = shift || die;
++	my $span = shift || die;
++	my $num = $span-&gt;num() || die;
++	die &quot;Span #$num is analog&quot; unless $span-&gt;is_digital();
++	my $termtype = $span-&gt;termtype() || die &quot;$0: Span #$num -- unkown termtype [NT/TE]\n&quot;;
++	my $timing;
++	my $lbo = 0;
++	my $framing = $span-&gt;framing() || die &quot;$0: No framing information for span #$num\n&quot;;
++	my $coding =  $span-&gt;coding() || die &quot;$0: No coding information for span #$num\n&quot;;
++	my $span_crc4 = $span-&gt;crc4();
++	$span_crc4 = (defined $span_crc4) ? &quot;,$span_crc4&quot; : '';
++	my $span_yellow = $span-&gt;yellow();
++	$span_yellow = (defined $span_yellow) ? &quot;,$span_yellow&quot; : '';
++	# &quot;MFC/R2 does not normally use CRC4&quot;
++	# FIXME: a finer way to override:
++	if ($gconfig-&gt;{'pri_connection_type'} eq 'R2') { 
++		$span_crc4 = '';
++		$framing = 'cas';
++	}
++	$timing = ($termtype eq 'NT') ? 0 : $bri_te_last_timing++;
++	printf &quot;span=%d,%d,%d,%s,%s%s%s\n&quot;,
++			$num,
++			$timing,
++			$lbo,
++			$framing,
++			$coding,
++			$span_crc4,
++			$span_yellow;
++	printf &quot;# termtype: %s\n&quot;, lc($termtype);
++	my $dchan_type;
++	if ($span-&gt;is_bri()) {
++		my $use_bristuff = 0;
++		my $cfg_hardhdlc = $gconfig-&gt;{'bri_hardhdlc'};
++		my $xpd = $span-&gt;xpd();
++		if(!defined($cfg_hardhdlc) || $cfg_hardhdlc =~ /AUTO/i) {
++			# Autodetect
++			if(defined($xpd)) {
++				# Bristuff?
++				if(defined($xpd-&gt;dchan_hardhdlc) &amp;&amp; !is_true($xpd-&gt;dchan_hardhdlc)) {
++					$use_bristuff = 1;
++				}
++			}
++		} elsif(!is_true($cfg_hardhdlc)) {
++			$use_bristuff = 1;
++		}
++		if($use_bristuff) {
++			$dchan_type = 'dchan';
++		} else {
++			$dchan_type = 'hardhdlc';
++		}
++		printf &quot;bchan=%s\n&quot;, Dahdi::Config::Gen::bchan_range($span);
++		my $dchan = $span-&gt;dchan();
++		printf &quot;$dchan_type=%d\n&quot;, $dchan-&gt;num();
++	} elsif($span-&gt;is_pri()) {
++		if ($gconfig-&gt;{'pri_connection_type'} eq 'PRI') {
++			printf &quot;bchan=%s\n&quot;, Dahdi::Config::Gen::bchan_range($span);
++			my $dchan = $span-&gt;dchan();
++			printf &quot;dchan=%d\n&quot;, $dchan-&gt;num();
++		} elsif ($gconfig-&gt;{'pri_connection_type'} eq 'R2' ) {
++			my $idle_bits = $gconfig-&gt;{'r2_idle_bits'};
++			printf &quot;cas=%s:$idle_bits\n&quot;, Dahdi::Config::Gen::bchan_range($span);
++			printf &quot;dchan=%d\n&quot;, $span-&gt;dchan()-&gt;num();
++		}
++	} else {
++		die &quot;Digital span $num is not BRI, nor PRI?&quot;;
++	}
++	print_echo_can($gconfig, Dahdi::Config::Gen::bchan_range($span));
++}
++
++sub gen_signalling($$) {
++	my $gconfig = shift || die;
++	my $chan = shift || die;
++	my $type = $chan-&gt;type;
++	my $num = $chan-&gt;num;
++
++	die &quot;channel $num type $type is not an analog channel\n&quot; if $chan-&gt;span-&gt;is_digital();
++	if($type eq 'EMPTY') {
++		printf &quot;# channel %d, %s, no module.\n&quot;, $num, $chan-&gt;fqn;
++		return;
++	}
++	my $signalling = $gconfig-&gt;{'dahdi_signalling'};
++	my $sig = $signalling-&gt;{$type} || die &quot;unknown default dahdi signalling for chan $num type $type&quot;;
++	if ($type eq 'IN') {
++		printf &quot;# astbanktype: input\n&quot;;
++	} elsif ($type eq 'OUT') {
++		printf &quot;# astbanktype: output\n&quot;;
++	}
++	printf &quot;$sig=$num\n&quot;;
++	print_echo_can($gconfig, $num);
++}
++
++sub generate($$$) {
++	my $self = shift || die;
++	my $file = $self-&gt;{FILE};
++	my $gconfig = $self-&gt;{GCONFIG};
++	my $genopts = $self-&gt;{GENOPTS};
++	my @spans = @_;
++	warn &quot;Empty configuration -- no spans\n&quot; unless @spans;
++	rename &quot;$file&quot;, &quot;$file.bak&quot;
++		or $! == 2	# ENOENT (No dependency on Errno.pm)
++		or die &quot;Failed to backup old config: $!\n&quot;;
++	#$gconfig-&gt;dump;
++	print &quot;Generating $file\n&quot; if $genopts-&gt;{verbose};
++	open(F, &quot;&gt;$file&quot;) || die &quot;$0: Failed to open $file: $!\n&quot;;
++	my $old = select F;
++	printf &quot;# Autogenerated by $0 on %s\n&quot;, scalar(localtime);
++	print  &quot;# If you edit this file and execute $0 again,\n&quot;;
++	print  &quot;# your manual changes will be LOST.\n&quot;;
++	print &lt;&lt;&quot;HEAD&quot;;
++# Dahdi Configuration File
++#
++# This file is parsed by the Dahdi Configurator, dahdi_cfg
++#
++HEAD
++	foreach my $span (@spans) {
++		printf &quot;# Span %d: %s %s\n&quot;, $span-&gt;num, $span-&gt;name, $span-&gt;description;
++		if($span-&gt;is_digital()) {
++			gen_digital($gconfig, $span);
++		} else {
++			foreach my $chan ($span-&gt;chans()) {
++				if(1 || !defined $chan-&gt;type) {
++					my $type = $chan-&gt;probe_type;
++					my $num = $chan-&gt;num;
++					die &quot;Failed probing type for channel $num&quot;
++						unless defined $type;
++					$chan-&gt;type($type);
++				}
++				gen_signalling($gconfig, $chan);
++			}
++		}
++		print &quot;\n&quot;;
++	}
++	print &lt;&lt;&quot;TAIL&quot;;
++# Global data
++
++loadzone	= $gconfig-&gt;{'loadzone'}
++defaultzone	= $gconfig-&gt;{'defaultzone'}
++TAIL
++	close F;
++	select $old;
++}
++
++1;
++
++__END__
++
++=head1 NAME
++
++dahdi - Generate configuration for dahdi drivers.
++
++=head1 SYNOPSIS
++
++ use Dahdi::Config::Gen::Dahdi;
++
++ my $cfg = new Dahdi::Config::Gen::Dahdi(\%global_config, \%genopts);
++ $cfg-&gt;generate(@span_list);
++
++=head1 DESCRIPTION
++
++Generate the F&lt;/etc/dahdi/system.conf&gt;.
++This is the configuration for dahdi_cfg(1).
++
++Its location may be overriden via the environment variable F&lt;DAHDI_CONF_FILE&gt;.
+
+Added: trunk/dahdi-gen/Dahdi/Config/Gen/Unicall.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Gen/Unicall.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Config/Gen/Unicall.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,72 @@
++package Dahdi::Config::Gen::Unicall;
++use strict;
++
++use Dahdi::Config::Gen qw(is_true);
++
++sub new($$$) {
++	my $pack = shift || die;
++	my $gconfig = shift || die;
++	my $genopts = shift || die;
++	my $file = $ENV{UNICALL_CHANNELS_FILE} || &quot;/etc/asterisk/unicall-channels.conf&quot;;
++	my $self = {
++			FILE	=&gt; $file,
++			GCONFIG	=&gt; $gconfig,
++			GENOPTS	=&gt; $genopts,
++		};
++	bless $self, $pack;
++	return $self;
++}
++
++sub generate($) {
++	my $self = shift || die;
++	my $file = $self-&gt;{FILE};
++	my $gconfig = $self-&gt;{GCONFIG};
++	my $genopts = $self-&gt;{GENOPTS};
++	#$gconfig-&gt;dump;
++	my @spans = @_;
++	warn &quot;Empty configuration -- no spans\n&quot; unless @spans;
++	die &quot;Only for R2&quot; unless $gconfig-&gt;{'pri_connection_type'} eq 'R2';
++	rename &quot;$file&quot;, &quot;$file.bak&quot;
++		or $! == 2	# ENOENT (No dependency on Errno.pm)
++		or die &quot;Failed to backup old config: $!\n&quot;;
++	print &quot;Generating $file\n&quot; if $genopts-&gt;{verbose};
++	open(F, &quot;&gt;$file&quot;) || die &quot;$0: Failed to open $file: $!\n&quot;;
++	my $old = select F;
++	printf &quot;; Autogenerated by $0 on %s\n&quot;, scalar(localtime);
++	print  &quot;; If you edit this file and execute $0 again,\n&quot;;
++	print  &quot;; your manual changes will be LOST.\n&quot;;
++	print  &quot;; This file should be #included in unicall.conf\n\n&quot;;
++	foreach my $span (@spans) {
++		next unless $span-&gt;is_digital();
++		printf &quot;; Span %d: %s %s\n&quot;, $span-&gt;num, $span-&gt;name, $span-&gt;description;
++		my $idle_bits = $gconfig-&gt;{'r2_idle_bits'}; 
++		printf &quot;protocolend=%s\n&quot;, ($span-&gt;termtype() eq 'TE') ? 'cpe' : 'co';
++		printf &quot;channel=%s\n&quot;, Dahdi::Config::Gen::bchan_range($span);
++		print &quot;\n&quot;;
++	}
++	close F;
++	select $old;
++}
++
++1;
++
++__END__
++
++=head1 NAME
++
++unicall - Generate configuration for unicall channels.
++
++=head1 SYNOPSIS
++
++ use Dahdi::Config::Gen::Unicall;
++
++ my $cfg = new Dahdi::Config::Gen::Unicall(\%global_config, \%genopts);
++ $cfg-&gt;generate(@span_list);
++
++=head1 DESCRIPTION
++
++Generate the F&lt;/etc/asterisk/unicall-channels.conf&gt; to be included in 
++F&lt;/etc/asterisk/unicall.conf&gt;
++
++Its location may be overriden via the environment variable 
++C&lt;UNICALL_CHANNELS_FILE&gt;.
+
+Added: trunk/dahdi-gen/Dahdi/Config/Gen/Users.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Gen/Users.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Config/Gen/Users.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,227 @@
++package Dahdi::Config::Gen::Users;
++use strict;
++
++use File::Basename;
++use Dahdi::Config::Gen qw(is_true);
++
++# Generate a complete users.conf for the asterisk-gui
++# As the asterisk-gui provides no command-line interface of its own and
++# no decent support of #include, we have no choice but to nuke users.conf
++# if we're to provide a working system
++
++sub new($$$) {
++	my $pack = shift || die;
++	my $gconfig = shift || die;
++	my $genopts = shift || die;
++	my $file = $ENV{USERS_FILE} || &quot;/etc/asterisk/users.conf&quot;;
++	my $self = {
++			FILE	=&gt; $file,
++			GCONFIG	=&gt; $gconfig,
++			GENOPTS	=&gt; $genopts,
++		};
++	bless $self, $pack;
++	return $self;
++}
++
++# A single analog trunk for all the FXO channels
++sub gen_analog_trunk {
++	my @fxo_ports = @_;
++	return unless (@fxo_ports); # no ports
++
++	my $ports = join(',', @fxo_ports);
++
++	print &lt;&lt; &quot;EOF&quot;
++[trunk_1]
++trunkname = analog
++hasexten = no
++hasiax = no
++hassip = no
++hasregisteriax = no
++hasregistersip = no
++trunkstyle = analog
++dahdichan = $ports
++
++EOF
++}
++
++# A digital trunk for a single span.
++# FIXME: how do I create the DID context?
++sub gen_digital_trunk($) {
++	my $span = shift;
++	my $num = $span-&gt;num;
++	my $sig = $span-&gt;signalling;
++	my $type = $span-&gt;type;
++	my $bchan_range = Dahdi::Config::Gen::bchan_range($span);
++
++	print &lt;&lt; &quot;EOF&quot;;
++[span_$num]
++group = $num
++hasexten = no
++signalling = $sig
++trunkname = Span $num $type
++trunkstyle = digital  ; GUI metadata
++hassip = no
++hasiax = no
++context = DID_span_$num
++dahdichan = $bchan_range
++
++EOF
++}
++
++my $ExtenNum;
++
++# A single user for a FXS channel
++sub gen_channel($$) {
++	my $self = shift || die;
++	my $chan = shift || die;
++	my $gconfig = $self-&gt;{GCONFIG};
++	my $type = $chan-&gt;type;
++	my $num = $chan-&gt;num;
++	die &quot;channel $num type $type is not an analog channel\n&quot; if $chan-&gt;span-&gt;is_digital();
++	my $exten = $ExtenNum++;
++	my $sig = $gconfig-&gt;{'chan_dahdi_signalling'}{$type};
++	my $full_name = &quot;$type $num&quot;;
++
++	die &quot;missing default_chan_dahdi_signalling for chan #$num type $type&quot; unless $sig;
++	print &lt;&lt; &quot;EOF&quot;;
++[$exten]
++context = DLPN_DialPlan1
++callwaiting = yes
++fullname = $full_name
++cid_number = $exten
++hasagent = no
++hasdirectory = no
++hasiax = no
++hasmanager = no
++hassip = no
++hasvoicemail = yes
++mailbox = $exten
++threewaycalling = yes
++vmsecret = $exten
++signalling = $sig
++dahdichan = $num
++registeriax = no
++registersip = no
++canreinvite = no
++
++EOF
++}
++
++sub generate($) {
++	my $self = shift || die;
++	my $file = $self-&gt;{FILE};
++	my $gconfig = $self-&gt;{GCONFIG};
++	my $genopts = $self-&gt;{GENOPTS};
++	#$gconfig-&gt;dump;
++	my @spans = @_;
++	warn &quot;Empty configuration -- no spans\n&quot; unless @spans;
++	rename &quot;$file&quot;, &quot;$file.bak&quot;
++		or $! == 2	# ENOENT (No dependency on Errno.pm)
++		or die &quot;Failed to backup old config: $!\n&quot;;
++	print &quot;Generating $file\n&quot; if $genopts-&gt;{verbose};
++	open(F, &quot;&gt;$file&quot;) || die &quot;$0: Failed to open $file: $!\n&quot;;
++	my $old = select F;
++	print &lt;&lt;&quot;HEAD&quot;;
++;!
++;! Automatically generated configuration file
++;! Filename: @{[basename($file)]} ($file)
++;! Generator: $0
++;! Creation Date: @{[scalar(localtime)]}
++;! If you edit this file and execute $0 again,
++;! your manual changes will be LOST.
++;!
++[general]
++;
++; Starting point of allocation of extensions
++;
++userbase = @{[$gconfig-&gt;{'base_exten'}+1]}
++;
++; Create voicemail mailbox and use use macro-stdexten
++;
++hasvoicemail = yes
++;
++; Set voicemail mailbox @{[$gconfig-&gt;{'base_exten'}+1]} password to 1234
++;
++vmsecret = 1234
++;
++; Create SIP Peer
++;
++hassip = no
++;
++; Create IAX friend
++;
++hasiax = no
++;
++; Create Agent friend
++;
++hasagent = no
++;
++; Create H.323 friend
++;
++;hash323 = yes
++;
++; Create manager entry
++;
++hasmanager = no
++;
++; Remaining options are not specific to users.conf entries but are general.
++;
++callwaiting = yes
++threewaycalling = yes
++callwaitingcallerid = yes
++transfer = yes
++canpark = yes
++cancallforward = yes
++callreturn = yes
++callgroup = 1
++pickupgroup = 1
++localextenlength = @{[length($gconfig-&gt;{'base_exten'})]}
++
++
++HEAD
++	my @fxo_ports = ();
++	$ExtenNum = $self-&gt;{GCONFIG}-&gt;{'base_exten'};
++	foreach my $span (@spans) {
++		printf &quot;; Span %d: %s %s\n&quot;, $span-&gt;num, $span-&gt;name, $span-&gt;description;
++		if ($span-&gt;type =~ /^(BRI_(NT|TE)|E1|T1)$/) {
++			gen_digital_trunk($span);
++			next;
++		}
++		foreach my $chan ($span-&gt;chans()) {
++			if (grep { $_ eq $span-&gt;type} ( 'FXS', 'IN', 'OUT' )) {
++				$self-&gt;gen_channel($chan);
++			} elsif ($chan-&gt;type eq 'FXO') {
++				# TODO: &quot;$first_chan-$last_chan&quot;
++				push @fxo_ports,($chan-&gt;num);
++			}
++		}
++		print &quot;\n&quot;;
++	}
++	gen_analog_trunk(@fxo_ports);
++	close F;
++	select $old;
++}
++
++1;
++
++__END__
++
++=head1 NAME
++
++users - Generate configuration for users.conf.
++
++=head1 SYNOPSIS
++
++ use Dahdi::Config::Gen::Users;
++
++ my $cfg = new Dahdi::Config::Gen::Users(\%global_config, \%genopts);
++ $cfg-&gt;generate(@span_list);
++
++=head1 DESCRIPTION
++
++Generate the F&lt;/etc/asterisk/users.conf&gt; which is used by asterisk(1) 
++and AsteriskGUI. This will replace your entire configuration including
++any SIP/IAX users and trunks you may have set. Thus it's probably only
++appropriate for an initial setup.
++
++Its location may be overriden via the environment variable F&lt;USERS_FILE&gt;.
+
+Added: trunk/dahdi-gen/Dahdi/Config/Gen/Xpporder.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Gen/Xpporder.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Config/Gen/Xpporder.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,142 @@
++package Dahdi::Config::Gen::Xpporder;
++use strict;
++
++use Dahdi::Config::Gen qw(is_true);
++use Dahdi::Xpp;
++
++sub new($$$) {
++	my $pack = shift || die;
++	my $gconfig = shift || die;
++	my $genopts = shift || die;
++	my $file = $ENV{XPPORDER_CONF} || &quot;/etc/dahdi/xpp_order&quot;;
++	my $self = {
++			FILE	=&gt; $file,
++			GCONFIG	=&gt; $gconfig,
++			GENOPTS	=&gt; $genopts,
++		};
++	bless $self, $pack;
++	return $self;
++}
++
++#
++# Returns list of xbuses sorted by the span numbers assigned
++# to their XPD's. Also checks that each XBUS span numbers are sequential.
++sub get_sorted_xbuses(@) {
++	my @spans = @_;	# Verify our spans
++	my @xbuses = Dahdi::Xpp::xbuses;
++	my %xbus_of_span;
++	my %xbus_beginning;
++	my %seen_spans;
++	my @sorted_xbuses;
++	foreach my $xbus (@xbuses) {
++		my $last_spanno;
++		foreach my $xpd ($xbus-&gt;xpds) {
++			my $spanno = $xpd-&gt;spanno;
++			if(!$spanno) {
++				printf STDERR &quot;%s: Is not registered. Skipping.\n&quot;, $xpd-&gt;fqn;
++				next;
++			}
++			$seen_spans{$spanno}++;
++			if($xbus_of_span{$spanno}) {
++				printf STDERR &quot;%s: Span %d already seen on %s\n&quot;,
++					$xpd-&gt;fqn, $spanno, $xbus_of_span{$spanno}-&gt;name;
++				die;
++			}
++			$xbus_of_span{$spanno} = $xbus;
++			# Check XPD's sequential numbering
++			if(defined $last_spanno) {
++				if($last_spanno + 1 != $spanno) {
++					printf STDERR &quot;%s: Bad span numbers (%d, %d)\n&quot;,
++						$xpd-&gt;fqn, $last_spanno, $spanno;
++					die;
++				}
++			} else {
++				$xbus_beginning{$xbus} = $spanno;
++			}
++			$last_spanno = $spanno;
++		}
++	}
++	foreach my $span (@spans) {
++		my $spanno = $span-&gt;num;
++		if(!defined($seen_spans{$spanno})) {
++			warn &quot;Span $spanno: Ignored: Does not belong to any XPD\n&quot;;
++		}
++	}
++	@sorted_xbuses = sort { $xbus_beginning{$a} &lt;=&gt; $xbus_beginning{$b} } @xbuses;
++	return @sorted_xbuses;
++}
++
++sub generate($$$) {
++	my $self = shift || die;
++	my $file = $self-&gt;{FILE};
++	my $gconfig = $self-&gt;{GCONFIG};
++	my $genopts = $self-&gt;{GENOPTS};
++	my @spans = @_;		# Verify it's all our spans
++	my @xbuses = get_sorted_xbuses(@spans);
++	warn &quot;Empty configuration -- no xbuses\n&quot; unless @xbuses;
++	rename &quot;$file&quot;, &quot;$file.bak&quot;
++		or $! == 2	# ENOENT (No dependency on Errno.pm)
++		or die &quot;Failed to backup old config: $!\n&quot;;
++	#$gconfig-&gt;dump;
++	print &quot;Generating $file\n&quot; if $genopts-&gt;{verbose};
++	open(F, &quot;&gt;$file&quot;) || die &quot;$0: Failed to open $file: $!\n&quot;;
++	my $old = select F;
++	printf &quot;# Autogenerated by $0 on %s\n&quot;, scalar(localtime);
++	print  &quot;# If you edit this file and execute $0 again,\n&quot;;
++	print  &quot;# your manual changes will be LOST.\n&quot;;
++	print &lt;&lt;'HEAD';
++#
++# This is an optional configuration file for ordering
++# Dahdi registration.
++#
++# It is read from /etc/dahdi/xpp_order. This location
++# may be overridden via the environment variable XPPORDER_CONF
++#
++# Lines may contain:
++#   - The Astribank label (verbatim)
++#   - The Astribank connector string (prefixed with @)
++# Ordering number of each listed Astribank is determined
++# by its position in this file.
++# Astribanks not listed in this file, get an ordering
++# number of 99 (last).
++#
++# Astribanks with same ordering number are sorted by their
++# connectors (to preserve legacy behavior).
++#
++# Examples:
++#usb:1234
++#@usb-0000:06:02.2-2
++HEAD
++	foreach my $xbus (@xbuses) {
++		my $label = $xbus-&gt;label;
++		my $connector = $xbus-&gt;connector;
++		my $name = $xbus-&gt;name;
++		printf &quot;%s\t# %s (%s)\n&quot;, $label, $connector, $name;
++	}
++	close F;
++	select $old;
++}
++
++1;
++
++__END__
++
++=head1 NAME
++
++Xpporder - Generate Astribank ordering information for dahdi_registration.
++
++=head1 SYNOPSIS
++
++ use Dahdi::Config::Gen::Xpporder;
++
++ my $cfg = new Dahdi::Config::Gen::Xpporder(\%global_config, \%genopts);
++ $cfg-&gt;generate;
++
++=head1 DESCRIPTION
++
++Generate the F&lt;/etc/dahdi/xpp_order&gt;.
++This is the configuration for dahdi_registration(1).
++The order is determined according to current Dahdi registration
++order.
++
++Its location may be overriden via the environment variable F&lt;XPPORDER_CONF&gt;.
+
+Added: trunk/dahdi-gen/Dahdi/Config/Gen.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Gen.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Config/Gen.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,213 @@
++package Dahdi::Config::Gen;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2009, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Gen.pm 6272 2009-03-29 18:53:02Z tzafrir $
++#
++
++=head1 NAME
++
++Dahdi::Config::Gen -- Wrapper class for configuration generators.
++
++=head1 SYNOPSIS
++
++ use Dahdi::Config::Gen qw(is_true);
++ my $params = Dahdi::Config::Params-&gt;new('the-config-file');
++ my $gconfig = Dahdi::Config::Gen-&gt;new($params);
++ my $num = $gconfig-&gt;{'base_exten'};
++ my $overlap = is_true($gconfig-&gt;{'brint_overlap'});
++ $gconfig-&gt;dump;	# For debugging
++ $gconfig-&gt;run_generator('system', {}, @spans);
++
++=head1 DESCRIPTION
++
++The constructor must be given an C&lt;Dahdi::Config::Params&gt; object.
++The returned object contains all data required for generation in the
++form of a hash.
++
++The constructor maps the C&lt;item()&gt;s from the parameter object into semantic
++configuration keys.  E.g: the C&lt;lc_country&gt; item is mapped to C&lt;loadzone&gt; and
++C&lt;defaultzone&gt; keys.
++
++The actual generation is done by delegation to one of the generators.
++This is done via the C&lt;run_generator()&gt; method which receive the
++generator name, a generator specific options hash and a list of
++span objects (from C&lt;Dahdi::Span&gt;) for which to generate configuration.
++
++This module contains few helper functions. E.g: C&lt;is_true()&gt;, C&lt;bchan_range()&gt;.
++
++=cut
++
++require Exporter;
+<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">+ at ISA</A> = qw(Exporter);
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">+ at EXPORT_OK</A> = qw(is_true);
++
++use strict;
++
++# Parse values as true/false 
++sub is_true($) {
++	my $val = shift;
++	return undef unless defined $val;
++	return $val =~ /^(1|y|yes)$/i;
++}
++
++# Generate channel range strings from span objects
++# E.g: &quot;63-77,79-93&quot;
++sub bchan_range($) {
++	my $span = shift || die;
++	my $first_chan = ($span-&gt;chans())[0];
++	my $first_num = $first_chan-&gt;num();
++	my $range_start = $first_num;
++	my @range;
++	my $prev = undef;
++
++	die unless $span-&gt;is_digital();
++	foreach my $c (@{$span-&gt;bchan_list()}) {
++		my $curr = $c + $first_num;
++		if(!defined($prev)) {
++			$prev = $curr;
++		} elsif($curr != $prev + 1) {
++			push(@range, sprintf(&quot;%d-%d&quot;, $range_start, $prev));
++			$range_start = $curr;
++		}
++		$prev = $curr;
++	}
++	if($prev &gt;= $first_num) {
++		push(@range, sprintf(&quot;%d-%d&quot;, $range_start, $prev));
++	}
++	return join(',', @range);
++}
++
++sub new($) {
++	my $pack = shift || die &quot;$0: Missing package argument&quot;;
++	my $p = shift || die &quot;$0: Missing parameters argument&quot;;
++
++	# Set defaults
++	my $fxs_default_start = $p-&gt;item('fxs_default_start');
++	my $fxo_default_start = $p-&gt;item('fxo_default_start');
++
++	my %default_context = (
++		FXO	=&gt; $p-&gt;item('context_lines'),
++		FXS	=&gt; $p-&gt;item('context_phones'),
++		IN	=&gt; $p-&gt;item('context_input'),
++		OUT	=&gt; $p-&gt;item('context_output'),
++		BRI_TE	=&gt; $p-&gt;item('context_lines'),
++		BRI_NT	=&gt; $p-&gt;item('context_lines'),
++		E1_TE	=&gt; $p-&gt;item('context_lines'),
++		T1_TE	=&gt; $p-&gt;item('context_lines'),
++		J1_TE	=&gt; $p-&gt;item('context_lines'),
++		E1_NT	=&gt; $p-&gt;item('context_lines'),
++		T1_NT	=&gt; $p-&gt;item('context_lines'),
++		J1_NT	=&gt; $p-&gt;item('context_lines'),
++		);
++	my %default_group = (
++		FXO	=&gt; $p-&gt;item('group_lines'),
++		FXS	=&gt; $p-&gt;item('group_phones'),
++		IN	=&gt; '',
++		OUT	=&gt; '',
++		BRI_TE	=&gt; $p-&gt;item('group_lines'),
++		BRI_NT	=&gt; $p-&gt;item('group_lines'),
++		E1_TE	=&gt; $p-&gt;item('group_lines'),
++		T1_TE	=&gt; $p-&gt;item('group_lines'),
++		J1_TE	=&gt; $p-&gt;item('group_lines'),
++		E1_NT	=&gt; $p-&gt;item('group_lines'),
++		T1_NT	=&gt; $p-&gt;item('group_lines'),
++		J1_NT	=&gt; $p-&gt;item('group_lines'),
++		);
++	my %default_dahdi_signalling = (
++		FXO	=&gt; &quot;fxs$fxo_default_start&quot;,
++		FXS	=&gt; &quot;fxo$fxs_default_start&quot;,
++		IN	=&gt; &quot;fxo$fxs_default_start&quot;,
++		OUT	=&gt; &quot;fxo$fxs_default_start&quot;,
++		);
++	my %default_chan_dahdi_signalling = (
++		FXO	=&gt; &quot;fxs_$fxo_default_start&quot;,
++		FXS	=&gt; &quot;fxo_$fxs_default_start&quot;,
++		IN	=&gt; &quot;fxo_$fxs_default_start&quot;,
++		OUT	=&gt; &quot;fxo_$fxs_default_start&quot;,
++		);
++
++	# First complex mapping
++	my $gconfig = {
++			PARAMETERS	=&gt; $p,
++			'loadzone'	=&gt; $p-&gt;item('lc_country'),
++			'defaultzone'	=&gt; $p-&gt;item('lc_country'),
++			'context'	=&gt; \%default_context,
++			'group'		=&gt; \%default_group,
++			'dahdi_signalling'	=&gt; \%default_dahdi_signalling,
++			'chan_dahdi_signalling'	=&gt; \%default_chan_dahdi_signalling,
++		};
++	# Now add trivial mappings
++	my @trivial = qw(
++		base_exten
++		freepbx
++		fxs_immediate
++		bri_hardhdlc
++		bri_sig_style
++		r2_idle_bits
++		echo_can
++		brint_overlap
++		pri_termtype
++		pri_connection_type
++		);
++	foreach my $k (@trivial) {
++		$gconfig-&gt;{$k} = $p-&gt;item($k);
++	}
++	bless $gconfig,$pack;
++
++	return $gconfig;
++}
++
++sub run_generator($$@) {
++	my $gconfig = shift || die;
++	my $name = shift || die &quot;$0: Missing generator name argument&quot;;
++	my $genopts = shift || die &quot;$0: Missing genopts argument&quot;;
++	ref($genopts) eq 'HASH' or die &quot;$0: Bad genopts argument&quot;;
++	my @spans = @_;
++
++	my $module = &quot;Dahdi::Config::Gen::$name&quot;;
++	#print STDERR &quot;DEBUG: $module\n&quot;;
++	eval &quot;use $module&quot;;
++	if($@) {
++		die &quot;Failed to load configuration generator for '$name'\n&quot;;
++	}
++	my $cfg = $module-&gt;new($gconfig, $genopts);
++	$cfg-&gt;generate(@spans);
++}
++
++sub dump($) {
++	my $self = shift || die;
++	printf STDERR &quot;%s dump:\n&quot;, ref $self;
++	my $width = 30;
++	foreach my $k (sort keys %$self) {
++		my $val = $self-&gt;{$k};
++		my $ref = ref $val;
++		#print STDERR &quot;DEBUG: '$k', '$ref', '$val'\n&quot;;
++		if($ref eq '') {
++			printf STDERR &quot;%-${width}s %s\n&quot;, $k, $val;
++		} elsif($ref eq 'SCALAR') {
++			printf STDERR &quot;%-${width}s %s\n&quot;, $k, ${$val};
++		} elsif($ref eq 'ARRAY') {
++			#printf STDERR &quot;%s:\n&quot;, $k;
++			my $i = 0;
++			foreach my $v (@{$val}) {
++				printf STDERR &quot;%-${width}s %s\n&quot;, &quot;$k\-&gt;[$i]&quot;, $v;
++				$i++;
++			}
++		} elsif($ref eq 'HASH') {
++			#printf STDERR &quot;%s:\n&quot;, $k;
++			foreach my $k1 (keys %{$val}) {
++				printf STDERR &quot;%-${width}s %s\n&quot;, &quot;$k\-&gt;\{$k1\}&quot;, ${$val}{$k1};
++			}
++		} else {
++			printf STDERR &quot;%-${width}s (-&gt; %s)\n&quot;, $k, $ref;
++		}
++	}
++}
++
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Config/Params.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Params.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Config/Params.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,149 @@
++package Dahdi::Config::Params;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2009, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Params.pm 6647 2009-05-19 16:46:06Z tzafrir $
++#
++use strict;
++
++=head1 NAME
++
++Dahdi::Config::Params -- Object oriented representation of F&lt;genconf_parameters&gt; file.
++
++=head1 SYNOPSIS
++
++ use Dahdi::Config::Params;
++ my $params = Dahdi::Config::Params-&gt;new('the-config-file');
++ print $params-&gt;item{'some-key'};
++ $params-&gt;dump;	# For debugging
++
++=head1 DESCRIPTION
++
++The constructor must be given a configuration file name:
++
++=over 4
++
++=item * Missing file is B&lt;not&gt; an error.
++
++=item * Other opening errors cause a C&lt;die&gt; to be thrown.
++
++=item * The file name is saved as the value of C&lt;GENCONF_FILE&gt; key.
++
++=back
++
++The access to config keys should only be done via the C&lt;item()&gt; method:
++
++=over 4
++
++=item * It contains all hard-coded defaults.
++
++=item * All these values are overriden by directives in the config file.
++
++=back
++
++=cut
++
++sub new($$) {
++	my $pack = shift || die;
++	my $cfg_file = shift || die;
++	my $self = {
++			GENCONF_FILE	=&gt; $cfg_file,
++		};
++	bless $self, $pack;
++	if(!open(F, $cfg_file)) {
++		if(defined($!{ENOENT})) {
++			#print STDERR &quot;No $cfg_file. Assume empty config\n&quot;;
++			return $self; # Empty configuration
++		}
++		die &quot;$pack: Failed to open '$cfg_file': $!\n&quot;;
++	}
++	#print STDERR &quot;$pack: $cfg_file\n&quot;;
++	my $array_key;
++	while(&lt;F&gt;) {
++		my ($key, $val);
++		chomp;
++		s/#.*$//;
++		s/\s+$//;	# trim tail whitespace
++		next unless /\S/;
++		if(defined $array_key &amp;&amp; /^\s+/) {
++			s/^\s+//;	# trim beginning whitespace
++			push(@{$self-&gt;{$array_key}}, $_);
++			next; 
++		}
++		undef $array_key;
++		($key, $val) = split(/\s+/, $_, 2);
++		$key = lc($key);
++		if(! defined $val) {
++			$array_key = $key;
++			next;
++		}
++		die &quot;$cfg_file:$.: Duplicate key '$key'\n&quot;, if exists $self-&gt;{$key};
++		$self-&gt;{$key} = $val;
++	}
++	close F;
++	return $self;
++}
++
++sub item($$) {
++	my $self = shift || die;
++	my $key = shift || die;
++	my %defaults = (
++			base_exten		=&gt; '4000',
++			freepbx			=&gt; 'no',	# Better via -F command line
++			fxs_immediate		=&gt; 'no',
++			fxs_default_start	=&gt; 'ks',
++			fxo_default_start	=&gt; 'ks',
++			lc_country		=&gt; 'us',
++			context_lines		=&gt; 'from-pstn',
++			context_phones		=&gt; 'from-internal',
++			context_input		=&gt; 'astbank-input',
++			context_output		=&gt; 'astbank-output',
++			group_phones		=&gt; '5',
++			group_lines		=&gt; '0',
++			brint_overlap		=&gt; 'no',
++			bri_sig_style		=&gt; 'bri_ptmp',
++			echo_can		=&gt; 'mg2',
++			bri_hardhdlc		=&gt; 'auto',
++			pri_connection_type	=&gt; 'PRI',
++			r2_idle_bits		=&gt; '1101',
++			'pri_termtype'		=&gt; [ 'SPAN/* TE' ],
++		);
++
++	return (exists($self-&gt;{$key})) ? $self-&gt;{$key} :$defaults{$key};
++}
++
++sub dump($) {
++	my $self = shift || die;
++	printf STDERR &quot;%s dump:\n&quot;, ref $self;
++	my $width = 30;
++	foreach my $k (sort keys %$self) {
++		my $val = $self-&gt;{$k};
++		my $ref = ref $val;
++		#print STDERR &quot;DEBUG: '$k', '$ref', '$val'\n&quot;;
++		if($ref eq '') {
++			printf STDERR &quot;%-${width}s %s\n&quot;, $k, $val;
++		} elsif($ref eq 'SCALAR') {
++			printf STDERR &quot;%-${width}s %s\n&quot;, $k, ${$val};
++		} elsif($ref eq 'ARRAY') {
++			#printf STDERR &quot;%s:\n&quot;, $k;
++			my $i = 0;
++			foreach my $v (@{$val}) {
++				printf STDERR &quot;%-${width}s %s\n&quot;, &quot;$k\-&gt;[$i]&quot;, $v;
++				$i++;
++			}
++		} elsif($ref eq 'HASH') {
++			#printf STDERR &quot;%s:\n&quot;, $k;
++			foreach my $k1 (keys %{$val}) {
++				printf STDERR &quot;%-${width}s %s\n&quot;, &quot;$k\-&gt;\{$k1\}&quot;, ${$val}{$k1};
++			}
++		} else {
++			printf STDERR &quot;%-${width}s (-&gt; %s)\n&quot;, $k, $ref;
++		}
++	}
++}
++
++1;
++
+
+Added: trunk/dahdi-gen/Dahdi/Hardware/PCI.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Hardware/PCI.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Hardware/PCI.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,216 @@
++package Dahdi::Hardware::PCI;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: PCI.pm 6313 2009-04-02 20:56:42Z tzafrir $
++#
++use strict;
++use Dahdi::Utils;
++use Dahdi::Hardware;
++
++our @ISA = qw(Dahdi::Hardware);
++
++# Lookup algorithm:
++# 	First match 'vendor:product/subvendor:subproduct' key
++#	Else match 'vendor:product/subvendor' key
++#	Else match 'vendor:product' key
++#	Else not a dahdi hardware.
++my %pci_ids = (
++	# from wct4xxp
++	'10ee:0314'		=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE410P/TE405P (1st Gen)' },
++	'd161:0420/0004'	=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE420 (4th Gen)' },
++	'd161:0410/0004'	=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE410P (4th Gen)' },
++	'd161:0405/0004'	=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE405P (4th Gen)' },
++	'd161:0410/0003'	=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE410P (3rd Gen)' },
++	'd161:0405/0003'	=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE405P (3rd Gen)' },
++	'd161:0410'		=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE410P (2nd Gen)' },
++	'd161:0405'		=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE405P (2nd Gen)' },
++	'd161:0220/0004'	=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE220 (4th Gen)' },
++	'd161:0205/0004'	=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE205P (4th Gen)' },
++	'd161:0210/0004'	=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE210P (4th Gen)' },
++	'd161:0205/0003'	=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE205P (3rd Gen)' },
++	'd161:0210/0003'	=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE210P (3rd Gen)' },
++	'd161:0205'		=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE205P ' },
++	'd161:0210'		=&gt; { DRIVER =&gt; 'wct4xxp', DESCRIPTION =&gt; 'Wildcard TE210P ' },
++
++	# from wctdm24xxp
++	'd161:2400'		=&gt; { DRIVER =&gt; 'wctdm24xxp', DESCRIPTION =&gt; 'Wildcard TDM2400P' },
++	'd161:0800'		=&gt; { DRIVER =&gt; 'wctdm24xxp', DESCRIPTION =&gt; 'Wildcard TDM800P' },
++	'd161:8002'		=&gt; { DRIVER =&gt; 'wctdm24xxp', DESCRIPTION =&gt; 'Wildcard AEX800' },
++	'd161:8003'		=&gt; { DRIVER =&gt; 'wctdm24xxp', DESCRIPTION =&gt; 'Wildcard AEX2400' },
++	'd161:8005'		=&gt; { DRIVER =&gt; 'wctdm24xxp', DESCRIPTION =&gt; 'Wildcard TDM410P' },
++	'd161:8006'		=&gt; { DRIVER =&gt; 'wctdm24xxp', DESCRIPTION =&gt; 'Wildcard AEX410P' },
++
++	# from pciradio
++	'e159:0001/e16b'	=&gt; { DRIVER =&gt; 'pciradio', DESCRIPTION =&gt; 'PCIRADIO' },
++
++	# from wcfxo
++	'e159:0001/8084'	=&gt; { DRIVER =&gt; 'wcfxo', DESCRIPTION =&gt; 'Wildcard X101P clone' },
++	'e159:0001/8085'	=&gt; { DRIVER =&gt; 'wcfxo', DESCRIPTION =&gt; 'Wildcard X101P' },
++	'e159:0001/8086'	=&gt; { DRIVER =&gt; 'wcfxo', DESCRIPTION =&gt; 'Wildcard X101P clone' },
++	'e159:0001/8087'	=&gt; { DRIVER =&gt; 'wcfxo', DESCRIPTION =&gt; 'Wildcard X101P clone' },
++	'1057:5608'		=&gt; { DRIVER =&gt; 'wcfxo', DESCRIPTION =&gt; 'Wildcard X100P' },
++
++	# from wct1xxp
++	'e159:0001/6159'	=&gt; { DRIVER =&gt; 'wct1xxp', DESCRIPTION =&gt; 'Digium Wildcard T100P T1/PRI or E100P E1/PRA Board' },
++
++	# from wctdm
++	'e159:0001/a159'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard S400P Prototype' },
++	'e159:0001/e159'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard S400P Prototype' },
++	'e159:0001/b100'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV E/F' },
++	'e159:0001/b1d9'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV I' },
++	'e159:0001/b118'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV I' },
++	'e159:0001/b119'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV I' },
++	'e159:0001/a9fd'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV H' },
++	'e159:0001/a8fd'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV H' },
++	'e159:0001/a800'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV H' },
++	'e159:0001/a801'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV H' },
++	'e159:0001/a908'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV H' },
++	'e159:0001/a901'	=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV H' },
++	#'e159:0001'		=&gt; { DRIVER =&gt; 'wctdm', DESCRIPTION =&gt; 'Wildcard TDM400P REV H' },
++
++	# from wcte11xp
++	'e159:0001/71fe'	=&gt; { DRIVER =&gt; 'wcte11xp', DESCRIPTION =&gt; 'Digium Wildcard TE110P T1/E1 Board' },
++	'e159:0001/79fe'	=&gt; { DRIVER =&gt; 'wcte11xp', DESCRIPTION =&gt; 'Digium Wildcard TE110P T1/E1 Board' },
++	'e159:0001/795e'	=&gt; { DRIVER =&gt; 'wcte11xp', DESCRIPTION =&gt; 'Digium Wildcard TE110P T1/E1 Board' },
++	'e159:0001/79de'	=&gt; { DRIVER =&gt; 'wcte11xp', DESCRIPTION =&gt; 'Digium Wildcard TE110P T1/E1 Board' },
++	'e159:0001/797e'	=&gt; { DRIVER =&gt; 'wcte11xp', DESCRIPTION =&gt; 'Digium Wildcard TE110P T1/E1 Board' },
++
++	# from wcte12xp
++	'd161:0120'		=&gt; { DRIVER =&gt; 'wcte12xp', DESCRIPTION =&gt; 'Wildcard TE12xP' },
++	'd161:8000'		=&gt; { DRIVER =&gt; 'wcte12xp', DESCRIPTION =&gt; 'Wildcard TE121' },
++	'd161:8001'		=&gt; { DRIVER =&gt; 'wcte12xp', DESCRIPTION =&gt; 'Wildcard TE122' },
++
++	# from wcb4xxp
++	'd161:b410'             =&gt; { DRIVER =&gt; 'wcb4xxp', DESCRIPTION =&gt; 'Digium Wildcard B410P' },
++
++	# from tor2
++	'10b5:9030'		=&gt; { DRIVER =&gt; 'tor2', DESCRIPTION =&gt; 'PLX 9030' },
++	'10b5:3001'		=&gt; { DRIVER =&gt; 'tor2', DESCRIPTION =&gt; 'PLX Development Board' },
++	'10b5:d00d'		=&gt; { DRIVER =&gt; 'tor2', DESCRIPTION =&gt; 'Tormenta 2 Quad T1/PRI or E1/PRA' },
++	'10b5:4000'		=&gt; { DRIVER =&gt; 'tor2', DESCRIPTION =&gt; 'Tormenta 2 Quad T1/E1 (non-Digium clone)' },
++
++	# Cologne Chips:
++	# (Still a partial list)
++	'1397:08b4/b556'	=&gt; { DRIVER =&gt; 'qozap', DESCRIPTION =&gt; 'Junghanns DuoBRI ISDN card' },
++	'1397:08b4'		=&gt; { DRIVER =&gt; 'qozap', DESCRIPTION =&gt; 'Junghanns QuadBRI ISDN card' },
++	'1397:16b8'		=&gt; { DRIVER =&gt; 'qozap', DESCRIPTION =&gt; 'Junghanns OctoBRI ISDN card' },
++	'1397:30b1'		=&gt; { DRIVER =&gt; 'cwain', DESCRIPTION =&gt; 'HFC-E1 ISDN E1 card' },
++	'1397:2bd0'		=&gt; { DRIVER =&gt; 'zaphfc', DESCRIPTION =&gt; 'HFC-S ISDN BRI card' },
++	# Has three submodels. Tested with 0675:1704:
++	'1043:0675'		=&gt; { DRIVER =&gt; 'zaphfc', DESCRIPTION =&gt; 'ASUSTeK Computer Inc. ISDNLink P-IN100-ST-D' },
++	'1397:f001'		=&gt; { DRIVER =&gt; 'ztgsm', DESCRIPTION =&gt; 'HFC-GSM Cologne Chips GSM' },
++
++	# Rhino cards (based on pci.ids)
++	'0b0b:0105'	=&gt; { DRIVER =&gt; 'r1t1', DESCRIPTION =&gt; 'Rhino R1T1' },
++	'0b0b:0205'	=&gt; { DRIVER =&gt; 'r4fxo', DESCRIPTION =&gt; 'Rhino R14FXO' },
++	'0b0b:0206'	=&gt; { DRIVER =&gt; 'rcbfx', DESCRIPTION =&gt; 'Rhino RCB4FXO 4-channel FXO analog telphony card' },
++	'0b0b:0305'	=&gt; { DRIVER =&gt; 'r1t1', DESCRIPTION =&gt; 'Rhino R1T1' },
++	'0b0b:0405'	=&gt; { DRIVER =&gt; 'rcbfx', DESCRIPTION =&gt; 'Rhino R8FXX' },
++	'0b0b:0406'	=&gt; { DRIVER =&gt; 'rcbfx', DESCRIPTION =&gt; 'Rhino RCB8FXX 8-channel modular analog telphony card' },
++	'0b0b:0505'	=&gt; { DRIVER =&gt; 'rcbfx', DESCRIPTION =&gt; 'Rhino R24FXX' },
++	'0b0b:0506'	=&gt; { DRIVER =&gt; 'rcbfx', DESCRIPTION =&gt; 'Rhino RCB24FXS 24-Channel FXS analog telphony card' },
++	'0b0b:0605'	=&gt; { DRIVER =&gt; 'rxt1', DESCRIPTION =&gt; 'Rhino R2T1' },
++	'0b0b:0705'	=&gt; { DRIVER =&gt; 'rcbfx', DESCRIPTION =&gt; 'Rhino R24FXS' },
++	'0b0b:0706'	=&gt; { DRIVER =&gt; 'rcbfx', DESCRIPTION =&gt; 'Rhino RCB24FXO 24-Channel FXO analog telphony card' },
++	'0b0b:0906'	=&gt; { DRIVER =&gt; 'rcbfx', DESCRIPTION =&gt; 'Rhino RCB24FXX 24-channel modular analog telphony card' },
++
++	# Sangoma cards (based on pci.ids)
++	'1923:0040'	=&gt; { DRIVER =&gt; 'wanpipe', DESCRIPTION =&gt; 'Sangoma Technologies Corp. A200/Remora FXO/FXS Analog AFT card' },
++	'1923:0100'	=&gt; { DRIVER =&gt; 'wanpipe', DESCRIPTION =&gt; 'Sangoma Technologies Corp. A104d QUAD T1/E1 AFT card' },
++	'1923:0300'	=&gt; { DRIVER =&gt; 'wanpipe', DESCRIPTION =&gt; 'Sangoma Technologies Corp. A101 single-port T1/E1' },
++	'1923:0400'	=&gt; { DRIVER =&gt; 'wanpipe', DESCRIPTION =&gt; 'Sangoma Technologies Corp. A104u Quad T1/E1 AFT' },
++
++	# Yeastar (from output of modinfo):
++	'e159:0001/2151' =&gt; { DRIVER =&gt; 'ystdm8xx', DESCRIPTION =&gt; 'Yeastar YSTDM8xx'},
++	);
++
++$ENV{PATH} .= &quot;:/usr/sbin:/sbin:/usr/bin:/bin&quot;;
++
++sub pci_sorter {
++	return $a-&gt;priv_device_name() cmp $b-&gt;priv_device_name();
++}
++
++sub new($@) {
++	my $pack = shift || die &quot;Wasn't called as a class method\n&quot;;
++	my %attr = @_;
++	my $name = sprintf(&quot;pci:%s&quot;, $attr{PRIV_DEVICE_NAME});
++	my $self = Dahdi::Hardware-&gt;new($name, 'PCI');
++	%{$self} = (%{$self}, %attr);
++	bless $self, $pack;
++	return $self;
++}
++
++my %pci_devs;
++
++sub readfile($) {
++	my $name = shift || die;
++	open(F, $name) || die &quot;Failed to open '$name': $!&quot;;
++	my $str = &lt;F&gt;;
++	close F;
++	chomp($str);
++	return $str;
++}
++
++sub scan_devices($) {
++	my @devices;
++
++	while(&lt;/sys/bus/pci/devices/*&gt;) {
++		m,([^/]+)$,,;
++		my $name = $1;
++		my $l = readlink $_ || die;
++		$pci_devs{$name}{PRIV_DEVICE_NAME} = $name;
++		$pci_devs{$name}{DEVICE} = $l;
++		$pci_devs{$name}{VENDOR} = readfile &quot;$_/vendor&quot;;
++		$pci_devs{$name}{PRODUCT} = readfile &quot;$_/device&quot;;
++		$pci_devs{$name}{SUBVENDOR} = readfile &quot;$_/subsystem_vendor&quot;;
++		$pci_devs{$name}{SUBPRODUCT} = readfile &quot;$_/subsystem_device&quot;;
++		my $dev = $pci_devs{$name};
++		grep(s/0x//, $dev-&gt;{VENDOR}, $dev-&gt;{PRODUCT}, $dev-&gt;{SUBVENDOR}, $dev-&gt;{SUBPRODUCT});
++		$pci_devs{$name}{DRIVER} = '';
++	}
++
++	while(&lt;/sys/bus/pci/drivers/*/[0-9]*&gt;) {
++		m,^(.*?)/([^/]+)/([^/]+)$,;
++		my $prefix = $1;
++		my $drvname = $2;
++		my $id = $3;
++		my $l = readlink &quot;$prefix/$drvname/module&quot;;
++		# Find the real module name (if we can).
++		if(defined $l) {
++			my $moduledir = &quot;$prefix/$drvname/$l&quot;;
++			my $modname = $moduledir;
++			$modname =~ s:^.*/::;
++			$drvname = $modname;
++		}
++		$pci_devs{$id}{LOADED} = $drvname;
++	}
++	foreach (sort keys %pci_devs) {
++		my $dev = $pci_devs{$_};
++		my $key;
++		# Try to match
++		$key = &quot;$dev-&gt;{VENDOR}:$dev-&gt;{PRODUCT}/$dev-&gt;{SUBVENDOR}:$dev-&gt;{SUBPRODUCT}&quot;;
++		$key = &quot;$dev-&gt;{VENDOR}:$dev-&gt;{PRODUCT}/$dev-&gt;{SUBVENDOR}&quot; if !defined($pci_ids{$key});
++		$key = &quot;$dev-&gt;{VENDOR}:$dev-&gt;{PRODUCT}&quot; if !defined($pci_ids{$key});
++		next unless defined $pci_ids{$key};
++
++		my $d = Dahdi::Hardware::PCI-&gt;new(
++			PRIV_DEVICE_NAME	=&gt; $dev-&gt;{PRIV_DEVICE_NAME},
++			VENDOR			=&gt; $dev-&gt;{VENDOR},
++			PRODUCT			=&gt; $dev-&gt;{PRODUCT},
++			SUBVENDOR		=&gt; $dev-&gt;{SUBVENDOR},
++			SUBPRODUCT		=&gt; $dev-&gt;{SUBPRODUCT},
++			LOADED			=&gt; $dev-&gt;{LOADED},
++			DRIVER			=&gt; $pci_ids{$key}{DRIVER},
++			DESCRIPTION		=&gt; $pci_ids{$key}{DESCRIPTION},
++			);
++		push(@devices, $d);
++	}
++	@devices = sort pci_sorter @devices;
++	return @devices;
++}
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Hardware/USB.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Hardware/USB.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Hardware/USB.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,152 @@
++package Dahdi::Hardware::USB;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: USB.pm 6313 2009-04-02 20:56:42Z tzafrir $
++#
++use strict;
++use Dahdi::Utils;
++use Dahdi::Hardware;
++use Dahdi::Xpp::Mpp;
++
++our @ISA = qw(Dahdi::Hardware);
++
++my %usb_ids = (
++	# from wcusb
++	'06e6:831c'	=&gt; { DRIVER =&gt; 'wcusb', DESCRIPTION =&gt; 'Wildcard S100U USB FXS Interface' },
++	'06e6:831e'	=&gt; { DRIVER =&gt; 'wcusb2', DESCRIPTION =&gt; 'Wildcard S110U USB FXS Interface' },
++	'06e6:b210'	=&gt; { DRIVER =&gt; 'wc_usb_phone', DESCRIPTION =&gt; 'Wildcard Phone Test driver' },
++
++	# from xpp_usb
++	'e4e4:1130'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-8/16 no-firmware' },
++	'e4e4:1131'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-8/16 USB-firmware' },
++	'e4e4:1132'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-8/16 FPGA-firmware' },
++	'e4e4:1140'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-BRI no-firmware' },
++	'e4e4:1141'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-BRI USB-firmware' },
++	'e4e4:1142'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-BRI FPGA-firmware' },
++	'e4e4:1150'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-multi no-firmware' },
++	'e4e4:1151'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-multi USB-firmware' },
++	'e4e4:1152'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-multi FPGA-firmware' },
++	'e4e4:1160'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-modular no-firmware' },
++	'e4e4:1161'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-modular USB-firmware' },
++	'e4e4:1162'	=&gt; { DRIVER =&gt; 'xpp_usb', DESCRIPTION =&gt; 'Astribank-modular FPGA-firmware' },
++	
++	# Sangoma USB FXO:
++	'10c4:8461'	=&gt; { DRIVER =&gt; 'wanpipe', DESCRIPTION =&gt; 'Sangoma WANPIPE USB-FXO Device' },
++	);
++
++
++$ENV{PATH} .= &quot;:/usr/sbin:/sbin:/usr/bin:/bin&quot;;
++
++sub usb_sorter() {
++	return $a-&gt;hardware_name cmp $b-&gt;hardware_name;
++}
++
++sub mpp_addinfo($) {
++	my $self = shift || die;
++
++	my $mppinfo = Dahdi::Xpp::Mpp-&gt;new($self);
++	$self-&gt;{MPPINFO} = $mppinfo if defined $mppinfo;
++}
++
++sub new($@) {
++	my $pack = shift or die &quot;Wasn't called as a class method\n&quot;;
++	my %attr = @_;
++	my $name = sprintf(&quot;usb:%s&quot;, $attr{PRIV_DEVICE_NAME});
++	my $self = Dahdi::Hardware-&gt;new($name, 'USB');
++	%{$self} = (%{$self}, %attr);
++	bless $self, $pack;
++	return $self;
++}
++
++sub readval($) {
++	my $fname = shift || warn;
++	open(F, $fname) || warn &quot;Failed opening '$fname': $!&quot;;
++	my $val = &lt;F&gt;;
++	close F;
++	chomp $val;
++	warn &quot;$fname is empty&quot; unless defined $val and $val;
++	return $val;
++}
++
++sub set_transport($$) {
++	my $pack = shift || die;
++	my $xbus = shift || die;
++	my $xbus_dir = shift;
++	my $transportdir = &quot;$xbus_dir/transport&quot;;
++	my $hwdev;
++	if(! -e &quot;$transportdir/ep_00&quot;) {
++		warn &quot;A trasnport in '$transportdir' is not USB&quot;;
++		return undef;
++	}
++	my ($usbdev) = glob(&quot;$transportdir/usb_device:*&quot;);
++	my $busnum;
++	my $devnum;
++	# Different kernels...
++	if(defined $usbdev) {	# It's USB
++		if($usbdev =~ /.*usb_device:usbdev(\d+)\.(\d+)/) {
++			$busnum = $1;
++			$devnum = $2;
++		} else {
++			warn &quot;Bad USB transportdir='$transportdir' usbdev='$usbdev'\n&quot;;
++		}
++	} elsif(-d &quot;$transportdir/usb_endpoint&quot;) {
++		$busnum = readval(&quot;$transportdir/busnum&quot;);
++		$devnum = readval(&quot;$transportdir/devnum&quot;);
++	}
++	my $usbname = sprintf(&quot;%03d/%03d&quot;, $busnum, $devnum);
++	#printf STDERR &quot;DEBUG: %03d/%03d\n&quot;, $busnum, $devnum;
++	$xbus-&gt;{USB_DEVNAME} = $usbname;
++	$hwdev = Dahdi::Hardware-&gt;device_by_hwname(&quot;usb:$usbname&quot;);
++	#print &quot;set_transport: &quot;, $hwdev, &quot;\n&quot;;
++	$xbus-&gt;{TRANSPORT} = $hwdev;
++	$hwdev-&gt;{XBUS} = $xbus;
++	$hwdev-&gt;{LOADED} = 'xpp_usb';
++	$xbus-&gt;{IS_TWINSTAR} = $hwdev-&gt;is_twinstar;
++	return $hwdev;
++}
++
++sub scan_devices($) {
++	my $pack = shift || die;
++	my $usb_device_list = &quot;/proc/bus/usb/devices&quot;;
++	return unless (-r $usb_device_list);
++
++	my @devices;
++	open(F, $usb_device_list) || die &quot;Failed to open $usb_device_list: $!&quot;;
++	local $/ = '';
++	while(&lt;F&gt;) {
++		my @lines = split(/\n/);
++		my ($tline) = grep(/^T/, @lines);
++		my ($pline) = grep(/^P/, @lines);
++		my ($sline) = grep(/^S:.*SerialNumber=/, @lines);
++		my ($busnum,$devnum) = ($tline =~ /Bus=(\w+)\W.*Dev#=\s*(\w+)\W/);
++		my $devname = sprintf(&quot;%03d/%03d&quot;, $busnum, $devnum);
++		my ($vendor,$product) = ($pline =~ /Vendor=(\w+)\W.*ProdID=(\w+)\W/);
++		my $serial;
++		if(defined $sline) {
++			$sline =~ /SerialNumber=(.*)/;
++			$serial = $1;
++			#$serial =~ s/[[:^print:]]/_/g;
++		}
++		my $model = $usb_ids{&quot;$vendor:$product&quot;};
++		next unless defined $model;
++		my $d = Dahdi::Hardware::USB-&gt;new(
++			IS_ASTRIBANK		=&gt; ($model-&gt;{DRIVER} eq 'xpp_usb')?1:0,
++			PRIV_DEVICE_NAME	=&gt; $devname,
++			VENDOR			=&gt; $vendor,
++			PRODUCT			=&gt; $product,
++			SERIAL			=&gt; $serial,
++			DESCRIPTION		=&gt; $model-&gt;{DESCRIPTION},
++			DRIVER			=&gt; $model-&gt;{DRIVER},
++			);
++		push(@devices, $d);
++	}
++	close F;
++	@devices = sort usb_sorter @devices;
++	return @devices;
++}
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Hardware.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Hardware.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Hardware.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,221 @@
++package Dahdi::Hardware;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Hardware.pm 6313 2009-04-02 20:56:42Z tzafrir $
++#
++use strict;
++
++=head1 NAME
++
++Dahdi::Hardware - Perl interface to a Dahdi devices listing
++
++
++  use Dahdi::Hardware;
++  
++  my $hardware = Dahdi::Hardware-&gt;scan; 
++  
++  # mini dahdi_hardware:
++  foreach my $device ($hardware-&gt;device_list) {
++    print &quot;Vendor: device-&gt;{VENDOR}, Product: $device-&gt;{PRODUCT}\n&quot;
++  }
++
++  # let's see if there are devices without loaded drivers, and sugggest
++  # drivers to load:
++  my @to_load = ();
++  foreach my $device ($hardware-&gt;device_list) {
++    if (! $device-&gt;{LOADED} ) {
++      push @to_load, ($device-&gt;${DRIVER});
++    }
++  }
++  if (@to_load) {
++    print &quot;To support the extra devices you probably need to run:\n&quot;
++    print &quot;  modprobe &quot;. (join ' ', @to_load). &quot;\n&quot;;
++  }
++
++
++This module provides information about available Dahdi devices on the
++system. It identifies devices by (USB/PCI) bus IDs.
++
++
++=head1 Device Attributes
++
++As usual, object attributes can be used in either upp-case or
++lower-case, or lower-case functions.
++
++=head2 bus_type
++
++'PCI' or 'USB'.
++
++
++=head2 description
++
++A one-line description of the device.
++
++
++=head2 driver
++
++Name of a Dahdi device driver that should handle this device. This is
++based on a pre-made list.
++
++
++=head2 vendor, product, subvendor, subproduct
++
++The PCI and USB vendor ID, product ID, sub-vendor ID and sub-product ID.
++(The standard short lspci and lsusb listings show only vendor and
++product IDs).
++
++
++=head2 loaded
++
++If the device is handled by a module - the name of the module. Else -
++undef.
++
++
++=head2 priv_device_name
++
++A string that shows the &quot;location&quot; of that device on the bus.
++
++
++=head2 is_astribank
++
++True if the device is a Xorcom Astribank (which may provide some extra
++attributes).
++
++=head2 serial
++
++(Astribank-specific attrribute) - the serial number string of the
++Astribank.
++
++=cut
++#
++# A global hardware handle
++#
++
++my %hardware_list = (
++			'PCI'	=&gt; [],
++			'USB'	=&gt; [],
++		);
++
++
++sub new($$) {
++	my $pack = shift || die &quot;Wasn't called as a class method\n&quot;;
++	my $name =  shift || die &quot;$0: Missing device name&quot;;
++	my $type =  shift || die &quot;$0: Missing device type&quot;;
++	my $dev = {};
++	$dev-&gt;{'BUS_TYPE'} = $type;
++	$dev-&gt;{IS_ASTRIBANK} = 0 unless defined $dev-&gt;{'IS_ASTRIBANK'};
++	$dev-&gt;{'HARDWARE_NAME'} = $name;
++	return $dev;
++}
++
++=head1 device_list()
++
++Returns a list of the hardware devices on the system.
++
++You must run scan() first for this function to run meaningful output.
++
++=cut
++
++sub device_list($) {
++	my $pack = shift || die;
++	my @types = @_;
++	my @list;
++
++	@types = qw(USB PCI) unless @types;
++	foreach my $t (@types) {
++		my $lst = $hardware_list{$t};
++		@list = ( @list, @{$lst} );
++	}
++	return @list;
++}
++
++sub device_by_hwname($$) {
++	my $pack = shift || die;
++	my $name = shift || die;
++	my @list = device_list('localcall');
++
++	my @good = grep { $_-&gt;hardware_name eq $name } @list;
++	return undef unless @good;
++	@good &gt; 1 &amp;&amp; die &quot;$pack: Multiple matches for '$name': @good&quot;;
++	return $good[0];
++}
++
++=head1 drivers()
++
++Returns a list of drivers (currently sorted by name) that are used by
++the devices in the current system (regardless to whether or not they are
++loaded.
++
++=cut
++
++sub drivers($) {
++	my $self = shift || die;
++	my @devs = device_list('localcall');
++	my @drvs = map { $_-&gt;{DRIVER} } @devs;
++	# Make unique
++	my %drivers;
++	@drivers{@drvs} = 1;
++	return sort keys %drivers;
++}
++
++
++=head1 scan()
++
++Scan the system for Dahdi devices (PCI and USB). Returns nothing but
++must be run to initialize the module.
++
++=cut
++
++my $hardware_scanned;
++
++sub scan($) {
++	my $pack = shift || die;
++
++	return if $hardware_scanned++;
++	foreach my $type (qw(PCI USB)) {
++		eval &quot;use Dahdi::Hardware::$type&quot;;
++		die $@ if $@;
++		$hardware_list{$type} = [ &quot;Dahdi::Hardware::$type&quot;-&gt;scan_devices ];
++	}
++}
++
++sub import {
++	Dahdi::Hardware-&gt;scan unless grep(/\bnoscan\b/i, @_);
++}
++
++sub showall {
++	my $pack = shift || die;
++	my @devs;
++
++	my $printer = sub {
++			my $title = shift;
++			my @devs = @_;
++
++			return unless @devs;
++			printf &quot;%s:\n&quot;, $title;
++			foreach my $dev (@devs) {
++				printf &quot;\t%s\n&quot;, $dev-&gt;hardware_name;
++				foreach my $k (sort keys %{$dev}) {
++					my $v = $dev-&gt;{$k};
++					if($k eq 'MPPINFO') {
++						printf &quot;\t\tMPPINFO:\n&quot;;
++						eval &quot;use Dahdi::Xpp::Mpp&quot;;
++						die $@ if $@;
++						$v-&gt;showinfo(&quot;\t\t  &quot;);
++					} else {
++						printf &quot;\t\t%-20s %s\n&quot;, $k, $v;
++					}
++				}
++			}
++		};
++	foreach my $type (qw(USB PCI)) {
++		my $lst = $hardware_list{$type};
++		&amp;$printer(&quot;$type devices&quot;, @{$lst});
++	}
++}
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Span.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Span.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Span.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,356 @@
++package Dahdi::Span;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Span.pm 6613 2009-05-13 10:37:08Z tzafrir $
++#
++use strict;
++use Dahdi::Utils;
++use Dahdi::Chans;
++use Dahdi::Xpp::Xpd;
++
++=head1 NAME
++
++Dahdi::Spans - Perl interface to a Dahdi span information
++
++This package allows access from perl to information about a Dahdi
++channel. It is part of the Dahdi Perl package.
++
++A span is a logical unit of Dahdi channels. Normally a port in a
++digital card or a whole analog card.
++
++See documentation of module L&lt;Dahdi&gt; for usage example. Specifically
++C&lt;Dahdi::spans()&gt; must be run initially.
++
++=head1 by_number()
++
++Get a span by its Dahdi span number.
++
++=head1 Span Properties
++
++=head2 num()
++
++The span number.
++
++=head2 name()
++
++The name field of a Dahdi span. E.g.:
++
++  TE2/0/1
++
++=head2 description()
++
++The description field of the span. e.g:
++
++  &quot;T2XXP (PCI) Card 0 Span 1&quot; HDB3/CCS/CRC4 RED
++
++=head2 chans()
++
++The list of the channels (L&lt;Dahdi::Chan&gt; objects) of this span.
++In a scalar context returns the number of channels this span has.
++
++=head2 bchans()
++
++Likewise a list of bchannels (or a count in a scalar context).
++
++=head2 is_sync_master()
++
++Is this span the source of timing for Dahdi?
++
++=head2 type()
++
++Type of span, or &quot;UNKNOWN&quot; if could not be detected. Current known
++types: 
++
++BRI_TE, BRI_NT, E1_TE, E1_NT, J1_TE, J1_NT, T1_TE, T1_NT, FXS, FXO
++
++=head2 is_pri()
++
++Is this an E1/J1/T1 span?
++
++=head2 is_bri()
++
++Is this a BRI span?
++
++=head2 is_digital()
++
++Is this a digital (as opposed to analog) span?
++
++=head2 termtype()
++
++Set for digital spans. &quot;TE&quot; or &quot;NT&quot;. Will probably be assumed to be &quot;TE&quot;
++if there's no information pointing either way.
++
++=head2 coding()
++
++Suggested sane coding type (e.g.: &quot;hdb3&quot;, &quot;b8zs&quot;) for this type of span. 
++
++=head2 framing()
++
++Suggested sane framing type (e.g.: &quot;ccs&quot;, &quot;esf&quot;) for this type of span. 
++
++=head2 yellow(), crc4()
++
++Likewise, suggestions ofr the respective fields in the span= line in
++/etc/dahdi/system.conf for this span.
++
++=head2 signalling()
++
++Suggested chan_dahdi.conf signalling for channels of this span.
++
++=head2 switchtype()
++
++Suggested chan_dahdi.conf switchtype for channels of this span.
++
++=head1 Note
++
++Most of those properties are normally used as lower-case functions, but
++actually set in the module as capital-letter propeties. To look at e.g.
++&quot;signalling&quot; is set, look for &quot;SIGNALLING&quot;.
++
++=cut
++
++my $proc_base = &quot;/proc/dahdi&quot;;
++
++sub chans($) {
++	my $span = shift;
++	return @{$span-&gt;{CHANS}};
++}
++
++sub by_number($) {
++	my $span_number = shift;
++	die &quot;Missing span number&quot; unless defined $span_number;
++	my @spans = Dahdi::spans();
++
++	my ($span) = grep { $_-&gt;num == $span_number } @spans;
++	return $span;
++}
++
++my @bri_strings = (
++		'BRI_(NT|TE)',
++		'(?:quad|octo)BRI PCI ISDN Card.* \[(NT|TE)\]\ ',
++		'octoBRI \[(NT|TE)\] ',
++		'HFC-S PCI A ISDN.* \[(NT|TE)\] ',
++		'(B4XXP) \(PCI\) Card', # Does not expose NT/TE type
++		);
++
++my @pri_strings = (
++		'Tormenta 2 .*Quad (E1|T1)',       # tor2.
++		'Xorcom XPD.*: (E1|T1)',           # Astribank PRI
++		'Digium Wildcard .100P (T1|E1)/', # wct1xxp
++		'ISA Tormenta Span 1',	           # torisa
++		'TE110P T1/E1',                    # wcte11xp
++		'Wildcard TE120P',                 # wcte12xp
++		'Wildcard TE121',                  # wcte12xp
++		'Wildcard TE122',                  # wcte12xp
++		'T[24]XXP \(PCI\) Card ',          # wct4xxp
++		'R[24]T1 \(PCI\) Card',            # rxt1
++		'Rhino R1T1 (E1)/PRA Card',        # r1t1
++		'Rhino R1T1 (T1)/PRI Card',        # r1t1
++		);
++
++our $DAHDI_BRI_NET = 'bri_net';
++our $DAHDI_BRI_CPE = 'bri_cpe';
++
++our $DAHDI_PRI_NET = 'pri_net';
++our $DAHDI_PRI_CPE = 'pri_cpe';
++
++sub init_proto($$) {
++	my $self = shift;
++	my $proto = shift;
++
++	$self-&gt;{PROTO} = $proto;
++	if($proto eq 'E1') {
++		$self-&gt;{DCHAN_IDX} = 15;
++		$self-&gt;{BCHAN_LIST} = [ 0 .. 14, 16 .. 30 ];
++	} elsif($proto eq 'T1') {
++		$self-&gt;{DCHAN_IDX} = 23;
++		$self-&gt;{BCHAN_LIST} = [ 0 .. 22 ];
++	}
++	$self-&gt;{TYPE} = &quot;${proto}_$self-&gt;{TERMTYPE}&quot;;
++}
++
++sub new($$) {
++	my $pack = shift or die &quot;Wasn't called as a class method\n&quot;;
++	my $num = shift or die &quot;Missing a span number parameter\n&quot;;
++	my $self = { NUM =&gt; $num };
++	bless $self, $pack;
++	$self-&gt;{TYPE} = &quot;UNKNOWN&quot;;
++	my @xpds = Dahdi::Xpp::Xpd::xpds_by_spanno;
++	my $xpd = $xpds[$num];
++	if(defined $xpd) {
++		die &quot;Spanno mismatch: $xpd-&gt;spanno, $num&quot; unless $xpd-&gt;spanno == $num;
++		$self-&gt;{XPD} = $xpd;
++	}
++	open(F, &quot;$proc_base/$num&quot;) or die &quot;Failed to open '$proc_base/$num\n&quot;;
++	my $head = &lt;F&gt;;
++	chomp $head;
++	$self-&gt;{IS_DIGITAL} = 0;
++	$self-&gt;{IS_BRI} = 0;
++	$self-&gt;{IS_PRI} = 0;
++	foreach my $cardtype (@bri_strings) {
++		if($head =~ m/$cardtype/) {
++			my $termtype = $1;
++			$termtype = 'TE' if ( $1 eq 'B4XXP' );
++			$self-&gt;{IS_DIGITAL} = 1;
++			$self-&gt;{IS_BRI} = 1;
++			$self-&gt;{TERMTYPE} = $termtype;
++			$self-&gt;{TYPE} = &quot;BRI_$termtype&quot;;
++			$self-&gt;{DCHAN_IDX} = 2;
++			$self-&gt;{BCHAN_LIST} = [ 0, 1 ];
++			last;
++		}
++	}
++	foreach my $cardtype (@pri_strings) {
++		if($head =~ m/$cardtype/) {
++			my @info;
++
++			push(@info, $1) if defined $1;
++			push(@info, $2) if defined $2;
++			my ($proto) = grep(/(E1|T1|J1)/, @info);
++			$proto = 'UNKNOWN' unless defined $proto;
++			my ($termtype) = grep(/(NT|TE)/, @info);
++			$termtype = 'UNKNOWN' unless defined $termtype;
++
++			$self-&gt;{IS_DIGITAL} = 1;
++			$self-&gt;{IS_PRI} = 1;
++			$self-&gt;{TERMTYPE} = $termtype;
++			$self-&gt;init_proto($proto);
++			last;
++		}
++	}
++	($self-&gt;{NAME}, $self-&gt;{DESCRIPTION}) = (split(/\s+/, $head, 4))[2, 3];
++	$self-&gt;{IS_DAHDI_SYNC_MASTER} =
++		($self-&gt;{DESCRIPTION} =~ /\(MASTER\)/) ? 1 : 0;
++	$self-&gt;{CHANS} = [];
++	my @channels;
++	my $index = 0;
++	while(&lt;F&gt;) {
++		chomp;
++		s/^\s*//;
++		s/\s*$//;
++		next unless /\S/;
++		next unless /^\s*\d+/; # must be a real channel string.
++		my $c = Dahdi::Chans-&gt;new($self, $index, $_);
++		push(@channels, $c);
++		$index++;
++	}
++	close F;
++	if($self-&gt;is_pri()) {
++		# Check for PRI with unknown type strings
++		if($index == 31) {
++			if($self-&gt;{PROTO} eq 'UNKNOWN') {
++				$self-&gt;init_proto('E1');
++			} elsif($self-&gt;{PROTO} ne 'E1')  {
++				die &quot;$index channels in a $self-&gt;{PROTO} span&quot;;
++			}
++		} elsif($index == 24) {
++			if($self-&gt;{PROTO} eq 'UNKNOWN') {
++				$self-&gt;init_proto('T1');	# FIXME: J1?
++			} elsif($self-&gt;{PROTO} ne 'T1') {
++				die &quot;$index channels in a $self-&gt;{PROTO} span&quot;;
++			}
++		}
++	}
++	@channels = sort { $a-&gt;num &lt;=&gt; $b-&gt;num } @channels;
++	$self-&gt;{CHANS} = \@channels;
++	$self-&gt;{YELLOW} = undef;
++	$self-&gt;{CRC4} = undef;
++	if($self-&gt;is_bri()) {
++		$self-&gt;{CODING} = 'ami';
++		$self-&gt;{DCHAN} = ($self-&gt;chans())[$self-&gt;{DCHAN_IDX}];
++		$self-&gt;{BCHANS} = [ ($self-&gt;chans())[@{$self-&gt;{BCHAN_LIST}}] ];
++		# Infer some info from channel name:
++		my $first_chan = ($self-&gt;chans())[0] || die &quot;$0: No channels in span #$num\n&quot;;
++		my $chan_fqn = $first_chan-&gt;fqn();
++		if($chan_fqn =~ m(ZTHFC.*/|ztqoz.*/|XPP_BRI_.*|B4/.*)) {		# BRI
++			$self-&gt;{FRAMING} = 'ccs';
++			$self-&gt;{SWITCHTYPE} = 'euroisdn';
++			$self-&gt;{SIGNALLING} = ($self-&gt;{TERMTYPE} eq 'NT') ? $DAHDI_BRI_NET : $DAHDI_BRI_CPE ;
++		} elsif($chan_fqn =~ m(ztgsm.*/)) {				# Junghanns's GSM cards. 
++			$self-&gt;{FRAMING} = 'ccs';
++			$self-&gt;{SIGNALLING} = 'gsm';
++		}
++	}
++	if($self-&gt;is_pri()) {
++		$self-&gt;{DCHAN} = ($self-&gt;chans())[$self-&gt;{DCHAN_IDX}];
++		$self-&gt;{BCHANS} = [ ($self-&gt;chans())[@{$self-&gt;{BCHAN_LIST}}] ];
++		if($self-&gt;{PROTO} eq 'E1') {
++			$self-&gt;{CODING} = 'hdb3';
++			$self-&gt;{FRAMING} = 'ccs';
++			$self-&gt;{SWITCHTYPE} = 'euroisdn';
++			$self-&gt;{CRC4} = 'crc4';
++		} elsif($self-&gt;{PROTO} eq 'T1') {
++			$self-&gt;{CODING} = 'b8zs';
++			$self-&gt;{FRAMING} = 'esf';
++			$self-&gt;{SWITCHTYPE} = 'national';
++		} else {
++			die &quot;'$self-&gt;{PROTO}' unsupported yet&quot;;
++		}
++	}
++	return $self;
++}
++
++sub bchans($) {
++	my $self = shift || die;
++
++	return @{$self-&gt;{BCHANS}};
++}
++
++sub set_termtype($$) {
++	my $span = shift || die;
++	my $termtype = shift || die;
++	$span-&gt;{TERMTYPE} = $termtype;
++	$span-&gt;{SIGNALLING} = ($termtype eq 'NT') ? $DAHDI_PRI_NET : $DAHDI_PRI_CPE ;
++	$span-&gt;{TYPE} = $span-&gt;proto . &quot;_$termtype&quot;;
++}
++
++sub pri_set_fromconfig($$) {
++	my $span = shift || die;
++	my $genconf = shift || die;
++	my $name = $span-&gt;name;
++#	if(defined $termtype) {
++#		die &quot;Termtype for $name already defined as $termtype\n&quot;;
++#	}
++	my $pri_termtype = $genconf-&gt;{pri_termtype};
++	my @pri_specs;
++	if(defined $pri_termtype) {
++		@pri_specs = @{$pri_termtype};
++	}
++	push(@pri_specs , 'SPAN/* TE');		# Default
++	my @patlist = ( &quot;SPAN/&quot; . $span-&gt;num );
++	my ($xbus_name, $xpd_name) = ($name =~ m|(XBUS-\d+)/(XPD-\d+)|);
++	if(defined $xbus_name) {
++		push(@patlist, &quot;NUM/$xbus_name/$xpd_name&quot;);
++#		push(@patlist, &quot;CONNECTOR/$ENV{XBUS_CONNECTOR}/$xpd_name&quot;);
++	}
++	#print STDERR &quot;PATLIST=@patlist\n&quot;;
++	my $match_termtype;
++SPEC:
++	for(my $i = 0; $i &lt; @pri_specs; $i++) {
++		my $spec = $pri_specs[$i];
++		#print STDERR &quot;spec: $spec\n&quot;;
++		my ($match, $termtype) = split(/\s+/, $spec);
++		next unless defined $match and defined $termtype;
++		# Convert &quot;globs&quot; to regex
++		$match =~ s/\*/.*/g;
++		$match =~ s/\?/./g;
++		#print STDERR &quot;match: $match\n&quot;;
++		foreach my $pattern (@patlist) {
++			#print STDERR &quot;testmatch: $pattern =~ $match\n&quot;;
++			if($pattern =~ $match) {
++				#print STDERR &quot;$xpd_name: MATCH '$pattern' ~ '$match' termtype=$termtype\n&quot;;
++				$match_termtype = $termtype;
++				last SPEC;
++			}
++		}
++	}
++	die &quot;Unknown pri_termtype&quot; unless defined $match_termtype;
++	$span-&gt;set_termtype($match_termtype);
++}
++
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Utils.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Utils.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Utils.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,52 @@
++package Dahdi::Utils;
++
++# Accessors (miniperl does not have Class:Accessor)
++our $AUTOLOAD;
++sub AUTOLOAD {
++	my $self = shift;
++	my $name = $AUTOLOAD;
++	$name =~ s/.*://;   # strip fully-qualified portion
++	return if $name =~ /^[A-Z_]+$/;	# ignore special methods (DESTROY)
++	my $key = uc($name);
++	my $val = shift;
++	if (defined $val) {
++		#print STDERR &quot;set: $key = $val\n&quot;;
++		return $self-&gt;{$key} = $val;
++	} else {
++		if(!exists $self-&gt;{$key}) {
++			#$self-&gt;xpp_dump;
++			#die &quot;Trying to get uninitialized '$key'&quot;;
++		}
++		my $val = $self-&gt;{$key};
++		#print STDERR &quot;get: $key ($val)\n&quot;;
++		return $val;
++	}
++}
++
++sub xpp_dump($) {
++	my $self = shift || die;
++	printf STDERR &quot;Dump a %s\n&quot;, ref($self);
++	foreach my $k (sort keys %{$self}) {
++		my $val = $self-&gt;{$k};
++		$val = '**UNDEF**' if !defined $val;
++		printf STDERR &quot;    %-20s %s\n&quot;, $k, $val;
++	}
++}
++
++# Based on Autoloader
++
++sub import {
++	my $pkg = shift;
++	my $callpkg = caller;
++
++	#print STDERR &quot;import: $pkg, $callpkg\n&quot;;
++	#
++	# Export symbols, but not by accident of inheritance.
++	#
++	die &quot;Sombody inherited Dahdi::Utils&quot; if $pkg ne 'Dahdi::Utils';
++	no strict 'refs';
++	*{ $callpkg . '::AUTOLOAD' } = \&AUTOLOAD;
++	*{ $callpkg . '::xpp_dump' } = \&amp;xpp_dump;
++}
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Xpp/Line.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Xpp/Line.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Xpp/Line.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,89 @@
++package Dahdi::Xpp::Line;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2008, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Line.pm 5671 2009-01-18 10:22:27Z tzafrir $
++#
++use strict;
++use Dahdi::Utils;
++
++sub new($$$) {
++	my $pack = shift or die &quot;Wasn't called as a class method\n&quot;;
++	my $xpd = shift or die;
++	my $index = shift;
++	defined $index or die;
++	my $self = {};
++	bless $self, $pack;
++	$self-&gt;{XPD} = $xpd;
++	$self-&gt;{INDEX} = $index;
++	return $self;
++}
++
++sub blink($$) {
++	my $self = shift;
++	my $on = shift;
++	my $xpd = $self-&gt;xpd;
++	my $result = $xpd-&gt;xpd_getattr(&quot;blink&quot;);
++	$result = hex($result);
++	if(defined($on)) {		# Now change
++		my $onbitmask = 1 &lt;&lt; $self-&gt;index;
++		my $offbitmask = $result &amp; ~$onbitmask;
++
++		$result = $offbitmask;
++		$result |= $onbitmask if $on;
++		$result = $xpd-&gt;xpd_setattr(&quot;blink&quot;, $result);
++	}
++	return $result;
++}
++
++sub create_all($$) {
++	my $pack = shift or die &quot;Wasn't called as a class method\n&quot;;
++	my $xpd = shift || die;
++	my $procdir = shift || die;
++	local $/ = &quot;\n&quot;;
++	my @lines;
++	for(my $i = 0; $i &lt; $xpd-&gt;{CHANNELS}; $i++) {
++		my $line = Dahdi::Xpp::Line-&gt;new($xpd, $i);
++		push(@lines, $line);
++	}
++	$xpd-&gt;{LINES} = \@lines;
++	if($xpd-&gt;type eq 'FXO') {
++		my $battery = $xpd-&gt;xpd_getattr(&quot;fxo_battery&quot;);
++		if(defined $battery) {
++			my @batt = split(/\s+/, $battery);
++			foreach my $l (@lines) {
++				die unless @batt;
++				my $state = shift @batt;
++				$l-&gt;{BATTERY} = ($state eq '+') ? 1 : 0;
++			}
++		} else {
++			# Fallback to old interface
++			my ($infofile) = glob &quot;$procdir/*_info&quot;;
++			die &quot;Failed globbing '$procdir/*_info'&quot; unless defined $infofile;
++			open(F, &quot;$infofile&quot;) || die &quot;Failed opening '$infofile': $!&quot;;
++			my $battery_info = 0;
++			while (&lt;F&gt;) {
++				chomp;
++				$battery_info = 1 if /^Battery:/;
++				if($battery_info &amp;&amp; s/^\s*on\s*:\s*//) {
++					my @batt = split;
++					foreach my $l (@lines) {
++						die unless @batt;
++						my $state = shift @batt;
++						$l-&gt;{BATTERY} = ($state eq '+') ? 1 : 0;
++					}
++					$battery_info = 0;
++					die if @batt;
++				}
++			}
++			close F;
++		}
++	}
++	close F;
++}
++
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Xpp/Mpp.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Xpp/Mpp.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Xpp/Mpp.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,221 @@
++package Dahdi::Xpp::Mpp;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2009, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Mpp.pm 6630 2009-05-16 22:46:57Z tzafrir $
++#
++use strict;
++use File::Basename;
++use Getopt::Std;
++BEGIN { my $dir = dirname($0); unshift(@INC, &quot;$dir&quot;, &quot;$dir/perl_modules&quot;); }
++
++use Dahdi::Utils;
++
++=head1 NAME
++
++Dahdi::Xpp::Mpp - Perl interface to C&lt;astribank_tool(8)&gt;
++
++=head1 DESCRIPTION
++
++This package uses C&lt;astribank_tool(8)&gt; to collect information
++about Astribanks via MPP (Management Processor Protocol).
++
++The binary default location is F&lt;/usr/sbin/astribank_tool&gt;. It may be
++overridden via module parameter C&lt;astribank_tool=&gt; and the
++C&lt;ASTRIBANK_TOOL&gt; environment variable (higher priority).
++
++It may also be set/unset from code via the set_astribank_tool() method.
++
++=head1 METHODS
++
++=head2 mpp_addinfo()
++
++Called with a list of C&lt;Dahdi::Hardware&gt; objects and augment their
++data with C&lt;Dahdi::Xpp::Mpp&gt; objects.
++
++This method is the normal external interface of this class.
++
++=head2 new()
++
++Constructor. Receive as parameter an instance of C&lt;Dahdi::Hardware&gt; class
++and return a C&lt;Dahdi::Xpp:Mpp&gt; object.
++
++Normally, used indirectly via the mpp_addinfo() method.
++
++=head2 set_astribank_tool()
++
++Override default location of astribank_tool(8). It is legal
++to set it to C&lt;undef&gt;.
++
++=head2 showinfo()
++
++Dump an C&lt;Dahdi::Xpp::Mpp&gt; object for debugging.
++
++=cut
++
++my $astribank_tool = '/usr/sbin/astribank_tool';
++
++sub set_astribank_tool($$) {
++	my $pack = shift || die;
++	$pack eq 'Dahdi::Xpp::Mpp' or die &quot;$0: Called from wrong package? ($pack)&quot;;
++	my $arg = shift;
++	$astribank_tool = $arg;
++	#print STDERR &quot;Setting astribank_tool='$astribank_tool'\n&quot;;
++}
++
++sub import {
++	my ($param) = grep(/^astribank_tool=/, @_);
++	if(defined $param) {
++		$param =~ s/^astribank_tool=//;
++		$astribank_tool = $param;
++	}
++	if(defined $ENV{ASTRIBANK_TOOL}) {
++		$astribank_tool = $ENV{ASTRIBANK_TOOL};
++	}
++}
++
++sub showinfo($$) {
++	my $self = shift || die;
++	my $prefix = shift || die;
++
++	return unless defined $self;
++	foreach my $k (sort keys %{$self}) {
++		my $v = $self-&gt;{$k};
++		if(ref($v) eq 'ARRAY') {
++			my @a = @{$v};
++			my $i;
++			my $ki;
++			for($i = 0; $i &lt; @a; $i++) {
++				$ki = sprintf &quot;%s[%d]&quot;, $k, $i;
++				printf &quot;$prefix%-20s %s\n&quot;, $ki, $a[$i];
++			}
++		} else {
++			if($k eq 'DEV') {
++				printf &quot;$prefix%-20s -&gt; %s\n&quot;, $k, $v-&gt;hardware_name;
++			} else {
++				printf &quot;$prefix%-20s %s\n&quot;, $k, $v;
++			}
++		}
++	}
++}
++
++sub astribank_tool_cmd($) {
++	my $dev = shift || die;
++	my $usb_top;
++
++	# Find USB bus toplevel
++	$usb_top = '/dev/bus/usb';
++	$usb_top = '/proc/bus/usb' unless -d $usb_top;
++	die &quot;No USB toplevel found\n&quot; unless -d $usb_top;
++	my $name = $dev-&gt;priv_device_name();
++	die &quot;$0: Unkown private device name&quot; unless defined $name;
++	my $path = &quot;$usb_top/$name&quot;;
++	return ($astribank_tool, '-D', &quot;$path&quot;);
++}
++
++sub new($$$) {
++	my $pack = shift || die;
++	my $dev = shift || die;
++	my $product = $dev-&gt;product;
++
++	return undef unless $dev-&gt;is_astribank;
++	return undef unless $dev-&gt;bus_type eq 'USB';
++	return undef unless $product =~ /116./;
++	my $mppinfo = {
++			DEV	=&gt; $dev,
++			HAS_MPP	=&gt; 1,
++		};
++	bless $mppinfo, $pack;
++	#print STDERR &quot;$astribank_tool($path) -- '$product'\n&quot;;
++	if(! -x $astribank_tool) {
++		warn &quot;Could not run '$astribank_tool'\n&quot;;
++		return $mppinfo;
++	}
++	return $mppinfo unless $product =~ /116[12]/;
++	$mppinfo-&gt;{'MPP_TALK'} = 1;
++	my @cmd = astribank_tool_cmd($dev);
++	my $name = $dev-&gt;priv_device_name();
++	my $dbg_file = &quot;$name&quot;;
++	$dbg_file =~ s/\W/_/g;
++	#$dbg_file = &quot;/tmp/twinstar-debug-$dbg_file&quot;;
++	$dbg_file = &quot;/dev/null&quot;;
++	unless(open(F, &quot;@cmd 2&gt; '$dbg_file' |&quot;)) {
++		warn &quot;Failed running '$astribank_tool': $!&quot;;
++		return undef;
++	}
++	local $/ = &quot;\n&quot;;
++	local $_;
++	while(&lt;F&gt;) {
++		chomp;
++		#printf STDERR &quot;'%s'\n&quot;, $_;
++		if(s/^INFO:\s*//) {
++			$mppinfo-&gt;{'PROTOCOL'} = $1 if /^protocol\s+version:\s*(\d+)/i;
++		} elsif(s/^EEPROM:\s*//) {
++			$mppinfo-&gt;{'EEPROM_RELEASE'} = $1 if /^release\s*:\s*([\d\.]+)/i;
++			$mppinfo-&gt;{'EEPROM_LABEL'} = $1 if /^label\s*:\s*([\w._'-]+)/i;
++		} elsif(s/^Extrainfo:\s+:\s*(.+?)$//) {
++			$mppinfo-&gt;{'EEPROM_EXTRAINFO'} = $1;
++		} elsif(s/^Capabilities:\s*TwinStar\s*:\s*(.+?)$//) {
++			my $cap = $1;
++			$mppinfo-&gt;{'TWINSTAR_CAPABLE'} = ($cap =~ /yes/i) ? 1 : 0;
++		} elsif(s/^TwinStar:\s*//) {
++			$mppinfo-&gt;{'TWINSTAR_PORT'} = $1 if /^connected\s+to\s*:\s*usb-(\d+)/i;
++			if(s/^USB-(\d+)\s*POWER\s*:\s*//) {
++				my $v = ($_ eq 'ON') ? 1 : 0;
++				$mppinfo-&gt;{'TWINSTAR_POWER'}-&gt;[$1] = $v;
++			}
++			if(s/^Watchdog[^:]+:\s*//) {
++				my $v = ($_ eq 'on-guard') ? 1 : 0;
++				$mppinfo-&gt;{'TWINSTAR_WATCHDOG'} = $v;
++			}
++			#printf STDERR &quot;\t%s\n&quot;, $_;
++		} else {
++			#printf STDERR &quot;\t%s\n&quot;, $_;
++		}
++	}
++	unless(close F) {
++		warn &quot;Failed running '$astribank_tool': $!&quot;;
++		return undef;
++	}
++	#$mppinfo-&gt;showinfo;
++	return $mppinfo;
++}
++
++sub mpp_setwatchdog($$) {
++	my $mppinfo = shift || die;
++	my $on = shift;
++	die &quot;$0: Bad value '$on'&quot; unless defined($on) &amp;&amp; $on =~ /^[0-1]$/;
++	my $dev = $mppinfo-&gt;dev || die;
++	return undef unless defined $mppinfo-&gt;mpp_talk;
++	my $old = $mppinfo-&gt;tws_watchdog;
++	my @cmd = astribank_tool_cmd($dev);
++	print STDERR &quot;DEBUG($on): '@cmd'\n&quot;;
++	system(@cmd, '-w', $on);
++	die &quot;Running $astribank_tool failed: $?&quot; if $?;
++}
++
++sub mpp_jump($) {
++	my $mppinfo = shift || die;
++	my $dev = $mppinfo-&gt;dev || die;
++	return undef unless defined $mppinfo-&gt;mpp_talk;
++	my $port = $mppinfo-&gt;twinstar_port;
++	$port = ($port == 1) ? 0 : 1;
++	die &quot;Unknown TwinStar port&quot; unless defined $port;
++	my @cmd = astribank_tool_cmd($dev);
++	system(@cmd, '-p', $port);
++	die &quot;Running $astribank_tool failed: $?&quot; if $?;
++}
++
++sub mpp_addinfo($@) {
++	my $pack = shift || die;
++	my @devlist = @_;
++
++	foreach my $dev (@devlist) {
++		$dev-&gt;{MPPINFO} = $pack-&gt;new($dev);
++	}
++}
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Xpp/Xbus.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Xpp/Xbus.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Xpp/Xbus.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,215 @@
++package Dahdi::Xpp::Xbus;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Xbus.pm 6417 2009-04-20 13:44:35Z tzafrir $
++#
++use strict;
++use Dahdi::Utils;
++use Dahdi::Hardware;
++use Dahdi::Xpp::Xpd;
++
++my $proc_base = &quot;/proc/xpp&quot;;
++
++sub xpds($) {
++	my $xbus = shift;
++	return @{$xbus-&gt;{XPDS}};
++}
++
++sub by_number($) {
++	my $busnumber = shift;
++	die &quot;Missing xbus number parameter&quot; unless defined $busnumber;
++	my @xbuses = Dahdi::Xpp::xbuses();
++
++	my ($xbus) = grep { $_-&gt;num == $busnumber } @xbuses;
++	return $xbus;
++}
++
++sub by_label($) {
++	my $label = shift;
++	die &quot;Missing xbus label parameter&quot; unless defined $label;
++	my @xbuses = Dahdi::Xpp::xbuses();
++
++	my ($xbus) = grep { $_-&gt;label eq $label } @xbuses;
++	return $xbus;
++}
++
++sub get_xpd_by_number($$) {
++	my $xbus = shift;
++	my $xpdid = shift;
++	die &quot;Missing XPD id parameter&quot; unless defined $xpdid;
++	$xpdid = sprintf(&quot;%02d&quot;, $xpdid);
++	my @xpds = $xbus-&gt;xpds;
++	my ($wanted) = grep { $_-&gt;id eq $xpdid } @xpds;
++	return $wanted;
++}
++
++my %file_warned;	# Prevent duplicate warnings about same file.
++
++sub xbus_attr_path($$) {
++	my ($busnum, @attr) = @_;
++	foreach my $attr (@attr) {
++		my $file = sprintf &quot;$Dahdi::Xpp::sysfs_astribanks/xbus-%02d/$attr&quot;, $busnum;
++		unless(-f $file) {
++			my $procfile = sprintf &quot;/proc/xpp/XBUS-%02d/$attr&quot;, $busnum;
++			warn &quot;$0: warning - OLD DRIVER: missing '$file'. Fall back to '$procfile'\n&quot;
++				unless $file_warned{$attr}++;
++			$file = $procfile;
++		}
++		next unless -f $file;
++		return $file;
++	}
++	return undef;
++}
++
++sub xbus_getattr($$) {
++	my $xbus = shift || die;
++	my $attr = shift || die;
++	$attr = lc($attr);
++	my $file = xbus_attr_path($xbus-&gt;num, lc($attr));
++
++	open(F, $file) || die &quot;Failed opening '$file': $!&quot;;
++	my $val = &lt;F&gt;;
++	close F;
++	chomp $val;
++	return $val;
++}
++
++sub read_attrs() {
++	my $xbus = shift || die;
++	my @attrnames = qw(CONNECTOR LABEL STATUS);
++	my @attrs;
++
++	foreach my $attr (@attrnames) {
++		my $val = xbus_getattr($xbus, $attr);
++		if($attr eq 'STATUS') {
++			# Some values are in all caps as well
++			$val = uc($val);
++		} elsif($attr eq 'CONNECTOR') {
++			$val =~ s/^/@/;	# Add prefix
++		} elsif($attr eq 'LABEL') {
++			# Fix badly burned labels.
++			$val =~ s/[[:^print:]]/_/g;
++		}
++		$xbus-&gt;{$attr} = $val;
++	}
++}
++
++sub transport_type($$) {
++	my $xbus = shift || die;
++	my $xbus_dir = shift;
++	my $transport = &quot;$xbus_dir/transport&quot;;
++	if(-e &quot;$transport/ep_00&quot;) {	# It's USB
++		$xbus-&gt;{TRANSPORT_TYPE} = 'USB';
++	} else {
++		warn &quot;Unkown transport in $xbus_dir\n&quot;;
++		undef $xbus-&gt;{TRANSPORT_TYPE};
++	}
++	return $xbus-&gt;{TRANSPORT_TYPE};
++}
++
++sub read_xpdnames_old($) {
++	my $xbus_num = shift || die;
++	my $pat = sprintf &quot;/proc/xpp/XBUS-%02d/XPD-[0-9][0-9]&quot;, $xbus_num;
++	my @xpdnames;
++
++	#print STDERR &quot;read_xpdnames_old($xbus_num): $pat\n&quot;;
++	foreach (glob $pat) {
++		die &quot;Bad /proc entry: '$_'&quot; unless /^.*XPD-([0-9])([0-9])$/;
++		my $name = sprintf(&quot;%02d:%1d:%1d&quot;, $xbus_num, $1, $2);
++		#print STDERR &quot;\t&gt; $_ ($name)\n&quot;;
++		push(@xpdnames, $name);
++	}
++	return @xpdnames;
++}
++
++sub read_xpdnames($) {
++	my $xbus_num = shift || die;
++	my $xbus_dir = &quot;$Dahdi::Xpp::sysfs_astribanks/xbus-$xbus_num&quot;;
++	my $pat = sprintf &quot;%s/xbus-%02d/[0-9][0-9]:[0-9]:[0-9]&quot;, $Dahdi::Xpp::sysfs_astribanks, $xbus_num;
++	my @xpdnames;
++
++	#print STDERR &quot;read_xpdnames($xbus_num): $pat\n&quot;;
++	foreach (glob $pat) {
++		die &quot;Bad /sys entry: '$_'&quot; unless m/^.*\/([0-9][0-9]):([0-9]):([0-9])$/;
++		my ($busnum, $unit, $subunit) = ($1, $2, $3);
++		my $name = sprintf(&quot;%02d:%1d:%1d&quot;, $1, $2, $3);
++		#print STDERR &quot;\t&gt; $_ ($name)\n&quot;;
++		push(@xpdnames, $name);
++	}
++	return @xpdnames;
++}
++
++my $warned_notransport = 0;
++
++sub new($$) {
++	my $pack = shift or die &quot;Wasn't called as a class method\n&quot;;
++	my $num = shift;
++	my $xbus_dir = &quot;$Dahdi::Xpp::sysfs_astribanks/xbus-$num&quot;;
++	my $self = {
++		NUM		=&gt; $num,
++		NAME		=&gt; &quot;XBUS-$num&quot;,
++		SYSFS_DIR	=&gt; $xbus_dir,
++		};
++	bless $self, $pack;
++	$self-&gt;read_attrs;
++	# Get transport related info
++	my $transport = &quot;$xbus_dir/transport&quot;;
++	my $transport_type = $self-&gt;transport_type($xbus_dir);
++	if(defined $transport_type) {
++		my $tt = &quot;Dahdi::Hardware::$transport_type&quot;;
++		my $hw = $tt-&gt;set_transport($self, $xbus_dir);
++		#printf STDERR &quot;Xbus::new transport($transport_type): %s\n&quot;, $hw-&gt;{HARDWARE_NAME};
++	}
++	my @xpdnames;
++	my @xpds;
++	if(-e $transport) {
++		@xpdnames = read_xpdnames($num);
++	} else {
++		@xpdnames = read_xpdnames_old($num);
++		warn &quot;$0: warning - OLD DRIVER: missing '$transport'. Fall back to /proc\n&quot;
++			unless $warned_notransport++;
++	}
++	foreach my $xpdstr (@xpdnames) {
++		my ($busnum, $unit, $subunit) = split(/:/, $xpdstr);
++		my $procdir = &quot;/proc/xpp/XBUS-$busnum/XPD-$unit$subunit&quot;;
++		my $xpd = Dahdi::Xpp::Xpd-&gt;new($self, $unit, $subunit, $procdir, &quot;$xbus_dir/$xpdstr&quot;);
++		push(@xpds, $xpd);
++	}
++	@{$self-&gt;{XPDS}} = sort { $a-&gt;id &lt;=&gt; $b-&gt;id } @xpds;
++	return $self;
++}
++
++sub pretty_xpds($) {
++		my $xbus = shift;
++		my @xpds = sort { $a-&gt;id &lt;=&gt; $b-&gt;id } $xbus-&gt;xpds();
++		my @xpd_types = map { $_-&gt;type } @xpds;
++		my $last_type = '';
++		my $mult = 0;
++		my $xpdstr = '';
++		foreach my $curr (@xpd_types) {
++			if(!$last_type || ($curr eq $last_type)) {
++				$mult++;
++			} else {
++				if($mult == 1) {
++					$xpdstr .= &quot;$last_type &quot;;
++				} elsif($mult) {
++					$xpdstr .= &quot;$last_type*$mult &quot;;
++				}
++				$mult = 1;
++			}
++			$last_type = $curr;
++		}
++		if($mult == 1) {
++			$xpdstr .= &quot;$last_type &quot;;
++		} elsif($mult) {
++			$xpdstr .= &quot;$last_type*$mult &quot;;
++		}
++		$xpdstr =~ s/\s*$//;	# trim trailing space
++		return $xpdstr;
++}
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Xpp/Xpd.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Xpp/Xpd.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Xpp/Xpd.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,277 @@
++package Dahdi::Xpp::Xpd;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Xpd.pm 6647 2009-05-19 16:46:06Z tzafrir $
++#
++use strict;
++use Dahdi::Utils;
++use Dahdi::Xpp;
++use Dahdi::Xpp::Line;
++
++my %file_warned;	# Prevent duplicate warnings about same file.
++
++sub xpd_attr_path($@) {
++	my $self = shift || die;
++	my ($busnum, $unitnum, $subunitnum, @attr) = (
++		$self-&gt;xbus-&gt;num,
++		$self-&gt;unit,
++		$self-&gt;subunit,
++		@_);
++	foreach my $attr (@attr) {
++		my $file = sprintf &quot;$Dahdi::Xpp::sysfs_xpds/%02d:%1d:%1d/$attr&quot;,
++		   $busnum, $unitnum, $subunitnum;
++		unless(-f $file) {
++			my $procfile = sprintf &quot;/proc/xpp/XBUS-%02d/XPD-%1d%1d/$attr&quot;,
++			   $busnum, $unitnum, $subunitnum;
++			warn &quot;$0: warning - OLD DRIVER: missing '$file'. Fall back to /proc\n&quot;
++				unless $file_warned{$attr}++;
++			$file = $procfile;
++		}
++		next unless -f $file;
++		return $file;
++	}
++	return undef;
++}
++
++# Backward compat plug for old /proc interface...
++sub xpd_old_gettype($) {
++	my $xpd = shift || die;
++	my $summary = &quot;/proc/xpp/&quot; . $xpd-&gt;fqn . &quot;/summary&quot;;
++	open(F, $summary) or die &quot;Failed to open '$summary': $!&quot;;
++	my $head = &lt;F&gt;;
++	close F;
++	chomp $head;
++	$head =~ s/^XPD-\d+\s+\(//;
++	$head =~ s/,.*//;
++	return $head;
++}
++
++sub xpd_old_getspan($) {
++	my $xpd = shift || die;
++	my $dahdi_registration = &quot;/proc/xpp/&quot; . $xpd-&gt;fqn . &quot;/dahdi_registration&quot;;
++	open(F, $dahdi_registration) or die &quot;Failed to open '$dahdi_registration': $!&quot;;
++	my $head = &lt;F&gt;;
++	close F;
++	chomp $head;
++	return $head;
++}
++
++sub xpd_old_getoffhook($) {
++	my $xpd = shift || die;
++	my $summary = &quot;/proc/xpp/&quot; . $xpd-&gt;fqn . &quot;/summary&quot;;
++	my $channels;
++
++	local $/ = &quot;\n&quot;;
++	open(F, &quot;$summary&quot;) || die &quot;Failed opening $summary: $!\n&quot;;
++	my $head = &lt;F&gt;;
++	chomp $head;	# &quot;XPD-00 (BRI_TE ,card present, span 3)&quot;
++	my $offhook;
++	while(&lt;F&gt;) {
++		chomp;
++		if(s/^\s*offhook\s*:\s*//) {
++			s/\s*$//;
++			$offhook = $_;
++			$offhook || die &quot;No channels in '$summary'&quot;;
++			last;
++		}
++	}
++	close F;
++	return $offhook;
++}
++
++my %attr_missing_warned;	# Prevent duplicate warnings
++
++sub xpd_driver_getattr($$) {
++	my $xpd = shift || die;
++	my $attr = shift || die;
++	$attr = lc($attr);
++	my ($busnum, $unitnum, $subunitnum) = ($xpd-&gt;xbus-&gt;num, $xpd-&gt;unit, $xpd-&gt;subunit);
++	my $file = sprintf &quot;$Dahdi::Xpp::sysfs_xpds/%02d:%1d:%1d/driver/$attr&quot;,
++			$busnum, $unitnum, $subunitnum;
++	if(!defined($file)) {
++		warn &quot;$0: xpd_driver_getattr($attr) -- Missing attribute.\n&quot; if
++			$attr_missing_warned{$attr};
++		return undef;
++	}
++	open(F, $file) || return undef;
++	my $val = &lt;F&gt;;
++	close F;
++	chomp $val;
++	return $val;
++}
++
++sub xpd_getattr($$) {
++	my $xpd = shift || die;
++	my $attr = shift || die;
++	$attr = lc($attr);
++	my $file = $xpd-&gt;xpd_attr_path(lc($attr));
++
++	# Handle special cases for backward compat
++	return xpd_old_gettype($xpd) if $attr eq 'type' and !defined $file;
++	return xpd_old_getspan($xpd) if $attr eq 'span' and !defined $file;
++	return xpd_old_getoffhook($xpd) if $attr eq 'offhook' and !defined $file;
++	if(!defined($file)) {
++		warn &quot;$0: xpd_getattr($attr) -- Missing attribute.\n&quot; if
++			$attr_missing_warned{$attr};
++		return undef;
++	}
++	open(F, $file) || return undef;
++	my $val = &lt;F&gt;;
++	close F;
++	chomp $val;
++	return $val;
++}
++
++sub xpd_setattr($$$) {
++	my $xpd = shift || die;
++	my $attr = shift || die;
++	my $val = shift;
++	$attr = lc($attr);
++	my $file = xpd_attr_path($xpd, $attr);
++	my $oldval = $xpd-&gt;xpd_getattr($attr);
++	open(F, &quot;&gt;$file&quot;) or die &quot;Failed to open $file for writing: $!&quot;;
++	print F &quot;$val&quot;;
++	if(!close(F)) {
++		if($! == 17) {	# EEXISTS
++			# good
++		} else {
++			return undef;
++		}
++	}
++	return $oldval;
++}
++
++sub blink($$) {
++	my $self = shift;
++	my $on = shift;
++	my $result = $self-&gt;xpd_getattr(&quot;blink&quot;);
++	if(defined($on)) {		# Now change
++		$self-&gt;xpd_setattr(&quot;blink&quot;, ($on)?&quot;0xFFFF&quot;:&quot;0&quot;);
++	}
++	return $result;
++}
++
++sub dahdi_registration($$) {
++	my $self = shift;
++	my $on = shift;
++	my $result;
++	my $file = $self-&gt;xpd_attr_path(&quot;span&quot;, &quot;dahdi_registration&quot;);
++	die &quot;$file is missing&quot; unless -f $file;
++	# First query
++	open(F, &quot;$file&quot;) or die &quot;Failed to open $file for reading: $!&quot;;
++	$result = &lt;F&gt;;
++	chomp $result;
++	close F;
++	if(defined($on) and $on ne $result) {		# Now change
++		open(F, &quot;&gt;$file&quot;) or die &quot;Failed to open $file for writing: $!&quot;;
++		print F ($on)?&quot;1&quot;:&quot;0&quot;;
++		if(!close(F)) {
++			if($! == 17) {	# EEXISTS
++				# good
++			} else {
++				undef $result;
++			}
++		}
++	}
++	return $result;
++}
++
++sub xpds_by_spanno() {
++	my @xbuses = Dahdi::Xpp::xbuses();
++	my @xpds = map { $_-&gt;xpds } @xbuses;
++	@xpds = grep { $_-&gt;spanno } @xpds;
++	@xpds = sort { $a-&gt;spanno &lt;=&gt; $b-&gt;spanno } @xpds;
++	my @spanno = map { $_-&gt;spanno } @xpds;
++	my @idx;
++	@idx[@spanno] = @xpds;	# The spanno is the index now
++	return @idx;
++}
++
++sub new($$$$$) {
++	my $pack = shift or die &quot;Wasn't called as a class method\n&quot;;
++	my $xbus = shift || die;
++	my $unit = shift;	# May be zero
++	my $subunit = shift;	# May be zero
++	my $procdir = shift || die;
++	my $sysfsdir = shift || die;
++	my $self = {
++		XBUS		=&gt; $xbus,
++		ID		=&gt; sprintf(&quot;%1d%1d&quot;, $unit, $subunit),
++		FQN		=&gt; $xbus-&gt;name . &quot;/&quot; . &quot;XPD-$unit$subunit&quot;,
++		UNIT		=&gt; $unit,
++		SUBUNIT		=&gt; $subunit,
++		DIR		=&gt; $procdir,
++		SYSFS_DIR	=&gt; $sysfsdir,
++		};
++	bless $self, $pack;
++	my @offhook = split / /, ($self-&gt;xpd_getattr('offhook'));
++	$self-&gt;{CHANNELS} = @offhook;
++	my $type = $self-&gt;xpd_getattr('type');
++	my $span = $self-&gt;xpd_getattr('span');
++	$self-&gt;{SPANNO} = $span;
++	$self-&gt;{TYPE} = $type;
++	if($type =~ /BRI_(NT|TE)/) {
++		$self-&gt;{IS_BRI} = 1;
++		$self-&gt;{TERMTYPE} = $1;
++		$self-&gt;{DCHAN_HARDHDLC} = $self-&gt;xpd_driver_getattr('dchan_hardhdlc');
++	}
++	$self-&gt;{IS_PRI} = ($type =~ /[ETJ]1/);
++	$self-&gt;{IS_DIGITAL} = ( $self-&gt;{IS_BRI} || $self-&gt;{IS_PRI} );
++	Dahdi::Xpp::Line-&gt;create_all($self, $procdir);
++	return $self;
++}
++
++#------------------------------------
++# static xpd related helper functions
++#------------------------------------
++
++sub sync_priority_rank($) {
++	my $xpd = shift || die;
++	# The @rank array is ordered by priority of sync (good to bad)
++	my @rank = (
++		($xpd-&gt;is_pri and defined($xpd-&gt;termtype) and $xpd-&gt;termtype eq 'TE'),
++		($xpd-&gt;is_bri and defined($xpd-&gt;termtype) and $xpd-&gt;termtype eq 'TE'),
++		($xpd-&gt;is_pri),
++		($xpd-&gt;type eq 'FXO'),
++		($xpd-&gt;is_bri),
++		($xpd-&gt;type eq 'FXS'),
++		);
++	for(my $i = 0; $i &lt; @rank; $i++) {
++		return $i if $rank[$i];
++	}
++	return @rank + 1;
++}
++
++# An XPD sync priority comparator for sort()
++sub sync_priority_compare() {
++	my $rank_a = sync_priority_rank($a);
++	my $rank_b = sync_priority_rank($b);
++	#print STDERR &quot;DEBUG: $rank_a (&quot;, $a-&gt;fqn, &quot;) $rank_b (&quot;, $b-&gt;fqn, &quot;)\n&quot;;
++	return $a-&gt;fqn cmp $b-&gt;fqn if $rank_a == $rank_b;
++	return $rank_a &lt;=&gt; $rank_b;
++}
++
++# For debugging: show a list of XPD's with relevant sync info.
++sub show_xpd_rank(@) {
++	print STDERR &quot;XPD's by rank\n&quot;;
++	foreach my $xpd (@_) {
++		my $type = $xpd-&gt;type;
++		my $rank = sync_priority_rank($xpd);
++		if($xpd-&gt;is_digital) {
++			$type .= &quot; (TERMTYPE &quot; . ($xpd-&gt;termtype || &quot;UNKNOWN&quot;) . &quot;)&quot;;
++		}
++		printf STDERR &quot;%3d %-15s %s\n&quot;, $rank, $xpd-&gt;fqn, $type;
++	}
++}
++
++sub xpds_by_rank(@) {
++	my @xpd_prio = sort sync_priority_compare @_;
++	#show_xpd_rank(@xpd_prio);
++	return @xpd_prio;
++}
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi/Xpp.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Xpp.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi/Xpp.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,337 @@
++package Dahdi::Xpp;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Xpp.pm 6313 2009-04-02 20:56:42Z tzafrir $
++#
++use strict;
++use Dahdi::Hardware;
++use Dahdi::Xpp::Xbus;
++
++=head1 NAME
++
++Dahdi::Xpp - Perl interface to the Xorcom Astribank drivers.
++
++=head1 SYNOPSIS
++
++  # Listing all Astribanks:
++  use Dahdi::Xpp;
++  # scans hardware:
++  my @xbuses = Dahdi::Xpp::xbuses(&quot;SORT_CONNECTOR&quot;);
++  for my $xbus (@xbuses) {
++    print $xbus-&gt;name.&quot; (&quot;.$xbus-&gt;label .&quot;, &quot;. $xbus-&gt;connector .&quot;)\n&quot;;
++    for my $xpd ($xbus-&gt;xpds) {
++      print &quot; - &quot;.$xpd-&gt;fqn,&quot;\n&quot;;
++    }
++  }
++=cut
++
++#
++# A global handle for all xbuses
++#
++my @xbuses;
++
++my $proc_base = &quot;/proc/xpp&quot;;
++our $sysfs_astribanks = &quot;/sys/bus/astribanks/devices&quot;;
++our $sysfs_xpds = &quot;/sys/bus/xpds/devices&quot;;
++our $sysfs_ab_driver = &quot;/sys/bus/astribanks/drivers/xppdrv&quot;;
++
++sub scan($) {
++	my $pack = shift || die;
++
++	opendir(D, $sysfs_astribanks) || return();
++	while(my $entry = readdir D) {
++		next unless $entry =~ /xbus-(\d+)/;
++		my $xbus = Dahdi::Xpp::Xbus-&gt;new($1);
++		push(@xbuses, $xbus);
++	}
++	closedir D;
++	return @xbuses;
++}
++
++# Nominal sorters for xbuses
++sub by_name {
++	return $a-&gt;name cmp $b-&gt;name;
++}
++
++sub by_connector {
++	return $a-&gt;connector cmp $b-&gt;connector;
++}
++
++sub by_label {
++	my $cmp = $a-&gt;label cmp $b-&gt;label;
++	return $cmp if $cmp != 0;
++	return $a-&gt;connector cmp $b-&gt;connector;
++}
++
++sub score_type {
++	my $score;
++
++	return 1 if grep(/\b[ETJ]1/, @_);
++	return 2 if grep(/\bBRI/, @_);
++	return 3 if grep(/\bFXO/, @_);
++	return 4;	# FXS
++}
++
++sub by_type {
++	my @a_types = map { $_-&gt;type } $a-&gt;xpds();
++	my @b_types = map { $_-&gt;type } $b-&gt;xpds();
++	my $res;
++
++	my $a_score = score_type(@a_types);
++	my $b_score = score_type(@b_types);
++	#printf STDERR &quot;DEBUG-a: %s %s %s\n&quot;, $a-&gt;name, $a_score, join(','<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">, at a_types</A>);
++	#printf STDERR &quot;DEBUG-b: %s %s %s\n&quot;, $b-&gt;name, $b_score, join(','<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">, at b_types</A>);
++	$res = $a_score &lt;=&gt; $b_score;
++	$res = $a-&gt;connector cmp $b-&gt;connector if $res == 0;
++	return $res;
++}
++
++sub by_xpporder {
++	my $cmp = $a-&gt;xpporder cmp $b-&gt;xpporder;
++	return $cmp if $cmp != 0;
++	return $a-&gt;connector cmp $b-&gt;connector;
++}
++
++=head1 xbuses([sort_order])
++
++Scans system (/proc and /sys) and returns a list of Astribank (Xbus) 
++objects. The optional parameter sort_order is the order in which 
++the Astribanks will be returns:
++
++
++=head1 sorters([sort_order])
++
++With no parameters, returns the names of built in sorters.
++With a single parameter, returns a reference to the requested built in sorter.
++Also, for convenience, a reference to a custom sorter function may be passed
++and returned as is.
++
++The built in sorters are:
++
++=over
++
++=item SORT_XPPORDER
++
++Sort by ordering defined in F&lt;/etc/dahdi/xpp_order&gt; file.
++Astribanks can be listed in this file by their label or by
++their connector string (prefixed with &lt;@&gt;).
++
++Astribanks not listed in the F&lt;xpp_order&gt; file are sorted
++via ordering number 999 -- So they come after the Astribanks
++that are listed.
++
++Astribanks with same ordering number (e.g: 999) are sorted
++by their connector string (to preserve legacy behaviour).
++
++=item SORT_CONNECTOR
++
++Sort by the connector string. For USB this defines the &quot;path&quot; to get to
++the device through controllers, hubs etc.
++
++=item SORT_LABEL
++
++Sorts by the label of the Astribank. The label field is unique to the
++Astribank. It can also be viewed through 'lsusb -v' without the drivers
++loaded (the iSerial field in the Device Descriptor). This is normally
++relieble, but some older Astribanks have an empty label.
++
++=item SORT_NAME
++
++Sort by the &quot;name&quot;. e.g: &quot;XBUS-00&quot;. The order of Astribank names depends
++on the load order, and hence may change between different runs.
++
++=item SORT_TYPE
++
++Sort by XPD types. First Astribanks with E1/T1/J1 XPDs, then with BRI,
++then with FXO, then ones with only FXS ports. Within each type they
++are sorted by the connector field (as in SORT_CONNECTOR above).
++
++=item custom function
++
++Instead of using a predefined sorter, you can pass your own sorting
++function. See the example sorters in the code of this module.
++
++=back
++
++=cut
++
++sub sorters {
++	my %sorter_table = (
++		SORT_CONNECTOR	=&gt; \&amp;by_connector,
++		SORT_NAME	=&gt; \&amp;by_name,
++		SORT_LABEL	=&gt; \&amp;by_label,
++		SORT_TYPE	=&gt; \&amp;by_type,
++		SORT_XPPORDER	=&gt; \&amp;by_xpporder,
++		# Aliases
++		connector	=&gt; \&amp;by_connector,
++		name		=&gt; \&amp;by_name,
++		label		=&gt; \&amp;by_label,
++		type		=&gt; \&amp;by_type,
++		xpporder	=&gt; \&amp;by_xpporder,
++	);
++	my $which_sorter = shift || return sort keys %sorter_table;
++	return $which_sorter if ref($which_sorter) eq 'CODE';
++	return $sorter_table{$which_sorter};
++}
++
++sub add_xpporder(@) {
++	my @xbuses = @_;
++	my $cfg = $ENV{XPPORDER_CONF} || '/etc/dahdi/xpp_order';
++	my %order;
++
++	# Set defaults
++	foreach my $xbus (@xbuses) {
++		$xbus-&gt;{XPPORDER} = 99;
++	}
++	# Read from optional config file
++	if(!open(F, $cfg)) {
++		warn &quot;$0: Failed opening '$cfg': $!&quot;
++			unless $! == 2;		# ENOENT
++		return;
++	}
++	my $count = 1;
++	while(&lt;F&gt;) {
++		chomp;
++		s/#.*//;
++		s/^\s*//;
++		s/\s*$//;
++		next unless /\S/;
++		$order{$_} = $count++;
++	}
++	close F;
++	# Overrides from config file
++	foreach my $xbus (@xbuses) {
++		my $label = $xbus-&gt;label;
++		my $connector = '@' . $xbus-&gt;connector;
++		my $val;
++		$val = $order{$label};
++		$val = $order{$connector} unless defined $val;
++		$xbus-&gt;{XPPORDER} = $val if defined $val;
++	}
++}
++
++sub xbuses {
++	my $optsort = shift || 'SORT_XPPORDER';
++	my @sorted_xbuses;
++
++	if(! @xbuses) {
++		@xbuses = Dahdi::Xpp-&gt;scan();
++	}
++	add_xpporder(@xbuses);
++	my $sorter = sorters($optsort);
++	die &quot;Unknown optional sorter '$optsort'&quot; unless defined $sorter;
++	@sorted_xbuses = sort $sorter @xbuses;
++	return @sorted_xbuses;
++}
++
++sub xpd_of_span($) {
++	my $span = shift or die &quot;Missing span parameter&quot;;
++	return undef unless defined $span;
++	foreach my $xbus (Dahdi::Xpp::xbuses) {
++		foreach my $xpd ($xbus-&gt;xpds()) {
++			return $xpd if $xpd-&gt;fqn eq $span-&gt;name;
++		}
++	}
++	return undef;
++}
++
++=head1 sync([new_sync_source])
++
++Gets (and optionally sets) the internal Astribanks synchronization
++source. When used to set sync source, returns the original sync source.
++
++A synchronization source is a value valid writing into /proc/xpp/sync .
++For more information read that file and see README.Astribank .
++
++=cut
++
++sub sync_via_proc {
++	my $newsync = shift;
++	my $result;
++	my $newapi = 0;
++
++	my $file = &quot;$proc_base/sync&quot;;
++	return '' unless -f $file;
++	# First query
++	open(F, &quot;$file&quot;) or die &quot;Failed to open $file for reading: $!&quot;;
++	while(&lt;F&gt;) {
++		chomp;
++		/SYNC=/ and $newapi = 1;
++		s/#.*//;
++		if(/\S/) {	# First non-comment line
++			s/^SYNC=\D*// if $newapi;
++			$result = $_;
++			last;
++		}
++	}
++	close F;
++	if(defined($newsync)) {		# Now change
++		$newsync =~ s/.*/\U$&amp;/;
++		if($newsync =~ /^(\d+)$/) {
++			$newsync = ($newapi)? &quot;SYNC=$1&quot; : &quot;$1 0&quot;;
++		} elsif($newsync ne 'DAHDI') {
++			die &quot;Bad sync parameter '$newsync'&quot;;
++		}
++		open(F, &quot;&gt;$file&quot;) or die &quot;Failed to open $file for writing: $!&quot;;
++		print F $newsync;
++		close(F) or die &quot;Failed in closing $file: $!&quot;;
++	}
++	return $result;
++}
++
++sub sync {
++	my ($newsync) = @_;
++	my $result;
++	my $file = &quot;$sysfs_ab_driver/sync&quot;;
++	if(! -f $file) {	# Old /proc interface
++		return sync_via_proc(@_);
++	}
++	open(F, &quot;$file&quot;) or die &quot;Failed to open $file for reading: $!&quot;;
++	$result = &lt;F&gt;;
++	close F;
++	chomp $result;
++	$result =~ s/^SYNC=\D*//;
++	if(defined $newsync) {		# Now change
++		$newsync =~ s/.*/\U$&amp;/;
++		if($newsync =~ /^(\d+)$/) {
++			$newsync = &quot;SYNC=$1&quot;;
++		} elsif($newsync ne 'DAHDI') {
++			die &quot;Bad sync parameter '$newsync'&quot;;
++		}
++		open(F, &quot;&gt;$file&quot;) or die &quot;Failed to open $file for writing: $!&quot;;
++		print F $newsync;
++		close(F) or die &quot;Failed in closing $file: $!&quot;;
++	}
++	return $result;
++}
++
++=head1 SEE ALSO
++
++=over
++
++=item L&lt;Dahdi::Xpp::Xbus&gt;
++
++Xbus (Astribank) object.
++
++=item L&lt;Dahdi::Xpp::Xpd&gt;
++
++XPD (the rough equivalent of a Dahdi span) object.
++
++=item L&lt;Dahdi::Xpp::Line&gt;
++
++Object for a line: an analog port or a time-slot in a adapter. 
++Equivalent of a channel in Dahdi.
++
++=item L&lt;Dahdi&gt;
++
++General documentation in the master package.
++
++=back
++
++=cut
++
++1;
+
+Added: trunk/dahdi-gen/Dahdi.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi.pm	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/Dahdi.pm	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,69 @@
++package Dahdi;
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: Dahdi.pm 6579 2009-05-08 10:21:05Z tzafrir $
++#
++use strict;
++use Dahdi::Span;
++
++=head1 NAME
++
++Dahdi - Perl interface to Dahdi information
++
++This package allows access from Perl to information about Dahdi
++hardware and loaded Dahdi devices.
++
++=head1 SYNOPSIS
++
++  # Listing channels in analog spans:
++  use Dahdi;
++  # scans system:
++  my @spans = Dahdi::spans();
++  for my $span (@spans) {
++    next if ($span-&gt;is_digital);
++     $span-&gt;num. &quot; - [&quot;. $span-&gt;type .&quot;] &quot;. $span-&gt;name. &quot;\n&quot;;
++    for my $chan ($span-&gt;chans) {
++      print &quot; - &quot;.$chan-&gt;num . &quot; - [&quot;. $chan-&gt;type. &quot;] &quot;. $chan-&gt;fqn&quot;. \n&quot;;
++    }
++  }
++=cut
++
++my $proc_base = &quot;/proc/dahdi&quot;;
++
++=head1 spans()
++
++Returns a list of span objects, ordered by span number.
++
++=cut
++
++sub spans() {
++	my @spans;
++
++	-d $proc_base or return ();
++	foreach my $zfile (glob &quot;$proc_base/*&quot;) {
++		$zfile =~ s:$proc_base/::;
++		next unless ($zfile =~ /^\d+$/);
++		my $span = Dahdi::Span-&gt;new($zfile);
++		push(@spans, $span);
++	}
++	@spans = sort { $a-&gt;num &lt;=&gt; $b-&gt;num } @spans;
++	return @spans;
++}
++
++=head1 SEE ALSO
++
++Span objects: L&lt;Dahdi::Span&gt;.
++
++Dahdi channels objects: L&lt;Dahdi::Chan&gt;.
++
++Dahdi hardware devices information: L&lt;Dahdi::Hardware&gt;.
++
++Xorcom Astribank -specific information: L&lt;Dahdi::Xpp&gt;.
++
++=cut
++
++1;
+
+Added: trunk/dahdi-gen/dahdi_genconf
+===================================================================
+--- trunk/dahdi-gen/dahdi_genconf	2009-12-20 19:42:40 UTC (rev 854)
++++ trunk/dahdi-gen/dahdi_genconf	2009-12-20 21:44:13 UTC (rev 855)
+@@ -0,0 +1,196 @@
++#! /usr/bin/perl -w
++#
++# Written by Oron Peled &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">oron at actcom.co.il</A>&gt;
++# Copyright (C) 2007, Xorcom
++# This program is free software; you can redistribute and/or
++# modify it under the same terms as Perl itself.
++#
++# $Id: dahdi_genconf 6647 2009-05-19 16:46:06Z tzafrir $
++#
++use strict;
++use File::Basename;
++BEGIN { my $dir = dirname($0); unshift(@INC, &quot;$dir&quot;); }
++
++use Getopt::Std;
++use Dahdi;
++use Dahdi::Xpp;
++use Dahdi::Config::Gen;
++use Dahdi::Config::Params;
++
++my $version = '1';	# Functionality version (integer)
++my $revision = '$Revision: 6647 $';
++
++my %opts;
++
++sub set_defaults {
++	my $default_file = $ENV{GENCONF_PARAMETERS} || &quot;/etc/dahdi/genconf_parameters&quot;;
++	my $params = Dahdi::Config::Params-&gt;new($default_file);
++	#$params-&gt;dump;
++	if($opts{v}) {
++		print &quot;Default parameters from &quot;, $params-&gt;{GENCONF_FILE}, &quot;\n&quot;;
++	}
++	my $gconfig = Dahdi::Config::Gen-&gt;new($params);
++	#$gconfig-&gt;dump;
++	return $gconfig;
++}
++
++sub spans_prep($@) {
++	my $gconfig = shift || die;
++	my @spans = @_;
++	foreach my $span (@spans) {
++		if($span-&gt;is_pri) {
++			$span-&gt;pri_set_fromconfig($gconfig);
++		}
++	}
++}
++
++sub generator_list($) {
++	my $gconfig = shift || die;
++	my @genlist;
++
++	if (@ARGV) {
++		for my $gen (@ARGV) {
++			push @genlist, $gen;
++		}
++	} else {
++		# No files given. Use the defaults.
++		@genlist = ('system', 'chandahdi');
++		if($gconfig-&gt;{'pri_connection_type'} eq 'R2') {
++			push @genlist, 'unicall';
++		}
++	}
++	return @genlist;
++}
++
++sub parse_genopts($) {
++	my $optstr = shift;
++	my %genopts;
++
++	$optstr = '' unless defined $optstr;
++	foreach my $o (split(/,/, $optstr)) {
++		my ($k, $v) = split(/=/, $o, 2);
++		$v = 1 unless defined $v and $v;
++		$genopts{$k} = $v;
++	}
++	return %genopts;
++}
++
++sub generate_files($@) {
++	my $gconfig = shift || die;
++	my @spans = @_;
++	my @generators = generator_list($gconfig);
++
++	for my $gen (@generators) {
++		my ($name, $optstr) = split(/=/, $gen, 2);
++		die &quot;Illegal name '$name'\n&quot; unless $name =~ /^\w+$/;
++		$name =~ s/(.)(.*)/\u$1\L$2/;
++		my %genopts = parse_genopts($optstr);
++		$genopts{'freepbx'} = 'yes' if $opts{'F'};
++		if(defined $opts{'v'}) {
++			$genopts{'verbose'} = $opts{v};
++		}
++		$gconfig-&gt;run_generator($name, \%genopts, @spans);
++	}
++}
++
++getopts('vVF', \%opts) || die &quot;$0: Bad option\n&quot;;
++if($opts{'V'}) {
++	my $revstr = $revision;
++	$revstr =~ s/[^$]*\$[^:]+:\s*//;
++	$revstr =~ s/\s*\$.*//;
++	print &quot;$0: version=$version revision=$revstr\n&quot;;
++	exit 0;
++}
++
++my $gconfig = set_defaults;
++my @spans = Dahdi::spans();
++spans_prep($gconfig, @spans);
++generate_files($gconfig, @spans);
++
++__END__
++
++=head1 NAME
++
++dahdi_genconf - Generate configuration for dahdi channels.
++
++=head1 SYNOPSIS
++
++dahdi_genconf [options] [generator...]
++
++=head1 DESCRIPTION
++
++This script generate configuration files for Dahdi hardware.
++It uses two information sources:
++
++=over 4
++
++=item Hardware
++
++ The actual dahdi hardware is automatically detected on the host.
++
++=item /etc/dahdi/genconf_parameters
++
++A configuration file that supplements the hardware information.
++Its location may be overriden via the C&lt;GENCONF_PARAMETERS&gt; environment
++variable.
++
++=back
++
++The dahdi_genconf script can generate various kinds of configuration files
++as specificed by the generator arguments.  Each generator is a perl classes
++in Dahdi::Config::Gen namespace.  The generator names on the command line
++are the class names in lowercase.
++
++The following generators are currently implemented: system, chandahdi, unicall, users.
++For further documentation on each, please user perldoc on the relevant
++class. E.g: C&lt;perldoc Dahdi::Config::Gen::Chandahdi&gt;
++
++Each generator on the command line may be passed custom options by assigning
++a comma separated list of options to the generator name. E.g:
++
++ dahdi_genconf system chandahdi=verbose unicall
++
++=head2 Global options:
++
++=over 4
++
++=item -V
++
++Version -- print version string and exit.
++
++=item -v
++
++Verbose -- sets the C&lt;'verbose'&gt; option for all generators.
++
++=item -F
++
++Freepbx -- sets the C&lt;'freepbx'&gt; option for all generators.
++Currently, chandahdi is affected.
++
++
++=back
++
++=head2 Implementation notes:
++
++=over 4
++
++=item *
++
++F&lt;genconf_parameters&gt; parsing is done via C&lt;Dahdi::Config::Params&gt;.
++An object representing the parsed data is instanciated by:
++C&lt;Dahdi::Config::Params-E&lt;gt&gt;new()&gt;.
++The C&lt;item()&gt; method of this object contains all the hard coded
++defaults of the configuration directives.
++
++=item *
++
++A configuration object is instanciated by C&lt;Dahdi::Config::Gen-E&lt;gt&gt;new($params)&gt;.
++The mapping of configuration directives into semantic configuration is
++done in the constructor.
++
++=item *
++
++A single generator is run via the the C&lt;run_generator()&gt; method of the
++configuration object.
++
++=back
+
+
+Property changes on: trunk/dahdi-gen/dahdi_genconf
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000408.html">[Destar-dev] r854 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000410.html">[Destar-dev] r856 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#409">[ date ]</a>
+              <a href="thread.html#409">[ thread ]</a>
+              <a href="subject.html#409">[ subject ]</a>
+              <a href="author.html#409">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

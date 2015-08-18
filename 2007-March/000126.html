@@ -1,0 +1,367 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r631 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r631%20-%20trunk&In-Reply-To=%3C200703112021.l2BKLamd013933%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000125.html">
+   <LINK REL="Next"  HREF="000131.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r631 - trunk</H1>
+    <B>hholzer at mail.berlios.de</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r631%20-%20trunk&In-Reply-To=%3C200703112021.l2BKLamd013933%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r631 - trunk">hholzer at mail.berlios.de
+       </A><BR>
+    <I>Sun Mar 11 21:21:36 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000125.html">[Destar-dev] r630 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000131.html">[Destar-dev] r631 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#126">[ date ]</a>
+              <a href="thread.html#126">[ thread ]</a>
+              <a href="subject.html#126">[ subject ]</a>
+              <a href="author.html#126">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: hholzer
+Date: 2007-03-11 21:21:26 +0100 (Sun, 11 Mar 2007)
+New Revision: 631
+
+Added:
+   trunk/cfg_trunk_zapbri.py
+Removed:
+   trunk/cfg_trunk_zaphfc.py
+Log:
+zap bri configuration update (zaphfc)
+
+
+Added: trunk/cfg_trunk_zapbri.py
+===================================================================
+--- trunk/cfg_trunk_zapbri.py	2007-03-08 21:05:33 UTC (rev 630)
++++ trunk/cfg_trunk_zapbri.py	2007-03-11 20:21:26 UTC (rev 631)
+@@ -0,0 +1,191 @@
++# -*- coding: utf-8 -*-
++#
++# Copyright (C) 2005 by Holger Schurig
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++import panelutils
++
++
++class CfgTrunkZapBRI(CfgTrunk):
++
++	shortName = _(&quot;Standard ZAP BRI trunk&quot;)
++	newObjectTitle = _(&quot;New standard ZAP BRI trunk&quot;)
++	technology = &quot;ZAP&quot;
++	
++	def createVariables(self):
++		self.variables = [
++			VarType(&quot;name&quot;,
++				title=_(&quot;Name&quot;),
++				len=35),
++
++			VarType(&quot;channels&quot;,
++				title=_(&quot;Zaptel channel number&quot;),
++				type=&quot;int&quot;,
++				len=2,
++				default = 1),
++
++			VarType(&quot;cards&quot;, title=_(&quot;Number of lines&quot;), type=&quot;int&quot;, default=1, len=2),
++
++			VarType(&quot;signalling&quot;,
++				title=_(&quot;Signalling type&quot;),
++				type=&quot;choice&quot;,
++				options=[('bri_cpe',_('BRI signalling PTP, CPE side')),
++					('bri_net', _('BRI signalling PTP, Network side')),
++					('bri_cpe_ptmp',_('BRI signalling PTMP, CPE side')),
++					('bri_net_ptmp',_('BRI signalling PTMP, Network side'))],
++				default=&quot;bri_cpe_ptmp&quot;),
++
++			VarType(&quot;group&quot;,
++				title=_(&quot;Callout group&quot;),
++				type=&quot;int&quot;,
++				default = 1),
++	
++			VarType(&quot;panelLab&quot;,
++				title=_(&quot;Operator Panel&quot;),
++				type=&quot;label&quot;,
++				hide=True),
++
++			VarType(&quot;panel&quot;,
++				title=_(&quot;Show this trunk in the panel&quot;),
++				type=&quot;bool&quot;,
++				hide=True,
++				optional=True),
++
++			VarType(&quot;Inbound&quot;,
++				title=_(&quot;Calls from BRI trunk&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;clid&quot;,
++				title=_(&quot;Change Caller*Id to:&quot;),
++				len=25,
++				optional=True),
++
++ 			VarType(&quot;clidnumin&quot;,
++ 				title=_(&quot;Change Caller*Id Number to:&quot;),
++ 				len=40,
++ 				optional=True),
++
++			VarType(&quot;contextin&quot;,
++				title=_(&quot;Go to&quot;),
++				type=&quot;radio&quot;,
++				default='phone',
++				options=[('phone',_(&quot;Phone&quot;)),('ivr',_(&quot;IVR&quot;)),('pbx',_(&quot;Virtual PBX&quot;))]),
++
++			VarType(&quot;phone&quot;,
++				title=_(&quot;Extension to ring&quot;),
++				type=&quot;choice&quot;,
++				optional=False,
++				options=getChoice(&quot;CfgPhone&quot;)),
++
++			VarType(&quot;ivr&quot;,
++				title=_(&quot;IVR to jump to&quot;),
++				type=&quot;choice&quot;,
++				optional=True,
++				options=getChoice(&quot;CfgIVR&quot;)),
++
++			VarType(&quot;pbx&quot;,
++				title=_(&quot;Allow dial extension from which Virtual PBX&quot;),
++				type=&quot;choice&quot;,
++				optional=True,
++				options=getChoice(&quot;CfgOptPBX&quot;)),
++
++ 			VarType(&quot;Outbound&quot;,
++ 				title=_(&quot;Outgoing calls to BRI trunk&quot;),
++ 				type=&quot;label&quot;),
++ 
++ 			VarType(&quot;clidnameout&quot;,
++ 				title=_(&quot;Change Caller*Id Name to:&quot;),
++ 				len=40,
++ 				optional=True),
++ 
++ 			VarType(&quot;clidnumout&quot;,
++ 				title=_(&quot;Change Caller*Id Number to:&quot;),
++ 				len=40,
++ 				optional=True),
++
++			VarType(&quot;dial&quot;,
++				hide=True,
++				len=50),
++				]
++
++		self.dependencies = [
++			DepType(&quot;phone&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;)),
++			DepType(&quot;ivr&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;))
++		]
++
++	def checkConfig(self):
++                res = CfgTrunk.checkConfig(self)
++                if res:
++                        return res
++
++	def createAsteriskConfig(self):
++		needModule(&quot;chan_zap&quot;)
++
++		c = AstConf(&quot;zaptel.conf&quot;)
++		c.setSection(&quot;&quot;)
++		c.destar_comment = False
++		for n in range(self.cards):
++			c.append(&quot;span=%d,1,3,ccs,ami&quot; % (self.channels + n))
++		for n in range(self.cards):
++			c.append(&quot;bchan=%d-%d&quot; % (self.channels + n * 3, self.channels + n * 3 + 1))
++			c.append(&quot;dchan=%d&quot; % (self.channels + n * 3 + 2))
++		c.append(&quot;alaw=%d-%d&quot; % (self.channels + n * 3, self.channels + n * 3 + 2))
++		c.append(&quot;&quot;)
++
++		# Create config for chan_zap:
++		c = AstConf(&quot;zapata.conf&quot;)
++		c.append(&quot;&quot;)
++		c.append(&quot;nationalprefix = 0&quot;)
++		c.append(&quot;internationalprefix = 00&quot;)
++		c.append(&quot;pridialplan = dynamic&quot;)
++		c.append(&quot;prilocaldialplan = local&quot;)
++		c.append(&quot;echocancel=no&quot;)
++		c.append(&quot;echotraining = 300&quot;)
++		c.append(&quot;echocancelwhenbridged=no&quot;)
++		
++		c.append(&quot;switchtype=euroisdn&quot;)
++		c.append(&quot;signalling=%s&quot; % self.signalling)
++
++		c.append(&quot;; ISDN Trunk %s&quot; % self.name)
++		c.append(&quot;context=in-%s&quot; % self.name)
++		if self.group:
++			c.appendValue(self, &quot;group&quot;)
++
++		chanstr = &quot;&quot;
++		for n in range(self.cards):
++		    if chanstr:
++			chanstr = chanstr + &quot;,&quot;
++		    chanstr = chanstr + &quot;%d-%d&quot; % (self.channels + n * 3 , self.channels + 1 + n * 3 )
++		c.append(&quot;channel=%s&quot; % chanstr)
++		c.append(&quot;&quot;)
++
++		#Dial part to use on dialout macro
++		if self.group:
++			self.dial = &quot;Zap/g%d/${ARG1}&quot; % (self.group)
++		
++		#What to do with incoming calls
++		self.createIncomingContext()
++
++		if panelutils.isConfigured() == 1 and self.panel:
++			panelutils.createTrunkButton(self)
++
+
+Deleted: trunk/cfg_trunk_zaphfc.py
+===================================================================
+--- trunk/cfg_trunk_zaphfc.py	2007-03-08 21:05:33 UTC (rev 630)
++++ trunk/cfg_trunk_zaphfc.py	2007-03-11 20:21:26 UTC (rev 631)
+@@ -1,91 +0,0 @@
+-# -*- coding: utf-8 -*-
+-#
+-# Copyright (C) 2005 by Holger Schurig
+-# 
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-#
+-
+-
+-from configlets import *
+-
+-
+-class CfgTrunkZapHFC(CfgTrunk):
+-
+-	shortName = _(&quot;ISDN using zaphfc&quot;)
+-	newObjectTitle = _(&quot;New ISDN using zaphfc trunk&quot;)
+-	
+-	def createVariables(self):
+-		self.variables = [
+-			VarType(&quot;name&quot;,  title=_(&quot;Name&quot;), len=35),
+-			VarType(&quot;mode&quot;,  title=_(&quot;Mode of NTBA&quot;), type=&quot;choice&quot;,
+-							 options=(&quot;p2p&quot;,&quot;p2mp&quot;), default=&quot;p2mp&quot;),
+-			VarType(&quot;cards&quot;, title=_(&quot;Number of cards&quot;), type=&quot;int&quot;, default=1, len=2),
+-	
+-			VarType(&quot;Outbound&quot;,  title=_(&quot;Calls to the ISDN network&quot;), type=&quot;label&quot;),
+-			VarType(&quot;msn&quot;,   title=_(&quot;Subscriber number&quot;), len=15),
+-			VarType(&quot;ext&quot;,   title=_(&quot;Outgoing prefix&quot;), optional=True, len=6),
+-			]
+-
+-
+-	def fixup(self):
+-		CfgTrunk.fixup(self)
+-
+-
+-	def createAsteriskConfig(self):
+-		needModule(&quot;chan_zap&quot;)
+-
+-		# Create config for the zaphfc kernel module:
+-		c = AstConf(&quot;zaptel.conf&quot;)
+-		c.destar_comment = False
+-		c.setSection(&quot;&quot;)
+-		c.append(&quot;loadzone=nl&quot;)
+-		c.append(&quot;defaultzone=nl&quot;)
+-		for n in range(self.cards):
+-			c.append(&quot;span=%d,1,3,ccs,ami&quot; % (n+1))
+-		for n in range(self.cards):
+-			c.append(&quot;bchan=%d-%d&quot; % (n*3+1,n*3+2))
+-			c.append(&quot;dchan=%d&quot; % (n*3+3))
+-
+-
+-		# Create config for chan_zap:
+-		c = AstConf(&quot;zapata.conf&quot;)
+-		c.append(&quot;switchtype=euroisdn&quot;)
+-		if self.mode==&quot;p2p&quot;:
+-			c.append(&quot;signalling=bri_cpe&quot;)
+-			prefix=self.msn
+-		else:
+-			c.append(&quot;signalling=bri_net_ptmp&quot;)
+-			prefix = &quot;&quot;
+-		c.append(&quot;group=1&quot;)
+-		# TODO?
+-		c.append(&quot;context=in-pstn&quot;)
+-		c.append(&quot;channel=1-2&quot;)
+-
+-		# Write DID extensions
+-		if self.mode==&quot;p2p&quot;:
+-			# For every phone, we need a separate DID config entry, we create them
+-			# in the [in-pstn] context.
+-			c = AstConf(&quot;extensions.conf&quot;)
+-			c.setSection(&quot;in-pstn&quot;)
+-			for p in configlet_tree:
+-				if not isinstance(p, Phone): continue
+-				if not p.did: continue
+-				#c.appendExten(&quot;%s%s&quot; % (self.msn,p.ext), &quot;Macro(exten-std,SIP/%s)&quot; % p.name)
+-
+-		# Write dialout entry:
+-		if self.ext:
+-			c = AstConf(&quot;extensions.conf&quot;)
+-			c.setSection(&quot;default&quot;)
+-			c.appendExten(&quot;_%s.&quot; % self.ext, &quot;Dial(Zap/g1/${EXTEN:%d},60)&quot; % (len(self.ext)))
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000125.html">[Destar-dev] r630 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000131.html">[Destar-dev] r631 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#126">[ date ]</a>
+              <a href="thread.html#126">[ thread ]</a>
+              <a href="subject.html#126">[ subject ]</a>
+              <a href="author.html#126">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

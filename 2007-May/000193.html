@@ -1,0 +1,358 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r684 - branches/destar-callweaver
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r684%20-%20branches/destar-callweaver&In-Reply-To=%3C200705141440.l4EEeZM5004398%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000192.html">
+   <LINK REL="Next"  HREF="000194.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r684 - branches/destar-callweaver</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r684%20-%20branches/destar-callweaver&In-Reply-To=%3C200705141440.l4EEeZM5004398%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r684 - branches/destar-callweaver">santiago at mail.berlios.de
+       </A><BR>
+    <I>Mon May 14 16:40:35 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000192.html">[Destar-dev] r683 - branches/destar-callweaver
+</A></li>
+        <LI>Next message: <A HREF="000194.html">[Destar-dev] r685 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#193">[ date ]</a>
+              <a href="thread.html#193">[ thread ]</a>
+              <a href="subject.html#193">[ subject ]</a>
+              <a href="author.html#193">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-05-14 16:40:33 +0200 (Mon, 14 May 2007)
+New Revision: 684
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/Templates.ptl
+   branches/destar-callweaver/cfg_app_chanspy.py
+   branches/destar-callweaver/cfg_opt_logger.py
+   branches/destar-callweaver/cfg_opt_voicemail.py
+   branches/destar-callweaver/cfg_trunk_iax.py
+   branches/destar-callweaver/destar
+   branches/destar-callweaver/page_admin_pbxstate.ptl
+   branches/destar-callweaver/page_admin_reload.ptl
+   branches/destar-callweaver/page_admin_viewconf.ptl
+   branches/destar-callweaver/page_config.ptl
+   branches/destar-callweaver/page_config_applications.ptl
+   branches/destar-callweaver/page_config_options.ptl
+   branches/destar-callweaver/page_user_quickdiallist.ptl
+   branches/destar-callweaver/page_user_settings.ptl
+   branches/destar-callweaver/page_user_state.ptl
+Log:
+Changing labels to CallWeaver
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-14 14:40:33 UTC (rev 684)
+@@ -1,3 +1,6 @@
++2007-05-15:
++* Changing some labels to CallWeaver
++
+ 2007-05-12:
+ * Added cfg_trunk_unicall
+ 
+
+Modified: branches/destar-callweaver/Templates.ptl
+===================================================================
+--- branches/destar-callweaver/Templates.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/Templates.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -158,7 +158,7 @@
+    	'&lt;head&gt;\n'
+    	if refresh:
+    		'&lt;meta http-equiv=&quot;Refresh&quot; content=&quot;%d;&quot; /&gt;\n' % refresh
+-  	'&lt;title&gt;Asterisk/DeStar PBX :: %s&lt;/title&gt;\n' % title
++  	'&lt;title&gt;CallWeaver/DeStar PBX :: %s&lt;/title&gt;\n' % title
+   	'&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;\n'
+   	'&lt;style type=&quot;text/css&quot; media=&quot;screen, tv, projection&quot;&gt;\n'
+   	'	@import url(&quot;/static/css/general.css&quot;);\n' 
+@@ -183,7 +183,7 @@
+ 	# Header
+  	'&lt;div id=&quot;wrapper&quot;&gt;\n'
+  	'	&lt;div id=&quot;header&quot;&gt;\n'
+- 	'		&lt;h1&gt;DeStar/Asterisk PBX&lt;/h1&gt;\n'
++ 	'		&lt;h1&gt;DeStar/CallWeaver PBX&lt;/h1&gt;\n'
+ 
+ 	
+ 	# Side menu
+
+Modified: branches/destar-callweaver/cfg_app_chanspy.py
+===================================================================
+--- branches/destar-callweaver/cfg_app_chanspy.py	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/cfg_app_chanspy.py	2007-05-14 14:40:33 UTC (rev 684)
+@@ -25,7 +25,7 @@
+ 
+ 	shortName   = _(&quot;Listen calls&quot;)
+ 	newObjectTitle  = _(&quot;New spy extension&quot;)
+-	description = _(&quot;Listen all calls on the Asterisk server. Jump through calls pressing *.&quot;)
++	description = _(&quot;Listen all calls on the CallWeaver server. Jump through calls pressing *.&quot;)
+ 	
+ 	def createVariables(self):
+ 		self.variables   = [ 
+
+Modified: branches/destar-callweaver/cfg_opt_logger.py
+===================================================================
+--- branches/destar-callweaver/cfg_opt_logger.py	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/cfg_opt_logger.py	2007-05-14 14:40:33 UTC (rev 684)
+@@ -24,7 +24,7 @@
+ class CfgOptLogger(CfgOptSingle):
+ 	shortName   = _(&quot;Logger options&quot;)
+ 	newObjectTitle  = _(&quot;Logger options&quot;)
+-	description = _(&quot;Asterisk can emit many events to it's console or a log file, Here you can make it more (or less) verbose:&quot;)
++	description = _(&quot;CallWeaver can emit many events to it's console or a log file, Here you can make it more (or less) verbose:&quot;)
+ 	
+ 	def createVariables(self):
+ 		_opt = [('error',   _(&quot;Errors&quot;)),
+
+Modified: branches/destar-callweaver/cfg_opt_voicemail.py
+===================================================================
+--- branches/destar-callweaver/cfg_opt_voicemail.py	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/cfg_opt_voicemail.py	2007-05-14 14:40:33 UTC (rev 684)
+@@ -44,10 +44,10 @@
+ 				 VarType(&quot;emailsettings&quot;, title=_(&quot;E-mail integration settings&quot;), type=&quot;label&quot;),
+ 				 VarType(&quot;emailintegration&quot;, title=_(&quot;Activate email voicemail notifications?&quot;), type=&quot;bool&quot;),
+ 				 VarType(&quot;serveremail&quot;, title=_(&quot;Who the e-mail notification should appear to come from&quot;), hint=_(&quot;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">destar_pbx at yourdomain</A>&quot;), optional=True, len=30),
+-				 VarType(&quot;fromstring&quot;, title=_(&quot;Change the From: string&quot;), default=_(&quot;The Asterisk/DeStar PBX&quot;), optional=True, len=50),
++				 VarType(&quot;fromstring&quot;, title=_(&quot;Change the From: string&quot;), default=_(&quot;The CallWeaver/DeStar PBX&quot;), optional=True, len=50),
+ 				 VarType(&quot;emailsubject&quot;, title=_(&quot;Change email Subject&quot;), default=_(&quot;[DeStar PBX]: New message from ${VM_CALLERID} in mailbox ${VM_MAILBOX}&quot;), optional=True, len=80),
+ 				 VarType(&quot;emailbody&quot;, title=_(&quot;Change email Body&quot;), type=&quot;text&quot;, 
+-					default=_(&quot;Dear ${VM_NAME}:\\n\\n\\tjust wanted to let you know you were just left a ${VM_DUR} long message (number ${VM_MSGNUM})\\n\\tin mailbox ${VM_MAILBOX} from ${VM_CALLERID}, on ${VM_DATE}, so you might\\n\\twant to check it when you get a chance. Thanks!\\n\\n\\t\\t\\t--Asterisk/Destar PBX.&quot;), 
++					default=_(&quot;Dear ${VM_NAME}:\\n\\n\\tjust wanted to let you know you were just left a ${VM_DUR} long message (number ${VM_MSGNUM})\\n\\tin mailbox ${VM_MAILBOX} from ${VM_CALLERID}, on ${VM_DATE}, so you might\\n\\twant to check it when you get a chance. Thanks!\\n\\n\\t\\t\\t--CallWeaver/Destar PBX.&quot;), 
+ 					optional=True),
+ 				 VarType(&quot;attach&quot;, title=_(&quot;Should the email contain the voicemail as an attachment?&quot;), type=&quot;bool&quot;),
+ 				 VarType(&quot;mailcmd&quot;, title=_(&quot;Override the default program to send e-mail&quot;), hint=_(&quot;i.e.: /usr/sbin/sendmail -t&quot;), optional=True),
+
+Modified: branches/destar-callweaver/cfg_trunk_iax.py
+===================================================================
+--- branches/destar-callweaver/cfg_trunk_iax.py	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/cfg_trunk_iax.py	2007-05-14 14:40:33 UTC (rev 684)
+@@ -26,7 +26,7 @@
+ 
+ 	shortName   = _(&quot;Standard IAX Trunk&quot;)
+ 	newObjectTitle  = _(&quot;New standard IAX trunk&quot;)
+-	description = _(&quot;&quot;&quot;Used to setup an IAX trunk to another Asterisk server or an IAX termination.&quot;&quot;&quot;)
++	description = _(&quot;&quot;&quot;Used to setup an IAX trunk to another CallWeaver or Asterisk server or an IAX termination.&quot;&quot;&quot;)
+ 	technology = &quot;IAX2&quot;
+ 	
+ 	def createVariables(self):
+
+Modified: branches/destar-callweaver/destar
+===================================================================
+--- branches/destar-callweaver/destar	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/destar	2007-05-14 14:40:33 UTC (rev 684)
+@@ -47,7 +47,7 @@
+ 
+ def print_usage():
+ 	program = &quot;destar&quot;
+-	print _(&quot;DeStar: Asterisk Management web interface&quot;)
++	print _(&quot;DeStar: CallWeaver Management web interface&quot;)
+ 	print
+ 	print _(&quot;Usage:&quot;)
+ 	print _(&quot;  %s [options]: normal execution&quot;) % program
+
+Modified: branches/destar-callweaver/page_admin_pbxstate.ptl
+===================================================================
+--- branches/destar-callweaver/page_admin_pbxstate.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_admin_pbxstate.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -62,7 +62,7 @@
+ 
+ 	_q_parent  = 'page_admin'
+ 	_q_title   = _(&quot;PBX State&quot;)
+-	_q_desc    = _(&quot;Status of Asterisk/DeStar PBX&quot;)
++	_q_desc    = _(&quot;Status of CallWeaver/DeStar PBX&quot;)
+ 	_q_link    = 'pbxstate'
+ 	_q_menupos = 10
+ 	_q_level   = 3
+@@ -81,7 +81,7 @@
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			htmltext(_(&quot;Asterisk is not running!&quot;))
++			htmltext(_(&quot;CallWeaver is not running!&quot;))
+ 			'&lt;/span&gt;&lt;/p&gt;'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+
+Modified: branches/destar-callweaver/page_admin_reload.ptl
+===================================================================
+--- branches/destar-callweaver/page_admin_reload.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_admin_reload.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -29,7 +29,7 @@
+ 
+ 	_q_parent  = 'page_admin'
+ 	_q_title   = _(&quot;Apply Changes&quot;)
+-	_q_desc    = _(&quot;Reload Asterisk/DeStar PBX&quot;)
++	_q_desc    = _(&quot;Reload CallWeaver/DeStar PBX&quot;)
+ 	_q_link    = 'reload'
+ 	_q_menupos = 90
+ 	_q_level   = 3
+@@ -47,7 +47,7 @@
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			_(&quot;Asterisk is not running!&quot;)
++			_(&quot;CallWeaver is not running!&quot;)
+ 			'&lt;/span&gt;&lt;/p&gt;'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+
+Modified: branches/destar-callweaver/page_admin_viewconf.ptl
+===================================================================
+--- branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -61,7 +61,7 @@
+ 
+ 	_q_parent  = 'page_admin'
+ 	_q_title   = _(&quot;View/Save Configuration&quot;)
+-	_q_desc    = _(&quot;Show and Save Asterisk configuration files&quot;)
++	_q_desc    = _(&quot;Show and Save CallWeaver configuration files&quot;)
+ 	_q_link    = 'viewconf'
+ 	_q_menupos = 90
+ 	_q_level   = 3
+@@ -99,7 +99,7 @@
+ 				showForm.render()
+ 
+ 			elif showForm['_show']:
+-				header(_(&quot;Asterisk configuration files&quot;))
++				header(_(&quot;CallWeaver configuration files&quot;))
+ 				if not missingModules == []: self.showMissingModules(missingModules)
+ 				entries = []
+ 				for file,cnf in configEntries:
+
+Modified: branches/destar-callweaver/page_config.ptl
+===================================================================
+--- branches/destar-callweaver/page_config.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_config.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -28,7 +28,7 @@
+ 
+ 	_q_parent  = 'page_main'
+ 	_q_title   = _(&quot;Configuration&quot;)
+-	_q_desc    = _(&quot;Modify Asterisk configuration&quot;)
++	_q_desc    = _(&quot;Modify CallWeaver configuration&quot;)
+ 	_q_menupos = 30
+ 	_q_level   = 3
+ 
+@@ -84,7 +84,7 @@
+ 
+ 		if not backend.countConfiglets(clazz=&quot;CfgOptManager&quot;):
+ 			self.configurationTip(
+-				_(&quot;You should create a management API entry. Without this entry, DeStar can't control the Asterisk PBX software.&quot;),
++				_(&quot;You should create a management API entry. Without this entry, DeStar can't control the CallWeaver PBX software.&quot;),
+ 				&quot;add/CfgOptManager&quot;,
+ 				[_(&quot;Configuration&quot;), _(&quot;Options&quot;), _(&quot;Management API access&quot;)] )
+ 
+
+Modified: branches/destar-callweaver/page_config_applications.ptl
+===================================================================
+--- branches/destar-callweaver/page_config_applications.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_config_applications.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -27,7 +27,7 @@
+ 
+ 	_q_parent  = 'page_config'
+ 	_q_title   = _(&quot;Applications&quot;)
+-	_q_desc    = _(&quot;Special Asterisk Applications&quot;)
++	_q_desc    = _(&quot;Special CallWeaver Applications&quot;)
+ 	_q_link    = 'applications'
+ 	_q_menupos = 50
+ 	_q_level   = 3
+
+Modified: branches/destar-callweaver/page_config_options.ptl
+===================================================================
+--- branches/destar-callweaver/page_config_options.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_config_options.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -27,7 +27,7 @@
+ 
+ 	_q_parent  = 'page_config'
+ 	_q_title   = _(&quot;Options&quot;)
+-	_q_desc    = _(&quot;DeStar and Asterisk options and parameters&quot;)
++	_q_desc    = _(&quot;DeStar and CallWeaver options and parameters&quot;)
+ 	_q_link    = 'options'
+ 	_q_menupos = 999
+ 	_q_level   = 3
+
+Modified: branches/destar-callweaver/page_user_quickdiallist.ptl
+===================================================================
+--- branches/destar-callweaver/page_user_quickdiallist.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_user_quickdiallist.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -81,7 +81,7 @@
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			htmltext(_(&quot;Asterisk is not running!&quot;))
++			htmltext(_(&quot;CallWeaver is not running!&quot;))
+ 			'&lt;/span&gt;&lt;/p&gt;'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+
+Modified: branches/destar-callweaver/page_user_settings.ptl
+===================================================================
+--- branches/destar-callweaver/page_user_settings.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_user_settings.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -114,7 +114,7 @@
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			htmltext(_(&quot;Asterisk is not running!&quot;))
++			htmltext(_(&quot;CallWeaver is not running!&quot;))
+ 			'&lt;/span&gt;&lt;/p&gt;'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+
+Modified: branches/destar-callweaver/page_user_state.ptl
+===================================================================
+--- branches/destar-callweaver/page_user_state.ptl	2007-05-12 07:52:18 UTC (rev 683)
++++ branches/destar-callweaver/page_user_state.ptl	2007-05-14 14:40:33 UTC (rev 684)
+@@ -141,7 +141,7 @@
+ 		manager.connect()
+ 		if not manager.isConnected():
+ 			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			htmltext(_(&quot;Asterisk is not running!&quot;))
++			htmltext(_(&quot;CallWeaver is not running!&quot;))
+ 			'&lt;/span&gt;&lt;/p&gt;'
+ 		elif not manager.isLoggedIn():
+ 			# TODO: describe how to set this up
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000192.html">[Destar-dev] r683 - branches/destar-callweaver
+</A></li>
+	<LI>Next message: <A HREF="000194.html">[Destar-dev] r685 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#193">[ date ]</a>
+              <a href="thread.html#193">[ thread ]</a>
+              <a href="subject.html#193">[ subject ]</a>
+              <a href="author.html#193">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

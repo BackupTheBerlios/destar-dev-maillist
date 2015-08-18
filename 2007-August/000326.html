@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r790 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r790%20-%20trunk&In-Reply-To=%3C200708162315.l7GNFatJ007306%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000325.html">
+   <LINK REL="Next"  HREF="000327.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r790 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r790%20-%20trunk&In-Reply-To=%3C200708162315.l7GNFatJ007306%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r790 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Aug 17 01:15:36 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000325.html">[Destar-dev] r789 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000327.html">[Destar-dev] [Bug #11798] Sipgate needs &quot;fromuser&quot; in sip.conf
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#326">[ date ]</a>
+              <a href="thread.html#326">[ thread ]</a>
+              <a href="subject.html#326">[ subject ]</a>
+              <a href="author.html#326">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-17 01:15:35 +0200 (Fri, 17 Aug 2007)
+New Revision: 790
+
+Modified:
+   trunk/page_user_phonebook.ptl
+Log:
+show caller id name instead of channel name if it exists
+
+
+
+Modified: trunk/page_user_phonebook.ptl
+===================================================================
+--- trunk/page_user_phonebook.ptl	2007-08-16 21:29:16 UTC (rev 789)
++++ trunk/page_user_phonebook.ptl	2007-08-16 23:15:35 UTC (rev 790)
+@@ -48,15 +48,16 @@
+         
+ 		'&lt;h3&gt;Phones&lt;/h3&gt;'
+ 		'&lt;table&gt;'
+-		'&lt;tr&gt;&lt;th&gt;Number&lt;/th&gt; &lt;th&gt;Short Name&lt;/th&gt; &lt;th&gt;Name&lt;/th&gt;&lt;/tr&gt;'
++		'&lt;tr&gt;&lt;th&gt;Number&lt;/th&gt; &lt;th&gt;Name&lt;/th&gt;&lt;/tr&gt;'
+ 		for o in backend.getConfiglets('Phones'):
+-			if self.session.pbx:
+-				if o.pbx == self.session.pbx:
+-					'&lt;tr&gt;'
+-                                        '&lt;td&gt;&lt;a href=&quot;../dial/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o.ext, o.ext)
+-					'&lt;td&gt;%s&lt;/td&gt; &lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % (o.shortName, o.name)
+-			else:
+-				'&lt;tr&gt;&lt;td&gt;%s&lt;/td&gt; &lt;td&gt;%s&lt;/td&gt; &lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % (o.ext, o.shortName, o.name)
++			if o.pbx == self.session.pbx or self.session.level &gt;= 3 :
++				'&lt;tr&gt;'
++				'&lt;td&gt;&lt;a href=&quot;../dial/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o.ext, o.ext)
++				if o.calleridname:
++					'&lt;td&gt;&lt;a href=&quot;../dial/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o.ext, o.calleridname)
++				else:
++					'&lt;td&gt;&lt;a href=&quot;../dial/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o.ext, o.name)
++				'&lt;/tr&gt;'
+ 		'&lt;/table&gt;'
+ 		
+ 		footer()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000325.html">[Destar-dev] r789 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000327.html">[Destar-dev] [Bug #11798] Sipgate needs &quot;fromuser&quot; in sip.conf
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#326">[ date ]</a>
+              <a href="thread.html#326">[ thread ]</a>
+              <a href="subject.html#326">[ subject ]</a>
+              <a href="author.html#326">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

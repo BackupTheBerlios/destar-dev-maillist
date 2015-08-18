@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r741 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r741%20-%20trunk&In-Reply-To=%3C200707032126.l63LQakb013452%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000251.html">
+   <LINK REL="Next"  HREF="000253.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r741 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r741%20-%20trunk&In-Reply-To=%3C200707032126.l63LQakb013452%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r741 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Jul  3 23:26:36 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000251.html">[Destar-dev] r740 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000253.html">[Destar-dev] [Bug #11495] Destar rewrites user's defined voicemail	pin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#252">[ date ]</a>
+              <a href="thread.html#252">[ thread ]</a>
+              <a href="subject.html#252">[ subject ]</a>
+              <a href="author.html#252">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-03 23:26:35 +0200 (Tue, 03 Jul 2007)
+New Revision: 741
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/panelutils.py
+Log:
+* panelutils.py: small typos on PARK and QUEUE.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-03 21:21:31 UTC (rev 740)
++++ trunk/CHANGELOG.txt	2007-07-03 21:26:35 UTC (rev 741)
+@@ -4,6 +4,7 @@
+ * cfg_opt_zappri: CRC is optional, CAS format is better with colons.
+ * cfg_phone_ext: use this more like a 'virtual' extension than just an alias.
+ * Added configlet._id as Queue member priority.
++* panelutils.py: small typos on PARK and QUEUE.
+ 
+ 2007-06-30:
+ * Added option to return to operator on macro-voicemail.
+
+Modified: trunk/panelutils.py
+===================================================================
+--- trunk/panelutils.py	2007-07-03 21:21:31 UTC (rev 740)
++++ trunk/panelutils.py	2007-07-03 21:26:35 UTC (rev 741)
+@@ -119,7 +119,7 @@
+ 	p.append(&quot;Position=n&quot;)
+ 	p.append(&quot;Icon=1&quot;)
+ 	p.append(&quot;Extension=%s&quot; % obj.ext)
+-	p.append(&quot;Label=%s&quot; % obj.name)
++	p.append('Label=&quot;%s&quot;' % obj.name)
+ 	p.append(&quot;Astdbkey=%s/%s&quot; % (obj.pbx, obj.ext))
+ 
+ def createAgentButton(obj):
+@@ -127,7 +127,7 @@
+ 	p.setSection(&quot;%s/%s&quot; % (obj.technology, obj.number) )
+ 	p.append(&quot;Position=n&quot;)
+ 	p.append(&quot;Icon=6&quot;)
+-	p.append(&quot;Label=%s&quot; % obj.name)
++	p.append('Label=&quot;%s&quot;' % obj.name)
+ 
+ def createTrunkButton(obj):
+ 	p = AstConf(&quot;op_buttons.cfg&quot;)
+@@ -146,7 +146,7 @@
+ 
+ def createParkButton(obj):
+ 	p = AstConf(&quot;op_buttons.cfg&quot;)
+-	p.setSection(&quot;%s%s&quot; % (_(&quot;PARK&quot;),obj.ext))
++	p.setSection(&quot;%s/%s&quot; % (&quot;PARK&quot;,obj.ext))
+ 	p.append(&quot;Position=n&quot;)
+ 	p.append(&quot;Icon=3&quot;)
+ 	p.append(&quot;Extension=%s&quot; % obj.ext)
+@@ -154,11 +154,11 @@
+ 
+ def createQueueButton(obj):
+ 	p = AstConf(&quot;op_buttons.cfg&quot;)
+-	p.setSection(&quot;%s/%s&quot; % (obj.technology, obj.name) )
++	p.setSection(&quot;%s/%s&quot; % (&quot;QUEUE&quot;,obj.name))
+ 	p.append(&quot;Position=n&quot;)
+ 	p.append(&quot;Icon=3&quot;)
+ 	p.append(&quot;Extension=-1&quot;)
+-	p.append(&quot;Label=%s&quot; % obj.name)
++	p.append('Label=&quot;%s&quot;' % obj.name)
+ 
+ def startPanelDaemon():
+         return commands.getoutput(PANEL_START_CMD)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000251.html">[Destar-dev] r740 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000253.html">[Destar-dev] [Bug #11495] Destar rewrites user's defined voicemail	pin
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#252">[ date ]</a>
+              <a href="thread.html#252">[ thread ]</a>
+              <a href="subject.html#252">[ subject ]</a>
+              <a href="author.html#252">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

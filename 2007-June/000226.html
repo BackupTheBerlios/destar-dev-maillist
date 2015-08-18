@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r716 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r716%20-%20trunk&In-Reply-To=%3C200706132143.l5DLhIRf010250%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000225.html">
+   <LINK REL="Next"  HREF="000227.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r716 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r716%20-%20trunk&In-Reply-To=%3C200706132143.l5DLhIRf010250%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r716 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Jun 13 23:43:18 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000225.html">[Destar-dev] r715 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000227.html">[Destar-dev] r717 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#226">[ date ]</a>
+              <a href="thread.html#226">[ thread ]</a>
+              <a href="subject.html#226">[ subject ]</a>
+              <a href="author.html#226">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-13 23:43:18 +0200 (Wed, 13 Jun 2007)
+New Revision: 716
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_trunk_iax.py
+Log:
+using username instead of trunk name in register line
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-13 21:28:03 UTC (rev 715)
++++ trunk/CHANGELOG.txt	2007-06-13 21:43:18 UTC (rev 716)
+@@ -2,6 +2,7 @@
+ * cfg_phone_queue: string Spanish to English
+ * cfg_trunk_iax.py: added remote port setting
+ * cfg_trunk_iax.py: added registry option
++  - using username instead of trunk name in register line
+ 
+ 2007-06-12:
+ * Fixed bug in Dialouts. Added fields to change Caller ID.
+
+Modified: trunk/cfg_trunk_iax.py
+===================================================================
+--- trunk/cfg_trunk_iax.py	2007-06-13 21:28:03 UTC (rev 715)
++++ trunk/cfg_trunk_iax.py	2007-06-13 21:43:18 UTC (rev 716)
+@@ -36,6 +36,10 @@
+ 				len=30,
+ 				default=&quot;iaxtrunk&quot;),
+ 
++			VarType(&quot;id&quot;,
++				title=_(&quot;IAX username&quot;),
++				len=15),
++
+ 			VarType(&quot;host&quot;,
+ 				title=_(&quot;IAX host&quot;),
+ 				len=80),
+@@ -184,7 +188,7 @@
+ 
+ 		if self.register:
+ 			c.setSection(&quot;general&quot;)
+-			registerstr = &quot;register =&gt; %s&quot; % self.name
++			registerstr = &quot;register =&gt; %s&quot; % self.id
+ 			if self.auth == &quot;plain&quot;:
+ 				registerstr += &quot;:%s&quot; % self.pw
+ 			# TODO: registration using rsa keys 
+@@ -198,7 +202,7 @@
+ 			c.setSection(self.name)
+ 			c.append(&quot;type=friend&quot;)
+ 			c.append(&quot;host=%s&quot; % self.host)
+-			c.append(&quot;username=%s&quot; % self.name)
++			c.append(&quot;username=%s&quot; % self.id)
+ 			c.append(&quot;context=in-%s&quot; % self.name)
+ 			c.append(&quot;bandwidth=%s&quot; % self.bandwidth)
+ 			c.append(&quot;qualify=yes&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000225.html">[Destar-dev] r715 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000227.html">[Destar-dev] r717 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#226">[ date ]</a>
+              <a href="thread.html#226">[ thread ]</a>
+              <a href="subject.html#226">[ subject ]</a>
+              <a href="author.html#226">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

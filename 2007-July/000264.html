@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r748 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r748%20-%20trunk&In-Reply-To=%3C200707041904.l64J4jUh030309%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000263.html">
+   <LINK REL="Next"  HREF="000265.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r748 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r748%20-%20trunk&In-Reply-To=%3C200707041904.l64J4jUh030309%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r748 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Jul  4 21:04:45 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000263.html">[Destar-dev] r747 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000265.html">[Destar-dev] r749 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#264">[ date ]</a>
+              <a href="thread.html#264">[ thread ]</a>
+              <a href="subject.html#264">[ subject ]</a>
+              <a href="author.html#264">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-07-04 21:04:45 +0200 (Wed, 04 Jul 2007)
+New Revision: 748
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/Server.py
+   trunk/destar
+Log:
+Added https support
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-04 16:38:30 UTC (rev 747)
++++ trunk/CHANGELOG.txt	2007-07-04 19:04:45 UTC (rev 748)
+@@ -3,6 +3,7 @@
+ * Added cfg_ivr_treenode to make simple IVR trees.
+ * Merged Queue Statistics from 0.2.X branch.
+ * Added routine to install initial queue.db
++* Added https support
+ 
+ 2007-07-03:
+ * Use configlet shortName on logs if name is not present.
+
+Modified: trunk/Server.py
+===================================================================
+--- trunk/Server.py	2007-07-04 16:38:30 UTC (rev 747)
++++ trunk/Server.py	2007-07-04 19:04:45 UTC (rev 748)
+@@ -13,7 +13,7 @@
+ try:
+ 	from quixote.http_response import Stream
+ except:
+-	print &quot;You need Quixote 1.x, not Quixote 0.6&quot;
++	print &quot;You need Quixote 2.x or greater&quot;
+ 	sys.exit(1)
+ from quixote.publish import Publisher
+ from medusa import http_server, xmlrpc_handler
+@@ -33,7 +33,7 @@
+ 
+ 
+ class QuixoteHandler:
+-    def __init__(self, publisher, server_name, server):
++    def __init__(self, publisher, server_name, server, https=False):
+ 	&quot;&quot;&quot;QuixoteHandler(publisher:Publisher, server_name:string,
+ 			server:medusa.http_server.http_server)
+ 
+@@ -43,6 +43,7 @@
+ 	self.publisher = publisher
+ 	self.server_name = server_name
+ 	self.server = server
++	self.https = https
+ 
+     def match(self, request):
+ 	# Always match, since this is the only handler there is.
+@@ -101,6 +102,9 @@
+ 		   'SERVER_SOFTWARE': self.server_name,
+ 		   }
+ 
++	if self.https:
++		   environ['HTTPS'] = 'on'
++
+ 	# Propagate HTTP headers
+ 	for title, header in msg.items():
+ 	    envname = title.replace('-', '_').upper()
+@@ -155,12 +159,13 @@
+     &quot;&quot;&quot;
+ 
+     def __init__(self, approot, create_publisher, config_file=None, port=80,
+-	       enable_ptl=True):
++	       enable_ptl=True, https=False):
+ 	self.approot = approot
+ 	self.config_file = config_file
+ 	self.port = port
+ 	#self.publishclass = publisher
+ 	self.publisher = create_publisher()
++	self.https = https
+ 	if enable_ptl:
+ 	    from quixote import enable_ptl
+ 	    enable_ptl()
+@@ -172,7 +177,7 @@
+ #	if self.config_file:
+ #	    publisher.read_config(self.config_file)
+ #	publisher.setup_logs()
+-	dh = QuixoteHandler(self.publisher, self.approot, server)
++	dh = QuixoteHandler(self.publisher, self.approot, server, self.https)
+ 	server.install_handler(dh)
+ 	asyncore.loop()
+ 
+
+Modified: trunk/destar
+===================================================================
+--- trunk/destar	2007-07-04 16:38:30 UTC (rev 747)
++++ trunk/destar	2007-07-04 19:04:45 UTC (rev 748)
+@@ -37,6 +37,7 @@
+ import daemonize
+ be_daemon = False
+ rport = 8080
++https = False
+ pid_file = '/var/run/destar.pid'
+ VERSION = destar_version
+ 
+@@ -61,11 +62,12 @@
+ 	print _(&quot;  -d | --daemonize: run in the background&quot;)
+ 	print _(&quot;  -r &lt;port&gt; | --port=&lt;port&gt;: run on port &lt;port&gt; (default: 8080)&quot;)
+ 	print _(&quot;  -b | --backend: run on backend mode&quot;)
++	print _(&quot;  -s | --https: run on https mode&quot;)
+ 
+ 
+ try:
+-	opts,args = getopt.getopt(sys.argv[1:],'dhpr:vb', 
+-		['daemonize','help','pid=', 'port=', 'version', 'backend'])
++	opts,args = getopt.getopt(sys.argv[1:],'dhpr:vbs', 
++		['daemonize','help','pid=', 'port=', 'version', 'backend', 'https'])
+ except getopt.GetoptError:
+ 	print _(&quot;DeStar: Command-line parsing error. Aborting.&quot;)
+ 	print_usage()
+@@ -91,6 +93,8 @@
+ 		backend.createAsteriskConfig()
+ 		backend.writeAsteriskConfig()
+ 		sys.exit(0)
++	if opt in ('-s', '--https'):
++		https = True
+ 
+ # Validate parameters to give better errors:
+ try:
+@@ -119,7 +123,7 @@
+ # 'Publisher.py' contains our session management, 'page_main' contains
+ # the start page.
+ import Server, Publisher
+-pub = Server.Server(&quot;page_main&quot;, Publisher.create_publisher, port=int(rport))
++pub = Server.Server(&quot;page_main&quot;, Publisher.create_publisher, port=int(rport), https=https)
+ 
+ 
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000263.html">[Destar-dev] r747 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000265.html">[Destar-dev] r749 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#264">[ date ]</a>
+              <a href="thread.html#264">[ thread ]</a>
+              <a href="subject.html#264">[ subject ]</a>
+              <a href="author.html#264">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

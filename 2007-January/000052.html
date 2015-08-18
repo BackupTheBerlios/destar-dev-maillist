@@ -1,0 +1,502 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r575 - branches/quixote2
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r575%20-%20branches/quixote2&In-Reply-To=%3C200701222124.l0MLOlZB006629%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000044.html">
+   <LINK REL="Next"  HREF="000053.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r575 - branches/quixote2</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r575%20-%20branches/quixote2&In-Reply-To=%3C200701222124.l0MLOlZB006629%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r575 - branches/quixote2">santiago at mail.berlios.de
+       </A><BR>
+    <I>Mon Jan 22 22:24:47 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000044.html">[Destar-dev] r574 - web
+</A></li>
+        <LI>Next message: <A HREF="000053.html">[Destar-dev] r576 - branches
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#52">[ date ]</a>
+              <a href="thread.html#52">[ thread ]</a>
+              <a href="subject.html#52">[ subject ]</a>
+              <a href="author.html#52">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-01-22 22:24:46 +0100 (Mon, 22 Jan 2007)
+New Revision: 575
+
+Modified:
+   branches/quixote2/CHANGELOG.txt
+   branches/quixote2/backend.py
+   branches/quixote2/cfg_app_callfw.py
+   branches/quixote2/cfg_dialout_normal.py
+   branches/quixote2/cfg_ivr_autoatt.py
+   branches/quixote2/cfg_opt_settings.py
+   branches/quixote2/cfg_phone_epygi.py
+   branches/quixote2/cfg_phone_iax.py
+   branches/quixote2/cfg_phone_mgcp.py
+   branches/quixote2/cfg_phone_sip.py
+   branches/quixote2/cfg_phone_zap.py
+   branches/quixote2/configlets.py
+   branches/quixote2/manager.py
+Log:
+* Merged last changes from trunk
+
+
+
+Modified: branches/quixote2/CHANGELOG.txt
+===================================================================
+--- branches/quixote2/CHANGELOG.txt	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/CHANGELOG.txt	2007-01-22 21:24:46 UTC (rev 575)
+@@ -1,3 +1,13 @@
++2007-01-22:
++* Merged last changes from trunk
++
++2007-01-21:
++* added tapi support
++* Releasing and taging 0.2.2 version
++
++2007-01-19:
++* Fixed hungup typo
++
+ 2007-01-16:
+ * Merging quixote2 branch and trunk 
+ 
+
+Modified: branches/quixote2/backend.py
+===================================================================
+--- branches/quixote2/backend.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/backend.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -116,6 +116,11 @@
+ 	* macros.inc
+ 	&quot;&quot;&quot;
+ 
++	tapisupport = False
++        for obj in configlets.configlet_tree:
++	        if obj.__class__.__name__ == 'CfgOptSettings':
++		        if obj.tapi:
++			        tapisupport = True
+ 
+ 	# Start with empty config files
+ 	configlets.asterisk_configfiles = []
+@@ -174,70 +179,75 @@
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Macro to dial a standard local extension&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;; format: Macro(stdexten,dest,voicebox 1/0,ext,pbx)&quot;)
++	c.append(&quot;; format: Macro(stdexten,dest,ext,pbx)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.setSection(&quot;macro-dial-std-exten&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; test for CFIM (Call Forwarding Immediate)&quot;)
+-	c.append(&quot;exten=s,1,Set(fw_ext=${DB(CFIM/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,1,Set(fw_ext=${DB(CFIM/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; test for VMIM (VM Immediate)&quot;)
+-	c.append(&quot;exten=s,n,Set(vmim=${DB(VMIM/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n,Set(vmim=${DB(VMIM/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${vmim}&quot; != &quot;&quot;]?vmu)')
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; test for DND (Do Not Disturb)&quot;)
+-	c.append(&quot;exten=s,n,Set(dnd=${DB(DND/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n,Set(dnd=${DB(DND/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${dnd}&quot; != &quot;&quot;]?busy)')
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get dial seconds&quot;)
+-	c.append(&quot;exten=s,n,Set(dsec=${DB(DSEC/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n,Set(dsec=${DB(DSEC/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${dsec}&quot; != &quot;&quot;]?dsecEnd)')
+ 	c.append(&quot;exten=s,n,Set(dsec=45)&quot;)
+ 	c.append(&quot;exten=s,n(dsecEnd),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get global dial options&quot;)
+ 	c.append(&quot;exten=s,n,Set(dopt=${DIAL_OPTIONS})&quot;)
+-	#c.append('exten=s,n,GotoIf($[&quot;${dopt}&quot; != &quot;&quot;]?doptEnd)')
+-	#c.append(&quot;exten=s,n,Set(dopt=r)&quot;)
+-	#c.append(&quot;exten=s,n(doptEnd),NoOp()&quot;)
++        if tapisupport:
++	        c.append(&quot;exten=s,n,Set(dopt=${dopt}M(tapi^${UNIQUEID}|${ARG1}))&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get early media&quot;)
+-	c.append(&quot;exten=s,n,Set(emedia=${DB(EMEDIA/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n,Set(emedia=${DB(EMEDIA/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${emedia}&quot; = &quot;&quot;]?emediaEnd)')
+ 	c.append(&quot;exten=s,n,Set(dopt=${dopt}m(${emedia}))&quot;)
+ 	c.append(&quot;exten=s,n,Answer()&quot;)
+ 	c.append(&quot;exten=s,n(emediaEnd),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; parallel ringing&quot;)
+-	c.append(&quot;exten=s,n,Set(prng=${DB(PRNG/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n,Set(prng=${DB(PRNG/${ARG4}/${ARG3})})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial&quot;)
+-	c.append(&quot;exten=s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWw${dopt})&quot;)
++	c.append(&quot;exten=s,n(MainDial),NoOp()&quot;)
++        if tapisupport:
++                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${ARG1})&quot;)
++                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)&quot;)
++                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: SET CALLERID ${CALLERID})&quot;)
++                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)&quot;)
++	c.append(&quot;exten=s,n,Dial(${ARG1}${prng},${dsec},TtWw${dopt})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'timeout'&quot;)
+-	c.append(&quot;exten=s,n(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append('exten=s,n,GotoIf($[&quot;{CDR(intrunk)}&quot; = &quot;&quot;]?cftoend)')
+-	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFTO-TRUNK/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFTO-TRUNK/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append(&quot;exten=s,n(cftoend),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; no CFTO (Call Forward Timeout), test VM U.&quot;)
+-	c.append(&quot;exten=s,n,Set(vmu=${DB(VMU/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n,Set(vmu=${DB(VMU/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${vmu}&quot; != &quot;&quot;]?vmu)')
+ 	c.append(&quot;exten=s,n,Goto(hangup)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'busy'&quot;)
+-	c.append(&quot;exten=s,MainDial+101(busy),Set(fw_ext=${DB(CFBS/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,MainDial+101(busy),Set(fw_ext=${DB(CFBS/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append('exten=s,n,GotoIf($[&quot;{CDR(intrunk)}&quot; = &quot;&quot;]?cfbsend)')
+-	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFBS-TRUNK/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFBS-TRUNK/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append(&quot;exten=s,n(cfbsend),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; no CFBS (Call Forward Busy), test VM Busy&quot;)
+-	c.append(&quot;exten=s,n,Set(vmbs=${DB(VMBS/${ARG5}/${ARG4})})&quot;)
++	c.append(&quot;exten=s,n,Set(vmbs=${DB(VMBS/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${vmbs}&quot; != &quot;&quot;]?vmbs)')
+ 	c.append(&quot;exten=s,n,Answer()&quot;)
+ 	c.append(&quot;exten=s,n,Playtones(busy)&quot;)
+@@ -246,15 +256,21 @@
+ 	c.append(&quot;exten=s,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append('exten=s,n(vmu),Set(vmopt=u)')
+-	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG4}@${ARG5})&quot;)
++	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3}@${ARG4})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append('exten=s,n(vmbs),Set(vmopt=b)')
+-	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG4}@${ARG5})&quot;)
++	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3}@${ARG4})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=s,n(hangup),Hangup()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=i,0,Hangup&quot;)
++        if tapisupport:
++                c.append(&quot;exten=h,1,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;)
+ 
++                c.append(&quot;[macro-tapi];&quot;)
++                c.append(&quot;exten=s,1,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;${ARG2}] LINE_CALLSTATE LINECALLSTATE_CONNECTED)&quot;)
++                c.append(&quot;exten=s,2,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)&quot;)
++
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; format: Macro(voicemail,&lt;VoiceMail arguments&gt;)&quot;)
+ 	c.append(&quot;;&quot;)
+
+Modified: branches/quixote2/cfg_app_callfw.py
+===================================================================
+--- branches/quixote2/cfg_app_callfw.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/cfg_app_callfw.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -51,22 +51,31 @@
+ 		    needModule(&quot;app_devstate&quot;)
+ 		c = AstConf(&quot;extensions.conf&quot;)
+ 		c.setSection(self.pbx)
+-		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Answer()&quot;)
++		c.appendExten(&quot;_%s&quot; % self.set, &quot;Set(testcf=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
++		c.appendExten(&quot;_%s&quot; % self.set, 'GotoIf($[&quot;${testcf}&quot; != &quot;&quot;]?switchoff)')	
++		c.appendExten(&quot;_%s&quot; % self.set, &quot;Set(lastnum=${DB(%s_LASTNUM/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
++		c.appendExten(&quot;_%s&quot; % self.set, 'GotoIf($[&quot;${lastnum}&quot; = &quot;&quot;]?nonumber)')
++		c.appendExten(&quot;_%s&quot; % self.set, &quot;Goto(%s,%s${lastnum},1)&quot; % (self.pbx, self.set))
++		c.appendExten(&quot;_%s&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;nonumber&quot;)
++		c.appendExten(&quot;_%s&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;switchoff&quot;)
++		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Answer()&quot;)
+ 		if self.toggle:
+-			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Set(testcf=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
+-			c.appendExten(&quot;_%sX.&quot; % self.set, 'GotoIf($[&quot;${testcf}&quot; = &quot;&quot;]?:switchoff)')
+-		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Set(DB(%s/%s/${CALLERIDNUM})=${EXTEN:%d})&quot; % (self.type, self.pbx,len(self.set)))
++			c.appendExten(&quot;_%s.&quot; % self.set, &quot;Set(testcf=${DB(%s/%s/${CALLERIDNUM})})&quot; % (self.type, self.pbx))
++			c.appendExten(&quot;_%s.&quot; % self.set, 'GotoIf($[&quot;${testcf}&quot; != &quot;&quot;]?switchoff)')	
++		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Set(DB(%s/%s/${CALLERIDNUM})=${EXTEN:%d})&quot; % (self.type, self.pbx,len(self.set)))
++		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Set(DB(%s_LASTNUM/%s/${CALLERIDNUM})=${EXTEN:%d})&quot; % (self.type, self.pbx,len(self.set)))
+ 		if self.devstateprefix:
+-			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx))
++			c.appendExten(&quot;_%s.&quot; % self.set, &quot;Devstate(%s_%s_${CALLERIDNUM},2)&quot; % (self.type.lower(), self.pbx))
+ 		if self.type == &quot;CFIM&quot;:
+-			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-unconditional)&quot;)
++			c.appendExten(&quot;_%s.&quot; % self.set, &quot;Playback(call-fwd-unconditional)&quot;)
+ 		elif self.type == &quot;CFTO&quot;:
+-			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-no-ans)&quot;)
++			c.appendExten(&quot;_%s.&quot; % self.set, &quot;Playback(call-fwd-no-ans)&quot;)
+ 		else:
+-			c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Playback(call-fwd-on-busy)&quot;)
+-		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Wait(1)&quot;)
+-		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Hangup&quot;)
+-		c.appendExten(&quot;_%sX.&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;switchoff&quot;)
++			c.appendExten(&quot;_%s.&quot; % self.set, &quot;Playback(call-fwd-on-busy)&quot;)
++		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Wait(1)&quot;)
++		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Hangup&quot;)
++		c.appendExten(&quot;_%s.&quot; % self.set, &quot;Goto(%s,%s,1)&quot; % (self.pbx, self.ext), label=&quot;switchoff&quot;)
++
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;Answer()&quot;)
+ 		c.appendExten(&quot;%s&quot; % self.ext, &quot;DBdel(%s/%s/${CALLERIDNUM})&quot; % (self.type, self.pbx))
+ 		if self.devstateprefix:
+
+Modified: branches/quixote2/cfg_dialout_normal.py
+===================================================================
+--- branches/quixote2/cfg_dialout_normal.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/cfg_dialout_normal.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -107,6 +107,11 @@
+ 		c.appendExten(&quot;s&quot;,'Set(options=%sL(%d000:10000))' % (opts,self.maxtime))
+ 		#TODO: add this trunks sorted by price and with a default one.
+ 		import configlets
++		tapisupport = False
++		for obj in configlets.configlet_tree:
++			if obj.__class__.__name__ == 'CfgOptSettings':
++				if obj.tapi:
++				    tapisupport = True
+ 		for obj in configlets.configlet_tree['Trunks']:
+ 			try:
+ 				if self.__getitem__(&quot;trunk_&quot;+obj.name):
+@@ -120,6 +125,12 @@
+ 						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; % obj.clidnameout)
+ 					if obj.clidnumout:
+ 						c.appendExten(&quot;s&quot;,&quot;Set(CALLERID(number)=%s)&quot; % obj.clidnumout)
++				        if tapisupport:
++					        c.appendExten(&quot;s&quot;,&quot;Set(chan=${CUT(CHANNEL,,1)})&quot;)
++					        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${chan})&quot;)
++	    				        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALTONE)&quot;)
++					        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALING)&quot;)
++					        c.appendExten(&quot;s&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_PROCEEDING)&quot;)
+ 					c.appendExten(&quot;s&quot;,&quot;Dial(%s,%d|${options})&quot; % (obj.dial,self.ringtime))
+ 			except KeyError:
+ 				pass
+@@ -131,4 +142,6 @@
+ 		c.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;)
+ 		c.appendExten(&quot;t&quot;,&quot;NoCDR&quot;)
+ 		c.appendExten(&quot;t&quot;,&quot;Hangup&quot;)
++		if tapisupport:
++		        c.appendExten(&quot;h&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;)
+ 
+
+Modified: branches/quixote2/cfg_ivr_autoatt.py
+===================================================================
+--- branches/quixote2/cfg_ivr_autoatt.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/cfg_ivr_autoatt.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -171,10 +171,10 @@
+ 		s.appendExten(&quot;i&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.ext))	
+ 		s.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;)
+ 		s.appendExten(&quot;t&quot;,&quot;NoCDR&quot;)
+-		s.appendExten(&quot;t&quot;,&quot;Hungup&quot;)
++		s.appendExten(&quot;t&quot;,&quot;Hangup&quot;)
+ 		s.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;)
+ 		s.appendExten(&quot;T&quot;,&quot;NoCDR&quot;)
+-		s.appendExten(&quot;T&quot;,&quot;Hungup&quot;)
++		s.appendExten(&quot;T&quot;,&quot;Hangup&quot;)
+ 	
+ 
+ 	def row(self):
+
+Modified: branches/quixote2/cfg_opt_settings.py
+===================================================================
+--- branches/quixote2/cfg_opt_settings.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/cfg_opt_settings.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -326,6 +326,10 @@
+ 			hint=_(&quot;The language is used for voice prompts&quot;),
+ 			len=10,
+ 			type=&quot;string&quot;),
++		     VarType(&quot;tapi&quot;,
++			title=_(&quot;Tapi Support&quot;),
++			type=&quot;bool&quot;,
++			default = True),
+ 		]
+ 
+ 	def createAsteriskConfig(self):
+@@ -350,3 +354,6 @@
+ 		c.append(&quot;loadzone = %s&quot; % zapcountry)
+ 		if self.country != 'us':
+ 			c.append(&quot;defaultzone = %s&quot; % zapcountry)
++		if self.tapi:
++			needModule(&quot;app_userevent&quot;)
++			needModule(&quot;app_cut&quot;)
+
+Modified: branches/quixote2/cfg_phone_epygi.py
+===================================================================
+--- branches/quixote2/cfg_phone_epygi.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/cfg_phone_epygi.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -108,11 +108,6 @@
+ 					type=&quot;label&quot;,
+ 					len=6),
+ 
+-			VarType(&quot;usevm&quot;,
+-					title=_(&quot;Use voicemail&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+ 			VarType(&quot;usemwi&quot;,
+ 					title=_(&quot;Signal waiting mail&quot;),
+ 					type=&quot;bool&quot;,
+@@ -299,7 +294,7 @@
+ 		extensions = AstConf(&quot;extensions.conf&quot;)
+ 		extensions.setSection(self.pbx)
+ 		if self.ext:
+-			extensions.appendExten(self.ext, &quot;Macro(dial-std-exten,%s/%s@%s:5060,out-%s,%d,%s,%s)&quot; % (self.technology,self.name,self.gw,self.name,int(self.usevm),self.pbx,self.ext))
++			extensions.appendExten(self.ext, &quot;Macro(dial-std-exten,%s/%s@%s:5060,out-%s,%s,%s)&quot; % (self.technology,self.name,self.gw,self.name,self.pbx,self.ext))
+ 
+ 		self.createVoicemailConfig(sip)
+ 		self.createOutgoingContext()
+
+Modified: branches/quixote2/cfg_phone_iax.py
+===================================================================
+--- branches/quixote2/cfg_phone_iax.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/cfg_phone_iax.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -100,11 +100,6 @@
+ 					title=_(&quot;Voicemail settings&quot;),
+ 					type=&quot;label&quot;),
+ 
+-			VarType(&quot;usevm&quot;,
+-					title=_(&quot;Use voicemail&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+ 			VarType(&quot;usemwi&quot;,
+ 					title=_(&quot;Signal waiting mail&quot;),
+ 					type=&quot;bool&quot;,
+
+Modified: branches/quixote2/cfg_phone_mgcp.py
+===================================================================
+--- branches/quixote2/cfg_phone_mgcp.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/cfg_phone_mgcp.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -109,11 +109,6 @@
+ 					type=&quot;label&quot;,
+ 					len=6),
+ 
+-			VarType(&quot;usevm&quot;,
+-					title=_(&quot;Use voicemail&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-
+ 			VarType(&quot;usemwi&quot;,
+ 					title=_(&quot;Signal waiting mail&quot;),
+ 					type=&quot;bool&quot;,
+
+Modified: branches/quixote2/cfg_phone_sip.py
+===================================================================
+--- branches/quixote2/cfg_phone_sip.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/cfg_phone_sip.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -109,11 +109,6 @@
+ 					type=&quot;label&quot;,
+ 					len=6),
+ 					
+-			VarType(&quot;usevm&quot;,
+-					title=_(&quot;Use voicemail&quot;),
+-					type=&quot;bool&quot;,
+-					optional=True),
+-			
+ 			VarType(&quot;usemwi&quot;,
+ 					title=_(&quot;Signal waiting mail&quot;),
+ 					type=&quot;bool&quot;,
+
+Modified: branches/quixote2/cfg_phone_zap.py
+===================================================================
+--- branches/quixote2/cfg_phone_zap.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/cfg_phone_zap.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -107,11 +107,6 @@
+ 				type=&quot;label&quot;,
+ 				len=6),
+ 			
+-			VarType(&quot;usevm&quot;,
+-				title=_(&quot;Use voicemail&quot;),
+-				type=&quot;bool&quot;,
+-				optional=True),
+-				
+ 			VarType(&quot;usemwi&quot;,
+ 				title=_(&quot;Signal waiting mail&quot;),
+ 				type=&quot;bool&quot;,
+@@ -294,11 +289,10 @@
+ 
+ 
+ 	def createDialEntry(self, extensions, exten, pbx, ext):
+-		ret = extensions.appendExten(exten, &quot;Macro(dial-std-exten,%s/%s,out-%s,%d,%s,%s)&quot; % (
++		ret = extensions.appendExten(exten, &quot;Macro(dial-std-exten,%s/%s,out-%s,%s,%s)&quot; % (
+ 			self.technology,
+ 			self.channels,
+ 			self.name,
+-			int(self.usevm),
+ 			pbx,
+ 			ext)
+ 		      )
+
+Modified: branches/quixote2/configlets.py
+===================================================================
+--- branches/quixote2/configlets.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/configlets.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -976,11 +976,10 @@
+ 					v.hide = False
+ 
+ 	def createDialEntry(self, extensions, exten, pbx, ext):
+-		ret = extensions.appendExten(exten, &quot;Macro(dial-std-exten,%s/%s,out-%s,%d,%s,%s)&quot; % (
++		ret = extensions.appendExten(exten, &quot;Macro(dial-std-exten,%s/%s,out-%s,%s,%s)&quot; % (
+ 			self.technology,
+ 			self.name,
+ 			self.name,
+-			int(self.usevm),
+ 			ext,
+ 			pbx
+ 			))
+
+Modified: branches/quixote2/manager.py
+===================================================================
+--- branches/quixote2/manager.py	2007-01-22 00:14:12 UTC (rev 574)
++++ branches/quixote2/manager.py	2007-01-22 21:24:46 UTC (rev 575)
+@@ -344,7 +344,7 @@
+ 		# Callerid: &lt;unknown&gt;
+ 		# Uniqueid: 1091804181.95
+ 
+-		# reap old, hungup channels :-)
++		# reap old, hangup channels :-)
+ 		global channels
+ 		reapchannel = normalizeChannel(dict.Channel)
+ 		toreap = []
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000044.html">[Destar-dev] r574 - web
+</A></li>
+	<LI>Next message: <A HREF="000053.html">[Destar-dev] r576 - branches
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#52">[ date ]</a>
+              <a href="thread.html#52">[ thread ]</a>
+              <a href="subject.html#52">[ subject ]</a>
+              <a href="author.html#52">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

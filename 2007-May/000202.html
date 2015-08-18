@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r692 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r692%20-%20branches/0.2.X&In-Reply-To=%3C200705302012.l4UKCaRR000730%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000201.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r692 - branches/0.2.X</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r692%20-%20branches/0.2.X&In-Reply-To=%3C200705302012.l4UKCaRR000730%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r692 - branches/0.2.X">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Wed May 30 22:12:36 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000201.html">[Destar-dev] r691 - branches/0.2.X trunk
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#202">[ date ]</a>
+              <a href="thread.html#202">[ thread ]</a>
+              <a href="subject.html#202">[ subject ]</a>
+              <a href="author.html#202">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-05-30 22:12:35 +0200 (Wed, 30 May 2007)
+New Revision: 692
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/page_owner_cdr.ptl
+Log:
+* Bug fixes and translation adjustments for PBX owner statistics.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-05-30 16:58:13 UTC (rev 691)
++++ branches/0.2.X/CHANGELOG.txt	2007-05-30 20:12:35 UTC (rev 692)
+@@ -1,5 +1,6 @@
+ 2007-05-30:
+ * Menu adjustment for other languages, _() is not needed.
++* Bug fixes and translation adjustments for PBX owner statistics.
+ 
+ 2007-05-29:
+ * Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+
+Modified: branches/0.2.X/page_owner_cdr.ptl
+===================================================================
+--- branches/0.2.X/page_owner_cdr.ptl	2007-05-30 16:58:13 UTC (rev 691)
++++ branches/0.2.X/page_owner_cdr.ptl	2007-05-30 20:12:35 UTC (rev 692)
+@@ -48,6 +48,8 @@
+ def _q_test():
+ 	return cdrutils.db
+ 
++def M_(message): return _(str(message))
++
+ def N_(message): return message
+ 
+ def formScript [html] ():
+@@ -71,8 +73,8 @@
+ 	&quot;&lt;p&gt;&quot;
+ 	lastpage = total/limit
+ 	if pagenum &gt; 1:
+-		&quot;&lt;a href='javascript:gotopage(\&quot;_newest\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % _(str(&quot;First&quot;))
+-		&quot;&lt;a href='javascript:gotopage(\&quot;_newer\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % _(str(&quot;Previous&quot;))
++		&quot;&lt;a href='javascript:gotopage(\&quot;_newest\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % M_(&quot;First&quot;)
++		&quot;&lt;a href='javascript:gotopage(\&quot;_newer\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % M_(&quot;Previous&quot;)
+ 	
+ 	pagelist = [i for i in range(pagenum-10, pagenum+10) if i &gt;= 0 and  i &lt; lastpage]
+ 
+@@ -83,8 +85,8 @@
+ 			&quot;%d &nbsp; \n&quot; % (i+1)
+ 
+ 	if pagenum &lt; lastpage:
+-		&quot;&lt;a href='javascript:gotopage(\&quot;_older\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % _(str(&quot;Next&quot;))
+-		&quot;&lt;a href='javascript:gotopage(\&quot;_oldest\&quot;)'&gt;%s&lt;/a&gt; \n&quot; % _(str(&quot;Last&quot;))
++		&quot;&lt;a href='javascript:gotopage(\&quot;_older\&quot;)'&gt;%s&lt;/a&gt; &nbsp; \n&quot; % M_(&quot;Next&quot;)
++		&quot;&lt;a href='javascript:gotopage(\&quot;_oldest\&quot;)'&gt;%s&lt;/a&gt; \n&quot; % M_(&quot;Last&quot;)
+ 	&quot;&lt;/p&gt;\n &lt;br /&gt;&quot;
+ 
+ def     generateYearsNumbers():
+@@ -152,8 +154,8 @@
+ 	form.add_single_select('today', value=localday, options=zip( generateDaysNumbers() , range(1,32), generateDaysNumbers()  ), render_br=True)
+ 		
+ 	form.add(HiddenWidget, 'pagenumber', value='_newest')
+-	form.add(HiddenWidget, 'order', value='ASC')
+-	form.add(HiddenWidget, 'orderby', value=_('Time_of_start'))
++	form.add(HiddenWidget, 'order', value='DESC')
++	form.add(HiddenWidget, 'orderby', 'Time_of_start')
+ 
+ 	form.add(SubmitWidget, '_submit', _(&quot;Search&quot;), render_br=True)
+ 
+@@ -239,7 +241,7 @@
+ 	
+ 	return render()
+ 
+-def	cdrShowResults [html] (where=[], limit, offset, total = 0, field=_(&quot;Time_of_start&quot;), order=&quot;DESC&quot;):
++def	cdrShowResults [html] (where=[], limit, offset, total = 0, field=&quot;start&quot;, order=&quot;DESC&quot;):
+ 	if total == 0:
+ 		'&lt;p&gt;'
+ 		'--No records to Show--'
+@@ -259,13 +261,13 @@
+ 				'&lt;th&gt;'
+ 				if s[0] == field:
+ 					neworder = (order=='ASC' and 'DESC') or 'ASC'
+-					&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], neworder, _(str(s[0])))
++					&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], neworder, M_(s[0]))
+ 					if order=='ASC':
+-						&quot; &lt;img src='/static/down.gif' border='0' alt='%s'&gt;\n&quot; % _(str('Asc. Order'))
++						&quot; &lt;img src='/static/down.gif' border='0' alt='%s'&gt;\n&quot; % M_('Asc. Order')
+ 					else:
+-						&quot; &lt;img src='/static/up.gif' border='0' alt='%s'&gt;\n&quot; % _(str('Desc. Order'))
++						&quot; &lt;img src='/static/up.gif' border='0' alt='%s'&gt;\n&quot; % M_('Desc. Order')
+ 				else:
+-					&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], order, _(str(s[0])))
++					&quot;&lt;a href='javascript:orderby(\&quot;%s\&quot;,\&quot;%s\&quot;)'&gt;%s&lt;/a&gt;&quot; % (s[0], order, M_(s[0]))
+ 				'&lt;/th&gt;'
+                 	'&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;'
+ 		
+@@ -295,11 +297,12 @@
+ 
+ 			f = offset + limit
+ 			if total &gt;= f:			
+-				_(str('Showing records from %s to %s of %s &lt;br /&gt;&lt;br /&gt;')) % (offset+1, f, total)
++				M_('Showing records from %s to %s of %s' % (offset+1, f, total))
+ 			else:
+-				_(str('Showing records from %s to %s of %s &lt;br /&gt;&lt;br /&gt;')) % (offset+1, total, total)
++				M_('Showing records from %s to %s of %s' % (offset+1, total, total))
++			'&lt;br /&gt;&lt;br /&gt;'
+ 
+-		_(str('Total Duration of shown calls: %s min.' % totalmin))
++		M_('Total Duration of shown calls: %s min.' % totalmin)
+ 		'&lt;/p&gt;'
+ 
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000201.html">[Destar-dev] r691 - branches/0.2.X trunk
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#202">[ date ]</a>
+              <a href="thread.html#202">[ thread ]</a>
+              <a href="subject.html#202">[ subject ]</a>
+              <a href="author.html#202">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r789 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r789%20-%20trunk&In-Reply-To=%3C200708162129.l7GLTGbe013368%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000323.html">
+   <LINK REL="Next"  HREF="000326.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r789 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r789%20-%20trunk&In-Reply-To=%3C200708162129.l7GLTGbe013368%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r789 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Thu Aug 16 23:29:16 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000323.html">[Destar-dev] [Patch #2144] use dtmfmode=auto for sip phones
+</A></li>
+        <LI>Next message: <A HREF="000326.html">[Destar-dev] r790 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#325">[ date ]</a>
+              <a href="thread.html#325">[ thread ]</a>
+              <a href="subject.html#325">[ subject ]</a>
+              <a href="author.html#325">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-08-16 23:29:16 +0200 (Thu, 16 Aug 2007)
+New Revision: 789
+
+Added:
+   trunk/page_user_dial.ptl
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/manager.py
+   trunk/page_user_phonebook.ptl
+Log:
+* Added phone_user_dial.ptl: Initial work to click-to-dial from user's phone book.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-15 22:22:25 UTC (rev 788)
++++ trunk/CHANGELOG.txt	2007-08-16 21:29:16 UTC (rev 789)
+@@ -1,3 +1,6 @@
++2007-08-16:
++* Added phone_user_dial.ptl: Initial work to click-to-dial from user's phone book.
++
+ 2007-08-15:
+ * cfg_phone_sip: dtmf auto by default. Patch by Tzafrir
+ 
+
+Modified: trunk/manager.py
+===================================================================
+--- trunk/manager.py	2007-08-15 22:22:25 UTC (rev 788)
++++ trunk/manager.py	2007-08-16 21:29:16 UTC (rev 789)
+@@ -617,6 +617,12 @@
+ 	else:
+ 		conn.action('Command', Command='database del %s %s' % (family,key))
+ 
++def originateCallApp(channel,application,data):
++	return conn.action('Originate', Channel=channel, Application=application)
++
++def originateCallExt(channel,context,extension,priority):
++	return conn.action('Originate', Channel=channel, Context=context, Exten=extension, Priority=priority)
++
+ def getVarFamily(family):
+ 	varlist = []
+ 	for s in conn.action('Command', Command='database show %s' % family):
+
+Added: trunk/page_user_dial.ptl
+===================================================================
+--- trunk/page_user_dial.ptl	2007-08-15 22:22:25 UTC (rev 788)
++++ trunk/page_user_dial.ptl	2007-08-16 21:29:16 UTC (rev 789)
+@@ -0,0 +1,54 @@
++# -*- coding: iso-latin-1 -*-
++#
++# Copyright (C) 2005 by Holger Schurig
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from Templates import *
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session, redirect
++import backend, manager, configlets
++import time,types
++
++class Page(AccessControlled, Directory): 
++
++
++	_q_parent  = 'page_user'
++	_q_title   = '' 
++	_q_desc    = _(&quot;dial a phone&quot;)
++	_q_link    = 'dial'
++	_q_menupos = 3
++	_q_level   = 1
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	def _q_lookup(self, component):
++		if component:
++			if self.session.phone:
++				phone = backend.getConfiglet(name=self.session.phone)
++				manager.originateCallExt(&quot;%s/%s&quot; % (phone.technology, phone.name), &quot;out-%s&quot; % phone.name, component, &quot;1&quot;)
++				return redirect(&quot;../&quot;)
++			else:
++				return errorpage(_(&quot;You don't have an associated phone&quot;))
++		else:
++			return errorpage(_(&quot;No destination number&quot;))
+
+Modified: trunk/page_user_phonebook.ptl
+===================================================================
+--- trunk/page_user_phonebook.ptl	2007-08-15 22:22:25 UTC (rev 788)
++++ trunk/page_user_phonebook.ptl	2007-08-16 21:29:16 UTC (rev 789)
+@@ -52,7 +52,9 @@
+ 		for o in backend.getConfiglets('Phones'):
+ 			if self.session.pbx:
+ 				if o.pbx == self.session.pbx:
+-					'&lt;tr&gt;&lt;td&gt;%s&lt;/td&gt; &lt;td&gt;%s&lt;/td&gt; &lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % (o.ext, o.shortName, o.name)
++					'&lt;tr&gt;'
++                                        '&lt;td&gt;&lt;a href=&quot;../dial/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o.ext, o.ext)
++					'&lt;td&gt;%s&lt;/td&gt; &lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % (o.shortName, o.name)
+ 			else:
+ 				'&lt;tr&gt;&lt;td&gt;%s&lt;/td&gt; &lt;td&gt;%s&lt;/td&gt; &lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % (o.ext, o.shortName, o.name)
+ 		'&lt;/table&gt;'
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000323.html">[Destar-dev] [Patch #2144] use dtmfmode=auto for sip phones
+</A></li>
+	<LI>Next message: <A HREF="000326.html">[Destar-dev] r790 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#325">[ date ]</a>
+              <a href="thread.html#325">[ thread ]</a>
+              <a href="subject.html#325">[ subject ]</a>
+              <a href="author.html#325">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

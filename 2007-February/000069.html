@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r587 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r587%20-%20trunk&In-Reply-To=%3C200702052020.l15KKUtc007219%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000068.html">
+   <LINK REL="Next"  HREF="000070.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r587 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r587%20-%20trunk&In-Reply-To=%3C200702052020.l15KKUtc007219%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r587 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Mon Feb  5 21:20:30 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000068.html">[Destar-dev] r586 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000070.html">[Destar-dev] r588 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#69">[ date ]</a>
+              <a href="thread.html#69">[ thread ]</a>
+              <a href="subject.html#69">[ subject ]</a>
+              <a href="author.html#69">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-02-05 21:20:29 +0100 (Mon, 05 Feb 2007)
+New Revision: 587
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_config.ptl
+Log:
+* page_config.ptl: some configletTip functions were called without self.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-02-05 19:42:07 UTC (rev 586)
++++ trunk/CHANGELOG.txt	2007-02-05 20:20:29 UTC (rev 587)
+@@ -1,5 +1,6 @@
+ 2007-02-05:
+ * Bug fix related with request object adding configlets.
++* page_config.ptl: some configletTip functions were called without self.
+ 
+ 2007-01-30:
+ * Bug fixes related with request object and redirect function.
+
+Modified: trunk/page_config.ptl
+===================================================================
+--- trunk/page_config.ptl	2007-02-05 19:42:07 UTC (rev 586)
++++ trunk/page_config.ptl	2007-02-05 20:20:29 UTC (rev 587)
+@@ -71,13 +71,13 @@
+ 		groups = &quot;, &quot;.join(groups)
+ 
+ 		if self.session.user=='programmer':
+-			configurationTip(
++			self.configurationTip(
+ 				_(&quot;You should create a user with type 'Configurator'. Without this user, everyone connecting to DeStar can configure everything.&quot;),
+ 				&quot;add/CfgOptUser&quot;,
+ 				[_(&quot;Configuration&quot;), _(&quot;Options&quot;), _(&quot;DeStar user&quot;)] )
+ 
+ 		if not os.access(&quot;/etc/asterisk&quot;, os.O_RDWR):
+-			configurationTip(
++			self.configurationTip(
+ 				_(&quot;You should enable write access to the directory /etc/asterisk. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'.&quot; % groups),
+ 				&quot;&quot;,
+ 				[])
+@@ -112,7 +112,7 @@
+ 				[])
+ 		db_fn = &quot;/var/log/asterisk/master.db&quot;
+ 		if not os.access(db_fn, os.O_RDWR):
+-			configurationTip(
++			self.configurationTip(
+ 				_(&quot;You don't seem to have access to %s yet created by cdr_sqlite3_custom. Without this file CDR reports wont be accesible trough this interface.&quot;),
+ 				&quot;&quot;,
+ 				[])
+@@ -120,7 +120,7 @@
+ 		if self.tipped:
+ 			'&lt;/ul&gt;'
+ 
+-	def showConfigurables [plain] (sefl, head):
++	def showConfigurables [plain] (self, head):
+ 		'&lt;p&gt;'
+ 		head
+ 		':&lt;/p&gt;&lt;table id=&quot;subcategories&quot;&gt;&lt;thead&gt;'
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000068.html">[Destar-dev] r586 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000070.html">[Destar-dev] r588 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#69">[ date ]</a>
+              <a href="thread.html#69">[ thread ]</a>
+              <a href="subject.html#69">[ subject ]</a>
+              <a href="author.html#69">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

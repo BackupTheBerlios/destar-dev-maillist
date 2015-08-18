@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r588 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r588%20-%20trunk&In-Reply-To=%3C200702052039.l15KdP0i010205%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000069.html">
+   <LINK REL="Next"  HREF="000071.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r588 - trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r588%20-%20trunk&In-Reply-To=%3C200702052039.l15KdP0i010205%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r588 - trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Mon Feb  5 21:39:25 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000069.html">[Destar-dev] r587 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000071.html">[Destar-dev] r589 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-02-05 21:39:23 +0100 (Mon, 05 Feb 2007)
+New Revision: 588
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_trunk_fwdiax.py
+Log:
+* Cosmetic changes and clidnum added to cfg_trunk_fwdiax.py
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-02-05 20:20:29 UTC (rev 587)
++++ trunk/CHANGELOG.txt	2007-02-05 20:39:23 UTC (rev 588)
+@@ -1,6 +1,7 @@
+ 2007-02-05:
+ * Bug fix related with request object adding configlets.
+ * page_config.ptl: some configletTip functions were called without self.
++* Cosmetic changes and clidnum added to cfg_trunk_fwdiax.py
+ 
+ 2007-01-30:
+ * Bug fixes related with request object and redirect function.
+
+Modified: trunk/cfg_trunk_fwdiax.py
+===================================================================
+--- trunk/cfg_trunk_fwdiax.py	2007-02-05 20:20:29 UTC (rev 587)
++++ trunk/cfg_trunk_fwdiax.py	2007-02-05 20:39:23 UTC (rev 588)
+@@ -37,19 +37,53 @@
+ 	
+ 	def createVariables(self):
+ 		self.variables   = [
+-			VarType(&quot;name&quot;,     title=_(&quot;Name&quot;), len=15, default=&quot;fwdiax&quot;),
+-			VarType(&quot;fwdid&quot;,    title=_(&quot;FWD number&quot;),   len=6),
+-			VarType(&quot;fwdpw&quot;,    title=_(&quot;FWD password&quot;), len=15),
++			VarType(&quot;name&quot;,
++				title=_(&quot;Name&quot;),
++				len=15,
++				default=&quot;fwdiax&quot;),
++
++			VarType(&quot;fwdid&quot;,
++				title=_(&quot;FWD number&quot;),
++				len=6),
++
++			VarType(&quot;fwdpw&quot;,
++				title=_(&quot;FWD password&quot;),
++				len=15),
+ 	
+-			VarType(&quot;Outbound&quot;, title=_(&quot;Calls to FWD&quot;), type=&quot;label&quot;),
+-			VarType(&quot;ext&quot;,      title=_(&quot;Extension&quot;), optional=True, len=6),
+-			VarType(&quot;context&quot;,  title=_(&quot;Context&quot;), default=&quot;default&quot;, optional=True, hide=True),
+-			VarType(&quot;callerid&quot;, title=_(&quot;Caller-Id Name&quot;), optional=True),
++			VarType(&quot;Outbound&quot;,
++				title=_(&quot;Calls to FWD&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;ext&quot;,
++				title=_(&quot;Extension&quot;),
++				optional=True,
++				len=6),
++
++			VarType(&quot;context&quot;,
++				title=_(&quot;Context&quot;),
++				default=&quot;default&quot;,
++				optional=True,
++				hide=True),
++
++			VarType(&quot;callerid&quot;,
++				title=_(&quot;Change Caller*Id to:&quot;),
++				len=25,
++				optional=True),
++
++ 			VarType(&quot;clidnumin&quot;,
++ 				title=_(&quot;Change Caller*Id Number to:&quot;),
++ 				len=40,
++ 				optional=True),
+ 	
+-			VarType(&quot;Inbound&quot;,  title=_(&quot;Calls from FWD&quot;), type=&quot;label&quot;),
+-			VarType(&quot;phone&quot;,    title=_(&quot;Phone to ring&quot;), optional=True, type=&quot;choice&quot;,
+-								options=getChoice(&quot;CfgPhone&quot;))
+-		]
++			VarType(&quot;Inbound&quot;,
++				title=_(&quot;Calls from FWD&quot;),
++				type=&quot;label&quot;),
++
++			VarType(&quot;phone&quot;,
++				title=_(&quot;Phone to ring&quot;),
++				optional=True,
++				type=&quot;choice&quot;,
++				options=getChoice(&quot;CfgPhone&quot;))]
+ 		
+ 		self.dependencies = [
+ 			DepType(&quot;phone&quot;, 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000069.html">[Destar-dev] r587 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000071.html">[Destar-dev] r589 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

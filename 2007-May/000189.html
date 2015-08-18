@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r680 - branches/destar-callweaver
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r680%20-%20branches/destar-callweaver&In-Reply-To=%3C200705112148.l4BLmkj2008211%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000188.html">
+   <LINK REL="Next"  HREF="000190.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r680 - branches/destar-callweaver</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r680%20-%20branches/destar-callweaver&In-Reply-To=%3C200705112148.l4BLmkj2008211%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r680 - branches/destar-callweaver">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri May 11 23:48:46 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000188.html">[Destar-dev] r679 - branches/destar-callweaver
+</A></li>
+        <LI>Next message: <A HREF="000190.html">[Destar-dev] r681 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#189">[ date ]</a>
+              <a href="thread.html#189">[ thread ]</a>
+              <a href="subject.html#189">[ subject ]</a>
+              <a href="author.html#189">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-05-11 23:48:46 +0200 (Fri, 11 May 2007)
+New Revision: 680
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/cfg_phone_sip.py
+Log:
+callweaver.org md5 realm 
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 21:47:50 UTC (rev 679)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 21:48:46 UTC (rev 680)
+@@ -3,6 +3,7 @@
+ * Changing {M,m}acro for Proc and proc
+ * moving /etc/asterisk to /opt/etc/callweaver
+ * backend.py: Fixed apps names
++* cfg_phone_sip.py: fixed realm for MD5
+ 
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+
+Modified: branches/destar-callweaver/cfg_phone_sip.py
+===================================================================
+--- branches/destar-callweaver/cfg_phone_sip.py	2007-05-11 21:47:50 UTC (rev 679)
++++ branches/destar-callweaver/cfg_phone_sip.py	2007-05-11 21:48:46 UTC (rev 680)
+@@ -269,7 +269,7 @@
+ 		sip.append(&quot;type=friend&quot;)
+ 		sip.append(&quot;qualify=yes&quot;)
+ 		m = md5.new()
+-		m.update('%s:callweaver:%s' % (self.name,self.secret))
++		m.update('%s:callweaver.org:%s' % (self.name,self.secret))
+ 		sip.append(&quot;md5secret=%s&quot; % m.hexdigest())
+ 		sip.append(&quot;host=dynamic&quot;)
+ 		if self.host:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000188.html">[Destar-dev] r679 - branches/destar-callweaver
+</A></li>
+	<LI>Next message: <A HREF="000190.html">[Destar-dev] r681 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#189">[ date ]</a>
+              <a href="thread.html#189">[ thread ]</a>
+              <a href="subject.html#189">[ subject ]</a>
+              <a href="author.html#189">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r579 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r579%20-%20trunk&In-Reply-To=%3C200701300608.l0U68j8s009493%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000060.html">
+   <LINK REL="Next"  HREF="000062.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r579 - trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r579%20-%20trunk&In-Reply-To=%3C200701300608.l0U68j8s009493%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r579 - trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 30 07:08:45 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000060.html">[Destar-dev] [Bug #10163] Missing comprobation in some ptls
+</A></li>
+        <LI>Next message: <A HREF="000062.html">[Destar-dev] r580 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#61">[ date ]</a>
+              <a href="thread.html#61">[ thread ]</a>
+              <a href="subject.html#61">[ subject ]</a>
+              <a href="author.html#61">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-01-30 07:08:39 +0100 (Tue, 30 Jan 2007)
+New Revision: 579
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+   trunk/page_config_edit.ptl
+   trunk/page_login.ptl
+   trunk/page_user_settings.ptl
+Log:
+* Bug fixes related with request object and redirect function.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-01-29 14:48:37 UTC (rev 578)
++++ trunk/CHANGELOG.txt	2007-01-30 06:08:39 UTC (rev 579)
+@@ -1,3 +1,6 @@
++2007-01-30:
++* Bug fixes related with request object and redirect function.
++
+ 2007-01-29:
+ * Added &quot;filter_output&quot; publisher's funcion. It changed everything to text/html content-type,
+   including css. Needs some revision. Fixes bug #10130
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-01-29 14:48:37 UTC (rev 578)
++++ trunk/ConfigHelper.ptl	2007-01-30 06:08:39 UTC (rev 579)
+@@ -21,6 +21,7 @@
+ from Templates import *
+ from quixote.form import *
+ from quixote.html import htmlescape
++from quixote import redirect
+ import backend
+ import types, string
+ 
+@@ -244,16 +245,16 @@
+ 	form = Form()
+ 
+ 	if request.form.has_key('_cancel'):
+-		return request.redirect(exitPath)
++		return redirect(exitPath)
+ 	if request.form.has_key('_delete'):
+ 		if obj.hasDependencies():
+ 			return showDependencies()
+ 		else:
+ 			backend.deleteConfiglet(obj._id)
+-			return request.redirect(exitPath)
++			return redirect(exitPath)
+ 	if request.form.has_key('_cascade_delete'):
+ 		backend.deleteConfiglet(obj._id)
+-		return request.redirect(exitPath)
++		return redirect(exitPath)
+ 
+ 
+ 	do_update = False
+@@ -339,4 +340,4 @@
+ 	if form.has_errors():
+ 		return render()
+ 	saveConfig()
+-	return request.redirect(exitPath)
++	return redirect(exitPath)
+
+Modified: trunk/page_config_edit.ptl
+===================================================================
+--- trunk/page_config_edit.ptl	2007-01-29 14:48:37 UTC (rev 578)
++++ trunk/page_config_edit.ptl	2007-01-30 06:08:39 UTC (rev 579)
+@@ -43,7 +43,7 @@
+ 		obj = backend.getConfiglet(component)
+ 		if obj is not None:
+ 			obj.fixup()
+-			return configletsForm(request, obj, _(obj.shortName), exitPath = &quot;../&quot; + obj.groupName.lower())
++			return configletsForm(self.request, obj, _(obj.shortName), exitPath = &quot;../&quot; + obj.groupName.lower())
+ 		else:
+ 			return errorpage(_(&quot;Object does not exist&quot;))
+ 
+
+Modified: trunk/page_login.ptl
+===================================================================
+--- trunk/page_login.ptl	2007-01-29 14:48:37 UTC (rev 578)
++++ trunk/page_login.ptl	2007-01-30 06:08:39 UTC (rev 579)
+@@ -43,7 +43,7 @@
+ 	def loginForm(self, exitPath=&quot;.&quot;, render=0):
+ 
+ 		if self.request.form.has_key('_cancel'):
+-			return self.request.redirect(exitPath)
++			return redirect(exitPath)
+ 		form = Form()
+ 
+ 		form.add(StringWidget, &quot;name&quot;,  &quot;&quot;,  title=htmltext(_(&quot;User or phone name/number&quot;)), required=True)
+
+Modified: trunk/page_user_settings.ptl
+===================================================================
+--- trunk/page_user_settings.ptl	2007-01-29 14:48:37 UTC (rev 578)
++++ trunk/page_user_settings.ptl	2007-01-30 06:08:39 UTC (rev 579)
+@@ -28,7 +28,7 @@
+ def phoneSettingsForm(self, phone, exitPath=&quot;..&quot;):
+ 
+ 	if self.form.has_key('_cancel'):
+-		return request.redirect(exitPath)
++		return redirect(exitPath)
+ 	form = Form()
+ 
+ 	dnd  = manager.getVar('DND/%s' % phone.pbx,  phone.ext, False)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000060.html">[Destar-dev] [Bug #10163] Missing comprobation in some ptls
+</A></li>
+	<LI>Next message: <A HREF="000062.html">[Destar-dev] r580 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#61">[ date ]</a>
+              <a href="thread.html#61">[ thread ]</a>
+              <a href="subject.html#61">[ subject ]</a>
+              <a href="author.html#61">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

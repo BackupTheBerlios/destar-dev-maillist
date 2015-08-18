@@ -1,0 +1,435 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r744 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r744%20-%20trunk&In-Reply-To=%3C200707041535.l64FZOX7001652%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000259.html">
+   <LINK REL="Next"  HREF="000261.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r744 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r744%20-%20trunk&In-Reply-To=%3C200707041535.l64FZOX7001652%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r744 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Wed Jul  4 17:35:24 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000259.html">[Destar-dev] r743 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000261.html">[Destar-dev] r745 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#260">[ date ]</a>
+              <a href="thread.html#260">[ thread ]</a>
+              <a href="subject.html#260">[ subject ]</a>
+              <a href="author.html#260">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-04 17:35:24 +0200 (Wed, 04 Jul 2007)
+New Revision: 744
+
+Added:
+   trunk/cfg_ivr_treenode.py
+Modified:
+   trunk/CHANGELOG.txt
+Log:
+* Added cfg_ivr_treenode to make simple IVR trees.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-04 15:22:56 UTC (rev 743)
++++ trunk/CHANGELOG.txt	2007-07-04 15:35:24 UTC (rev 744)
+@@ -1,5 +1,6 @@
+ 2007-07-04:
+ * Improved Record-Sound Application.
++* Added cfg_ivr_treenode to make simple IVR trees.
+ 
+ 2007-07-03:
+ * Use configlet shortName on logs if name is not present.
+
+Added: trunk/cfg_ivr_treenode.py
+===================================================================
+--- trunk/cfg_ivr_treenode.py	2007-07-04 15:22:56 UTC (rev 743)
++++ trunk/cfg_ivr_treenode.py	2007-07-04 15:35:24 UTC (rev 744)
+@@ -0,0 +1,338 @@
++# -*- coding: utf-8 -*-
++#
++# This modules is Copyright (C) 2007 by Alejandro Rios,
++# Destar is Copyright (C) 2005 by Holger Schurig,
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import * 
++import os
++
++class CfgIVRTreeNode(CfgIVR):
++
++	shortName = _(&quot;IVR Tree node&quot;)
++	newObjectTitle= _(&quot;New IVR tree node&quot;)
++	description = _(&quot;&quot;&quot;Basic IVR which connects to other IVRs.&quot;&quot;&quot;)
++	groupName = 'IVRs'
++	
++	def createVariables(self):
++		self.variables = [
++			VarType(&quot;name&quot;,
++					title=_(&quot;Name&quot;),
++					len=25),
++
++			VarType(&quot;digittimeout&quot;,
++					title=_(&quot;How much time has the user to dial an extension?&quot;),
++					hint=_(&quot;(in seconds)&quot;),
++					len=10,
++					type=&quot;int&quot;,
++					default=3),
++
++			VarType(&quot;timeout&quot;,
++					title=_(&quot;Max. time for incoming calls in seconds&quot;),
++					hint=_(&quot;(0 or empty means no time restriction)&quot;),
++					optional=True,
++					len=10,
++					type=&quot;int&quot;,
++					default=0),
++
++			VarType(&quot;moh&quot;,
++					title=_(&quot;Music-on-hold class&quot;),
++					type=&quot;choice&quot;,
++					optional=True,
++					options=getChoice(&quot;CfgOptMusic&quot;)),
++
++			VarType(&quot;backgroundfile&quot;,
++					title=_(&quot;File to play in the background&quot;),
++					default=&quot;beep&quot;),
++
++			VarType(&quot;repeat&quot;,
++					title=_(&quot;How many times should it be played?&quot;),
++					default=1,
++					len=2,
++					type=&quot;int&quot;),
++
++			VarType(&quot;pause&quot;,
++					title=_(&quot;Pause between each playback&quot;),
++					optional=True,len=2),
++
++			VarType(&quot;operator&quot;,
++					title=_(&quot;Extension to ring after file playing or by pressing '0'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;)),
++
++			VarType(&quot;waittime&quot;,
++					title=_(&quot;Time to wait before jumping to extension&quot;),
++					hint=_(&quot;(in seconds)&quot;),
++					len=10,
++					type=&quot;int&quot;,
++					default=2),
++
++			VarType(&quot;pbx&quot;, 
++					title=_(&quot;Allow calling to all extensions of PBX&quot;),
++					type=&quot;choice&quot;, 
++					options=getChoice(&quot;CfgOptPBX&quot;),
++					optional=True),
++
++			VarType(&quot;ivrtime&quot;,
++					title=_(&quot;IVR to jump on special dates&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++
++			VarType(&quot;times&quot;,
++					title=_(&quot;Times string&quot;),
++					hint=_(&quot;i.e. *|*|25|dec,*|*|20|jul (comma separated)&quot;),
++					default=&quot;&quot;,
++					optional=True,
++					len=300),
++
++			VarType(&quot;ivr_1&quot;,
++					title=_(&quot;IVR to jump when pressing '1'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++			VarType(&quot;phone_1&quot;,
++					title=_(&quot;Phone to jump when pressing '1'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;),
++					optional=True),
++			VarType(&quot;ivr_2&quot;,
++					title=_(&quot;IVR to jump when pressing '2'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++			VarType(&quot;phone_2&quot;,
++					title=_(&quot;Phone to jump when pressing '2'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;),
++					optional=True),
++
++			VarType(&quot;ivr_3&quot;,
++					title=_(&quot;IVR to jump when pressing '3'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++			VarType(&quot;phone_3&quot;,
++					title=_(&quot;Phone to jump when pressing '3'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;),
++					optional=True),
++
++			VarType(&quot;ivr_4&quot;,
++					title=_(&quot;IVR to jump when pressing '4'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++			VarType(&quot;phone_4&quot;,
++					title=_(&quot;Phone to jump when pressing '4'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;),
++					optional=True),
++
++			VarType(&quot;ivr_5&quot;,
++					title=_(&quot;IVR to jump when pressing '5'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++			VarType(&quot;phone_5&quot;,
++					title=_(&quot;Phone to jump when pressing '5'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;),
++					optional=True),
++
++			VarType(&quot;ivr_6&quot;,
++					title=_(&quot;IVR to jump when pressing '6'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++			VarType(&quot;phone_6&quot;,
++					title=_(&quot;Phone to jump when pressing '6'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;),
++					optional=True),
++
++			VarType(&quot;ivr_7&quot;,
++					title=_(&quot;IVR to jump when pressing '7'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++			VarType(&quot;phone_7&quot;,
++					title=_(&quot;Phone to jump when pressing '7'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;),
++					optional=True),
++
++			VarType(&quot;ivr_8&quot;,
++					title=_(&quot;IVR to jump when pressing '8'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++			VarType(&quot;phone_8&quot;,
++					title=_(&quot;Phone to jump when pressing '8'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;),
++					optional=True),
++
++			VarType(&quot;ivr_9&quot;,
++					title=_(&quot;IVR to jump when pressing '9'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++			VarType(&quot;phone_9&quot;,
++					title=_(&quot;Phone to jump when pressing '9'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;),
++					optional=True),
++
++			VarType(&quot;ivr_ast&quot;,
++					title=_(&quot;IVR to jump when pressing '*'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgIVR&quot;),
++					render_br=False,
++					optional=True),
++			VarType(&quot;phone_ast&quot;,
++					title=_(&quot;Phone to jump when pressing '*'&quot;),
++					type=&quot;choice&quot;,
++					options=getChoice(&quot;CfgPhone&quot;),
++					optional=True)
++
++				]
++
++		self.dependencies = [
++			DepType(&quot;moh&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;)),
++			DepType(&quot;operator&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;)),
++			DepType(&quot;pbx&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;)),
++			DepType(&quot;ivrtime&quot;, 
++					type=&quot;hard&quot;,
++					message = _(&quot;This is a Dependency&quot;))]
++
++
++
++	def isAddable(self):
++		# BUG: it does somehow not work to simply write for obj in config_entries,
++		# despite the &quot;from configlets import *&quot; above
++		import configlets
++		return len(configlets.configlet_tree['Phones']) &gt; 0
++	isAddable = classmethod(isAddable)
++
++	def checkConfig(self):
++		return CfgIVR.checkConfig(self)
++		if self.repeat &lt; 1:
++			return (&quot;repeat&quot;,_(&quot;File should be played at least one time&quot;))
++		if self.ivrtime and not self.times:
++			return (&quot;times&quot;,_(&quot;Please specify dates&quot;))
++		
++	def createAsteriskConfig(self):
++		s = AstConf(&quot;extensions.conf&quot;)
++		s.setSection(self.name)
++		if self.pbx:
++			pbx = self.pbx
++		else:	
++			pbx = &quot;phones&quot;
++		s.append(&quot;include=%s&quot; % pbx)
++		s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(digit)=%d)&quot; % self.digittimeout)
++		if self.moh:
++			s.appendExten(&quot;s&quot;,&quot;Setmusiconhold(%s)&quot; % self.moh)
++			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=m)&quot;)
++		else:
++			s.appendExten(&quot;s&quot;,&quot;Set(DIAL_OPTIONS=r)&quot;)
++		if self.ivrtime:
++			if self.times:
++				times=self.times.split(',')
++				for t in times:
++					s.appendExten(&quot;s&quot;,&quot;GotoIfTime(%s?%s,s,1)&quot; % (t,self.ivrtime))
++		if self.timeout:
++			s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(absolute)=%s)&quot; % self.timeout)
++		for i in range(self.repeat):
++			s.appendExten(&quot;s&quot;,&quot;Background(%s)&quot; % self.backgroundfile)	
++			if self.pause:
++				s.appendExten(&quot;s&quot;,&quot;WaitExten(%s)&quot; % self.pause)
++		s.appendExten(&quot;s&quot;,&quot;WaitExten(%d)&quot; % self.waittime)
++		s.appendExten(&quot;s&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator))	
++		if self.ivr_1:
++			s.appendExten(&quot;1&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_1)	
++		if self.ivr_2:
++			s.appendExten(&quot;2&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_2)	
++		if self.ivr_3:
++			s.appendExten(&quot;3&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_3)	
++		if self.ivr_4:
++			s.appendExten(&quot;4&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_4)	
++		if self.ivr_5:
++			s.appendExten(&quot;5&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_5)	
++		if self.ivr_6:
++			s.appendExten(&quot;6&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_6)	
++		if self.ivr_7:
++			s.appendExten(&quot;7&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_7)	
++		if self.ivr_8:
++			s.appendExten(&quot;8&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_8)	
++		if self.ivr_9:
++			s.appendExten(&quot;9&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_9)	
++		if self.ivr_ast:
++			s.appendExten(&quot;*&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_ast)	
++		if self.phone_1:
++			s.appendExten(&quot;1&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_1))	
++		if self.phone_2:
++			s.appendExten(&quot;2&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_2))	
++		if self.phone_3:
++			s.appendExten(&quot;3&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_3))	
++		if self.phone_4:
++			s.appendExten(&quot;4&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_4))	
++		if self.phone_5:
++			s.appendExten(&quot;5&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_5))	
++		if self.phone_6:
++			s.appendExten(&quot;6&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_6))	
++		if self.phone_7:
++			s.appendExten(&quot;7&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_7))	
++		if self.phone_8:
++			s.appendExten(&quot;8&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_8))	
++		if self.phone_9:
++			s.appendExten(&quot;9&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_9))	
++		if self.phone_ast:
++			s.appendExten(&quot;*&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_ast))	
++		s.appendExten(&quot;0&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.operator))	
++		s.appendExten(&quot;i&quot;,&quot;Playback(privacy-invalid)&quot;)	
++		s.appendExten(&quot;i&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator))	
++		s.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;)
++		s.appendExten(&quot;t&quot;,&quot;NoCDR&quot;)
++		s.appendExten(&quot;t&quot;,&quot;Hangup&quot;)
++		s.appendExten(&quot;T&quot;,&quot;ResetCDR(w)&quot;)
++		s.appendExten(&quot;T&quot;,&quot;NoCDR&quot;)
++		s.appendExten(&quot;T&quot;,&quot;Hangup&quot;)
++		s.appendExten(&quot;#&quot;,&quot;ResetCDR(w)&quot;)
++		s.appendExten(&quot;#&quot;,&quot;NoCDR&quot;)
++		s.appendExten(&quot;#&quot;,&quot;Hangup&quot;)
++	
++
++	def row(self):
++		return (self.shortName,self.name)
+
+
+Property changes on: trunk/cfg_ivr_treenode.py
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000259.html">[Destar-dev] r743 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000261.html">[Destar-dev] r745 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#260">[ date ]</a>
+              <a href="thread.html#260">[ thread ]</a>
+              <a href="subject.html#260">[ subject ]</a>
+              <a href="author.html#260">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

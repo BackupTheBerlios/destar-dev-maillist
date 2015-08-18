@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r578 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r578%20-%20trunk&In-Reply-To=%3C200701291448.l0TEmcTE001950%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000056.html">
+   <LINK REL="Next"  HREF="000058.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r578 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r578%20-%20trunk&In-Reply-To=%3C200701291448.l0TEmcTE001950%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r578 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Mon Jan 29 15:48:38 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000056.html">[Destar-dev] [Bug #10130] destar's css are not loaded
+</A></li>
+        <LI>Next message: <A HREF="000058.html">[Destar-dev] [Bug #10130] destar's css are not loaded
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#57">[ date ]</a>
+              <a href="thread.html#57">[ thread ]</a>
+              <a href="subject.html#57">[ subject ]</a>
+              <a href="author.html#57">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-01-29 15:48:37 +0100 (Mon, 29 Jan 2007)
+New Revision: 578
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/Publisher.py
+Log:
+* Added &quot;filter_output&quot; publisher's funcion. It changed everything to text/html content-type,
+  including css. Needs some revision. Fixes bug #10130
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-01-23 00:01:51 UTC (rev 577)
++++ trunk/CHANGELOG.txt	2007-01-29 14:48:37 UTC (rev 578)
+@@ -1,3 +1,7 @@
++2007-01-29:
++* Added &quot;filter_output&quot; publisher's funcion. It changed everything to text/html content-type,
++  including css. Needs some revision. Fixes bug #10130
++
+ 2007-01-22:
+ * Merged last changes from quixote2 branch into trunk
+ 
+
+Modified: trunk/Publisher.py
+===================================================================
+--- trunk/Publisher.py	2007-01-23 00:01:51 UTC (rev 577)
++++ trunk/Publisher.py	2007-01-29 14:48:37 UTC (rev 578)
+@@ -65,9 +65,9 @@
+ 
+ 	def filter_output(self, request, output):
+ 		output = Publisher.filter_output(self, request, output)
+-		resp = request.response
+-		if resp.get_header('Content-Type') in (None, 'text/html'):
+-			resp.set_header('Content-Type','text/html; charset=%s' % language.encoding() )
++		#resp = request.response
++		#if resp.get_header('Content-Type') in (None, 'text/html'):
++		#	resp.set_header('Content-Type','text/html; charset=%s' % language.encoding() )
+ 		return output
+ 
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000056.html">[Destar-dev] [Bug #10130] destar's css are not loaded
+</A></li>
+	<LI>Next message: <A HREF="000058.html">[Destar-dev] [Bug #10130] destar's css are not loaded
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#57">[ date ]</a>
+              <a href="thread.html#57">[ thread ]</a>
+              <a href="subject.html#57">[ subject ]</a>
+              <a href="author.html#57">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r583 - in trunk: . misc misc/redhat
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r583%20-%20in%20trunk%3A%20.%20misc%20misc/redhat&In-Reply-To=%3C200702042158.l14Lw5gA018647%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000064.html">
+   <LINK REL="Next"  HREF="000066.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r583 - in trunk: . misc misc/redhat</H1>
+    <B>hholzer at mail.berlios.de</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r583%20-%20in%20trunk%3A%20.%20misc%20misc/redhat&In-Reply-To=%3C200702042158.l14Lw5gA018647%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r583 - in trunk: . misc misc/redhat">hholzer at mail.berlios.de
+       </A><BR>
+    <I>Sun Feb  4 22:58:05 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000064.html">[Destar-dev] r582 - in branches/0.2.X/misc: . redhat
+</A></li>
+        <LI>Next message: <A HREF="000066.html">[Destar-dev] r584 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#65">[ date ]</a>
+              <a href="thread.html#65">[ thread ]</a>
+              <a href="subject.html#65">[ subject ]</a>
+              <a href="author.html#65">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: hholzer
+Date: 2007-02-04 22:58:02 +0100 (Sun, 04 Feb 2007)
+New Revision: 583
+
+Added:
+   trunk/misc/redhat/
+   trunk/misc/redhat/init.d
+Modified:
+   trunk/backend.py
+   trunk/cfg_app_callfw.py
+   trunk/cfg_app_voicemailsettings.py
+   trunk/configlets.py
+Log:
+* added init file for redhat/fedora
+* fix typo in dialplan for cf-trunk
+* fix broken dialplan busy path
+* fix for voicemail pin clearing
+* make devstate settings optional
+    
+
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-02-04 20:34:51 UTC (rev 582)
++++ trunk/backend.py	2007-02-04 21:58:02 UTC (rev 583)
+@@ -217,18 +217,18 @@
+ 	c.append(&quot;exten=s,n,Set(prng=${DB(PRNG/${ARG4}/${ARG3})})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial&quot;)
+-	c.append(&quot;exten=s,n(MainDial),NoOp()&quot;)
++	c.append(&quot;exten=s,n(dialstart),NoOp()&quot;)
+         if tapisupport:
+                 c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${ARG1})&quot;)
+                 c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)&quot;)
+                 c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: SET CALLERID ${CALLERID})&quot;)
+                 c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)&quot;)
+-	c.append(&quot;exten=s,n,Dial(${ARG1}${prng},${dsec},TtWw${dopt})&quot;)
++	c.append(&quot;exten=s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWw${dopt})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'timeout'&quot;)
+ 	c.append(&quot;exten=s,n(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+-	c.append('exten=s,n,GotoIf($[&quot;{CDR(intrunk)}&quot; = &quot;&quot;]?cftoend)')
++	c.append('exten=s,n,GotoIf($[&quot;${CDR(intrunk)}&quot; = &quot;&quot;]?cftoend)')
+ 	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFTO-TRUNK/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append(&quot;exten=s,n(cftoend),NoOp()&quot;)
+@@ -241,7 +241,7 @@
+ 	c.append(&quot;; Dial result was 'busy'&quot;)
+ 	c.append(&quot;exten=s,MainDial+101(busy),Set(fw_ext=${DB(CFBS/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+-	c.append('exten=s,n,GotoIf($[&quot;{CDR(intrunk)}&quot; = &quot;&quot;]?cfbsend)')
++	c.append('exten=s,n,GotoIf($[&quot;${CDR(intrunk)}&quot; = &quot;&quot;]?cfbsend)')
+ 	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFBS-TRUNK/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append(&quot;exten=s,n(cfbsend),NoOp()&quot;)
+
+Modified: trunk/cfg_app_callfw.py
+===================================================================
+--- trunk/cfg_app_callfw.py	2007-02-04 20:34:51 UTC (rev 582)
++++ trunk/cfg_app_callfw.py	2007-02-04 21:58:02 UTC (rev 583)
+@@ -35,7 +35,7 @@
+ 			VarType(&quot;set&quot;,      title=_(&quot;Setting preffix&quot;), len=6, default=&quot;*21&quot;),
+ 			VarType(&quot;ext&quot;,   title=_(&quot;Unsetting extension&quot;), len=6, default=&quot;*22&quot;),
+ 			VarType(&quot;toggle&quot;,   title=_(&quot;Set function toggleable&quot;), type=&quot;bool&quot;),
+-			VarType(&quot;devstateprefix&quot;,   title=_(&quot;Create Devstate extension. Devstate Prefix:&quot;), len=8, default=&quot;&quot;)
++			VarType(&quot;devstateprefix&quot;,   title=_(&quot;Create Devstate extension. Devstate Prefix:&quot;), len=8, optional=True, default=&quot;&quot;)
+ 		       	]
+ 
+ 		self.dependencies = [ DepType(&quot;pbx&quot;, 
+
+Modified: trunk/cfg_app_voicemailsettings.py
+===================================================================
+--- trunk/cfg_app_voicemailsettings.py	2007-02-04 20:34:51 UTC (rev 582)
++++ trunk/cfg_app_voicemailsettings.py	2007-02-04 21:58:02 UTC (rev 583)
+@@ -53,6 +53,7 @@
+ 			VarType(&quot;devstateprefix&quot;,
+ 				title=_(&quot;Create Devstate extension. Devstate Prefix:&quot;),
+ 				len=8,
++				optional=True,
+ 				default=&quot;&quot;)
+ 		       	]
+ 
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-02-04 20:34:51 UTC (rev 582)
++++ trunk/configlets.py	2007-02-04 21:58:02 UTC (rev 583)
+@@ -1022,8 +1022,10 @@
+ 
+ 			vm = AstConf(&quot;voicemail.conf&quot;)
+ 			vm.setSection(self.pbx)
++			pin = &quot;&quot;
+ 			try:
+-				pin = self.pin
++			        if self.pin != None:
++				        pin = self.pin
+ 			except:
+ 				pin = &quot;&quot;
+ 			#TODO: deal with timezones
+
+Added: trunk/misc/redhat/init.d
+===================================================================
+--- trunk/misc/redhat/init.d	2007-02-04 20:34:51 UTC (rev 582)
++++ trunk/misc/redhat/init.d	2007-02-04 21:58:02 UTC (rev 583)
+@@ -0,0 +1,28 @@
++#!/bin/bash
++#
++# chkconfig: 35 99 00
++# description: destar.
++
++# Source the function library.
++. /etc/init.d/functions
++
++PIDFILE=&quot;/var/run/destar.pid&quot;
++RETVAL=0
++
++# See how we were called.
++case &quot;$1&quot; in
++  start)
++	/usr/sbin/destar &gt; /dev/null 2&gt;&amp;1 &amp;
++	echo $! &gt; $PIDFILE
++	RETVAL=0
++	;;
++  stop)
++	PID=`cat $PIDFILE`
++	kill $PID
++	;;
++  *)
++	echo $&quot;Usage: $0 {start|stop}&quot;
++	RETVAL=1
++esac
++
++exit $RETVAL
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000064.html">[Destar-dev] r582 - in branches/0.2.X/misc: . redhat
+</A></li>
+	<LI>Next message: <A HREF="000066.html">[Destar-dev] r584 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#65">[ date ]</a>
+              <a href="thread.html#65">[ thread ]</a>
+              <a href="subject.html#65">[ subject ]</a>
+              <a href="author.html#65">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r584 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r584%20-%20trunk&In-Reply-To=%3C200702042237.l14MbbDx021097%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000065.html">
+   <LINK REL="Next"  HREF="000067.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r584 - trunk</H1>
+    <B>hholzer at mail.berlios.de</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r584%20-%20trunk&In-Reply-To=%3C200702042237.l14MbbDx021097%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r584 - trunk">hholzer at mail.berlios.de
+       </A><BR>
+    <I>Sun Feb  4 23:37:37 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000065.html">[Destar-dev] r583 - in trunk: . misc misc/redhat
+</A></li>
+        <LI>Next message: <A HREF="000067.html">[Destar-dev] r585 - trunk/misc/redhat
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: hholzer
+Date: 2007-02-04 23:37:36 +0100 (Sun, 04 Feb 2007)
+New Revision: 584
+
+Modified:
+   trunk/page_admin_viewconf.ptl
+Log:
+* fix showMissingModules function
+
+
+Modified: trunk/page_admin_viewconf.ptl
+===================================================================
+--- trunk/page_admin_viewconf.ptl	2007-02-04 21:58:02 UTC (rev 583)
++++ trunk/page_admin_viewconf.ptl	2007-02-04 22:37:36 UTC (rev 584)
+@@ -95,12 +95,12 @@
+ 
+ 			if not showForm.is_submitted():
+ 				header(_(self._q_desc))
+-				if not missingModules == []: showMissingModules(missingModules)
++				if not missingModules == []: self.showMissingModules(missingModules)
+ 				showForm.render()
+ 
+ 			elif showForm['_show']:
+ 				header(_(&quot;Asterisk configuration files&quot;))
+-				if not missingModules == []: showMissingModules(missingModules)
++				if not missingModules == []: self.showMissingModules(missingModules)
+ 				entries = []
+ 				for file,cnf in configEntries:
+ 					if showForm[file]:
+@@ -123,7 +123,7 @@
+ 				'&lt;/p&gt;'
+ 		footer()
+ 
+-	def showMissingModules [plain] (missingModules):
++	def showMissingModules [plain] (self, missingModules):
+ 		'&lt;div id=&quot;error&quot;&gt;\n'
+ 		'&lt;p&gt;'
+ 		htmltext(_(&quot;WARNING: This configuration might experience grave problems because the following asterisk modules are missing on your system:&quot;))
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000065.html">[Destar-dev] r583 - in trunk: . misc misc/redhat
+</A></li>
+	<LI>Next message: <A HREF="000067.html">[Destar-dev] r585 - trunk/misc/redhat
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

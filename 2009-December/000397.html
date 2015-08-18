@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r843 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r843%20-%20trunk&In-Reply-To=%3C200912150245.nBF2j5Ko019542%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000396.html">
+   <LINK REL="Next"  HREF="000398.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r843 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r843%20-%20trunk&In-Reply-To=%3C200912150245.nBF2j5Ko019542%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r843 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec 15 03:45:05 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000396.html">[Destar-dev] r842 - in trunk: . lang/es/LC_MESSAGES	lang/fr/LC_MESSAGES
+</A></li>
+        <LI>Next message: <A HREF="000398.html">[Destar-dev] r844 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#397">[ date ]</a>
+              <a href="thread.html#397">[ thread ]</a>
+              <a href="subject.html#397">[ subject ]</a>
+              <a href="author.html#397">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-15 03:45:04 +0100 (Tue, 15 Dec 2009)
+New Revision: 843
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_ivr_treenode.py
+Log:
+* cfg_ivr_treenode.py:
+  - Added extension to test IVR from the inside.
+  - Admin may change incoming callerID.
+  - Choose if jump to operator or head of IVR by default.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-15 02:37:54 UTC (rev 842)
++++ trunk/CHANGELOG.txt	2009-12-15 02:45:04 UTC (rev 843)
+@@ -9,6 +9,10 @@
+   - Add Call Forwarding loop detection
+   - Added macro-send-fax
+   - Added macro-call-forward-warning
++* cfg_ivr_treenode.py: 
++  - Added extension to test IVR from the inside.
++  - Admin may change incoming callerID.
++  - Choose if jump to operator or head of IVR by default.
+ 
+ 2009-04-16
+ * Zap -&gt; DAHDI changes from branch icom-avatar
+
+Modified: trunk/cfg_ivr_treenode.py
+===================================================================
+--- trunk/cfg_ivr_treenode.py	2009-12-15 02:37:54 UTC (rev 842)
++++ trunk/cfg_ivr_treenode.py	2009-12-15 02:45:04 UTC (rev 843)
+@@ -35,6 +35,15 @@
+ 					title=_(&quot;Name&quot;),
+ 					len=25),
+ 
++			VarType(&quot;ext&quot;,
++					title=_(&quot;Extension to test&quot;),
++					len=6),
++
++                        VarType(&quot;clid&quot;,
++                                        title = _(&quot;Change Caller ID name to:&quot;),
++                                        len = 35,
++                                        optional = True),
++
+ 			VarType(&quot;digittimeout&quot;,
+ 					title=_(&quot;How much time has the user to dial an extension?&quot;),
+ 					hint=_(&quot;(in seconds)&quot;),
+@@ -73,6 +82,7 @@
+ 			VarType(&quot;operator&quot;,
+ 					title=_(&quot;Extension to ring after file playing or by pressing '0'&quot;),
+ 					type=&quot;choice&quot;,
++					optional=True,
+ 					options=getChoice(&quot;CfgPhone&quot;)),
+ 
+ 			VarType(&quot;waittime&quot;,
+@@ -256,12 +266,19 @@
+ 	def createAsteriskConfig(self):
+ 		s = AstConf(&quot;extensions.conf&quot;)
+ 		context = self.name
+-		s.setSection(context)
+ 		if self.pbx:
+ 			pbx = self.pbx
+ 		else:	
+ 			pbx = &quot;phones&quot;
++		if self.ext:
++			s.setSection(pbx)
++			s.appendExten(self.ext,&quot;Goto(%s,s,1)&quot; % self.name, context=pbx)	
++		s.setSection(context)
+ 		s.append(&quot;include=%s&quot; % pbx)
++		if self.clid:
++                                needModule(&quot;func_callerid&quot;)
++                                s.appendExten(&quot;s&quot;,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, context)
++	
+ 		s.appendExten(&quot;s&quot;,&quot;Set(TIMEOUT(digit)=%d)&quot; % self.digittimeout, context)
+ 		if self.moh:
+ 			s.appendExten(&quot;s&quot;,&quot;Setmusiconhold(%s)&quot; % self.moh, context)
+@@ -280,7 +297,10 @@
+ 			if self.pause:
+ 				s.appendExten(&quot;s&quot;,&quot;WaitExten(%s)&quot; % self.pause, context)
+ 		s.appendExten(&quot;s&quot;,&quot;WaitExten(%d)&quot; % self.waittime, context)
+-		s.appendExten(&quot;s&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), context)	
++		if self.operator:
++			s.appendExten(&quot;s&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), context)	
++		else:
++			s.appendExten(&quot;s&quot;,&quot;Goto(s,1)&quot;, context)	
+ 		if self.ivr_1:
+ 			s.appendExten(&quot;1&quot;,&quot;Goto(%s,s,1)&quot; % self.ivr_1, context)	
+ 		if self.ivr_2:
+@@ -323,7 +343,8 @@
+ 			s.appendExten(&quot;*&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.phone_ast), context)	
+ 		s.appendExten(&quot;0&quot;, &quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), context)	
+ 		s.appendExten(&quot;i&quot;,&quot;Playback(invalid)&quot;, context)	
+-		s.appendExten(&quot;i&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), context)	
++		#s.appendExten(&quot;i&quot;,&quot;Goto(%s,%s,1)&quot; % (pbx,self.operator), context)	
++		s.appendExten(&quot;i&quot;,&quot;Goto(s,1)&quot;, context)	
+ 		s.appendExten(&quot;t&quot;,&quot;ResetCDR(w)&quot;, context)
+ 		s.appendExten(&quot;t&quot;,&quot;NoCDR&quot;, context)
+ 		s.appendExten(&quot;t&quot;,&quot;Hangup&quot;, context)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000396.html">[Destar-dev] r842 - in trunk: . lang/es/LC_MESSAGES	lang/fr/LC_MESSAGES
+</A></li>
+	<LI>Next message: <A HREF="000398.html">[Destar-dev] r844 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#397">[ date ]</a>
+              <a href="thread.html#397">[ thread ]</a>
+              <a href="subject.html#397">[ subject ]</a>
+              <a href="author.html#397">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

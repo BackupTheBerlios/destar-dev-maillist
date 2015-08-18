@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] [Fwd: Destar patches]
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20%5BFwd%3A%20Destar%20patches%5D&In-Reply-To=%3C1168876950.5535.48.camel%40localhost.localdomain%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000012.html">
+   <LINK REL="Next"  HREF="000013.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] [Fwd: Destar patches]</H1>
+    <B>Santiago Jos&#233; Ruano Rinc&#243;n</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20%5BFwd%3A%20Destar%20patches%5D&In-Reply-To=%3C1168876950.5535.48.camel%40localhost.localdomain%3E"
+       TITLE="[Destar-dev] [Fwd: Destar patches]">santiago at avatar.com.co
+       </A><BR>
+    <I>Mon Jan 15 17:02:30 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000012.html">[Destar-dev] r549 - branches/quixote2
+</A></li>
+        <LI>Next message: <A HREF="000013.html">[Destar-dev] r550 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#24">[ date ]</a>
+              <a href="thread.html#24">[ thread ]</a>
+              <a href="subject.html#24">[ subject ]</a>
+              <a href="author.html#24">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>--------- Mensaje reenviado --------
+De: Harald Holzer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">harald at hholzer.at</A>&gt;
+Para: <A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">santiago at mail.berlios.de</A>
+Asunto: Destar patches
+Fecha: Sun, 14 Jan 2007 00:13:51 +0100 (CET)
+
+Patches should apply in the following order:
+1-record.diff
+2-modulemiss.diff
+3-siptos.diff
+4-queuetime.diff
+5-calleridcustom.diff
+5.1-calleridcustomclean.diff
+6-cleandefaults.diff
+7-emediarpng.diff
+7.1-emediarpngclean.diff
+8-sipped.diff
+9-devstate.diff
+
+patch 6-9 needs &quot;patch -p1&quot;.
+
+5 and 5.1 should commited together.
+7 and 7.1 should commited together.
+
+1)
+fix recording
+2)
+dont add modules to modules.conf, if they does not exists (Bug #9708)
+3)
+added sip tos option
+4)
+added queue timeout
+5)
+added callerid(number) option on incoming calls
+added callerid(number) option on outcoming calls
+added sip from domain option
+added DID custom mapping option
+6)
+some better defaults
+7)
+add early media support in dialmacro
+add parallel ringing support in dialmacro
+add call forward only on trunk support in dialmacro
+8)
+added sip pedantic option
+9)
+added fist attempt for devstate support on cf
+cleandup hint support
+
+
+regards,
+Harald
+-- 
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 189 bytes
+Desc: Esta parte del mensaje est? firmada	digitalmente
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/destar-dev/attachments/20070115/c6b4c44a/attachment.pgp">https://lists.berlios.de/pipermail/destar-dev/attachments/20070115/c6b4c44a/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000012.html">[Destar-dev] r549 - branches/quixote2
+</A></li>
+	<LI>Next message: <A HREF="000013.html">[Destar-dev] r550 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#24">[ date ]</a>
+              <a href="thread.html#24">[ thread ]</a>
+              <a href="subject.html#24">[ subject ]</a>
+              <a href="author.html#24">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

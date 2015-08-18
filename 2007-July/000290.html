@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r770 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r770%20-%20trunk&In-Reply-To=%3C200707302045.l6UKjhXv015314%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000289.html">
+   <LINK REL="Next"  HREF="000291.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r770 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r770%20-%20trunk&In-Reply-To=%3C200707302045.l6UKjhXv015314%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r770 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Mon Jul 30 22:45:43 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000289.html">[Destar-dev] r769 - in branches/alerios: . static
+</A></li>
+        <LI>Next message: <A HREF="000291.html">[Destar-dev] r771 - in trunk: . examples
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#290">[ date ]</a>
+              <a href="thread.html#290">[ thread ]</a>
+              <a href="subject.html#290">[ subject ]</a>
+              <a href="author.html#290">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-30 22:45:43 +0200 (Mon, 30 Jul 2007)
+New Revision: 770
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/configlets.py
+Log:
+* fixed awful bug on cascade deletion of configlets due to circular dependencies.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-27 23:15:10 UTC (rev 769)
++++ trunk/CHANGELOG.txt	2007-07-30 20:45:43 UTC (rev 770)
+@@ -1,3 +1,6 @@
++2007-07-30:
++* fixed awful bug on cascade deletion of configlets due to circular dependencies.
++
+ 2007-07-27:
+ * cfg_opt_did.py: fixed typos on appendExten().
+ * Templates, cfg_opt_settings:  changed logo location.
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-07-27 23:15:10 UTC (rev 769)
++++ trunk/configlets.py	2007-07-30 20:45:43 UTC (rev 770)
+@@ -296,18 +296,24 @@
+ 			if configlet_list[i]._id == obj._id:
+ 				configlet_list[i] = obj
+ 				
+-	def deleteConfiglet(self, _id):
++	def deleteConfiglet(self, _id, deleted=[]):
++		if _id in deleted:
++			return
++		else:
++			deleted.append(_id)
+ 		for group in self.groups.values():
+ 			for i in range(len(group)):
+ 				if group[i]._id == _id:
+ 					for dep in group[i].dependent_objs:
+-						self.deleteConfiglet(dep.configlet._id)
++						self.deleteConfiglet(dep.configlet._id,deleted)
+ 					obj = group[i]
+ 					try: 
+ 						obj_name = obj.name
+ 					except AttributeError:
+ 						obj_name = obj.shortName
+ 					sys.stderr.write (&quot;[%s] Deleting configlet '%s' with id '%s' from group '%s\n'&quot; % (time.asctime(time.localtime()), obj_name, obj._id, obj.groupName))
++					if not obj._id in deleted:
++						deleted.append(obj._id)
+ 					del group[i]
+ 					return
+ 					
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000289.html">[Destar-dev] r769 - in branches/alerios: . static
+</A></li>
+	<LI>Next message: <A HREF="000291.html">[Destar-dev] r771 - in trunk: . examples
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#290">[ date ]</a>
+              <a href="thread.html#290">[ thread ]</a>
+              <a href="subject.html#290">[ subject ]</a>
+              <a href="author.html#290">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

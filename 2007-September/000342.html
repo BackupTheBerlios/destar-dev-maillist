@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r805 - branches/santiago
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r805%20-%20branches/santiago&In-Reply-To=%3C200708312237.l7VMbWi0020023%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000341.html">
+   <LINK REL="Next"  HREF="000343.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r805 - branches/santiago</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r805%20-%20branches/santiago&In-Reply-To=%3C200708312237.l7VMbWi0020023%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r805 - branches/santiago">santiago at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep  1 00:37:32 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000341.html">[Destar-dev] r804 - in branches: . santiago
+</A></li>
+        <LI>Next message: <A HREF="000343.html">[Destar-dev] r806 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#342">[ date ]</a>
+              <a href="thread.html#342">[ thread ]</a>
+              <a href="subject.html#342">[ subject ]</a>
+              <a href="author.html#342">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-09-01 00:37:30 +0200 (Sat, 01 Sep 2007)
+New Revision: 805
+
+Modified:
+   branches/santiago/CHANGELOG.txt
+   branches/santiago/backend.py
+Log:
+first test for a better handling of Busy/NO available channels
+
+
+
+Modified: branches/santiago/CHANGELOG.txt
+===================================================================
+--- branches/santiago/CHANGELOG.txt	2007-08-31 22:33:24 UTC (rev 804)
++++ branches/santiago/CHANGELOG.txt	2007-08-31 22:37:30 UTC (rev 805)
+@@ -1,6 +1,7 @@
+ 2007-08-31:
+ * panelutils: use CallerID as label if it exists
+ * Use the same length for phone secrets
++* first test for a better handling of Busy/NO available channels
+ 
+ 2007-08-26:
+ * cfg_phone_queue: Don't answer and set MoH if Ring is usedi. Thanks to
+
+Modified: branches/santiago/backend.py
+===================================================================
+--- branches/santiago/backend.py	2007-08-31 22:33:24 UTC (rev 804)
++++ branches/santiago/backend.py	2007-08-31 22:37:30 UTC (rev 805)
+@@ -196,99 +196,102 @@
+ 	c.setSection(&quot;macro-dial-std-exten&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; test for CFIM (Call Forwarding Immediate)&quot;)
+-	c.append(&quot;exten=s,1,Set(fw_ext=${DB(CFIM/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
++	c.append(&quot;exten =&gt; s,1,Set(fw_ext=${DB(CFIM/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; test for VMIM (VM Immediate)&quot;)
+-	c.append(&quot;exten=s,n,Set(vmim=${DB(VMIM/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${vmim}&quot; != &quot;&quot;]?vmu)')
++	c.append(&quot;exten =&gt; s,n,Set(vmim=${DB(VMIM/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s,n,GotoIf($[&quot;${vmim}&quot; != &quot;&quot;]?vmu)')
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; test for DND (Do Not Disturb)&quot;)
+-	c.append(&quot;exten=s,n,Set(dnd=${DB(DND/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${dnd}&quot; != &quot;&quot;]?busy)')
++	c.append(&quot;exten =&gt; s,n,Set(dnd=${DB(DND/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s,n,GotoIf($[&quot;${dnd}&quot; != &quot;&quot;]?busy)')
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get dial seconds&quot;)
+-	c.append(&quot;exten=s,n,Set(dsec=${DB(DSEC/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${dsec}&quot; != &quot;&quot;]?dsecEnd)')
+-	c.append(&quot;exten=s,n,Set(dsec=45)&quot;)
+-	c.append(&quot;exten=s,n(dsecEnd),NoOp()&quot;)
++	c.append(&quot;exten =&gt; s,n,Set(dsec=${DB(DSEC/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s,n,GotoIf($[&quot;${dsec}&quot; != &quot;&quot;]?dsecEnd)')
++	c.append(&quot;exten =&gt; s,n,Set(dsec=45)&quot;)
++	c.append(&quot;exten =&gt; s,n(dsecEnd),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get global dial options&quot;)
+-	c.append(&quot;exten=s,n,Set(dopt=${DIAL_OPTIONS})&quot;)
++	c.append(&quot;exten =&gt; s,n,Set(dopt=${DIAL_OPTIONS})&quot;)
+         if tapisupport:
+-	        c.append(&quot;exten=s,n,Set(dopt=${dopt}M(tapi^${UNIQUEID}|${ARG1}))&quot;)
++	        c.append(&quot;exten =&gt; s,n,Set(dopt=${dopt}M(tapi^${UNIQUEID}|${ARG1}))&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get early media&quot;)
+-	c.append(&quot;exten=s,n,Set(emedia=${DB(EMEDIA/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${emedia}&quot; = &quot;&quot;]?emediaEnd)')
+-	c.append(&quot;exten=s,n,Set(dopt=${dopt}m(${emedia}))&quot;)
+-	c.append(&quot;exten=s,n,Answer()&quot;)
+-	c.append(&quot;exten=s,n(emediaEnd),NoOp()&quot;)
++	c.append(&quot;exten =&gt; s,n,Set(emedia=${DB(EMEDIA/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s,n,GotoIf($[&quot;${emedia}&quot; = &quot;&quot;]?emediaEnd)')
++	c.append(&quot;exten =&gt; s,n,Set(dopt=${dopt}m(${emedia}))&quot;)
++	c.append(&quot;exten =&gt; s,n,Answer()&quot;)
++	c.append(&quot;exten =&gt; s,n(emediaEnd),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; parallel ringing&quot;)
+-	c.append(&quot;exten=s,n,Set(prng=${DB(PRNG/${ARG4}/${ARG3})})&quot;)
++	c.append(&quot;exten =&gt; s,n,Set(prng=${DB(PRNG/${ARG4}/${ARG3})})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial&quot;)
+-	c.append(&quot;exten=s,n(dialstart),NoOp()&quot;)
++	c.append(&quot;exten =&gt; s,n(dialstart),NoOp()&quot;)
+         if tapisupport:
+-                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${ARG1})&quot;)
+-                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)&quot;)
+-                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: SET CALLERID ${CALLERID})&quot;)
+-                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)&quot;)
+-	c.append(&quot;exten=s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWwr${dopt})&quot;)
++                c.append(&quot;exten =&gt; s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${ARG1})&quot;)
++                c.append(&quot;exten =&gt; s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)&quot;)
++                c.append(&quot;exten =&gt; s,n,UserEvent(TAPI|TAPIEVENT: SET CALLERID ${CALLERID})&quot;)
++                c.append(&quot;exten =&gt; s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)&quot;)
++	c.append(&quot;exten =&gt; s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWwr${dopt})&quot;)
++	c.append(&quot;exten =&gt; s,n,Goto(s-${DIALSTATUS},1)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'timeout'&quot;)
+-	c.append(&quot;exten=s,n(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+-	c.append('exten=s,n,GotoIf($[&quot;${CDR(intrunk)}&quot; = &quot;&quot;]?cftoend)')
+-	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFTO-TRUNK/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+-	c.append(&quot;exten=s,n(cftoend),NoOp()&quot;)
++	c.append(&quot;exten =&gt; s,n(dialtimeout),Set(fw_ext=${DB(CFTO/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
++	c.append('exten =&gt; s,n,GotoIf($[&quot;${CDR(intrunk)}&quot; = &quot;&quot;]?cftoend)')
++	c.append(&quot;exten =&gt; s,n,Set(fw_ext=${DB(CFTO-TRUNK/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
++	c.append(&quot;exten =&gt; s,n(cftoend),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; no CFTO (Call Forward Timeout), test VM U.&quot;)
+-	c.append(&quot;exten=s,n,Set(vmu=${DB(VMU/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${vmu}&quot; != &quot;&quot;]?vmu)')
+-	c.append(&quot;exten=s,n,Goto(hangup)&quot;)
++	c.append(&quot;exten =&gt; s,n,Set(vmu=${DB(VMU/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s,n,GotoIf($[&quot;${vmu}&quot; != &quot;&quot;]?vmu)')
++	c.append(&quot;exten =&gt; s,n,Goto(hangup)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'busy'&quot;)
+-	c.append(&quot;exten=s,MainDial+101(busy),Set(fw_ext=${DB(CFBS/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+-	c.append('exten=s,n,GotoIf($[&quot;${CDR(intrunk)}&quot; = &quot;&quot;]?cfbsend)')
+-	c.append(&quot;exten=s,n,Set(fw_ext=${DB(CFBS-TRUNK/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+-	c.append(&quot;exten=s,n(cfbsend),NoOp()&quot;)
++	c.append(&quot;exten =&gt; s,MainDial+101(busy),Goto(s-NOANSWER,1)&quot;)
++	#c.append(&quot;exten =&gt; s,MainDial+101(busy),Set(fw_ext=${DB(CFBS/${ARG4}/${ARG3})})&quot;)
++	#c.append('exten =&gt; s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
++	#c.append('exten =&gt; s,n,GotoIf($[&quot;${CDR(intrunk)}&quot; = &quot;&quot;]?cfbsend)')
++	#c.append(&quot;exten =&gt; s,n,Set(fw_ext=${DB(CFBS-TRUNK/${ARG4}/${ARG3})})&quot;)
++	#c.append('exten =&gt; s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
++	#c.append(&quot;exten =&gt; s,n(cfbsend),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; no CFBS (Call Forward Busy), test VM Busy&quot;)
+-	c.append(&quot;exten=s,n,Set(vmbs=${DB(VMBS/${ARG4}/${ARG3})})&quot;)
+-	c.append('exten=s,n,GotoIf($[&quot;${vmbs}&quot; != &quot;&quot;]?vmbs)')
+-	c.append(&quot;exten=s,n,Answer()&quot;)
+-	c.append(&quot;exten=s,n,PlayTones(busy)&quot;)
+-	c.append(&quot;exten=s,n,Busy()&quot;)
++	c.append(&quot;exten =&gt; s,n,Set(vmbs=${DB(VMBS/${ARG4}/${ARG3})})&quot;)
++	c.append('exten =&gt; s,n,GotoIf($[&quot;${vmbs}&quot; != &quot;&quot;]?vmbs)')
++	c.append(&quot;exten =&gt; s,n,Answer()&quot;)
++	c.append(&quot;exten =&gt; s,n,PlayTones(busy)&quot;)
++	c.append(&quot;exten =&gt; s,n,Busy()&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;exten=s,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
++	c.append(&quot;exten =&gt; s,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append('exten=s,n(vmu),Set(vmopt=u)')
+-	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
++	c.append('exten =&gt; s-NOANSWER,1,Set(vmopt=u)')
++	c.append(&quot;exten =&gt; s-NOANSWER,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append('exten=s,n(vmbs),Set(vmopt=b)')
+-	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
++	c.append('exten =&gt; s-BUSY,1,Set(vmopt=b)')
++	c.append(&quot;exten =&gt; s-BUSY,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;exten=s,n(hangup),Hangup()&quot;)
++	c.append(&quot;exten =&gt; s,n(hangup),Hangup()&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;exten=i,0,Hangup&quot;)
++	c.append(&quot;exten =&gt; _s-.,1,Goto(s-NOANSWER,1)&quot;)
++	c.append(&quot;exten =&gt; i,0,Hangup&quot;)
+         if tapisupport:
+-                c.append(&quot;exten=h,1,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;)
++                c.append(&quot;exten =&gt; h,1,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;)
+ 
+                 c.append(&quot;[macro-tapi];&quot;)
+-                c.append(&quot;exten=s,1,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;${ARG2}] LINE_CALLSTATE LINECALLSTATE_CONNECTED)&quot;)
+-                c.append(&quot;exten=s,2,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)&quot;)
++                c.append(&quot;exten =&gt; s,1,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;${ARG2}] LINE_CALLSTATE LINECALLSTATE_CONNECTED)&quot;)
++                c.append(&quot;exten =&gt; s,2,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)&quot;)
+ 
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; format: Macro(voicemail,&lt;VoiceMail arguments&gt;,PBX)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.setSection(&quot;macro-voicemail&quot;)
+-	c.append(&quot;exten=o,1,Goto(${ARG2},0,1)&quot;)
+-	c.append(&quot;exten=a,1,Goto(${ARG2},0,1)&quot;)
++	c.append(&quot;exten =&gt; o,1,Goto(${ARG2},0,1)&quot;)
++	c.append(&quot;exten =&gt; a,1,Goto(${ARG2},0,1)&quot;)
+ 	c.append(&quot;exten =&gt; t,1,Hangup()&quot;)
+ 	c.append(&quot;exten =&gt; T,1,Hangup()&quot;)
+ 	c.append(&quot;exten =&gt; s,1,Answer&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000341.html">[Destar-dev] r804 - in branches: . santiago
+</A></li>
+	<LI>Next message: <A HREF="000343.html">[Destar-dev] r806 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#342">[ date ]</a>
+              <a href="thread.html#342">[ thread ]</a>
+              <a href="subject.html#342">[ subject ]</a>
+              <a href="author.html#342">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r691 - branches/0.2.X trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r691%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200705301658.l4UGwER1019849%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000200.html">
+   <LINK REL="Next"  HREF="000202.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r691 - branches/0.2.X trunk</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r691%20-%20branches/0.2.X%20trunk&In-Reply-To=%3C200705301658.l4UGwER1019849%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r691 - branches/0.2.X trunk">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Wed May 30 18:58:14 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000200.html">[Destar-dev] r690 - branches/0.2.X trunk
+</A></li>
+        <LI>Next message: <A HREF="000202.html">[Destar-dev] r692 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#201">[ date ]</a>
+              <a href="thread.html#201">[ thread ]</a>
+              <a href="subject.html#201">[ subject ]</a>
+              <a href="author.html#201">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-05-30 18:58:13 +0200 (Wed, 30 May 2007)
+New Revision: 691
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/Templates.ptl
+   trunk/CHANGELOG.txt
+   trunk/Templates.ptl
+Log:
+* Menu adjustment for other languages, _() is not needed.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-05-30 00:01:25 UTC (rev 690)
++++ branches/0.2.X/CHANGELOG.txt	2007-05-30 16:58:13 UTC (rev 691)
+@@ -1,3 +1,6 @@
++2007-05-30:
++* Menu adjustment for other languages, _() is not needed.
++
+ 2007-05-29:
+ * Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+ 
+
+Modified: branches/0.2.X/Templates.ptl
+===================================================================
+--- branches/0.2.X/Templates.ptl	2007-05-30 00:01:25 UTC (rev 690)
++++ branches/0.2.X/Templates.ptl	2007-05-30 16:58:13 UTC (rev 691)
+@@ -266,7 +266,7 @@
+ 				submenu.append( (sub._q_menupos, '/'.join(['',parent_name,sub._q_link]), sub._q_title, []) )
+ 		submenu.sort()
+ 
+-		if request.session.level == 3 and e._q_title == _(&quot;Virtual PBX Owner&quot;):
++		if request.session.level == 3 and e._q_title == &quot;Virtual PBX Owner&quot;:
+ 			continue
+ 		else:
+ 			m.append( (e._q_menupos, '/'.join(['',e._q_link]), e._q_title, submenu) )
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-05-30 00:01:25 UTC (rev 690)
++++ trunk/CHANGELOG.txt	2007-05-30 16:58:13 UTC (rev 691)
+@@ -1,3 +1,6 @@
++2007-05-30:
++* Menu adjustment for other languages, _() is not needed.
++
+ 2007-05-29:
+ * cfg_trunk_sip: Added port= setting in sip.conf 
+ * Don't show PBX Owner menu entry when logged in as 'Configurator' user. 
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-05-30 00:01:25 UTC (rev 690)
++++ trunk/Templates.ptl	2007-05-30 16:58:13 UTC (rev 691)
+@@ -268,7 +268,7 @@
+ 				submenu.append( (sub._q_menupos, '/'.join(['',parent_name,sub._q_link]), sub._q_title, []) )
+ 		submenu.sort()
+ 
+-		if session.level == 3 and e._q_title == _(&quot;Virtual PBX Owner&quot;):
++		if session.level == 3 and e._q_title == &quot;Virtual PBX Owner&quot;:
+ 			continue
+ 		else:
+ 			m.append( (e._q_menupos, '/'.join(['',e._q_link]), e._q_title, submenu) )
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000200.html">[Destar-dev] r690 - branches/0.2.X trunk
+</A></li>
+	<LI>Next message: <A HREF="000202.html">[Destar-dev] r692 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#201">[ date ]</a>
+              <a href="thread.html#201">[ thread ]</a>
+              <a href="subject.html#201">[ subject ]</a>
+              <a href="author.html#201">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

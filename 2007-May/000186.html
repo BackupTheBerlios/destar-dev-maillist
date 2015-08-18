@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r677 - branches/destar-callweaver
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r677%20-%20branches/destar-callweaver&In-Reply-To=%3C200705111650.l4BGoGpX030936%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000185.html">
+   <LINK REL="Next"  HREF="000187.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r677 - branches/destar-callweaver</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r677%20-%20branches/destar-callweaver&In-Reply-To=%3C200705111650.l4BGoGpX030936%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r677 - branches/destar-callweaver">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri May 11 18:50:16 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000185.html">[Destar-dev] r676 - branches/destar-callweaver
+</A></li>
+        <LI>Next message: <A HREF="000187.html">[Destar-dev] r678 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#186">[ date ]</a>
+              <a href="thread.html#186">[ thread ]</a>
+              <a href="subject.html#186">[ subject ]</a>
+              <a href="author.html#186">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-05-11 18:50:15 +0200 (Fri, 11 May 2007)
+New Revision: 677
+
+Modified:
+   branches/destar-callweaver/CHANGELOG.txt
+   branches/destar-callweaver/backend.py
+   branches/destar-callweaver/configlets.py
+   branches/destar-callweaver/page_admin_viewconf.ptl
+   branches/destar-callweaver/page_config.ptl
+Log:
+moving to /opt/etc/callweaver
+
+
+
+Modified: branches/destar-callweaver/CHANGELOG.txt
+===================================================================
+--- branches/destar-callweaver/CHANGELOG.txt	2007-05-11 15:57:08 UTC (rev 676)
++++ branches/destar-callweaver/CHANGELOG.txt	2007-05-11 16:50:15 UTC (rev 677)
+@@ -1,6 +1,7 @@
+ 2007-05-11:
+ * Branching destar for callweaver
+ * Changing {M,m}acro for Proc and proc
++* moving /etc/asterisk to /opt/etc/callweaver
+ 
+ 2007-05-08:
+ * Added the needed UserEvents in the dialplan to manage DND completely.
+
+Modified: branches/destar-callweaver/backend.py
+===================================================================
+--- branches/destar-callweaver/backend.py	2007-05-11 15:57:08 UTC (rev 676)
++++ branches/destar-callweaver/backend.py	2007-05-11 16:50:15 UTC (rev 677)
+@@ -42,7 +42,7 @@
+ 
+ def loadPythonConfig():
+ 	&quot;&quot;&quot;This loads the destar_cfg.py config file either from
+-	/etc/asterisk or from the current directory.&quot;&quot;&quot;
++	/opt/callweaver/etc or from the current directory.&quot;&quot;&quot;
+ 
+ 
+ 	global __loaded
+@@ -79,7 +79,7 @@
+ 		obj.createDependencies()
+ 
+ def createPythonConfig(f=None):
+-	&quot;&quot;&quot;This writes /etc/asterisk/destar_cfg.py.
++	&quot;&quot;&quot;This writes /opt/callweaver/etc/destar_cfg.py.
+ 
+ 	The output will be written into file hand 'f' if you provide one.
+ 	Use this for debugging, like this:
+@@ -374,7 +374,7 @@
+ 
+ 
+ def createAsteriskConfig():
+-	&quot;&quot;&quot;This creates all the Asterisk config files in /etc/asterisk.
++	&quot;&quot;&quot;This creates all the Asterisk config files in /opt/callweaver/etc.
+ 
+ 	First, we create an in-memory representation of all config files
+ 	to create. Then we check if any of the config files is already
+
+Modified: branches/destar-callweaver/configlets.py
+===================================================================
+--- branches/destar-callweaver/configlets.py	2007-05-11 15:57:08 UTC (rev 676)
++++ branches/destar-callweaver/configlets.py	2007-05-11 16:50:15 UTC (rev 677)
+@@ -21,10 +21,10 @@
+ import sys, os, types, sha, binascii, time
+ import panelutils
+ 
+-CONF_DIR = &quot;/etc/asterisk&quot;
++CONF_DIR = &quot;/opt/etc/callweaver&quot;
+ DOC_DIR = os.getenv('DESTAR_DOC_DIR', default='/tmp/destar-doc')
+ CONF_TAG = &quot;; Automatically created by DESTAR\n&quot;
+-ASTERISK_MODULES_DIR = os.getenv('ASTERISK_MODULES_DIR', default='/usr/lib/asterisk/modules') 
++CALLWEAVER_MODULES_DIR = os.getenv('CALLWEAVER_MODULES_DIR', default='/opt/lib/callweaver/modules') 
+ 
+ 
+ class AsteriskConfigFile:
+@@ -231,8 +231,8 @@
+ 				],
+ 			preload = [],
+ 			)
+-		# Get list of codecs and formats from ASTERISK_MODULES_DIR
+-		for f in os.listdir(ASTERISK_MODULES_DIR):
++		# Get list of codecs and formats from CALLWEAVER_MODULES_DIR
++		for f in os.listdir(CALLWEAVER_MODULES_DIR):
+ 			if f.startswith('codec_'): c.modules[&quot;codec&quot;].append(f[:-3])
+ 			if f.startswith('format_'): c.modules[&quot;format&quot;].append(f[:-3])
+ 	
+
+Modified: branches/destar-callweaver/page_admin_viewconf.ptl
+===================================================================
+--- branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-11 15:57:08 UTC (rev 676)
++++ branches/destar-callweaver/page_admin_viewconf.ptl	2007-05-11 16:50:15 UTC (rev 677)
+@@ -75,7 +75,7 @@
+ 			cantAccessPage()
+ 
+ 	def _q_test(self):
+-		return os.access(&quot;/etc/asterisk&quot;, os.O_RDWR)
++		return os.access(&quot;/opt/etc/callweaver&quot;, os.O_RDWR)
+ 
+ 
+ 	def _q_index [plain] (self):
+
+Modified: branches/destar-callweaver/page_config.ptl
+===================================================================
+--- branches/destar-callweaver/page_config.ptl	2007-05-11 15:57:08 UTC (rev 676)
++++ branches/destar-callweaver/page_config.ptl	2007-05-11 16:50:15 UTC (rev 677)
+@@ -76,9 +76,9 @@
+ 				&quot;add/CfgOptUser&quot;,
+ 				[_(&quot;Configuration&quot;), _(&quot;Options&quot;), _(&quot;DeStar user&quot;)] )
+ 
+-		if not os.access(&quot;/etc/asterisk&quot;, os.O_RDWR):
++		if not os.access(&quot;/opt/etc/callweaver&quot;, os.O_RDWR):
+ 			self.configurationTip(
+-				_(&quot;You should enable write access to the directory /etc/asterisk. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'.&quot; % groups),
++				_(&quot;You should enable write access to the directory /opt/etc/callweaver. Without the ability to modify the configuration files DeStar would be pretty useless. You should 'chmod g+rwx' this directory and set it's group to one of '%s'.&quot; % groups),
+ 				&quot;&quot;,
+ 				[])
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000185.html">[Destar-dev] r676 - branches/destar-callweaver
+</A></li>
+	<LI>Next message: <A HREF="000187.html">[Destar-dev] r678 - branches/destar-callweaver
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#186">[ date ]</a>
+              <a href="thread.html#186">[ thread ]</a>
+              <a href="subject.html#186">[ subject ]</a>
+              <a href="author.html#186">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

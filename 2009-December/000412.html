@@ -1,0 +1,282 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r858 - in trunk: . dahdi-gen/Dahdi/Config	dahdi-gen/Dahdi/Config/Gen
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r858%20-%20in%20trunk%3A%20.%20dahdi-gen/Dahdi/Config%0A%09dahdi-gen/Dahdi/Config/Gen&In-Reply-To=%3C200912210419.nBL4J5pr020640%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000411.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r858 - in trunk: . dahdi-gen/Dahdi/Config	dahdi-gen/Dahdi/Config/Gen</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r858%20-%20in%20trunk%3A%20.%20dahdi-gen/Dahdi/Config%0A%09dahdi-gen/Dahdi/Config/Gen&In-Reply-To=%3C200912210419.nBL4J5pr020640%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r858 - in trunk: . dahdi-gen/Dahdi/Config	dahdi-gen/Dahdi/Config/Gen">alerios at mail.berlios.de
+       </A><BR>
+    <I>Mon Dec 21 05:19:05 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000411.html">[Destar-dev] r857 - trunk
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#412">[ date ]</a>
+              <a href="thread.html#412">[ thread ]</a>
+              <a href="subject.html#412">[ subject ]</a>
+              <a href="author.html#412">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-21 05:19:03 +0100 (Mon, 21 Dec 2009)
+New Revision: 858
+
+Modified:
+   trunk/backend.py
+   trunk/cfg_trunk_zappri.py
+   trunk/dahdi-gen/Dahdi/Config/Gen.pm
+   trunk/dahdi-gen/Dahdi/Config/Gen/Destar.pm
+   trunk/page_admin_autodetect.ptl
+Log:
+* Dahdi E1 trunks autodetection almost ready.
+
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2009-12-20 22:28:33 UTC (rev 857)
++++ trunk/backend.py	2009-12-21 04:19:03 UTC (rev 858)
+@@ -316,7 +316,7 @@
+ 	c.setSection(context)
+ 	c.appendExten(&quot;s&quot;, &quot;Answer()&quot;, context)
+ 	c.appendExten(&quot;s&quot;, &quot;Wait(${ARG2})&quot;, context)
+-	c.appendExten(&quot;s&quot;, &quot;Set(LOCALSTATIONID=%s)&quot; getSetting('header_text', 'DeStar PBX'), context)
++	c.appendExten(&quot;s&quot;, &quot;Set(LOCALSTATIONID=%s)&quot; % getSetting('header_text', 'DeStar PBX'), context)
+ 	c.appendExten(&quot;s&quot;, &quot;SendFAX(${FAXFILE})&quot;, context)
+ 	c.appendExten(&quot;s&quot;, &quot;Hangup&quot;, context)
+ 	c.appendExten(&quot;h&quot;, &quot;NoOp(TX: REMOTESTATIONID is ${REMOTESTATIONID})&quot;, context)
+@@ -919,8 +919,8 @@
+ 
+ def dahdigenconf():
+ 	&quot;&quot;&quot;This calls dahdi_genconf.&quot;&quot;&quot;
+-	dahdi_genconf = commands.getoutput('dahdi_genconf system destar')
+-	if dahdi_genconf:
++	dahdi_genconf = commands.getoutput('dahdi_genconf system destar').split(&quot;\n&quot;)
++	if dahdi_genconf[0] != &quot;Empty configuration -- no spans&quot;:
+ 		fn = os.path.join(configlets.CONF_DIR,&quot;destar_channels.py&quot;)
+ 		try:
+ 			try:
+@@ -929,11 +929,14 @@
+ 				execfile(fn)
+ 			except IOError:
+ 				try:
+-					execfile(DESTAR_CFG)
++					execfile(&quot;dahdi-gen/destar_channels.py&quot;)
+ 				except IOError:
+-					print _(&quot;Warning: There is no %s or %s file yet.&quot; % (fn,DESTAR_CFG))
++					print _(&quot;Warning: There is no %s or %s file yet.&quot; % (fn,&quot;dahdi-gen/destar_channels.py&quot;))
++					return False
+ 		except NameError:
+ 			pass
++		fixupConfiglets()
++		createPythonConfig()
+ 		return True
+ 	else:
+ 		return False
+
+Modified: trunk/cfg_trunk_zappri.py
+===================================================================
+--- trunk/cfg_trunk_zappri.py	2009-12-20 22:28:33 UTC (rev 857)
++++ trunk/cfg_trunk_zappri.py	2009-12-21 04:19:03 UTC (rev 858)
+@@ -74,6 +74,15 @@
+ 				type=&quot;string&quot;,
+ 				optional=True),
+ 
++			VarType(&quot;dialmethod&quot;,
++				title=_(&quot;Dial Group Method: G/g/R/r&quot;),
++				type=&quot;choice&quot;,
++				options=[('g',_('g: Ascending sequential hunt group')),
++					('G', _('G: Descending sequential hunt group')),
++					('r', _('r: Ascending rotary hunt group')),
++					('R', _('R: Descending rotary hunt group'))],
++				default=&quot;g&quot;),
++
+ 			VarType(&quot;panelLab&quot;,
+ 				title=_(&quot;Operator Panel&quot;),
+ 				type=&quot;label&quot;,
+@@ -165,32 +174,32 @@
+ 					message = _(&quot;This is a Dependency&quot;))
+ 		]
+ 
+-	def isAddable(self):
+-		&quot;&quot;&quot;We can only add this configlet if we have at least one
+-		DAHDIPRI option defined.&quot;&quot;&quot;
++#	def isAddable(self):
++#		&quot;&quot;&quot;We can only add this configlet if we have at least one
++#		DAHDIPRI option defined.&quot;&quot;&quot;
++#
++#		# BUG: it does somehow not work to simply write for obj in config_entries,
++#		# despite the &quot;from configlets import *&quot; above
++#		import configlets
++#		for obj in configlets.configlet_tree:
++#			if obj.__class__.__name__ == 'CfgOptDAHDIPRI':
++#				return True
++#		return False 
++#	isAddable = classmethod(isAddable)
+ 
+-		# BUG: it does somehow not work to simply write for obj in config_entries,
+-		# despite the &quot;from configlets import *&quot; above
+-		import configlets
+-		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__ == 'CfgOptDAHDIPRI':
+-				return True
+-		return False 
+-	isAddable = classmethod(isAddable)
+-
+ 	def checkConfig(self):
+                 res = CfgTrunk.checkConfig(self)
+                 if res:
+                         return res
+-		import configlets
+-		for obj in configlets.configlet_tree:
+-			if obj.__class__.__name__ == 'CfgTrunkDAHDIPRI':
+-				if obj==self: continue
+-				try:
+-					if obj.group == self.group and obj.group:
+-						return (&quot;group&quot;, _(&quot;Group already in use&quot;))
+-				except AttributeError:
+-					pass
++		#import configlets
++		#for obj in configlets.configlet_tree:
++		#	if obj.__class__.__name__ == 'CfgTrunkDAHDIPRI':
++		#		if obj==self: continue
++		#		try:
++		#			if obj.group == self.group and obj.group:
++		#				return (&quot;group&quot;, _(&quot;Group already in use&quot;))
++		#		except AttributeError:
++		#			pass
+ 
+ 
+ 	def fixup(self):
+@@ -212,6 +221,8 @@
+ 			c.appendValue(self, &quot;group&quot;)
+ 		c.appendValue(self, &quot;signalling&quot;)
+ 		c.appendValue(self, &quot;switchtype&quot;)
++		c.append(&quot;resetinterval=never&quot;)
++		c.append(&quot;prilocaldialplan=local&quot;)
+ 		c.appendValue(self, &quot;pridialplan&quot;)
+ 		contextin = &quot;in-%s&quot; % self.name
+ 		c.append(&quot;context=%s&quot; % contextin)
+@@ -238,7 +249,7 @@
+ 
+ 		#Dial part to use on dialout macro
+ 		if self.group:
+-			self.dial = &quot;DAHDI/g%s/${ARG1}&quot; % (self.group)
++                        self.dial = &quot;DAHDI/%s%s/${ARG1}&quot; % (self.dialmethod, self.group)
+ 		else:
+ 			self.dial = &quot;DAHDI/%s/${ARG1}&quot; % (self.channels)
+ 		
+
+Modified: trunk/dahdi-gen/Dahdi/Config/Gen/Destar.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Gen/Destar.pm	2009-12-20 22:28:33 UTC (rev 857)
++++ trunk/dahdi-gen/Dahdi/Config/Gen/Destar.pm	2009-12-21 04:19:03 UTC (rev 858)
+@@ -62,11 +62,9 @@
+ 	my $type = $span-&gt;type() || die &quot;$0: Span #$num -- unkown type\n&quot;;
+ 	my $termtype = $span-&gt;termtype() || die &quot;$0: Span #$num -- unkown termtype [NT/TE]\n&quot;;
+ 	my $group = $gconfig-&gt;{'group'}{&quot;$type&quot;};
+-	my $context = $gconfig-&gt;{'context'}{&quot;$type&quot;};
+-	my @to_reset = qw/context group/;
++	my @to_reset = qw/group/;
+ 
+ 	die &quot;$0: missing default group (termtype=$termtype)\n&quot; unless defined($group);
+-	die &quot;$0: missing default context\n&quot; unless $context;
+ 
+ 	my $sig = $span-&gt;signalling || die &quot;missing signalling info for span #$num type $type&quot;;
+ 	grep($gconfig-&gt;{'bri_sig_style'} eq $_, 'bri', 'bri_ptmp', 'pri') or die &quot;unknown signalling style for BRI&quot;;
+
+Modified: trunk/dahdi-gen/Dahdi/Config/Gen.pm
+===================================================================
+--- trunk/dahdi-gen/Dahdi/Config/Gen.pm	2009-12-20 22:28:33 UTC (rev 857)
++++ trunk/dahdi-gen/Dahdi/Config/Gen.pm	2009-12-21 04:19:03 UTC (rev 858)
+@@ -173,6 +173,7 @@
+ 	#print STDERR &quot;DEBUG: $module\n&quot;;
+ 	eval &quot;use $module&quot;;
+ 	if($@) {
++		print $@;
+ 		die &quot;Failed to load configuration generator for '$name'\n&quot;;
+ 	}
+ 	my $cfg = $module-&gt;new($gconfig, $genopts);
+
+Modified: trunk/page_admin_autodetect.ptl
+===================================================================
+--- trunk/page_admin_autodetect.ptl	2009-12-20 22:28:33 UTC (rev 857)
++++ trunk/page_admin_autodetect.ptl	2009-12-21 04:19:03 UTC (rev 858)
+@@ -20,7 +20,6 @@
+ 
+ from Templates import *
+ import backend
+-import manager
+ from quixote.directory import Directory, AccessControlled
+ from quixote import get_request, get_session
+ 
+@@ -45,23 +44,11 @@
+ 
+ 	def _q_index [html] (self):
+ 		header(self._q_desc)
+-		manager.connect()
+-		if not manager.isConnected():
+-			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			_(&quot;Asterisk is not running!&quot;)
+-			'&lt;/span&gt;&lt;/p&gt;'
+-		elif not manager.isLoggedIn():
+-			# TODO: describe how to set this up
+-			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+-			_(&quot;The manager access is not working!&quot;)
+-			'&lt;/span&gt;&lt;/p&gt;'
+-		else:
+-			'&lt;p&gt;'
+-			_('Doing a reload, result is:')
+-			'&lt;/p&gt;'
++		'&lt;p&gt;'
++		_('Doing a reload, result is:')
++		'&lt;/p&gt;'
+ 
+-			'&lt;tt&gt;&lt;p&gt;'
+-			backend.dahdigenconf()
+-			'&lt;/p&gt;&lt;/tt&gt;'
+-
++		'&lt;tt&gt;&lt;p&gt;'
++		backend.dahdigenconf()
++		'&lt;/p&gt;&lt;/tt&gt;'
+ 		footer()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000411.html">[Destar-dev] r857 - trunk
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#412">[ date ]</a>
+              <a href="thread.html#412">[ thread ]</a>
+              <a href="subject.html#412">[ subject ]</a>
+              <a href="author.html#412">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

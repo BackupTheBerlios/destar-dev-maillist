@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] [Bug #9117] Wrong single select variables html	generation for configlets
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20%5BBug%20%239117%5D%20Wrong%20single%20select%20variables%20html%0A%09generation%20for%20configlets&In-Reply-To=%3C200707251554.l6PFstX0015115%40unicorn.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000278.html">
+   <LINK REL="Next"  HREF="000280.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] [Bug #9117] Wrong single select variables html	generation for configlets</H1>
+    <B>admin at berlios.de</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20%5BBug%20%239117%5D%20Wrong%20single%20select%20variables%20html%0A%09generation%20for%20configlets&In-Reply-To=%3C200707251554.l6PFstX0015115%40unicorn.berlios.de%3E"
+       TITLE="[Destar-dev] [Bug #9117] Wrong single select variables html	generation for configlets">admin at berlios.de
+       </A><BR>
+    <I>Wed Jul 25 17:54:55 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000278.html">[Destar-dev] Migration to asterisk 1.4
+</A></li>
+        <LI>Next message: <A HREF="000280.html">[Destar-dev] r760 - in trunk: . static static/themes	static/themes/destar
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#279">[ date ]</a>
+              <a href="thread.html#279">[ thread ]</a>
+              <a href="subject.html#279">[ subject ]</a>
+              <a href="author.html#279">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Bug #9117, was updated on 2006-Oct-13 19:58
+Here is a current snapshot of the bug.
+
+Project: DeStar
+Category: None
+Status: Open
+Resolution: None
+Bug Group: None
+Priority: 7
+Submitted by: santiago
+Assigned to : none
+Summary: Wrong single select variables html generation for configlets
+
+Details: the most of configlets have (&quot;value&quot;, &quot;Name&quot;) for each choice variable, but html code is using the Name as value, eg, for cfg_app_callfw.py:
+
+&lt;option value=&quot;Call Forwarding if Busy&quot;&gt;Call Forwarding if Busy&lt;/option&gt;
+
+&lt;option value=&quot;Call Forwarding if Timeout/Unavailable&quot;&gt;Call Forwarding if Timeout/Unavailable&lt;/option&gt;
+
+It should be fixed in ConfigHelper.py
+
+Follow-Ups:
+
+Date: 2007-Jul-25 10:54
+By: alerios
+
+Comment:
+Also, when the variables name doesn't use the _() function, the value field is ignored, and numbers are used instead.
+
+options=[('fxs_ls', _('loopstart')), ('fxs_ks', _('kewlstart'))]),
+
+**html without _():
+&lt;option selected=&quot;selected&quot; value=&quot;0&quot;&gt;loopstart&lt;/option&gt;
+&lt;option value=&quot;1&quot;&gt;kewlstart&lt;/option&gt;
+---
+options=[('fxs_ls', 'loopstart'), ('fxs_ks', 'kewlstart')]),
+
+**html with _():
+&lt;option selected=&quot;selected&quot; value=&quot;fxs_ls&quot;&gt;loopstart&lt;/option&gt;
+&lt;option value=&quot;fxs_ks&quot;&gt;kewlstart&lt;/option&gt;
+--
+options=[('fxs_ls', _('loopstart')), ('fxs_ks', _('kewlstart'))]),
+-------------------------------------------------------
+
+For detailed info, follow this link:
+<A HREF="http://developer.berlios.de/bugs/?func=detailbug&amp;bug_id=9117&amp;group_id=2112">http://developer.berlios.de/bugs/?func=detailbug&amp;bug_id=9117&amp;group_id=2112</A>
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000278.html">[Destar-dev] Migration to asterisk 1.4
+</A></li>
+	<LI>Next message: <A HREF="000280.html">[Destar-dev] r760 - in trunk: . static static/themes	static/themes/destar
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#279">[ date ]</a>
+              <a href="thread.html#279">[ thread ]</a>
+              <a href="subject.html#279">[ subject ]</a>
+              <a href="author.html#279">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

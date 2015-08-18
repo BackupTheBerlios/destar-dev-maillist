@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r713 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r713%20-%20trunk&In-Reply-To=%3C200706132108.l5DL8M9A007042%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000223.html">
+   <LINK REL="Next"  HREF="000229.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r713 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r713%20-%20trunk&In-Reply-To=%3C200706132108.l5DL8M9A007042%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r713 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Jun 13 23:08:23 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000223.html">[Destar-dev] r712 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000229.html">[Destar-dev] r714 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#224">[ date ]</a>
+              <a href="thread.html#224">[ thread ]</a>
+              <a href="subject.html#224">[ subject ]</a>
+              <a href="author.html#224">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-13 23:08:22 +0200 (Wed, 13 Jun 2007)
+New Revision: 713
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_trunk_iax.py
+Log:
+* cfg_trunk_iax.py: added remote port setting
+* cfg_trunk_iax.py: added registry option
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-13 21:02:31 UTC (rev 712)
++++ trunk/CHANGELOG.txt	2007-06-13 21:08:22 UTC (rev 713)
+@@ -1,5 +1,7 @@
+ 2007-06-13:
+ * cfg_phone_queue: string Spanish to English
++* cfg_trunk_iax.py: added remote port setting
++* cfg_trunk_iax.py: added registry option
+ 
+ 2007-06-12:
+ * Fixed bug in Dialouts. Added fields to change Caller ID.
+
+Modified: trunk/cfg_trunk_iax.py
+===================================================================
+--- trunk/cfg_trunk_iax.py	2007-06-13 21:02:31 UTC (rev 712)
++++ trunk/cfg_trunk_iax.py	2007-06-13 21:08:22 UTC (rev 713)
+@@ -40,11 +40,21 @@
+ 				title=_(&quot;IAX host&quot;),
+ 				len=80),
+ 
++			VarType(&quot;port&quot;,
++				title=_(&quot;IAX2 remote port&quot;),
++				type=&quot;int&quot;,
++				default=4569,
++				len=5),				
++
+ 			VarType(&quot;bandwidth&quot;,
+ 				title=_(&quot;Bandwith&quot;),
+ 				type=&quot;choice&quot;,
+ 				len=25,
+ 				options=[('low',_(&quot;Low&quot;)),('high', _(&quot;High&quot;))]),
++
++			VarType(&quot;register&quot;,
++				title=_(&quot;Register with remote host?&quot;),
++				type=&quot;bool&quot;),
+ 		
+ 			VarType(&quot;authLabel&quot;,
+ 				title=_(&quot;Authentication&quot;),
+@@ -171,6 +181,19 @@
+ 		self.createIncomingContext()
+ 		
+ 		c = AstConf(&quot;iax.conf&quot;)
++
++		if self.register:
++			c.setSection(&quot;general&quot;)
++			registerstr = &quot;register =&gt; %s&quot; % self.name
++			if self.auth == &quot;plain&quot;:
++				registerstr += &quot;:%s&quot; % self.pw
++			# TODO: registration using rsa keys 
++			#elif self.auth = &quot;rsa&quot;:
++			registerstr += &quot;@%s&quot; % self.host
++			if self.port:
++				registerstr += &quot;:%s&quot; % self.port
++			c.append(registerstr)
++
+ 		if not c.hasSection(self.name):
+ 			c.setSection(self.name)
+ 			c.append(&quot;type=friend&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000223.html">[Destar-dev] r712 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000229.html">[Destar-dev] r714 - in branches/0.2.X: . po
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#224">[ date ]</a>
+              <a href="thread.html#224">[ thread ]</a>
+              <a href="subject.html#224">[ subject ]</a>
+              <a href="author.html#224">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

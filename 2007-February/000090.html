@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r600 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r600%20-%20trunk&In-Reply-To=%3C200702280445.l1S4jfCh021028%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000089.html">
+   <LINK REL="Next"  HREF="000091.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r600 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r600%20-%20trunk&In-Reply-To=%3C200702280445.l1S4jfCh021028%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r600 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Feb 28 05:45:41 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000089.html">[Destar-dev] [Bug #10513] Not updated/deleted dependencies
+</A></li>
+        <LI>Next message: <A HREF="000091.html">[Destar-dev] r601 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#90">[ date ]</a>
+              <a href="thread.html#90">[ thread ]</a>
+              <a href="subject.html#90">[ subject ]</a>
+              <a href="author.html#90">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-02-28 05:45:39 +0100 (Wed, 28 Feb 2007)
+New Revision: 600
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/language.py
+Log:
+* languages.py: installing the gettext classes using unicode
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-02-26 23:04:22 UTC (rev 599)
++++ trunk/CHANGELOG.txt	2007-02-28 04:45:39 UTC (rev 600)
+@@ -1,3 +1,6 @@
++2007-02-27:
++* languages.py: installing the gettext classes using unicode
++
+ 2007-02-26:
+ * Fixed &quot;cancel&quot; option in page_login
+ * cfg_dialout_normal: adding r Dial option if no Authenticate() is used
+
+Modified: trunk/language.py
+===================================================================
+--- trunk/language.py	2007-02-26 23:04:22 UTC (rev 599)
++++ trunk/language.py	2007-02-28 04:45:39 UTC (rev 600)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2005 by Holger Schurig
+ #
+@@ -47,7 +47,7 @@
+ 			translation = gettext.translation('destar',localesdir,languages=[lang])
+ 	except IOError:
+ 		translation = gettext.NullTranslations()
+-	translation.install()
++	translation.install(unicode=True)
+ 
+ def desactivateGettext():
+ 	global _
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000089.html">[Destar-dev] [Bug #10513] Not updated/deleted dependencies
+</A></li>
+	<LI>Next message: <A HREF="000091.html">[Destar-dev] r601 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#90">[ date ]</a>
+              <a href="thread.html#90">[ thread ]</a>
+              <a href="subject.html#90">[ subject ]</a>
+              <a href="author.html#90">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

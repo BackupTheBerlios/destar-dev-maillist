@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r595 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-February/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r595%20-%20trunk&In-Reply-To=%3C200702222302.l1MN2xEM011937%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000080.html">
+   <LINK REL="Next"  HREF="000082.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r595 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r595%20-%20trunk&In-Reply-To=%3C200702222302.l1MN2xEM011937%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r595 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Feb 23 00:02:59 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000080.html">[Destar-dev] r594 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000082.html">[Destar-dev] [Bug #10469] zaphfc trunk config doesn't work
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#81">[ date ]</a>
+              <a href="thread.html#81">[ thread ]</a>
+              <a href="subject.html#81">[ subject ]</a>
+              <a href="author.html#81">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-02-23 00:02:58 +0100 (Fri, 23 Feb 2007)
+New Revision: 595
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_main.ptl
+   trunk/page_stats_cdr.ptl
+   trunk/page_stats_dialouts.ptl
+Log:
+* Fixed statistics displaying
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-02-22 04:01:56 UTC (rev 594)
++++ trunk/CHANGELOG.txt	2007-02-22 23:02:58 UTC (rev 595)
+@@ -1,3 +1,6 @@
++2007-02-22:
++* Fixed statistics displaying
++
+ 2007-02-21:
+ * Added new configlet for configure some IAX general options.
+ 
+
+Modified: trunk/page_main.ptl
+===================================================================
+--- trunk/page_main.ptl	2007-02-22 04:01:56 UTC (rev 594)
++++ trunk/page_main.ptl	2007-02-22 23:02:58 UTC (rev 595)
+@@ -64,9 +64,7 @@
+ 		# Import all cfg_*.py files once when the module loads.
+ 		for s in os.listdir(backend.CONFIGLETS_DIR):
+ 			#continue
+-			if not s.startswith('page_main') and not s.startswith('page_user') \
+-			and not s.startswith('page_login') and not s.startswith('page_admin') \
+-			and not s.startswith('page_logout') and not s.startswith('page_config') :
++			if not s.startswith('page_'):
+ 				continue
+ 			m = None
+ 			if s.endswith('.ptl'):
+
+Modified: trunk/page_stats_cdr.ptl
+===================================================================
+--- trunk/page_stats_cdr.ptl	2007-02-22 04:01:56 UTC (rev 594)
++++ trunk/page_stats_cdr.ptl	2007-02-22 23:02:58 UTC (rev 595)
+@@ -315,5 +315,5 @@
+ 
+ 	def _q_index [plain] (self):
+ 		header(self._q_desc, scripts=[formScript])
+-		cdrForm(request)
++		cdrForm(self.request)
+ 		footer()
+
+Modified: trunk/page_stats_dialouts.ptl
+===================================================================
+--- trunk/page_stats_dialouts.ptl	2007-02-22 04:01:56 UTC (rev 594)
++++ trunk/page_stats_dialouts.ptl	2007-02-22 23:02:58 UTC (rev 595)
+@@ -188,7 +188,7 @@
+ 	def _q_index [plain] (self):
+ 		header(self._q_desc)
+ 		if pychart_exists:
+-			cdrForm(request)
++			cdrForm(self.request)
+ 		else:
+ 			_(&quot;You need to install pychart and use a cdr with sqlite to get these statistics&quot;)
+ 		footer()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000080.html">[Destar-dev] r594 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000082.html">[Destar-dev] [Bug #10469] zaphfc trunk config doesn't work
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#81">[ date ]</a>
+              <a href="thread.html#81">[ thread ]</a>
+              <a href="subject.html#81">[ subject ]</a>
+              <a href="author.html#81">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,267 @@
+From vernondcole at gmail.com  Mon May  5 18:50:22 2008
+From: vernondcole at gmail.com (Vernon Cole)
+Date: Mon, 5 May 2008 10:50:22 -0600
+Subject: [Destar-dev] Python 2.5 (or 2.6) and asterisk 1.6 support
+Message-ID: <b7eb4a700805050950h374c05f0va34ef4bff4cf04f1@mail.gmail.com>
+
+Hello, all:
+
+You have never heard of me before, so let me introduce myself. I am Vernon
+Cole. I have been using asterisk for about 3 years now (have unplugged the
+land line at my home) and python for 5 years. I have been searching for
+something better than Centos and FreePBX, and I think that you have it. I
+really like the idea of destar, because it 1) is on the Ubuntu distro, and
+2) the user interaction is written in python.
+
+I have installed destar on a stock ubuntu heron machine which is my home
+PBX, and now have it working, after doing enough google searching to find
+the correct fixes.
+
+There is a discussion happening now on
+https://bugs.launchpad.net/bugs/82286
+where many people are having trouble with DeStar requiring python 2.4.
+(Python 2.5 is a better idea because it already has sqlite3 built in, as
+does asterisk 1.6.)
+
+I also notice that asterisk 1.4 from the ubuntu distro complains that destar
+is sending out depreciated commands.
+
+I have also set up another environment with development trunk versions of
+asterisk 1.6, python 2.6, and DeStar on a test computer.  Is anyone already
+working on new version support? I don't want to re-invent a wheel if someone
+is already chiseling on a new version. Where is this effort at? What should
+I do to help?
+--
+Vernon Cole
+Software Engineer
+Wendover, Nevada, USA
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://lists.berlios.de/pipermail/destar-dev/attachments/20080505/b59310fe/attachment.html>
+
+From alejandro.rios at avatar.com.co  Sat May 10 01:41:39 2008
+From: alejandro.rios at avatar.com.co (Alejandro Rios P.)
+Date: Fri, 9 May 2008 18:41:39 -0500
+Subject: [Destar-dev] Python 2.5 (or 2.6) and asterisk 1.6 support
+In-Reply-To: <b7eb4a700805050950h374c05f0va34ef4bff4cf04f1@mail.gmail.com>
+References: <b7eb4a700805050950h374c05f0va34ef4bff4cf04f1@mail.gmail.com>
+Message-ID: <20080509234139.GF4014@temporal>
+
+Hello Vernon.
+
+We are glad you have worked with destar and made yourself a positive
+opinion about it. We also think destar is a great alternative to killer
+apps like freepbx, and we keep using and developing destar every day in
+our company, Avatar Ltd.
+
+Anyway, public development of Destar have been stalled for a while, not
+because of its inactivity, but because of our limited time to commit to
+the berlios svn the changes we make to the code.
+
+We work with debian-etch in our installations, so we haven't really
+worked on porting the code to work with python-2.5 and newer versions of
+quixote.
+
+So, wellcome, and feel free to start working on that matter.
+
+Regards.
+
+On Mon, May 05, 2008 at 10:50:22AM -0600, Vernon Cole wrote:
+> Hello, all:
+> 
+> You have never heard of me before, so let me introduce myself. I am Vernon
+> Cole. I have been using asterisk for about 3 years now (have unplugged the
+> land line at my home) and python for 5 years. I have been searching for
+> something better than Centos and FreePBX, and I think that you have it. I
+> really like the idea of destar, because it 1) is on the Ubuntu distro, and
+> 2) the user interaction is written in python.
+> 
+> I have installed destar on a stock ubuntu heron machine which is my home
+> PBX, and now have it working, after doing enough google searching to find
+> the correct fixes.
+> 
+> There is a discussion happening now on
+> https://bugs.launchpad.net/bugs/82286
+> where many people are having trouble with DeStar requiring python 2.4.
+> (Python 2.5 is a better idea because it already has sqlite3 built in, as
+> does asterisk 1.6.)
+> 
+> I also notice that asterisk 1.4 from the ubuntu distro complains that destar
+> is sending out depreciated commands.
+> 
+> I have also set up another environment with development trunk versions of
+> asterisk 1.6, python 2.6, and DeStar on a test computer.  Is anyone already
+> working on new version support? I don't want to re-invent a wheel if someone
+> is already chiseling on a new version. Where is this effort at? What should
+> I do to help?
+> --
+> Vernon Cole
+> Software Engineer
+> Wendover, Nevada, USA
+
+> _______________________________________________
+> Destar-dev mailing list
+> Destar-dev at lists.berlios.de
+> https://lists.berlios.de/mailman/listinfo/destar-dev
+
+
+
+From tzafrir.cohen at xorcom.com  Sat May 10 02:21:05 2008
+From: tzafrir.cohen at xorcom.com (Tzafrir Cohen)
+Date: Sat, 10 May 2008 03:21:05 +0300
+Subject: [Destar-dev] Python 2.5 (or 2.6) and asterisk 1.6 support
+In-Reply-To: <20080509234139.GF4014@temporal>
+References: <b7eb4a700805050950h374c05f0va34ef4bff4cf04f1@mail.gmail.com>
+	<20080509234139.GF4014@temporal>
+Message-ID: <20080510002105.GA27523@xorcom.com>
+
+On Fri, May 09, 2008 at 06:41:39PM -0500, Alejandro Rios P. wrote:
+> Hello Vernon.
+> 
+> We are glad you have worked with destar and made yourself a positive
+> opinion about it. We also think destar is a great alternative to killer
+> apps like freepbx, and we keep using and developing destar every day in
+> our company, Avatar Ltd.
+> 
+> Anyway, public development of Destar have been stalled for a while, not
+> because of its inactivity, but because of our limited time to commit to
+> the berlios svn the changes we make to the code.
+> 
+> We work with debian-etch in our installations, so we haven't really
+> worked on porting the code to work with python-2.5 and newer versions of
+> quixote.
+> 
+> So, wellcome, and feel free to start working on that matter.
+
+I believe it is quite a good time to do that if you don't want to miss
+Lenny.
+
+There are hosts of interesting features in the trunk (resolved most of
+my immediate usability issues last time I looked, as the readers of this
+list might recall).
+
+-- 
+               Tzafrir Cohen
+icq#16849755              jabber:tzafrir.cohen at xorcom.com
++972-50-7952406           mailto:tzafrir.cohen at xorcom.com
+http://www.xorcom.com  iax:guest at local.xorcom.com/tzafrir
+
+
+From vernondcole at gmail.com  Wed May 14 17:54:54 2008
+From: vernondcole at gmail.com (Vernon Cole)
+Date: Wed, 14 May 2008 09:54:54 -0600
+Subject: [Destar-dev] Python 2.5 (or 2.6) and asterisk 1.6 support
+In-Reply-To: <200805130843.44214.h.schurig@mn-solutions.de>
+References: <b7eb4a700805050950h374c05f0va34ef4bff4cf04f1@mail.gmail.com>
+	<20080509234139.GF4014@temporal>
+	<200805130843.44214.h.schurig@mn-solutions.de>
+Message-ID: <b7eb4a700805140854v6536fa7cx2db03147b92ba8f5@mail.gmail.com>
+
+This is sounding interesting.  I am willing to do the work to update to a
+newer python, but it would be MUCH more productive to use a current source.
+If svn is the problem, an upgrade to something more modern may be in order.
+I have started messing with Bazaar which is a distributed source control
+system (used by Canonical and Ubuntu) and have never heard of git. I am open
+minded to anything that works.
+--
+Vernon
+
+(Holger:
+  Not even an old Pentium II in a corner at home? Some of us addicts cannot
+live without Asterisk!
+--
+VC)
+
+On Tue, May 13, 2008 at 12:43 AM, Holger Schurig <h.schurig at mn-solutions.de>
+wrote:
+
+> Hi !
+>
+> I'm still alive (yet not using Asterisk anymore) :-)
+>
+> > Anyway, public development of Destar have been stalled for a
+> > while, not because of its inactivity, but because of our
+> > limited time to commit to the berlios svn the changes we make
+> > to the code.
+>
+> Do you have an internal SCM?  If you prefer to use git, maybe it
+> would be beneficial for DeStar to switch to git, too.
+>
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://lists.berlios.de/pipermail/destar-dev/attachments/20080514/7be6c1e7/attachment.html>
+
+From tzafrir.cohen at xorcom.com  Wed May 14 18:04:44 2008
+From: tzafrir.cohen at xorcom.com (Tzafrir Cohen)
+Date: Wed, 14 May 2008 19:04:44 +0300
+Subject: [Destar-dev] Python 2.5 (or 2.6) and asterisk 1.6 support
+In-Reply-To: <b7eb4a700805140854v6536fa7cx2db03147b92ba8f5@mail.gmail.com>
+References: <b7eb4a700805050950h374c05f0va34ef4bff4cf04f1@mail.gmail.com>
+	<20080509234139.GF4014@temporal>
+	<200805130843.44214.h.schurig@mn-solutions.de>
+	<b7eb4a700805140854v6536fa7cx2db03147b92ba8f5@mail.gmail.com>
+Message-ID: <20080514160444.GY27523@xorcom.com>
+
+On Wed, May 14, 2008 at 09:54:54AM -0600, Vernon Cole wrote:
+> This is sounding interesting.  I am willing to do the work to update to a
+> newer python, but it would be MUCH more productive to use a current source.
+
+Let's put it this way: what are the show-stoppers for basing a 0.3.0
+release off current svn trunk?
+
+Some potential release goals:
+
+* Support for Asterisk 1.4
+* Python 2.5
+
+Some minor points to fight all day about:
+- What about support for 1.6?
+- When is it safe to deprecate 1.0? 1.2?
+- Version control system to use
+
+> (Holger:
+>   Not even an old Pentium II in a corner at home? Some of us addicts cannot
+> live without Asterisk!
+
+What's the smallest device DeStar has been known to run on?
+
+-- 
+               Tzafrir Cohen
+icq#16849755              jabber:tzafrir.cohen at xorcom.com
++972-50-7952406           mailto:tzafrir.cohen at xorcom.com
+http://www.xorcom.com  iax:guest at local.xorcom.com/tzafrir
+
+
+From tzafrir.cohen at xorcom.com  Thu May 15 10:24:20 2008
+From: tzafrir.cohen at xorcom.com (Tzafrir Cohen)
+Date: Thu, 15 May 2008 11:24:20 +0300
+Subject: [Destar-dev] asterisk 1.6 proofness: |
+Message-ID: <20080515082420.GF27523@xorcom.com>
+
+Hi
+
+Too lazy to grep the code and to log into the bug tracker. I noticed
+that my generated extensions.conf has a few '|' that are used as
+separators. In 1.6 the ',' is no longer converted to '|'. Rather, the
+separator is ','. A '|' is left as-is.
+
+In most cases simply replacing pipes with commas in extensions.conf will
+do the trick and also work just as well in older version. In the few
+examples I saw it worked. e.g:
+
+[pbx1]
+;Virtual PBX
+exten=0,1,MixMonitor(${TIMESTAMP}.wav49|W(0))
+exten=0,2,Queue(queue1|Tth)
+exten=queue1,1,MixMonitor(${TIMESTAMP}.wav49|W(0))
+exten=queue1,2,Queue(queue1|Tth)
+
+Having a comma here would have worked as well in 1.2 and 1.4 .
+
+-- 
+               Tzafrir Cohen
+icq#16849755              jabber:tzafrir.cohen at xorcom.com
++972-50-7952406           mailto:tzafrir.cohen at xorcom.com
+http://www.xorcom.com  iax:guest at local.xorcom.com/tzafrir
+
+

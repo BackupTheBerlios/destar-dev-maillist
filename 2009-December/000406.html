@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r852 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r852%20-%20trunk&In-Reply-To=%3C200912201801.nBKI1Rdt020439%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000405.html">
+   <LINK REL="Next"  HREF="000407.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r852 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r852%20-%20trunk&In-Reply-To=%3C200912201801.nBKI1Rdt020439%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r852 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 20 19:01:27 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000405.html">[Destar-dev] r851 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000407.html">[Destar-dev] r853 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#406">[ date ]</a>
+              <a href="thread.html#406">[ thread ]</a>
+              <a href="subject.html#406">[ subject ]</a>
+              <a href="author.html#406">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-20 19:01:22 +0100 (Sun, 20 Dec 2009)
+New Revision: 852
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_user_phonebook.ptl
+Log:
+* page_user_phonebook.ptl: catch an AttributeException.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-20 17:49:04 UTC (rev 851)
++++ trunk/CHANGELOG.txt	2009-12-20 18:01:22 UTC (rev 852)
+@@ -3,6 +3,7 @@
+ * page_admin_pbxstate.ptl: changed table distribution.
+ * cfg_phone_ext.py: in 1.6, set only accepts one variable at a time.
+ * cfg_opt_voicemail.py: change colon for pipe.
++* page_user_phonebook.ptl: catch an AttributeException.
+ 
+ 2009-12-16
+ * cfg_opt_pbx.py, cfg_app_*: separate context for all apps.
+
+Modified: trunk/page_user_phonebook.ptl
+===================================================================
+--- trunk/page_user_phonebook.ptl	2009-12-20 17:49:04 UTC (rev 851)
++++ trunk/page_user_phonebook.ptl	2009-12-20 18:01:22 UTC (rev 852)
+@@ -63,9 +63,12 @@
+ 			if o.pbx == self.session.pbx or self.session.level &gt;= 3 :
+ 				'&lt;tr&gt;'
+ 				'&lt;td&gt;&lt;a href=&quot;../dial/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o.ext, o.ext)
+-				if o.calleridname:
+-					'&lt;td&gt;&lt;a href=&quot;../dial/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o.ext, o.calleridname)
+-				else:
++				try:
++					if o.calleridname:
++						'&lt;td&gt;&lt;a href=&quot;../dial/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o.ext, o.calleridname)
++					else:
++						'&lt;td&gt;&lt;a href=&quot;../dial/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o.ext, o.name)
++				except:
+ 					'&lt;td&gt;&lt;a href=&quot;../dial/%s&quot;&gt;%s&lt;/a&gt;&lt;/td&gt;' % (o.ext, o.name)
+ 				'&lt;/tr&gt;'
+ 		'&lt;/table&gt;'
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000405.html">[Destar-dev] r851 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000407.html">[Destar-dev] r853 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#406">[ date ]</a>
+              <a href="thread.html#406">[ thread ]</a>
+              <a href="subject.html#406">[ subject ]</a>
+              <a href="author.html#406">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

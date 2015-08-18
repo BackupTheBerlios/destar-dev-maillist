@@ -1,0 +1,85 @@
+From admin at berlios.de  Wed Feb 18 17:15:23 2009
+From: admin at berlios.de (admin at berlios.de)
+Date: Wed, 18 Feb 2009 17:15:23 +0100 (CET)
+Subject: [Destar-dev] [Bug #15288] Unable to add trunk: ISDN using CAPI,
+	outgoing
+Message-ID: <200902181615.n1IGFNJv009865@unicorn.berlios.de>
+
+Bug #15288, was updated on 2009-Feb-18 17:15
+Here is a current snapshot of the bug.
+
+Project: DeStar
+Category: web interface
+Status: Open
+Resolution: None
+Bug Group: None
+Priority: 5
+Submitted by: hhoef
+Assigned to : none
+Summary: Unable to add trunk: ISDN using CAPI, outgoing
+
+Details: When I submit the form I get:
+
+Traceback (most recent call last):
+  File "/var/lib/python-support/python2.5/quixote/publish.py", line 522, in process_request
+    output = self.try_publish(request, env.get('PATH_INFO', ''))
+  File "/var/lib/python-support/python2.5/quixote/publish.py", line 444, in try_publish
+    self.namespace_stack)
+  File "/var/lib/python-support/python2.5/quixote/publish.py", line 697, in _traverse_url
+    namespace_stack)
+  File "/var/lib/python-support/python2.5/quixote/publish.py", line 802, in _get_component
+    object = container._q_lookup(request, component)
+  File "/usr/share/destar/python/ConfigHelper.ptl", line 125, in lookupConfiglets
+    new=True)
+  File "/usr/share/destar/python/ConfigHelper.ptl", line 338, in configletsForm
+    checkConfig()
+  File "/usr/share/destar/python/ConfigHelper.ptl", line 191, in checkConfig
+    ret = obj.checkConfig()
+  File "/usr/share/destar/python/configlets.py", line 876, in checkConfig
+    if self.contextin == 'phone' and not self.phone:
+  File "/usr/share/destar/python/configlets.py", line 510, in __getattr__
+    raise AttributeError
+AttributeError
+
+Form:
+_submit         Submit
+ext             
+msn             1234567
+name            kpn
+
+Cookies:
+
+Environment:
+ACCEPT_ENCODING gzip,deflate
+CONTENT_LENGTH  40
+CONTENT_TYPE    application/x-www-form-urlencoded
+GATEWAY_INTERFACE CGI/1.1
+HTTP_ACCEPT     text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+HTTP_ACCEPT_CHARSET ISO-8859-1,utf-8;q=0.7,*;q=0.7
+HTTP_ACCEPT_ENCODING gzip,deflate
+HTTP_ACCEPT_LANGUAGE en-us,en;q=0.5
+HTTP_CONNECTION keep-alive
+HTTP_COOKIE     
+HTTP_HOST       192.168.0.246:8080
+HTTP_KEEP_ALIVE 300
+HTTP_REFERER    http://192.168.0.246:8080/config/add/CfgTrunkCapi
+HTTP_USER_AGENT Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6 (.NET CLR 3.5.30729)
+PATH_INFO       /config/add/CfgTrunkCapi
+QUERY_STRING    
+REMOTE_ADDR     192.168.0.32
+REMOTE_PORT     2744
+REQUEST_METHOD  POST
+REQUEST_URI     /config/add/CfgTrunkCapi
+SCRIPT_FILENAME 
+SCRIPT_NAME     
+SERVER_NAME     192.168.0.246
+SERVER_PORT     8080
+SERVER_PROTOCOL HTTP/1.1
+SERVER_SOFTWARE page_main
+
+If you need more logs, please let me know.
+
+For detailed info, follow this link:
+http://developer.berlios.de/bugs/?func=detailbug&bug_id=15288&group_id=2112
+
+

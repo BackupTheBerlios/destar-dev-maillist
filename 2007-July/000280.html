@@ -1,0 +1,627 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r760 - in trunk: . static static/themes	static/themes/destar
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r760%20-%20in%20trunk%3A%20.%20static%20static/themes%0A%09static/themes/destar&In-Reply-To=%3C200707261454.l6QEsVqB021815%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000279.html">
+   <LINK REL="Next"  HREF="000281.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r760 - in trunk: . static static/themes	static/themes/destar</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r760%20-%20in%20trunk%3A%20.%20static%20static/themes%0A%09static/themes/destar&In-Reply-To=%3C200707261454.l6QEsVqB021815%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r760 - in trunk: . static static/themes	static/themes/destar">alerios at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul 26 16:54:31 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000279.html">[Destar-dev] [Bug #9117] Wrong single select variables html	generation for configlets
+</A></li>
+        <LI>Next message: <A HREF="000281.html">[Destar-dev] r761 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#280">[ date ]</a>
+              <a href="thread.html#280">[ thread ]</a>
+              <a href="subject.html#280">[ subject ]</a>
+              <a href="author.html#280">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-26 16:54:30 +0200 (Thu, 26 Jul 2007)
+New Revision: 760
+
+Added:
+   trunk/static/themes/
+   trunk/static/themes/avatar/
+   trunk/static/themes/destar/
+   trunk/static/themes/destar/css/
+   trunk/static/themes/destar/imgs/
+Removed:
+   trunk/static/css/
+   trunk/static/imgs/
+   trunk/static/layout.css
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+   trunk/Templates.ptl
+   trunk/backend.py
+   trunk/cfg_app_meetme.py
+   trunk/cfg_opt_settings.py
+   trunk/cfg_trunk_zap.py
+   trunk/cfg_trunk_zappri.py
+Log:
+Sorry for the big commit:
+
+* Now header title is an option on CfgOptSettings.
+* Fixed some int values expected where strings types found.
+* Added Themes support in Templates.ptl and CfgOptSettings.
+* Added FileWidgwt to ConfigHelper and option to upload a logo image on CfgOptSettings.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-07-11 22:23:07 UTC (rev 759)
++++ trunk/CHANGELOG.txt	2007-07-26 14:54:30 UTC (rev 760)
+@@ -1,3 +1,9 @@
++2007-07-26:
++* Now header title is an option on CfgOptSettings.
++* Fixed some int values expected where strings types found.
++* Added Themes support in Templates.ptl and CfgOptSettings.
++* Added FileWidgwt to ConfigHelper and option to upload a logo image on CfgOptSettings.
++
+ 2007-07-10:
+ * Improved call-forwarding applications:
+ 	- Added a menu and made asterisk say the digits pressed.
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-07-11 22:23:07 UTC (rev 759)
++++ trunk/ConfigHelper.ptl	2007-07-26 14:54:30 UTC (rev 760)
+@@ -33,7 +33,16 @@
+ 	def render_content(self):
+ 		return _(self.value)
+ 
++class FileHintWidget(FileWidget):
++	&quot;&quot;&quot;Widget for uploading files, but showing current file on hint
++	&quot;&quot;&quot;
+ 
++	def render_hint(self, hint):
++		if hint:
++			return htmltext('&lt;div class=&quot;hint&quot;&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/div&gt;') % (hint,hint)
++		else:
++			return ''
++
+ class LabelWidget(Widget):
+ 	&quot;&quot;&quot;Widget for output of a simple label, useful for grouping.
+ 	&quot;&quot;&quot;
+@@ -177,7 +186,7 @@
+ 			#print &quot;0&quot;, _v, v.name, v.type
+ 			if v.type==&quot;bool&quot; and not _v:
+ 				_v = False
+-			elif v.type==&quot;string&quot; and _v==None:
++			elif (v.type==&quot;string&quot; or v.type==&quot;file&quot;) and _v==None:
+ 				_v = &quot;&quot;
+ 			elif type(_v) == types.ListType:
+ 				_v = ','.join(_v)
+@@ -253,7 +262,8 @@
+ 		footer()
+ 
+ 
+-	form = Form()
++	#form = Form()
++	form = Form(enctype=&quot;multipart/form-data&quot;)
+ 
+ 	if request.form.has_key('_cancel'):
+ 		return redirect(exitPath)
+@@ -288,6 +298,8 @@
+ 		
+ 		if v.type==&quot;string&quot;:
+ 			form.add(StringWidget, v.name, _v, t, v.hint, r, render_br=v.render_br, maxlength=v.len, size=min(v.size,56) )
++		elif v.type==&quot;file&quot;:
++			form.add(FileHintWidget, v.name, _v, t, v.hint, r, render_br=v.render_br, maxlength=v.len, size=min(v.size,254) )
+ 		elif v.type==&quot;text&quot;:
+ 			form.add(TextWidget,   v.name, _v, t, v.hint, r, render_br=v.render_br, rows=v.__dict__.setdefault(&quot;rows&quot;,8), cols=v.__dict__.setdefault(&quot;cols&quot;,65) )
+ 		elif v.type==&quot;choice&quot;:
+
+Modified: trunk/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-07-11 22:23:07 UTC (rev 759)
++++ trunk/Templates.ptl	2007-07-26 14:54:30 UTC (rev 760)
+@@ -23,7 +23,7 @@
+ from quixote import get_session
+ from quixote.util import get_directory_path
+ from quixote.errors import AccessError
+-import os, sys, copy
++import os, sys, copy, backend
+ 
+ from version import *
+ 
+@@ -153,22 +153,25 @@
+ # such as JavaScript.
+ def header [html] (title, menu=None, refresh=None, scripts=None):
+ 
++	header_text = backend.getConfig('CfgOptSettings','header_text', 'Asterisk/DeStar PBX')
++	web_style = backend.getConfig('CfgOptSettings','style', 'destar')
++
+ 	# Boilerplate
+   	'&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;<A HREF="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</A>&quot;&gt;\n'
+    	'&lt;html xmlns=&quot;<A HREF="http://www.w3.org/1999/xhtml">http://www.w3.org/1999/xhtml</A>&quot;&gt;\n'
+    	'&lt;head&gt;\n'
+    	if refresh:
+    		'&lt;meta http-equiv=&quot;Refresh&quot; content=&quot;%d;&quot; /&gt;\n' % refresh
+-  	'&lt;title&gt;Asterisk/DeStar PBX :: %s&lt;/title&gt;\n' % title
++  	'&lt;title&gt;%s :: %s&lt;/title&gt;\n' % (header_text, title)
+   	'&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;\n'
+   	'&lt;style type=&quot;text/css&quot; media=&quot;screen, tv, projection&quot;&gt;\n'
+-  	'	@import url(&quot;/static/css/general.css&quot;);\n' 
+-  	'	@import url(&quot;/static/css/Menu.css&quot;);\n'
++  	'	@import url(&quot;/static/themes/%s/css/general.css&quot;);\n' % web_style
++  	'	@import url(&quot;/static/themes/%s/css/Menu.css&quot;);\n' % web_style
+   	'&lt;/style&gt;\n'
+   	'&lt;!--[if lte IE 6]&gt;\n'
+   	'&lt;style type=&quot;text/css&quot; media=&quot;screen, tv, projection&quot;&gt;\n'
+-  	'	@import &quot;/static/css/Menu4IE.css&quot;;\n'
+-  	'	body { behavior:url(&quot;/static/css/ADxMenu.htc&quot;); }\n'
++  	'	@import &quot;/static/themes/%s/css/Menu4IE.css&quot;;\n' % web_style
++  	'	body { behavior:url(&quot;/static/themes/%s/css/ADxMenu.htc&quot;); }\n' % web_style
+   	'&lt;/style&gt;\n'
+   	'&lt;![endif]--&gt;\n'
+  
+@@ -180,12 +183,10 @@
+ 	'&lt;body&gt;\n'
+ 	#'&lt;body onload=&quot;window.resizeTo(800,600);&quot;&gt;'
+ 
+-
+ 	# Header
+  	'&lt;div id=&quot;wrapper&quot;&gt;\n'
+  	'	&lt;div id=&quot;header&quot;&gt;\n'
+- 	'		&lt;h1&gt;DeStar/Asterisk PBX&lt;/h1&gt;\n'
+-
++	'               &lt;h1&gt;&lt;img src=&quot;/static/imgs/logo&quot; alt=&quot;%s&quot;/&gt;&lt;/h1&gt;\n' %header_text
+ 	
+ 	# Side menu
+ 	# e[0]: priority, only needed for sorting, discarded
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-07-11 22:23:07 UTC (rev 759)
++++ trunk/backend.py	2007-07-26 14:54:30 UTC (rev 760)
+@@ -694,7 +694,7 @@
+ 	obj = configlets.configlet_tree.getConfigletsByName(clazz)
+ 	if obj is not None and len(obj) &gt; 0:
+ 		obj = obj[0]
+-		return getattr(obj, name, default)
++		return getattr(obj, str(name), default)
+ 	return default
+ 
+ # Configlets can't import the Backend (because the Backend loads/imports
+
+Modified: trunk/cfg_app_meetme.py
+===================================================================
+--- trunk/cfg_app_meetme.py	2007-07-11 22:23:07 UTC (rev 759)
++++ trunk/cfg_app_meetme.py	2007-07-26 14:54:30 UTC (rev 760)
+@@ -88,10 +88,10 @@
+ 		# 'P' -- always prompt pin
+ 		args=&quot;&quot;
+ 		if self.confno:
+-			args += &quot;%d&quot; % self.confno
++			args += &quot;%d&quot; % int(self.confno)
+ 		args += &quot;|d&quot;
+ 		if self.pin:
+-			args += &quot;P|%d&quot; % self.pin
++			args += &quot;P|%d&quot; % int(self.pin)
+ 		c.appendExten(self.ext, &quot;MeetMe(%s)&quot; % args)
+ 
+ 		if self.confno:
+
+Modified: trunk/cfg_opt_settings.py
+===================================================================
+--- trunk/cfg_opt_settings.py	2007-07-11 22:23:07 UTC (rev 759)
++++ trunk/cfg_opt_settings.py	2007-07-26 14:54:30 UTC (rev 760)
+@@ -20,7 +20,12 @@
+ 
+ from configlets import *
+ 
++STATIC_DIR = os.getenv('STATICPAGES_DIR','static') 
++styles = []
++for f in os.listdir('%s/themes/' % STATIC_DIR):
++	styles.append((f,f))
+ 
++
+ countries = {
+ 	&quot;at&quot;: {&quot;description&quot;: _(&quot;Austria&quot;),
+ 		&quot;ringcadence&quot;: &quot;1000,5000&quot;,
+@@ -322,16 +327,47 @@
+ 			type=&quot;choice&quot;,
+ 			options=countries_lookup),
+ 		     VarType(&quot;language&quot;,
+-			title=_(&quot;language&quot;),
++			title=_(&quot;Language&quot;),
+ 			hint=_(&quot;The language is used for voice prompts&quot;),
+ 			len=10,
+ 			type=&quot;string&quot;),
++		     VarType(&quot;header_text&quot;,
++			title=_(&quot;Header text&quot;),
++			len=20,
++			type=&quot;string&quot;),
++		     VarType(&quot;style&quot;,
++			title=_(&quot;Web UI theme to use&quot;),
++			type=&quot;choice&quot;,
++			options=styles),
++		     VarType(&quot;logo&quot;,
++			title=_(&quot;Web UI logo to use&quot;),
++			hint=&quot;/static/imgs/logo&quot;,
++			type=&quot;file&quot;,
++			optional=True),
+ 		     VarType(&quot;tapi&quot;,
+ 			title=_(&quot;Tapi Support&quot;),
+ 			type=&quot;bool&quot;,
+ 			default = True),
+ 		]
+ 
++	def checkConfig(self):
++		res = CfgOpt.checkConfig(self)
++		if res:
++			return res
++		max_size = 2000000
++		#upload = get_field('filetoupload')
++		if self.logo:
++			upload = self.logo
++			pos = upload.fp.tell()  # Save current position in file.
++			upload.fp.seek(0, 2)    # Go to end of file.
++			size = upload.fp.tell() # Get new position (which is the file size).
++			upload.fp.seek(pos, 0)  # Return to previous position.
++			upload.size = size
++			if size &gt; max_size:
++				msg = &quot;The uploaded file is too big (size=%s, max=%s bytes)&quot;
++				msg %= (size, max_size)
++				return _(&quot;File bigger than %s bytes&quot;) % max_size
++		
+ 	def createAsteriskConfig(self):
+ 		country = countries[self.country]
+ 
+@@ -357,3 +393,16 @@
+ 		if self.tapi:
+ 			needModule(&quot;app_userevent&quot;)
+ 			needModule(&quot;app_cut&quot;)
++		if self.logo:
++			upload = self.logo
++			dest = '%s/imgs/logo' % STATIC_DIR
++			out = open(dest, 'wb')
++			# Copy file in chunks to avoid using lots of memory.
++			while 1:
++				chunk = upload.read(1024 * 1024)
++				if not chunk:
++				   break
++				out.write(chunk)
++			out.close()
++			upload.close()
++		self.logo = None 
+
+Modified: trunk/cfg_trunk_zap.py
+===================================================================
+--- trunk/cfg_trunk_zap.py	2007-07-11 22:23:07 UTC (rev 759)
++++ trunk/cfg_trunk_zap.py	2007-07-26 14:54:30 UTC (rev 760)
+@@ -41,7 +41,8 @@
+ 			VarType(&quot;signalling&quot;,
+ 				title=_(&quot;Signalling type&quot;),
+ 				type=&quot;choice&quot;,
+-				options=[('fxs_ls','loopstart'),('fxs_ks', 'kewlstart')]),
++				options=[('fxs_ls', _('loopstart')),
++					('fxs_ks', _('kewlstart'))]),
+ 
+ 			VarType(&quot;group&quot;,
+ 				title=_(&quot;Callout group&quot;),
+
+Modified: trunk/cfg_trunk_zappri.py
+===================================================================
+--- trunk/cfg_trunk_zappri.py	2007-07-11 22:23:07 UTC (rev 759)
++++ trunk/cfg_trunk_zappri.py	2007-07-26 14:54:30 UTC (rev 760)
+@@ -44,12 +44,12 @@
+ 			VarType(&quot;switchtype&quot;,
+ 				title=_(&quot;Switch type&quot;),
+ 				type=&quot;choice&quot;,
+-			      	options=[('national','National ISDN 2'),
+-					('dms100', 'Nortel DMS100'),
+-					('4ess', 'AT&amp;T 4ESS'),
+-					('5ess', 'Lucent 5ESS'),
+-					('euroisdn', 'Euro ISDN'),
+-					('ni1', 'Old National ISDN 1')],
++			      	options=[('national',_('National ISDN 2')),
++					('dms100', _('Nortel DMS100')),
++					('4ess', _('AT&amp;T 4ESS')),
++					('5ess', _('Lucent 5ESS')),
++					('euroisdn', _('Euro ISDN')),
++					('ni1', _('Old National ISDN 1'))],
+ 				default=&quot;euroisdn&quot;),
+ 				
+ 			VarType(&quot;channels&quot;,
+
+Deleted: trunk/static/layout.css
+===================================================================
+--- trunk/static/layout.css	2007-07-11 22:23:07 UTC (rev 759)
++++ trunk/static/layout.css	2007-07-26 14:54:30 UTC (rev 760)
+@@ -1,245 +0,0 @@
+-/* Ideas takes from <A HREF="http://www.htmldog.com/css/default.css">http://www.htmldog.com/css/default.css</A> */
+-
+-
+-/**********************************/
+-
+-.header {
+-	font-size: 2em;
+-	font-weight: bolder;
+-}
+-
+-.header em {
+-	color: #36c;
+-	font-style: normal;
+-}
+-
+-/**********************************/
+-
+-body {
+-	color: black;
+-	background: white;
+-	font-size: 77%;
+-	padding: 0.5em 1em;
+-	margin: 0;
+-}
+-
+-body, textarea, input {
+-	font-family: arial, helvetica, sans-serif;
+-}
+-
+-:link {
+-	color: #00c;
+-}
+-
+-:visited {
+-	color: #609;
+-}
+-
+-a:active {
+-	color: #c00
+-}
+-
+-h1 {
+-	display: inline;
+-	font-size: 2em;
+-}
+-
+-h1, h1 a:link, h1 a:visited {
+-	text-decoration: none;
+-	color: #36c;
+-}
+-
+-h1 a:hover {
+-	color: #339;
+-	background-color: transparent;
+-}
+-
+-h1 a:hover em {
+-	color: #36c;
+-}
+-
+-
+-/**********************************/
+-
+-#navigation {
+-	left: 1em;
+-	background: #eef;
+-}
+-
+-.nav {
+-	position: absolute;
+-	width: 11.5em;
+-	padding-bottom: 1em;
+-}
+-
+-.nav ul {
+-	padding: 0;
+-}
+-
+-.nav li {
+-	display: inline;
+-}
+-
+-.nav a {
+-	display: block;
+-	width: 8.5em;
+-	color: #336;
+-	line-height: 1.2em;
+-	text-decoration: none;
+-	padding: 0.15em 0.5em;
+-	border: 1px #eef solid;
+-	margin: 1px 0.5em;
+-	voice-family: &quot;\&quot;}\&quot;&quot;;
+-	voice-family:inherit;
+-	width: 9.5em;
+-}
+-html&gt;body .navigation a{
+-	width: 9.5em;
+-}
+-
+-.nav ul ul a {
+-	width: 6.5em;
+-	padding: 0.15em 0.5em 0.15em 1.5em;
+-	voice-family: &quot;\&quot;}\&quot;&quot;;
+-	voice-family:inherit;
+-	width: 8.5em;
+-}
+-html&gt;body .nav ul ul a {
+-	width: 8.5em;
+-}
+-
+-.nav a:visited {
+-	color: #558;
+-}
+-
+-.nav a:hover {
+-	color: #336;
+-	background-color: #f7f7f7;
+-	text-decoration: none;
+-	border-color: #ddd;
+-}
+-
+-
+-/**********************************/
+-
+-#contentHeading {
+-	background: white;
+-	margin-bottom: 0.7em;
+-}
+-
+-#content {
+-	margin-left: 12.5em;
+-}
+-
+-.addmore h2 {
+-	margin-top: 1.5em;
+-}
+-
+-.addmore li {
+-	list-style-type: square;
+-}
+-
+-th {
+-	text-align: left;
+-}
+-
+-/**********************************/
+-
+-#config {
+-	font-size: 10pt;
+-}
+-
+-#configFile {
+-	background: #eef;
+-	padding: 0.2em;
+-	font-size: 144%;
+-	background-color: #eef;
+-}
+-
+-#configSection {
+-	margin-top: 1em;
+-}
+-
+-#configContents {
+-	margin-top: 0.5em;
+-	margin-bottom: 2em;
+-	font-family: monospace;
+-}
+-
+-#configSection {
+-	margin-top: 1em;
+-}
+-
+-#line {
+-	border: 1px solid #000;
+-	/* TODO: border-collapse, width */
+-}
+-
+-#phonename {
+-	font-weight: bold;
+-}
+-
+-#phonestate {
+-	float: right;
+-}
+-
+-/**********************************/
+-
+-form.quixote .errornotice {
+-	margin-bottom: 1em;
+-	font-weight: bold;
+-	color: #f00;
+-	float: left;
+-}
+-
+-form.quixote .title {
+-	width: 16em;
+-	float: left;
+-	margin: 0 0.5em 10px 0;
+-}
+-
+-form.quixote .required {
+-	color: #f00;
+-	padding: 0.4em;
+-}
+-
+-form.quixote .submit {
+-	clear: left;
+-}
+-
+-form.quixote .content {
+-	float: left;
+-}
+-
+-form.quixote .content .error {
+-	color: #f00;
+-	display: inline;
+-	font-weight: bold;
+-	margin-left: 1em;
+-}
+-
+-form.quixote .LabelWidget {
+-	margin-top: 1em;
+-	margin-bottom: 0.5em;
+-	font-weight: bold;
+-	font-size: 114%;
+-	color: #336;
+-	background-color: #f7f7f7;
+-}
+-
+-form.quixote .SubmitWidget {
+-	margin-top: 2em;
+-	margin-right: 1em;
+-	float: left;
+-}
+-
+-
+-
+-form.quixote div.FormTokenWidget,
+-form.quixote.div.HiddenWidget {
+-	display: none;
+-}
+-
+-form.quixote br {
+-	clear: left;
+-}
+
+Copied: trunk/static/themes/destar/css (from rev 758, trunk/static/css)
+
+Copied: trunk/static/themes/destar/imgs (from rev 758, trunk/static/imgs)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000279.html">[Destar-dev] [Bug #9117] Wrong single select variables html	generation for configlets
+</A></li>
+	<LI>Next message: <A HREF="000281.html">[Destar-dev] r761 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#280">[ date ]</a>
+              <a href="thread.html#280">[ thread ]</a>
+              <a href="subject.html#280">[ subject ]</a>
+              <a href="author.html#280">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

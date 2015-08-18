@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r768 - in branches: . alerios
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r768%20-%20in%20branches%3A%20.%20alerios&In-Reply-To=%3C200707272309.l6RN9BOK003350%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000287.html">
+   <LINK REL="Next"  HREF="000289.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r768 - in branches: . alerios</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r768%20-%20in%20branches%3A%20.%20alerios&In-Reply-To=%3C200707272309.l6RN9BOK003350%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r768 - in branches: . alerios">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sat Jul 28 01:09:11 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000287.html">[Destar-dev] r767 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000289.html">[Destar-dev] r769 - in branches/alerios: . static
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#288">[ date ]</a>
+              <a href="thread.html#288">[ thread ]</a>
+              <a href="subject.html#288">[ subject ]</a>
+              <a href="author.html#288">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-28 01:09:10 +0200 (Sat, 28 Jul 2007)
+New Revision: 768
+
+Added:
+   branches/alerios/
+Modified:
+   branches/alerios/Templates.ptl
+   branches/alerios/cfg_opt_did.py
+   branches/alerios/cfg_opt_settings.py
+   branches/alerios/manager.py
+Log:
+* New brach to do some crazy stuff.
+
+
+Copied: branches/alerios (from rev 765, trunk)
+
+Modified: branches/alerios/Templates.ptl
+===================================================================
+--- trunk/Templates.ptl	2007-07-26 22:59:05 UTC (rev 765)
++++ branches/alerios/Templates.ptl	2007-07-27 23:09:10 UTC (rev 768)
+@@ -186,7 +186,7 @@
+ 	# Header
+  	'&lt;div id=&quot;wrapper&quot;&gt;\n'
+  	'	&lt;div id=&quot;header&quot;&gt;\n'
+-	'               &lt;h1&gt;&lt;img src=&quot;/static/imgs/logo&quot; alt=&quot;%s&quot;/&gt;&lt;/h1&gt;\n' %header_text
++	'               &lt;h1&gt;&lt;img src=&quot;/static/logo&quot; alt=&quot;%s&quot;/&gt;&lt;/h1&gt;\n' %header_text
+ 	
+ 	# Side menu
+ 	# e[0]: priority, only needed for sorting, discarded
+
+Modified: branches/alerios/cfg_opt_did.py
+===================================================================
+--- trunk/cfg_opt_did.py	2007-07-26 22:59:05 UTC (rev 765)
++++ branches/alerios/cfg_opt_did.py	2007-07-27 23:09:10 UTC (rev 768)
+@@ -120,22 +120,23 @@
+ 
+ 	def createAsteriskConfig(self):
+ 		c = AstConf(&quot;extensions.conf&quot;)
+-		c.setSection(&quot;in-%s&quot; % self.trunk)
+-		c.appendExten(self.did,&quot;Set(CDR(intrunk)=%s)&quot; %  self.trunk, self.pbx)
++		context = &quot;in-%s&quot; % self.trunk
++		c.setSection(context)
++		c.appendExten(self.did,&quot;Set(CDR(intrunk)=%s)&quot; %  self.trunk, context)
+ 		if self.clid:
+ 			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(self.did,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, self.pbx)
++			c.appendExten(self.did,&quot;Set(CALLERID(name)=%s)&quot; %  self.clid, context)
+ 		if self.clidnum:
+ 			needModule(&quot;func_callerid&quot;)
+-			c.appendExten(self.did,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnum, self.pbx)
++			c.appendExten(self.did,&quot;Set(CALLERID(number)=%s)&quot; %  self.clidnum, context)
+ 		if self.contextin == 'phone' and self.phone:
+ 			import configlets
+ 			obj = configlets.configlet_tree.getConfigletByName(self.phone)
+ 			try:
+-				c.appendExten(self.did,&quot;Goto(%s,%s,1)&quot; %  (obj.pbx,self.phone), self.pbx)
++				c.appendExten(self.did,&quot;Goto(%s,%s,1)&quot; %  (obj.pbx,self.phone), context)
+ 			except AttributeError:
+ 				pass
+ 		elif self.contextin == 'ivr' and self.ivr:
+-			c.appendExten(self.did,&quot;Goto(%s,s,1)&quot; % self.ivr, self.pbx)
++			c.appendExten(self.did,&quot;Goto(%s,s,1)&quot; % self.ivr, context)
+         	elif self.contextin == 'custommap' and self.custommapdest:
+-        		c.appendExten(self.did,&quot;Goto(%s,%s,1)&quot; % (self.custommappbx, self.custommapdest), self.pbx)
++        		c.appendExten(self.did,&quot;Goto(%s,%s,1)&quot; % (self.custommappbx, self.custommapdest), context)
+
+Modified: branches/alerios/cfg_opt_settings.py
+===================================================================
+--- trunk/cfg_opt_settings.py	2007-07-26 22:59:05 UTC (rev 765)
++++ branches/alerios/cfg_opt_settings.py	2007-07-27 23:09:10 UTC (rev 768)
+@@ -341,7 +341,7 @@
+ 			options=styles),
+ 		     VarType(&quot;logo&quot;,
+ 			title=_(&quot;Web UI logo to use&quot;),
+-			hint=&quot;/static/imgs/logo&quot;,
++			hint=&quot;/static/logo&quot;,
+ 			type=&quot;file&quot;,
+ 			optional=True),
+ 		     VarType(&quot;tapi&quot;,
+@@ -394,7 +394,7 @@
+ 			needModule(&quot;app_cut&quot;)
+ 		if self.logo:
+ 			upload = self.logo
+-			dest = '%s/imgs/logo' % STATIC_DIR
++			dest = '%s/logo' % STATIC_DIR
+ 			out = open(dest, 'wb')
+ 			# Copy file in chunks to avoid using lots of memory.
+ 			while 1:
+
+Modified: branches/alerios/manager.py
+===================================================================
+--- trunk/manager.py	2007-07-26 22:59:05 UTC (rev 765)
++++ branches/alerios/manager.py	2007-07-27 23:09:10 UTC (rev 768)
+@@ -639,6 +639,26 @@
+ def reloadMoH():
+ 	return conn.action('Command', Command='moh reload')
+ 
++def getQueues():
++	return conn.action('Command', Command='show queues')
++
++def getQueue(queue):
++	qstate = {}
++	qstate['In use'] = 0
++	qstate['Unavailable'] = 0
++	qstate['Not in use'] = 0
++	qstate['Callers'] = 0
++	for s in conn.action('Command', Command='show queue %s' % queue):
++		if s.find('(In use)') &gt; 0 or s.find('(Ringing)') &gt; 0:
++			qstate['In use'] += 1
++		if s.find('(Unavailable)') &gt; 0:
++			qstate['Unavailable'] += 1
++		if s.find('(Not in use)') &gt; 0:
++			qstate['Not in use'] += 1
++		if s.find('(wait: ') &gt; 0:
++			qstate['Callers'] += 1
++	return qstate
++
+ if __name__ == '__main__':
+ 	connect()
+ 	if not isConnected():
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000287.html">[Destar-dev] r767 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000289.html">[Destar-dev] r769 - in branches/alerios: . static
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#288">[ date ]</a>
+              <a href="thread.html#288">[ thread ]</a>
+              <a href="subject.html#288">[ subject ]</a>
+              <a href="author.html#288">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,28 @@
+From bogus@does.not.exist.com  Wed Mar 14 13:25:05 2012
+From: bogus@does.not.exist.com ()
+Date: Wed, 14 Mar 2012 12:25:05 -0000
+Subject: No subject
+Message-ID: <mailman.0.1331727912.31254.destar-dev@lists.berlios.de>
+
+e.g. from phone book, from last n calls, or to be able
+to call any phone URL, e.g. sip://this at there
+
+----------------------------------------------------------------------
+You can respond by visiting: 
+http://developer.berlios.de/feature/?func=detailfeature&feature_id=2325&group_id=2112
+
+
+From bogus@does.not.exist.com  Wed Mar 14 13:25:05 2012
+From: bogus@does.not.exist.com ()
+Date: Wed, 14 Mar 2012 12:25:05 -0000
+Subject: No subject
+Message-ID: <mailman.1.1331727912.31254.destar-dev@lists.berlios.de>
+
+In this use case, Users can explore the directory of
+all extensions.
+
+----------------------------------------------------------------------
+You can respond by visiting: 
+http://developer.berlios.de/feature/?func=detailfeature&feature_id=2322&group_id=2112
+
+

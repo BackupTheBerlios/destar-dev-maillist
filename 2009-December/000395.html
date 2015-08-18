@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r841 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r841%20-%20trunk&In-Reply-To=%3C200912150229.nBF2Tbef018956%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000394.html">
+   <LINK REL="Next"  HREF="000396.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r841 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r841%20-%20trunk&In-Reply-To=%3C200912150229.nBF2Tbef018956%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r841 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec 15 03:29:37 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000394.html">[Destar-dev] r840 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000396.html">[Destar-dev] r842 - in trunk: . lang/es/LC_MESSAGES	lang/fr/LC_MESSAGES
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#395">[ date ]</a>
+              <a href="thread.html#395">[ thread ]</a>
+              <a href="subject.html#395">[ subject ]</a>
+              <a href="author.html#395">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-15 03:29:37 +0100 (Tue, 15 Dec 2009)
+New Revision: 841
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/backend.py
+Log:
+* backend.py:
+  - Add Call Forwarding loop detection
+  - Added macro-send-fax
+  - Added macro-call-forward-warning
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-15 02:09:25 UTC (rev 840)
++++ trunk/CHANGELOG.txt	2009-12-15 02:29:37 UTC (rev 841)
+@@ -5,6 +5,10 @@
+ * Fixed missing argument to originateCallExt in page_user_dial.ptl
+ * Added manager verification on page_user_phonebook.ptl
+ * Added cfg_phone_rxfax to use ReceiveFax asterisk 1.6 app.
++* backend.py:
++  - Add Call Forwarding loop detection
++  - Added macro-send-fax
++  - Added macro-call-forward-warning
+ 
+ 2009-04-16
+ * Zap -&gt; DAHDI changes from branch icom-avatar
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2009-12-15 02:09:25 UTC (rev 840)
++++ trunk/backend.py	2009-12-15 02:29:37 UTC (rev 841)
+@@ -195,8 +195,11 @@
+ 	c.append(&quot;;&quot;)
+ 	c.setSection(&quot;macro-dial-std-exten&quot;)
+ 	c.append(&quot;;&quot;)
++	c.append(&quot;; test for CF count&quot;)
++	c.append('exten=s,1,GotoIf($[${cf_count} &gt;= 2]?nocf:cfim)')
++	c.append(&quot;exten=s,n(nocf),Goto(hangup)&quot;)
+ 	c.append(&quot;; test for CFIM (Call Forwarding Immediate)&quot;)
+-	c.append(&quot;exten=s,1,Set(fw_ext=${DB(CFIM/${ARG4}/${ARG3})})&quot;)
++	c.append(&quot;exten=s,n(cfim),Set(fw_ext=${DB(CFIM/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${fw_ext}&quot; != &quot;&quot;]?fw)')
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; test for VMIM (VM Immediate)&quot;)
+@@ -210,7 +213,7 @@
+ 	c.append(&quot;; get dial seconds&quot;)
+ 	c.append(&quot;exten=s,n,Set(dsec=${DB(DSEC/${ARG4}/${ARG3})})&quot;)
+ 	c.append('exten=s,n,GotoIf($[&quot;${dsec}&quot; != &quot;&quot;]?dsecEnd)')
+-	c.append(&quot;exten=s,n,Set(dsec=45)&quot;)
++	c.append(&quot;exten=s,n,Set(dsec=25)&quot;)
+ 	c.append(&quot;exten=s,n(dsecEnd),NoOp()&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get global dial options&quot;)
+@@ -265,7 +268,9 @@
+ 	c.append(&quot;exten=s,n,PlayTones(busy)&quot;)
+ 	c.append(&quot;exten=s,n,Busy()&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.append(&quot;exten=s,n(fw),Goto(${ARG2},${fw_ext},1)&quot;)
++	c.append(&quot;exten=s,n(fw),Set(cf_count=$[${cf_count} + 1])&quot;)
++	c.append(&quot;exten=s,n,Set(CALLERID(num)=${CALLERID(num)}-${ARG3})&quot;)
++	c.append(&quot;exten=s,n,Goto(real-${ARG2},${fw_ext},1)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append('exten=s,n(vmu),Set(vmopt=u)')
+ 	c.append(&quot;exten=s,n,Macro(voicemail,${vmopt}${ARG3},${ARG4})&quot;)
+@@ -298,20 +303,45 @@
+ 	c.append(&quot;exten =&gt; s,5,Hangup()&quot;)
+ 
+ 	c.append(&quot;;&quot;)
++	c.append(&quot;; format: Macro(sendfax,filename,waittime)&quot;)
++	c.append(&quot;;&quot;)
++	needModule(&quot;app_fax&quot;)
++	context=&quot;macro-sendfax&quot;
++	c.setSection(context)
++	c.appendExten(&quot;s&quot;, &quot;Answer()&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Wait(${ARG2})&quot;, context)
++        c.appendExten(&quot;s&quot;, &quot;Set(LOCALSTATIONID=%s)&quot; getSetting('header_text', 'DeStar PBX'), context)
++        c.appendExten(&quot;s&quot;, &quot;SendFAX(${FAXFILE})&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Hangup&quot;, context)
++        c.appendExten(&quot;h&quot;, &quot;NoOp(TX: REMOTESTATIONID is ${REMOTESTATIONID})&quot;, context)
++	c.appendExten(&quot;h&quot;, &quot;UserEvent(FAX|SEND: Call ended normally)&quot;, context)
++
++	c.append(&quot;;&quot;)
+ 	c.append(&quot;; format: Macro(call-forward,type,pbx,destination,message-to-play)&quot;)
+ 	c.append(&quot;;&quot;)
+-	c.setSection(&quot;macro-call-forward&quot;)
+-	c.appendExten(&quot;s&quot;, &quot;Answer()&quot;)
+-	c.appendExten(&quot;s&quot;, &quot;Set(DB(${ARG1}/${ARG2}/${CALLERIDNUM})=${ARG3})&quot;)
+-	c.appendExten(&quot;s&quot;, &quot;Set(DB(${ARG1}_LASTNUM/${ARG2}/${CALLERIDNUM})=${ARG3})&quot;)
+-	c.appendExten(&quot;s&quot;, &quot;Playback(${ARG4})&quot;)
+-	c.appendExten(&quot;s&quot;, &quot;Playback(has-been-set-to)&quot;)
+-	c.appendExten(&quot;s&quot;, &quot;SayDigits(${ARG3})&quot;)
+-	c.appendExten(&quot;s&quot;, &quot;Wait(1)&quot;)
+-	c.appendExten(&quot;s&quot;, &quot;Playback(vm-goodbye)&quot;)
+-	c.appendExten(&quot;s&quot;, &quot;Hangup&quot;)
++	context=&quot;macro-call-forward&quot;
++	c.setSection(context)
++	c.appendExten(&quot;s&quot;, &quot;Answer()&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Set(DB(${ARG1}/${ARG2}/${CALLERIDNUM})=${ARG3})&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Set(DB(${ARG1}_LASTNUM/${ARG2}/${CALLERIDNUM})=${ARG3})&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Playback(${ARG4})&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Playback(has-been-set-to)&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;SayDigits(${ARG3})&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Wait(1)&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Playback(vm-goodbye)&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Hangup&quot;, context)
+ 
+ 	c.append(&quot;;&quot;)
++	c.append(&quot;; format: Macro(call-forward-warning,destination,message-to-play)&quot;)
++	c.append(&quot;;&quot;)
++	context=&quot;macro-call-forward-warning&quot;
++	c.setSection(context)
++	c.appendExten(&quot;s&quot;, &quot;Answer()&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Playback(${ARG2})&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;Playback(has-been-set-to)&quot;, context)
++	c.appendExten(&quot;s&quot;, &quot;SayDigits(${ARG1})&quot;, context)
++
++	c.append(&quot;;&quot;)
+ 	c.append(&quot;; format: Macro(record,filename,format,maxduration)&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.setSection(&quot;macro-record&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000394.html">[Destar-dev] r840 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000396.html">[Destar-dev] r842 - in trunk: . lang/es/LC_MESSAGES	lang/fr/LC_MESSAGES
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#395">[ date ]</a>
+              <a href="thread.html#395">[ thread ]</a>
+              <a href="subject.html#395">[ subject ]</a>
+              <a href="author.html#395">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

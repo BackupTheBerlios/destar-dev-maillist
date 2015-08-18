@@ -1,0 +1,44 @@
+From admin at berlios.de  Mon Aug 31 10:09:14 2009
+From: admin at berlios.de (admin at berlios.de)
+Date: Mon, 31 Aug 2009 00:09:14 -0800 (AKDT)
+Subject: [Destar-dev] [Bug #16199] Security problems (CVE-2008-6538 and
+	CVE-2008-6539)
+Message-ID: <200908310809.n7V89EuC010692@unicorn.berlios.de>
+
+Bug #16199, was updated on 2009-Aug-31 00:09
+Here is a current snapshot of the bug.
+
+Project: DeStar
+Category: None
+Status: Open
+Resolution: None
+Bug Group: None
+Priority: 5
+Submitted by: sdelafond
+Assigned to : none
+Summary: Security problems (CVE-2008-6538 and CVE-2008-6539)
+
+Details: destar 0.2.2 is vulnerable to both CVE-2008-6538 and CVE-2008-6538:
+
+  http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-6538
+  http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-6539
+
+Namely:
+
+  DeStar 0.2.2-5 allows remote attackers to add arbitrary users via a direct
+  request to config/add/CfgOptUser. 
+
+  Static code injection vulnerability in user/settings/ in DeStar 0.2.2-5 allows 
+  remote authenticated users to add arbitrary administrators and inject 
+  arbitrary Python code into destar_cfg.py via a crafted pin parameter. 
+
+Both issues are very serious, so a fix would be most appreciated :)
+
+Cheers,
+
+--Seb
+
+For detailed info, follow this link:
+http://developer.berlios.de/bugs/?func=detailbug&bug_id=16199&group_id=2112
+
+

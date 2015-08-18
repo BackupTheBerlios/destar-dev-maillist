@@ -1,0 +1,616 @@
+From alerios at mail.berlios.de  Thu Oct  4 16:26:38 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Thu, 4 Oct 2007 16:26:38 +0200
+Subject: [Destar-dev] r814 - trunk
+Message-ID: <200710041426.l94EQcu0027893@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-10-04 16:26:38 +0200 (Thu, 04 Oct 2007)
+New Revision: 814
+
+Added:
+   trunk/cfg_trunk_sip_spa400.py
+Modified:
+   trunk/CHANGELOG.txt
+Log:
+Added special Trunk for SPA400 gateway
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-09-21 17:10:51 UTC (rev 813)
++++ trunk/CHANGELOG.txt	2007-10-04 14:26:38 UTC (rev 814)
+@@ -1,3 +1,6 @@
++2007-10-04:
++* Added special Trunk for SPA400 gateway
++
+ 2007-09-21:
+ * Added stunnel clues on INSTALL.txt
+ * Started work to release 0.3.0 on Makefile and man page.
+
+Added: trunk/cfg_trunk_sip_spa400.py
+===================================================================
+--- trunk/cfg_trunk_sip_spa400.py	2007-09-21 17:10:51 UTC (rev 813)
++++ trunk/cfg_trunk_sip_spa400.py	2007-10-04 14:26:38 UTC (rev 814)
+@@ -0,0 +1,136 @@
++# -*- coding: iso-latin-1 -*-
++# Copyright (C) 2007 Alejandro Rios P.
++# based on Free World Dialup Module by Hoger Schurig
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++import panelutils
++
++
++class CfgTrunkSipSPA400(CfgTrunk):
++
++	shortName   = _("SPA400 SIP Trunk")
++	newObjectTitle  = _("New SPA400 SIP trunk")
++	description = _("""Used to setup a SIP trunk to a SPA400 gateway.""")
++	technology = "SIP"
++	
++	def createVariables(self):
++		self.variables   = [
++			VarType("name",
++				title=_("Name"),
++				len=15,
++				default="siptrunk"),
++			
++			VarType("host",
++				title=_("SIP host"),
++				len=25),
++
++			VarType("nat",
++				title=_("Is the trunk behind NAT?"),
++				type="bool"),
++				
++			VarType("panelLab",
++				title=_("Operator Panel"),
++				type="label",
++				hide=True),
++				
++			VarType("panel",
++				title=_("Show this trunk in the panel"),
++				type="bool",
++				hide=True),
++	
++			VarType("Inbound",
++				title=_("Calls from SIP trunk"),
++				type="label"),
++				
++			VarType("clid",
++				title=_("Change Caller*Id to:"),
++				len=25,
++				optional=True),
++			
++			VarType("contextin",
++				title=_("Go to"),
++				type="radio",
++				default='phone',
++				options=[('phone',_("Phone")),('ivr',_("IVR")),('pbx',_("Virtual PBX"))]),
++			
++			VarType("phone",
++				title=_("Extension to ring"),
++				type="choice",
++				optional=False,
++				options=getChoice("CfgPhone")),
++			
++			VarType("ivr",
++				title=_("IVR to jump to"),
++				type="choice",
++				optional=True,
++				options=getChoice("CfgIVR")),
++
++			VarType("pbx",
++				title=_("Allow dial extension from which Virtual PBX"),
++				type="choice",
++				optional=True,
++				options=getChoice("CfgOptPBX")),
++
++			VarType("dial",
++				hide=True,
++				len=80),]
++
++		self.dependencies = [
++			DepType("phone", 
++					type="hard",
++					message = _("This is a Dependency")),
++			DepType("ivr", 
++					type="hard",
++					message = _("This is a Dependency"))
++		]
++
++
++	def checkConfig(self):
++		res = CfgTrunk.checkConfig(self)
++		if res:
++			return res
++                
++	def createAsteriskConfig(self):
++		needModule("res_crypto")
++		needModule("chan_sip")
++
++		self.dial = "SIP/${ARG1}@%s" % (self.name)
++		
++		#What to do with incoming calls
++		self.createIncomingContext()
++		
++		c = AstConf("sip.conf")
++		c.setSection("general")
++		c.append("register=%s@%s/%s" % (self.name, self.host, self.name))
++
++
++		if not c.hasSection(self.name):
++			c.setSection(self.name)
++			c.append("type=friend")
++			c.append("user=%s" % self.name)
++			c.append("host=%s" % self.host)
++			c.append("context=in-%s" % self.name)
++			c.append("canreinvite=no")
++			c.append("dtmfmode=rfc2833")
++			if self.nat:
++				c.append("nat=yes")
++			c.append("insecure=very")
++
++		if panelutils.isConfigured() == 1 and self.panel:
++			panelutils.createTrunkButton(self)
+
+
+
+From alerios at mail.berlios.de  Thu Oct  4 16:33:35 2007
+From: alerios at mail.berlios.de (alerios at BerliOS)
+Date: Thu, 4 Oct 2007 16:33:35 +0200
+Subject: [Destar-dev] r815 - trunk
+Message-ID: <200710041433.l94EXZ45028419@sheep.berlios.de>
+
+Author: alerios
+Date: 2007-10-04 16:33:34 +0200 (Thu, 04 Oct 2007)
+New Revision: 815
+
+Added:
+   trunk/cfg_trunk_sip_sc375.py
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_trunk_sip_spa400.py
+Log:
+Added special Trunk for Suncomm SC-375 Voip-GSM gateway
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-10-04 14:26:38 UTC (rev 814)
++++ trunk/CHANGELOG.txt	2007-10-04 14:33:34 UTC (rev 815)
+@@ -1,5 +1,6 @@
+ 2007-10-04:
+-* Added special Trunk for SPA400 gateway
++* Added special Trunk for Linksys SPA400 gateway
++* Added special Trunk for Suncomm SC-375 Voip-GSM gateway
+ 
+ 2007-09-21:
+ * Added stunnel clues on INSTALL.txt
+
+Added: trunk/cfg_trunk_sip_sc375.py
+===================================================================
+--- trunk/cfg_trunk_sip_sc375.py	2007-10-04 14:26:38 UTC (rev 814)
++++ trunk/cfg_trunk_sip_sc375.py	2007-10-04 14:33:34 UTC (rev 815)
+@@ -0,0 +1,143 @@
++# -*- coding: utf-8 -*-
++# Copyright (C) 2007 Alejandro Rios P.
++# based on Free World Dialup Module by Hoger Schurig
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from configlets import *
++import panelutils
++
++
++class CfgTrunkSipSC375(CfgTrunk):
++
++	shortName   = _("SC-375 SIP Trunk")
++	newObjectTitle  = _("New SC375 SIP trunk")
++	description = _("""Used to setup a SC-375 SunComm's GSM GW.""")
++	technology = "SIP"
++	
++	def createVariables(self):
++		self.variables   = [
++			VarType("name",
++				title=_("Name"),
++				len=15,
++				default="siptrunk"),
++			
++			VarType("pw",
++				title=_("SIP password"),
++				len=15),
++
++			VarType("nat",
++				title=_("Is the trunk behind NAT?"),
++				type="bool"),
++				
++			VarType("panelLab",
++				title=_("Operator Panel"),
++				type="label",
++				hide=True),
++				
++			VarType("panel",
++				title=_("Show this trunk in the panel"),
++				type="bool",
++				hide=True),
++	
++			VarType("Inbound",
++				title=_("Calls from SIP trunk"),
++				type="label"),
++				
++			VarType("clid",
++				title=_("Change Caller*Id to:"),
++				len=25,
++				optional=True),
++			
++			VarType("contextin",
++				title=_("Go to"),
++				type="radio",
++				default='phone',
++				options=[('phone',_("Phone")),('ivr',_("IVR")),('pbx',_("Virtual PBX"))]),
++			
++			VarType("phone",
++				title=_("Extension to ring"),
++				type="choice",
++				optional=False,
++				options=getChoice("CfgPhone")),
++			
++			VarType("ivr",
++				title=_("IVR to jump to"),
++				type="choice",
++				optional=True,
++				options=getChoice("CfgIVR")),
++
++			VarType("pbx",
++				title=_("Allow dial extension from which Virtual PBX"),
++				type="choice",
++				optional=True,
++				options=getChoice("CfgOptPBX")),
++
++			VarType("dial",
++				hide=True,
++				len=80),]
++
++		self.dependencies = [
++			DepType("phone", 
++					type="hard",
++					message = _("This is a Dependency")),
++			DepType("ivr", 
++					type="hard",
++					message = _("This is a Dependency"))
++		]
++
++
++	def checkConfig(self):
++		res = CfgTrunk.checkConfig(self)
++		if res:
++			return res
++                
++	def createAsteriskConfig(self):
++		needModule("res_crypto")
++		needModule("chan_sip")
++
++		#Dial part to use on dialout macro
++		#If we use the host it will not use authentication
++		#it's safe to use the peer name 
++		self.dial = "SIP/${ARG1}@%s" % (self.name)
++		
++		#What to do with incoming calls
++		self.createIncomingContext()
++		
++		c = AstConf("sip.conf")
++		if not c.hasSection(self.name):
++			c.setSection(self.name)
++			c.append("type=friend")
++			c.append("username=%s" % self.name)
++			c.append("regexten=%s" % self.name)
++			c.append("fromuser=%s" % self.name)
++			c.append("secret=%s" % self.pw)
++			c.append("host=dynamic")
++			c.append("insecure=very")
++			c.append("context=in-%s" % self.name)
++			c.append("canreinvite=no")
++			c.append("dtmfmode=inband")
++			c.append("call-limit=1")
++			if self.nat:
++				c.append("nat=yes")
++			c.append("qualify=yes")
++			c.append("disallow=all")
++			c.append("allow=ulaw")
++			c.append("allow=alaw")
++
++		if panelutils.isConfigured() == 1 and self.panel:
++			panelutils.createTrunkButton(self)
+
+Modified: trunk/cfg_trunk_sip_spa400.py
+===================================================================
+--- trunk/cfg_trunk_sip_spa400.py	2007-10-04 14:26:38 UTC (rev 814)
++++ trunk/cfg_trunk_sip_spa400.py	2007-10-04 14:33:34 UTC (rev 815)
+@@ -1,4 +1,4 @@
+-# -*- coding: iso-latin-1 -*-
++# -*- coding: utf-8 -*-
+ # Copyright (C) 2007 Alejandro Rios P.
+ # based on Free World Dialup Module by Hoger Schurig
+ # 
+
+
+
+From dasenjo at mail.berlios.de  Thu Oct 25 19:25:19 2007
+From: dasenjo at mail.berlios.de (dasenjo at BerliOS)
+Date: Thu, 25 Oct 2007 19:25:19 +0200
+Subject: [Destar-dev] r816 - in branches/0.2.X: . lang/es/LC_MESSAGES po
+Message-ID: <200710251725.l9PHPIUX009397@sheep.berlios.de>
+
+Author: dasenjo
+Date: 2007-10-25 19:25:02 +0200 (Thu, 25 Oct 2007)
+New Revision: 816
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_opt_sip_network.py
+   branches/0.2.X/lang/es/LC_MESSAGES/destar.mo
+   branches/0.2.X/po/destar.pot
+   branches/0.2.X/po/es.po
+Log:
+* cfg_opt_sip_network.py: added progressinband option, tos default changed to 0x18
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-10-04 14:33:34 UTC (rev 815)
++++ branches/0.2.X/CHANGELOG.txt	2007-10-25 17:25:02 UTC (rev 816)
+@@ -1,3 +1,6 @@
++2007-10-25:
++* cfg_opt_sip_network.py: added progressinband option, tos default changed to 0x18
++
+ 2007-09-13:
+ * Initial german translation by Nina Mabe.
+ 
+
+Modified: branches/0.2.X/cfg_opt_sip_network.py
+===================================================================
+--- branches/0.2.X/cfg_opt_sip_network.py	2007-10-04 14:33:34 UTC (rev 815)
++++ branches/0.2.X/cfg_opt_sip_network.py	2007-10-25 17:25:02 UTC (rev 816)
+@@ -81,7 +81,7 @@
+ 					title=_("TOS Field"),
+ 					len=10,
+ 					optional=True,
+-					default="184"),
++					default="0x18"),
+ 
+ 			VarType("srvlookup",
+ 					title=_("Enable DNS SRV lookups on outbound calls"),
+@@ -98,6 +98,14 @@
+                                         type="choice",
+                                         optional = True,
+                                         options=getChoice("CfgOptMusic")),
++
++			VarType("progressinband",
++                                        title=_("Send ring progress tones in band?"),
++                                        type="choice",
++                                        options=(
++						("yes",_("yes")),
++						("no",_("no")),
++						("never",_("never"))) ),
+ 		]
+ 
+ 	def checkConfig(self):
+@@ -138,3 +146,4 @@
+ 		c.append("nat=%s" % self.globalnat)
+ 		if self.srvlookup:
+ 			c.append("srvlookup=yes")
++		c.appendValue(self,"progressinband")
+
+Modified: branches/0.2.X/lang/es/LC_MESSAGES/destar.mo
+===================================================================
+(Binary files differ)
+
+Modified: branches/0.2.X/po/destar.pot
+===================================================================
+--- branches/0.2.X/po/destar.pot	2007-10-04 14:33:34 UTC (rev 815)
++++ branches/0.2.X/po/destar.pot	2007-10-25 17:25:02 UTC (rev 816)
+@@ -8,7 +8,7 @@
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2007-09-13 19:21-0500\n"
++"POT-Creation-Date: 2007-10-25 11:49-0500\n"
+ "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+ "Last-Translator: FULL NAME <EMAIL at ADDRESS>\n"
+ "Language-Team: LANGUAGE <LL at li.org>\n"
+@@ -189,8 +189,8 @@
+ #: ../cfg_app_voicemailsettings.py:62 ../cfg_dialout_normal.py:109
+ #: ../cfg_ivr_autoatt.py:114 ../cfg_ivr_autoatt.py:117
+ #: ../cfg_ivr_autoatt.py:120 ../cfg_ivr_autoatt.py:123 ../cfg_opt_did.py:91
+-#: ../cfg_opt_did.py:94 ../cfg_opt_did.py:97 ../cfg_opt_user.py:50
+-#: ../cfg_opt_user.py:53 ../cfg_phone_epygi.py:227 ../cfg_phone_epygi.py:234
++#: ../cfg_opt_did.py:94 ../cfg_opt_did.py:97 ../cfg_opt_user.py:51
++#: ../cfg_opt_user.py:54 ../cfg_phone_epygi.py:227 ../cfg_phone_epygi.py:234
+ #: ../cfg_phone_ext.py:59 ../cfg_phone_iax.py:224 ../cfg_phone_iax.py:231
+ #: ../cfg_phone_mgcp.py:227 ../cfg_phone_mgcp.py:234 ../cfg_phone_queue.py:181
+ #: ../cfg_phone_queue.py:184 ../cfg_phone_sip.py:229 ../cfg_phone_sip.py:236
+@@ -1228,6 +1228,22 @@
+ msgid "Music on hold"
+ msgstr ""
+ 
++#: ../cfg_opt_sip_network.py:103
++msgid "Send ring progress tones in band?"
++msgstr ""
++
++#: ../cfg_opt_sip_network.py:106
++msgid "yes"
++msgstr ""
++
++#: ../cfg_opt_sip_network.py:107
++msgid "no"
++msgstr ""
++
++#: ../cfg_opt_sip_network.py:108
++msgid "never"
++msgstr ""
++
+ #: ../cfg_opt_transfer.py:27 ../cfg_opt_transfer.py:28
+ msgid "Transfer Extensions"
+ msgstr ""
+@@ -1304,7 +1320,7 @@
+ msgid "Language"
+ msgstr ""
+ 
+-#: ../cfg_opt_user.py:65
++#: ../cfg_opt_user.py:66
+ msgid "Please choose a Virtual PBX for this user."
+ msgstr ""
+ 
+
+Modified: branches/0.2.X/po/es.po
+===================================================================
+--- branches/0.2.X/po/es.po	2007-10-04 14:33:34 UTC (rev 815)
++++ branches/0.2.X/po/es.po	2007-10-25 17:25:02 UTC (rev 816)
+@@ -7,8 +7,8 @@
+ msgstr ""
+ "Project-Id-Version: DeStar 0.2beta\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2007-06-15 13:04-0500\n"
+-"PO-Revision-Date: 2007-06-15 13:03-0500\n"
++"POT-Creation-Date: 2007-10-25 11:49-0500\n"
++"PO-Revision-Date: 2007-10-25 11:47-0500\n"
+ "Last-Translator: dasenjo <dasenjo at avatar.com.co>\n"
+ "Language-Team: Spanish <es at li.org>\n"
+ "MIME-Version: 1.0\n"
+@@ -205,8 +205,8 @@
+ #: ../cfg_app_voicemailsettings.py:62 ../cfg_dialout_normal.py:109
+ #: ../cfg_ivr_autoatt.py:114 ../cfg_ivr_autoatt.py:117
+ #: ../cfg_ivr_autoatt.py:120 ../cfg_ivr_autoatt.py:123 ../cfg_opt_did.py:91
+-#: ../cfg_opt_did.py:94 ../cfg_opt_did.py:97 ../cfg_opt_user.py:50
+-#: ../cfg_opt_user.py:53 ../cfg_phone_epygi.py:227 ../cfg_phone_epygi.py:234
++#: ../cfg_opt_did.py:94 ../cfg_opt_did.py:97 ../cfg_opt_user.py:51
++#: ../cfg_opt_user.py:54 ../cfg_phone_epygi.py:227 ../cfg_phone_epygi.py:234
+ #: ../cfg_phone_ext.py:59 ../cfg_phone_iax.py:224 ../cfg_phone_iax.py:231
+ #: ../cfg_phone_mgcp.py:227 ../cfg_phone_mgcp.py:234 ../cfg_phone_queue.py:181
+ #: ../cfg_phone_queue.py:184 ../cfg_phone_sip.py:229 ../cfg_phone_sip.py:236
+@@ -238,12 +238,12 @@
+ #: ../cfg_app_milliwatt.py:33 ../cfg_app_music.py:32 ../cfg_app_parking.py:32
+ #: ../cfg_app_play.py:32 ../cfg_app_record.py:34 ../cfg_app_saytime.py:31
+ #: ../cfg_app_voicemail.py:32 ../cfg_opt_monitor.py:32 ../cfg_opt_pickup.py:32
+-#: ../cfg_phone_epygi.py:59 ../cfg_phone_ext.py:26 ../cfg_phone_ext.py:43
+-#: ../cfg_phone_iax.py:52 ../cfg_phone_mgcp.py:51 ../cfg_phone_queue.py:43
+-#: ../cfg_phone_sip.py:59 ../cfg_phone_zap.py:59 ../cfg_trunk_fwdiax.py:45
+-#: ../cfg_trunk_iaxtel.py:44 ../configlets.py:582 ../configlets.py:959
+-#: ../configlets.py:1128 ../configlets.py:1149 ../page_stats_phone.ptl:65
+-#: ../page_user_state.ptl:66 ../page_user_state.ptl:81
++#: ../cfg_phone_epygi.py:59 ../cfg_phone_ext.py:43 ../cfg_phone_iax.py:52
++#: ../cfg_phone_mgcp.py:51 ../cfg_phone_queue.py:43 ../cfg_phone_sip.py:59
++#: ../cfg_phone_zap.py:59 ../cfg_trunk_fwdiax.py:45 ../cfg_trunk_iaxtel.py:44
++#: ../configlets.py:582 ../configlets.py:959 ../configlets.py:1128
++#: ../configlets.py:1149 ../page_stats_phone.ptl:65 ../page_user_state.ptl:66
++#: ../page_user_state.ptl:81
+ msgid "Extension"
+ msgstr "Extensi?n"
+ 
+@@ -1276,6 +1276,22 @@
+ msgid "Music on hold"
+ msgstr "M?sica en espera"
+ 
++#: ../cfg_opt_sip_network.py:103
++msgid "Send ring progress tones in band?"
++msgstr "?Enviar timbres de progreso en banda?"
++
++#: ../cfg_opt_sip_network.py:106
++msgid "yes"
++msgstr "s?"
++
++#: ../cfg_opt_sip_network.py:107
++msgid "no"
++msgstr "no"
++
++#: ../cfg_opt_sip_network.py:108
++msgid "never"
++msgstr "nunca"
++
+ #: ../cfg_opt_transfer.py:27 ../cfg_opt_transfer.py:28
+ msgid "Transfer Extensions"
+ msgstr "Extensiones de transferencia"
+@@ -1354,7 +1370,7 @@
+ msgid "Language"
+ msgstr "Idioma"
+ 
+-#: ../cfg_opt_user.py:65
++#: ../cfg_opt_user.py:66
+ msgid "Please choose a Virtual PBX for this user."
+ msgstr "Por favor, escoja la PBX Virtual para este usuario."
+ 
+@@ -1867,9 +1883,13 @@
+ msgid "Enable time restriction?"
+ msgstr "?Habilitar la restricci?n de tiempo?"
+ 
++#: ../cfg_phone_ext.py:26
++msgid "Alias extension"
++msgstr "Alias de la extensi?n"
++
+ #: ../cfg_phone_ext.py:27
+-msgid "New extension"
+-msgstr "Nueva extensi?n"
++msgid "New alias extension"
++msgstr "Nuevo alias para la extensi?n"
+ 
+ #: ../cfg_phone_ext.py:28
+ msgid "Set an 'alias' extension to a phone"
+@@ -2517,19 +2537,19 @@
+ "0,Sin tiempo l?mite|300,5 minutos|600,10 minutos|1200,20 minutos|2400,40 "
+ "minutos|3000,50 minutos"
+ 
+-#: ../panelutils.py:136
++#: ../panelutils.py:139
+ msgid "Meetme"
+ msgstr "Sala de Conferencia"
+ 
+-#: ../panelutils.py:140
++#: ../panelutils.py:143
+ msgid "PARK"
+ msgstr "Parqueo"
+ 
+-#: ../panelutils.py:144
++#: ../panelutils.py:147
+ msgid "Park"
+ msgstr "Parqueo"
+ 
+-#: ../panelutils.py:162
++#: ../panelutils.py:165
+ msgid "Restarting the panel daemon ..."
+ msgstr "Reiniciando el demonio del p?nel ..."
+ 
+
+
+

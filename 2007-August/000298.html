@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r778 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r778%20-%20trunk&In-Reply-To=%3C200708031836.l73IaQFx000286%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000296.html">
+   <LINK REL="Next"  HREF="000299.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r778 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r778%20-%20trunk&In-Reply-To=%3C200708031836.l73IaQFx000286%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r778 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Aug  3 20:36:26 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000296.html">[Destar-dev] r777 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000299.html">[Destar-dev] r779 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#298">[ date ]</a>
+              <a href="thread.html#298">[ thread ]</a>
+              <a href="subject.html#298">[ subject ]</a>
+              <a href="author.html#298">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-03 20:36:25 +0200 (Fri, 03 Aug 2007)
+New Revision: 778
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_trunk_zapdynamic.py
+Log:
+* cfg_trunk_zapdynamic: added panel, pridialplan configs and some default 
+  settings.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-01 21:47:10 UTC (rev 777)
++++ trunk/CHANGELOG.txt	2007-08-03 18:36:25 UTC (rev 778)
+@@ -1,3 +1,7 @@
++2007-08-03:
++* cfg_trunk_zapdynamic: added panel, pridialplan configs and some default
++  settings.
++
+ 2007-08-01:
+ * Updated es.po
+ * Added all: target in Makefile
+
+Modified: trunk/cfg_trunk_zapdynamic.py
+===================================================================
+--- trunk/cfg_trunk_zapdynamic.py	2007-08-01 21:47:10 UTC (rev 777)
++++ trunk/cfg_trunk_zapdynamic.py	2007-08-03 18:36:25 UTC (rev 778)
+@@ -55,6 +55,20 @@
+ 				options=[('pri_cpe',_('PRI signalling, CPE side')),
+ 					('pri_net', _('PRI signalling, Network side'))]),
+ 
++			VarType(&quot;pridialplan&quot;,
++				title=_(&quot;PRI Dialplan&quot;),
++				type=&quot;choice&quot;,
++				options=[('unknown',_('Unknown')),
++					('private', _('Private ISDN')),
++					('local', _('Local ISDN')),
++					('national', _('National ISDN')),
++					('international', _('International ISDN')),
++					('dynamic', _('Dynamic')),
++					],
++				default=&quot;local&quot;,
++
++				),
++
+ 			VarType(&quot;group&quot;,
+ 				title=_(&quot;Callout group&quot;),
+ 				type=&quot;int&quot;,
+@@ -142,6 +156,17 @@
+ 				type=&quot;int&quot;, 
+ 				len=2),
+ 
++			VarType(&quot;panelLab&quot;,
++				Title=_(&quot;Operator Panel&quot;),
++				type=&quot;label&quot;,
++				hide=True),
++
++			VarType(&quot;panel&quot;,
++				title=_(&quot;Show this trunk in the panel&quot;),
++				type=&quot;bool&quot;,
++				hide=True,
++				optional=True),
++
+ 			VarType(&quot;dial&quot;,
+ 				hide=True,
+ 				len=50),
+@@ -170,8 +195,22 @@
+ 		c.append(&quot;; Zaptel Trunk %s&quot; % self.name)
+ 		c.appendValue(self, &quot;signalling&quot;)
+ 		c.append(&quot;context=in-%s&quot; % self.name)
++		c.append(&quot;usecallerid=yes&quot;)
++		c.append(&quot;callerid=asreceived&quot;)
++		c.append(&quot;hidecallerid=no&quot;)
++		c.append(&quot;callwaiting=no&quot;)
++		c.append(&quot;usecallingpres=yes&quot;)
++		c.append(&quot;callwaitingcallerid=no&quot;)
++		c.append(&quot;threewaycalling=yes&quot;)
+ 		c.append(&quot;transfer=yes&quot;)
+-		c.append(&quot;callerid=asreceived&quot;)
++		c.append(&quot;cancallforward=yes&quot;)
++		c.append(&quot;callreturn=no&quot;)
++		c.append(&quot;echocancel=yes&quot;)
++		c.append(&quot;echocancelwhenbridged=yes&quot;)
++		c.append(&quot;echotraining=yes&quot;)
++		c.append(&quot;relaxdtmf=yes&quot;)
++		c.append(&quot;immediate=no&quot;)
++		c.append(&quot;busydetect=no&quot;)
+ 		if self.group:
+ 			c.appendValue(self, &quot;group&quot;)
+ 		c.append(&quot;channel=%s&quot; % self.channels)
+@@ -187,6 +226,6 @@
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+ 
+-		#if panelutils.isConfigured() == 1 and self.panel:
+-		#	panelutils.createTrunkButton(self)
++		if panelutils.isConfigured() == 1 and self.panel:
++			panelutils.createTrunkButton(self)
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000296.html">[Destar-dev] r777 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000299.html">[Destar-dev] r779 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#298">[ date ]</a>
+              <a href="thread.html#298">[ thread ]</a>
+              <a href="subject.html#298">[ subject ]</a>
+              <a href="author.html#298">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

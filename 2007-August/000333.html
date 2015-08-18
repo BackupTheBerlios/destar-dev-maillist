@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r796 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r796%20-%20trunk&In-Reply-To=%3C200708242314.l7ONE2Uw017241%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000332.html">
+   <LINK REL="Next"  HREF="000334.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r796 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r796%20-%20trunk&In-Reply-To=%3C200708242314.l7ONE2Uw017241%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r796 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Sat Aug 25 01:14:02 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000332.html">[Destar-dev] r795 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000334.html">[Destar-dev] r797 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#333">[ date ]</a>
+              <a href="thread.html#333">[ thread ]</a>
+              <a href="subject.html#333">[ subject ]</a>
+              <a href="author.html#333">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-08-25 01:14:00 +0200 (Sat, 25 Aug 2007)
+New Revision: 796
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_app_agentcallbacklogin.py
+Log:
+cfg_app_agentcallbacklogin. variable replacement was missing
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-08-24 22:31:30 UTC (rev 795)
++++ trunk/CHANGELOG.txt	2007-08-24 23:14:00 UTC (rev 796)
+@@ -1,5 +1,7 @@
+ 2007-08-24:
+ * cfg_trunk_sip port optional. Comment by Joan-Carles Samaranch
++* cfg_app_agentcallbacklogin. variable replacement was missing. Thanks
++  to Joan-Carles Samaranch 
+ 
+ 2007-08-22:
+ * Cast of billsec as integer in page_stats_cdr.ptl
+
+Modified: trunk/cfg_app_agentcallbacklogin.py
+===================================================================
+--- trunk/cfg_app_agentcallbacklogin.py	2007-08-24 22:31:30 UTC (rev 795)
++++ trunk/cfg_app_agentcallbacklogin.py	2007-08-24 23:14:00 UTC (rev 796)
+@@ -69,7 +69,7 @@
+ 			opts = &quot;&quot;
+ 		
+ 		c.appendExten(self.ext, &quot;AgentCallbackLogin(${CALLERIDNUM}|%s|${CALLERIDNUM}@%s)&quot; % (opts, self.pbx), self.pbx )
+-		c.appendExten(self.ext, &quot;DBdel(DND/%s/${CALLERIDNUM})&quot;, self.pbx)
++		c.appendExten(self.ext, &quot;DBdel(DND/%s/${CALLERIDNUM})&quot; % self.pbx, self.pbx)
+ 		c.appendExten(self.ext, &quot;Playback(do-not-disturb)&quot;, self.pbx)
+ 		c.appendExten(self.ext, &quot;Playback(cancelled)&quot;, self.pbx)
+ 		c.appendExten(self.ext, &quot;Hangup&quot;, self.pbx)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000332.html">[Destar-dev] r795 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000334.html">[Destar-dev] r797 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#333">[ date ]</a>
+              <a href="thread.html#333">[ thread ]</a>
+              <a href="subject.html#333">[ subject ]</a>
+              <a href="author.html#333">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

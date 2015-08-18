@@ -1,0 +1,299 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r816 - in branches/0.2.X: . lang/es/LC_MESSAGES po
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r816%20-%20in%20branches/0.2.X%3A%20.%20lang/es/LC_MESSAGES%20po&In-Reply-To=%3C200710251725.l9PHPIUX009397%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000356.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r816 - in branches/0.2.X: . lang/es/LC_MESSAGES po</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r816%20-%20in%20branches/0.2.X%3A%20.%20lang/es/LC_MESSAGES%20po&In-Reply-To=%3C200710251725.l9PHPIUX009397%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r816 - in branches/0.2.X: . lang/es/LC_MESSAGES po">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Thu Oct 25 19:25:19 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000356.html">[Destar-dev] r815 - trunk
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#357">[ date ]</a>
+              <a href="thread.html#357">[ thread ]</a>
+              <a href="subject.html#357">[ subject ]</a>
+              <a href="author.html#357">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-10-25 19:25:02 +0200 (Thu, 25 Oct 2007)
+New Revision: 816
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_opt_sip_network.py
+   branches/0.2.X/lang/es/LC_MESSAGES/destar.mo
+   branches/0.2.X/po/destar.pot
+   branches/0.2.X/po/es.po
+Log:
+* cfg_opt_sip_network.py: added progressinband option, tos default changed to 0x18
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-10-04 14:33:34 UTC (rev 815)
++++ branches/0.2.X/CHANGELOG.txt	2007-10-25 17:25:02 UTC (rev 816)
+@@ -1,3 +1,6 @@
++2007-10-25:
++* cfg_opt_sip_network.py: added progressinband option, tos default changed to 0x18
++
+ 2007-09-13:
+ * Initial german translation by Nina Mabe.
+ 
+
+Modified: branches/0.2.X/cfg_opt_sip_network.py
+===================================================================
+--- branches/0.2.X/cfg_opt_sip_network.py	2007-10-04 14:33:34 UTC (rev 815)
++++ branches/0.2.X/cfg_opt_sip_network.py	2007-10-25 17:25:02 UTC (rev 816)
+@@ -81,7 +81,7 @@
+ 					title=_(&quot;TOS Field&quot;),
+ 					len=10,
+ 					optional=True,
+-					default=&quot;184&quot;),
++					default=&quot;0x18&quot;),
+ 
+ 			VarType(&quot;srvlookup&quot;,
+ 					title=_(&quot;Enable DNS SRV lookups on outbound calls&quot;),
+@@ -98,6 +98,14 @@
+                                         type=&quot;choice&quot;,
+                                         optional = True,
+                                         options=getChoice(&quot;CfgOptMusic&quot;)),
++
++			VarType(&quot;progressinband&quot;,
++                                        title=_(&quot;Send ring progress tones in band?&quot;),
++                                        type=&quot;choice&quot;,
++                                        options=(
++						(&quot;yes&quot;,_(&quot;yes&quot;)),
++						(&quot;no&quot;,_(&quot;no&quot;)),
++						(&quot;never&quot;,_(&quot;never&quot;))) ),
+ 		]
+ 
+ 	def checkConfig(self):
+@@ -138,3 +146,4 @@
+ 		c.append(&quot;nat=%s&quot; % self.globalnat)
+ 		if self.srvlookup:
+ 			c.append(&quot;srvlookup=yes&quot;)
++		c.appendValue(self,&quot;progressinband&quot;)
+
+Modified: branches/0.2.X/lang/es/LC_MESSAGES/destar.mo
+===================================================================
+(Binary files differ)
+
+Modified: branches/0.2.X/po/destar.pot
+===================================================================
+--- branches/0.2.X/po/destar.pot	2007-10-04 14:33:34 UTC (rev 815)
++++ branches/0.2.X/po/destar.pot	2007-10-25 17:25:02 UTC (rev 816)
+@@ -8,7 +8,7 @@
+ msgstr &quot;&quot;
+ &quot;Project-Id-Version: PACKAGE VERSION\n&quot;
+ &quot;Report-Msgid-Bugs-To: \n&quot;
+-&quot;POT-Creation-Date: 2007-09-13 19:21-0500\n&quot;
++&quot;POT-Creation-Date: 2007-10-25 11:49-0500\n&quot;
+ &quot;PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n&quot;
+ &quot;Last-Translator: FULL NAME &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">EMAIL at ADDRESS</A>&gt;\n&quot;
+ &quot;Language-Team: LANGUAGE &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">LL at li.org</A>&gt;\n&quot;
+@@ -189,8 +189,8 @@
+ #: ../cfg_app_voicemailsettings.py:62 ../cfg_dialout_normal.py:109
+ #: ../cfg_ivr_autoatt.py:114 ../cfg_ivr_autoatt.py:117
+ #: ../cfg_ivr_autoatt.py:120 ../cfg_ivr_autoatt.py:123 ../cfg_opt_did.py:91
+-#: ../cfg_opt_did.py:94 ../cfg_opt_did.py:97 ../cfg_opt_user.py:50
+-#: ../cfg_opt_user.py:53 ../cfg_phone_epygi.py:227 ../cfg_phone_epygi.py:234
++#: ../cfg_opt_did.py:94 ../cfg_opt_did.py:97 ../cfg_opt_user.py:51
++#: ../cfg_opt_user.py:54 ../cfg_phone_epygi.py:227 ../cfg_phone_epygi.py:234
+ #: ../cfg_phone_ext.py:59 ../cfg_phone_iax.py:224 ../cfg_phone_iax.py:231
+ #: ../cfg_phone_mgcp.py:227 ../cfg_phone_mgcp.py:234 ../cfg_phone_queue.py:181
+ #: ../cfg_phone_queue.py:184 ../cfg_phone_sip.py:229 ../cfg_phone_sip.py:236
+@@ -1228,6 +1228,22 @@
+ msgid &quot;Music on hold&quot;
+ msgstr &quot;&quot;
+ 
++#: ../cfg_opt_sip_network.py:103
++msgid &quot;Send ring progress tones in band?&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:106
++msgid &quot;yes&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:107
++msgid &quot;no&quot;
++msgstr &quot;&quot;
++
++#: ../cfg_opt_sip_network.py:108
++msgid &quot;never&quot;
++msgstr &quot;&quot;
++
+ #: ../cfg_opt_transfer.py:27 ../cfg_opt_transfer.py:28
+ msgid &quot;Transfer Extensions&quot;
+ msgstr &quot;&quot;
+@@ -1304,7 +1320,7 @@
+ msgid &quot;Language&quot;
+ msgstr &quot;&quot;
+ 
+-#: ../cfg_opt_user.py:65
++#: ../cfg_opt_user.py:66
+ msgid &quot;Please choose a Virtual PBX for this user.&quot;
+ msgstr &quot;&quot;
+ 
+
+Modified: branches/0.2.X/po/es.po
+===================================================================
+--- branches/0.2.X/po/es.po	2007-10-04 14:33:34 UTC (rev 815)
++++ branches/0.2.X/po/es.po	2007-10-25 17:25:02 UTC (rev 816)
+@@ -7,8 +7,8 @@
+ msgstr &quot;&quot;
+ &quot;Project-Id-Version: DeStar 0.2beta\n&quot;
+ &quot;Report-Msgid-Bugs-To: \n&quot;
+-&quot;POT-Creation-Date: 2007-06-15 13:04-0500\n&quot;
+-&quot;PO-Revision-Date: 2007-06-15 13:03-0500\n&quot;
++&quot;POT-Creation-Date: 2007-10-25 11:49-0500\n&quot;
++&quot;PO-Revision-Date: 2007-10-25 11:47-0500\n&quot;
+ &quot;Last-Translator: dasenjo &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">dasenjo at avatar.com.co</A>&gt;\n&quot;
+ &quot;Language-Team: Spanish &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/destar-dev">es at li.org</A>&gt;\n&quot;
+ &quot;MIME-Version: 1.0\n&quot;
+@@ -205,8 +205,8 @@
+ #: ../cfg_app_voicemailsettings.py:62 ../cfg_dialout_normal.py:109
+ #: ../cfg_ivr_autoatt.py:114 ../cfg_ivr_autoatt.py:117
+ #: ../cfg_ivr_autoatt.py:120 ../cfg_ivr_autoatt.py:123 ../cfg_opt_did.py:91
+-#: ../cfg_opt_did.py:94 ../cfg_opt_did.py:97 ../cfg_opt_user.py:50
+-#: ../cfg_opt_user.py:53 ../cfg_phone_epygi.py:227 ../cfg_phone_epygi.py:234
++#: ../cfg_opt_did.py:94 ../cfg_opt_did.py:97 ../cfg_opt_user.py:51
++#: ../cfg_opt_user.py:54 ../cfg_phone_epygi.py:227 ../cfg_phone_epygi.py:234
+ #: ../cfg_phone_ext.py:59 ../cfg_phone_iax.py:224 ../cfg_phone_iax.py:231
+ #: ../cfg_phone_mgcp.py:227 ../cfg_phone_mgcp.py:234 ../cfg_phone_queue.py:181
+ #: ../cfg_phone_queue.py:184 ../cfg_phone_sip.py:229 ../cfg_phone_sip.py:236
+@@ -238,12 +238,12 @@
+ #: ../cfg_app_milliwatt.py:33 ../cfg_app_music.py:32 ../cfg_app_parking.py:32
+ #: ../cfg_app_play.py:32 ../cfg_app_record.py:34 ../cfg_app_saytime.py:31
+ #: ../cfg_app_voicemail.py:32 ../cfg_opt_monitor.py:32 ../cfg_opt_pickup.py:32
+-#: ../cfg_phone_epygi.py:59 ../cfg_phone_ext.py:26 ../cfg_phone_ext.py:43
+-#: ../cfg_phone_iax.py:52 ../cfg_phone_mgcp.py:51 ../cfg_phone_queue.py:43
+-#: ../cfg_phone_sip.py:59 ../cfg_phone_zap.py:59 ../cfg_trunk_fwdiax.py:45
+-#: ../cfg_trunk_iaxtel.py:44 ../configlets.py:582 ../configlets.py:959
+-#: ../configlets.py:1128 ../configlets.py:1149 ../page_stats_phone.ptl:65
+-#: ../page_user_state.ptl:66 ../page_user_state.ptl:81
++#: ../cfg_phone_epygi.py:59 ../cfg_phone_ext.py:43 ../cfg_phone_iax.py:52
++#: ../cfg_phone_mgcp.py:51 ../cfg_phone_queue.py:43 ../cfg_phone_sip.py:59
++#: ../cfg_phone_zap.py:59 ../cfg_trunk_fwdiax.py:45 ../cfg_trunk_iaxtel.py:44
++#: ../configlets.py:582 ../configlets.py:959 ../configlets.py:1128
++#: ../configlets.py:1149 ../page_stats_phone.ptl:65 ../page_user_state.ptl:66
++#: ../page_user_state.ptl:81
+ msgid &quot;Extension&quot;
+ msgstr &quot;Extensi&#243;n&quot;
+ 
+@@ -1276,6 +1276,22 @@
+ msgid &quot;Music on hold&quot;
+ msgstr &quot;M&#250;sica en espera&quot;
+ 
++#: ../cfg_opt_sip_network.py:103
++msgid &quot;Send ring progress tones in band?&quot;
++msgstr &quot;&#191;Enviar timbres de progreso en banda?&quot;
++
++#: ../cfg_opt_sip_network.py:106
++msgid &quot;yes&quot;
++msgstr &quot;s&#237;&quot;
++
++#: ../cfg_opt_sip_network.py:107
++msgid &quot;no&quot;
++msgstr &quot;no&quot;
++
++#: ../cfg_opt_sip_network.py:108
++msgid &quot;never&quot;
++msgstr &quot;nunca&quot;
++
+ #: ../cfg_opt_transfer.py:27 ../cfg_opt_transfer.py:28
+ msgid &quot;Transfer Extensions&quot;
+ msgstr &quot;Extensiones de transferencia&quot;
+@@ -1354,7 +1370,7 @@
+ msgid &quot;Language&quot;
+ msgstr &quot;Idioma&quot;
+ 
+-#: ../cfg_opt_user.py:65
++#: ../cfg_opt_user.py:66
+ msgid &quot;Please choose a Virtual PBX for this user.&quot;
+ msgstr &quot;Por favor, escoja la PBX Virtual para este usuario.&quot;
+ 
+@@ -1867,9 +1883,13 @@
+ msgid &quot;Enable time restriction?&quot;
+ msgstr &quot;&#191;Habilitar la restricci&#243;n de tiempo?&quot;
+ 
++#: ../cfg_phone_ext.py:26
++msgid &quot;Alias extension&quot;
++msgstr &quot;Alias de la extensi&#243;n&quot;
++
+ #: ../cfg_phone_ext.py:27
+-msgid &quot;New extension&quot;
+-msgstr &quot;Nueva extensi&#243;n&quot;
++msgid &quot;New alias extension&quot;
++msgstr &quot;Nuevo alias para la extensi&#243;n&quot;
+ 
+ #: ../cfg_phone_ext.py:28
+ msgid &quot;Set an 'alias' extension to a phone&quot;
+@@ -2517,19 +2537,19 @@
+ &quot;0,Sin tiempo l&#237;mite|300,5 minutos|600,10 minutos|1200,20 minutos|2400,40 &quot;
+ &quot;minutos|3000,50 minutos&quot;
+ 
+-#: ../panelutils.py:136
++#: ../panelutils.py:139
+ msgid &quot;Meetme&quot;
+ msgstr &quot;Sala de Conferencia&quot;
+ 
+-#: ../panelutils.py:140
++#: ../panelutils.py:143
+ msgid &quot;PARK&quot;
+ msgstr &quot;Parqueo&quot;
+ 
+-#: ../panelutils.py:144
++#: ../panelutils.py:147
+ msgid &quot;Park&quot;
+ msgstr &quot;Parqueo&quot;
+ 
+-#: ../panelutils.py:162
++#: ../panelutils.py:165
+ msgid &quot;Restarting the panel daemon ...&quot;
+ msgstr &quot;Reiniciando el demonio del p&#225;nel ...&quot;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000356.html">[Destar-dev] r815 - trunk
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#357">[ date ]</a>
+              <a href="thread.html#357">[ thread ]</a>
+              <a href="subject.html#357">[ subject ]</a>
+              <a href="author.html#357">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

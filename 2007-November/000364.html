@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r821 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r821%20-%20branches/0.2.X&In-Reply-To=%3C200711132244.lADMiZQC025551%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000363.html">
+   <LINK REL="Next"  HREF="000365.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r821 - branches/0.2.X</H1>
+    <B>dasenjo at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r821%20-%20branches/0.2.X&In-Reply-To=%3C200711132244.lADMiZQC025551%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r821 - branches/0.2.X">dasenjo at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 13 23:44:35 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000363.html">[Destar-dev] r820 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000365.html">[Destar-dev] r822 - in branches/0.2.X: . misc/debian
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#364">[ date ]</a>
+              <a href="thread.html#364">[ thread ]</a>
+              <a href="subject.html#364">[ subject ]</a>
+              <a href="author.html#364">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dasenjo
+Date: 2007-11-13 23:44:35 +0100 (Tue, 13 Nov 2007)
+New Revision: 821
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_opt_codec.py
+Log:
+* Added 'disallow=all' as an option for the codecs confgiration.
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-11-13 22:43:05 UTC (rev 820)
++++ branches/0.2.X/CHANGELOG.txt	2007-11-13 22:44:35 UTC (rev 821)
+@@ -1,5 +1,6 @@
+ 2007-11-13:
+ * Recording capability for conference rooms.
++* Added 'disallow=all' as an option for the codecs confgiration.
+ 
+ 2007-11-07:
+ * Some old cdr modules store disposition values as integers. A little try to handle it.
+
+Modified: branches/0.2.X/cfg_opt_codec.py
+===================================================================
+--- branches/0.2.X/cfg_opt_codec.py	2007-11-13 22:43:05 UTC (rev 820)
++++ branches/0.2.X/cfg_opt_codec.py	2007-11-13 22:44:35 UTC (rev 821)
+@@ -35,6 +35,7 @@
+ 			VarType(&quot;name&quot;, title=_(&quot;Allow codec&quot;), type=&quot;choice&quot;,
+ 				options=(
+ 					(&quot;all&quot;,_(&quot;Use all codecs&quot;)),
++					(&quot;disallow&quot;,_(&quot;Disallow all codecs&quot;)),
+ 					(&quot;alaw&quot;,_(&quot;A Law (g711a)&quot;)),
+ 					(&quot;ulaw&quot;,_(&quot;U Law (g711u)&quot;)),
+ 					(&quot;gsm&quot;,_(&quot;GSM&quot;)),
+@@ -58,6 +59,8 @@
+ 			if self.name == &quot;g723&quot;:
+ 				c.append(&quot;allow=%s.1&quot; % self.name)
+ 				needModule(&quot;codec_%s_1&quot; % self.name)
++			if self.name == &quot;disallow&quot;:
++				c.append(&quot;disallow=all&quot;)
+ 			else:	
+ 				c.append(&quot;allow=%s&quot; % self.name)
+ 				needModule(&quot;codec_%s&quot; % self.name)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000363.html">[Destar-dev] r820 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000365.html">[Destar-dev] r822 - in branches/0.2.X: . misc/debian
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#364">[ date ]</a>
+              <a href="thread.html#364">[ thread ]</a>
+              <a href="subject.html#364">[ subject ]</a>
+              <a href="author.html#364">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

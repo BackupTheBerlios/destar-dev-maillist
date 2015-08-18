@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r712 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r712%20-%20branches/0.2.X&In-Reply-To=%3C200706132102.l5DL2WOn006660%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000222.html">
+   <LINK REL="Next"  HREF="000224.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r712 - branches/0.2.X</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r712%20-%20branches/0.2.X&In-Reply-To=%3C200706132102.l5DL2WOn006660%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r712 - branches/0.2.X">santiago at mail.berlios.de
+       </A><BR>
+    <I>Wed Jun 13 23:02:32 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000222.html">[Destar-dev] r711 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000224.html">[Destar-dev] r713 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#223">[ date ]</a>
+              <a href="thread.html#223">[ thread ]</a>
+              <a href="subject.html#223">[ subject ]</a>
+              <a href="author.html#223">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-13 23:02:31 +0200 (Wed, 13 Jun 2007)
+New Revision: 712
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_trunk_iax.py
+Log:
+* cfg_trunk_iax.py: added remote port setting
+* cfg_trunk_iax.py: added registry option
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-06-13 20:53:54 UTC (rev 711)
++++ branches/0.2.X/CHANGELOG.txt	2007-06-13 21:02:31 UTC (rev 712)
+@@ -1,5 +1,7 @@
+ 2007-06-13:
+ * Changed coding header to utf-8 in all files.
++* cfg_trunk_iax.py: added remote port setting
++* cfg_trunk_iax.py: added registry option
+ 
+ 2007-06-12:
+ * Fixed bug in Zap trunks (clidnumin needed).
+
+Modified: branches/0.2.X/cfg_trunk_iax.py
+===================================================================
+--- branches/0.2.X/cfg_trunk_iax.py	2007-06-13 20:53:54 UTC (rev 711)
++++ branches/0.2.X/cfg_trunk_iax.py	2007-06-13 21:02:31 UTC (rev 712)
+@@ -40,11 +40,21 @@
+ 				title=_(&quot;IAX host&quot;),
+ 				len=80),
+ 
++			VarType(&quot;port&quot;,
++				title=_(&quot;IAX2 remote port&quot;),
++				type=&quot;int&quot;,
++				default=4569,
++				len=5),				
++
+ 			VarType(&quot;bandwidth&quot;,
+ 				title=_(&quot;Bandwith&quot;),
+ 				type=&quot;choice&quot;,
+ 				len=25,
+ 				options=[('low',_(&quot;Low&quot;)),('high', _(&quot;High&quot;))]),
++
++			VarType(&quot;register&quot;,
++				title=_(&quot;Register with remote host?&quot;),
++				type=&quot;bool&quot;),
+ 		
+ 			VarType(&quot;authLabel&quot;,
+ 				title=_(&quot;Authentication&quot;),
+@@ -73,7 +83,7 @@
+ 				hint=_(&quot;For 'RSA' only&quot;),
+ 				len=80,
+ 				optional=True),
+-
++	
+ 			VarType(&quot;trunk&quot;,
+ 				title=_(&quot;Enable trunking?&quot;),
+ 				type=&quot;bool&quot;,
+@@ -171,6 +181,19 @@
+ 		self.createIncomingContext()
+ 		
+ 		c = AstConf(&quot;iax.conf&quot;)
++
++		if self.register:
++			c.setSection(&quot;general&quot;)
++			registerstr = &quot;register =&gt; %s&quot; % self.name
++			if self.auth == &quot;plain&quot;:
++				registerstr += &quot;:%s&quot; % self.pw
++			# TODO: registration using rsa keys 
++			#elif self.auth = &quot;rsa&quot;:
++			registerstr += &quot;@%s&quot; % self.host
++			if self.port:
++				registerstr += &quot;:%s&quot; % self.port
++			c.append(registerstr)
++
+ 		if not c.hasSection(self.name):
+ 			c.setSection(self.name)
+ 			c.append(&quot;type=friend&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000222.html">[Destar-dev] r711 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000224.html">[Destar-dev] r713 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#223">[ date ]</a>
+              <a href="thread.html#223">[ thread ]</a>
+              <a href="subject.html#223">[ subject ]</a>
+              <a href="author.html#223">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

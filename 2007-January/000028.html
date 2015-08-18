@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r560 - branches/quixote2
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r560%20-%20branches/quixote2&In-Reply-To=%3C200701162229.l0GMToK5030767%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000027.html">
+   <LINK REL="Next"  HREF="000029.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r560 - branches/quixote2</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r560%20-%20branches/quixote2&In-Reply-To=%3C200701162229.l0GMToK5030767%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r560 - branches/quixote2">santiago at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan 16 23:29:50 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000027.html">[Destar-dev] [Bug #8998] Milliwatt application configlet doesn't	require app_miliwatt
+</A></li>
+        <LI>Next message: <A HREF="000029.html">[Destar-dev] r561 - branches/quixote2
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#28">[ date ]</a>
+              <a href="thread.html#28">[ thread ]</a>
+              <a href="subject.html#28">[ subject ]</a>
+              <a href="author.html#28">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-01-16 23:29:49 +0100 (Tue, 16 Jan 2007)
+New Revision: 560
+
+Modified:
+   branches/quixote2/CHANGELOG.txt
+   branches/quixote2/cfg_opt_pbx.py
+   branches/quixote2/page_stats_phone.ptl
+Log:
+Merging trunk and quixote2 branch
+
+
+
+Modified: branches/quixote2/CHANGELOG.txt
+===================================================================
+--- branches/quixote2/CHANGELOG.txt	2007-01-15 23:46:08 UTC (rev 559)
++++ branches/quixote2/CHANGELOG.txt	2007-01-16 22:29:49 UTC (rev 560)
+@@ -1,3 +1,21 @@
++2007-01-16:
++* Merging quixote2 branch and trunk 
++
++2007-01-15:
++* Fixed recording. Patch by Harald Holzer
++* dont add modules to modules.conf, if they does not exists (Bug #9708). Patch by Harald Holzer
++* added sip tos option. Patch by Harald Holzer
++* added queue timeout. Patch by Harald Holzer
++* added callerid(number) option on incoming calls. Patch by Harald Holzer
++- added callerid(number) option on outcoming calls
++- added sip from domain option
++- added DID custom mapping option
++* some better defaults. Patch by Harald Holzer
++* add early media support in dialmacro. Patch by Harald Holzer
++- add parallel ringing support in dialmacro
++- add call forward only on trunk support in dialmacro
++* added sip pedantic option. Patch by Harald Holzer
++
+ 2007-01-13:
+ * Deleted some debug prints.
+ 
+@@ -8,6 +26,26 @@
+ * page_user*.ptl and page_admin*.ptl: corrected some 
+   function's &quot;position&quot;
+ 
++2006-12-29:
++* &quot;updated&quot; version
++* First attempt to detect if cdr_sqlite3_custom.so exists
++
++2006-12-13:
++* Added global nat option for sip  in cfg_opt_sip_network.py
++* Cosmetical changes in cfg_opt_sip_network.py
++
++2006-12-07:
++* Added queue (member) and hint config for non SIP phones.
++* Partial fix for bug #9633. Needs more test.
++
++2006-12-04:
++* REALLY Moved language=** from [general] to [channels] in zapata.conf. Thanks to tzafrir! :)
++* Create an entry in op_buttons.cfg for Queues.
++
++2006-12-03:
++* Added queues web form variables for iax, zap ad mgcp phones 
++* Fixed some html warnings.
++
+ 2006-12-02:
+ * All missing page_* &quot;upgraded&quot;, but there is still work to do.
+ 
+@@ -22,8 +60,34 @@
+ * Renamed PageMain to Page
+ * Upgraded page_user, page_user_info and page_logout
+ 
++2006-11-21
++* Configlet to listen active calls with ChanSpy
++
++2006-11-16
++* Removed unnecessary global configlet_tree's in configlets.createIncomingContext()
++* Moved language=** from [general] to [channels] in zapata.conf. Thanks to tzafrir! :)
++
++2006-11-14:
++* Added email variable to the cfg_phone_* configlets. Closes bug #9462.
++* Set int type for the email pin.
++
++2006-11-11:
++* Updated fr.po. Thanks to Anthony Piron.
++
++2006-11-10:
++* configlets.py: added _X incoming context rule. Closes bug #9419.
++
++2006-11-09:
++* configlets.py: fixed incoming context rule.
++
++2006-11-05
++* page_stats_cdr.ptl: display records in DESC order.
++* page_stats_phone.ptl, page_stats_trunks.ptl, page_stats_dialouts.ptl:
++  Fixed current month
++ 
+ 2006-10-31:
+ * A test with page_main and page_login.
++* Simple and ugly bug fix for #9281.
+ 
+ 2006-10-30:
+ * panelutils: Insterting again startPanelDaemon and stopPanelDaemon,
+
+Modified: branches/quixote2/cfg_opt_pbx.py
+===================================================================
+--- branches/quixote2/cfg_opt_pbx.py	2007-01-15 23:46:08 UTC (rev 559)
++++ branches/quixote2/cfg_opt_pbx.py	2007-01-16 22:29:49 UTC (rev 560)
+@@ -30,7 +30,10 @@
+ 	groupName = 'PBX'
+ 		
+ 	variables = [
+-		VarType(&quot;name&quot;,	  title=_(&quot;Name&quot;), len=15),
++		VarType(&quot;name&quot;,
++			title=_(&quot;Name&quot;),
++			len=15,
++			default=&quot;defaultpbx&quot;),
+ 			]
+ 
+ 	def checkConfig(self):
+
+Modified: branches/quixote2/page_stats_phone.ptl
+===================================================================
+--- branches/quixote2/page_stats_phone.ptl	2007-01-15 23:46:08 UTC (rev 559)
++++ branches/quixote2/page_stats_phone.ptl	2007-01-16 22:29:49 UTC (rev 560)
+@@ -39,9 +39,9 @@
+ 	
+ 	# fix the month value for those smaller than 10 (january ... september) 1 -&gt; 01, 2 -&gt;02 
+ 	if localtime[1] &lt; 10:
+-		localmonth = '0%s' % localtime[1] 
++		localmonth = '0%s' % str(localtime[1])
+ 	else:
+-		localmonth = localtime[1]
++		localmonth = str(localtime[1])
+ 	
+ 	#the same for the day
+ 	if localtime[2] &lt; 10:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000027.html">[Destar-dev] [Bug #8998] Milliwatt application configlet doesn't	require app_miliwatt
+</A></li>
+	<LI>Next message: <A HREF="000029.html">[Destar-dev] r561 - branches/quixote2
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#28">[ date ]</a>
+              <a href="thread.html#28">[ thread ]</a>
+              <a href="subject.html#28">[ subject ]</a>
+              <a href="author.html#28">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

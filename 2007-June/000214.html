@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r703 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r703%20-%20trunk&In-Reply-To=%3C200706072242.l57MgNZn013443%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000213.html">
+   <LINK REL="Next"  HREF="000215.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r703 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r703%20-%20trunk&In-Reply-To=%3C200706072242.l57MgNZn013443%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r703 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun  8 00:42:23 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000213.html">[Destar-dev] r702 - branches/0.2.X
+</A></li>
+        <LI>Next message: <A HREF="000215.html">[Destar-dev] r704 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#214">[ date ]</a>
+              <a href="thread.html#214">[ thread ]</a>
+              <a href="subject.html#214">[ subject ]</a>
+              <a href="author.html#214">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-08 00:42:22 +0200 (Fri, 08 Jun 2007)
+New Revision: 703
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_trunk_sip.py
+Log:
+cfg_trunk_sip.py: Some changes in register and cmd lines to be compatible with budgetone.nl
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-07 22:26:04 UTC (rev 702)
++++ trunk/CHANGELOG.txt	2007-06-07 22:42:22 UTC (rev 703)
+@@ -1,3 +1,6 @@
++2007-06-07:
++* cfg_trunk_sip.py: Some changes in register and cmd lines to be compatible with budgetone.nl
++
+ 2007-06-06:
+ * Removed default op-panel config in destar_cfg.py sample.
+ * Added srvlookup setting for sip.conf
+
+Modified: trunk/cfg_trunk_sip.py
+===================================================================
+--- trunk/cfg_trunk_sip.py	2007-06-07 22:26:04 UTC (rev 702)
++++ trunk/cfg_trunk_sip.py	2007-06-07 22:42:22 UTC (rev 703)
+@@ -168,8 +168,8 @@
+ 			self.dial = &quot;SIP/${ARG1}@%s&quot; % (self.name)
+ 		else:
+ 			self.dial = &quot;SIP/${ARG1}@%s&quot; % (self.host)
+-		if self.forward:
+-			self.dial += &quot;/${ARG1}&quot; 
++			if self.forward:
++				self.dial += &quot;/${ARG1}&quot; 
+ 		
+ 		#What to do with incoming calls
+ 		self.createIncomingContext()
+@@ -178,14 +178,18 @@
+ 		c.setSection(&quot;general&quot;)
+ 		if self.register:
+ 			if not self.port:
+-				c.append(&quot;register=%s:%s@%s&quot; % (self.id, self.pw, self.host))
++				registerstr = &quot;register =&gt; %s:%s@%s&quot; % (self.id, self.pw, self.host)
+ 			else:
+-				c.append(&quot;register=%s:%s@%s:%s&quot; % (self.id, self.pw, self.host, self.port))
++				registerstr = &quot;register =&gt; %s:%s@%s:%s&quot; % (self.id, self.pw, self.host, self.port)
++			if self.forward: 
++				registerstr += &quot;/%s&quot; % self.id
++			c.append(registerstr)
+ 
+ 		if not c.hasSection(self.name):
+ 			c.setSection(self.name)
+ 			c.append(&quot;type=friend&quot;)
+ 			c.append(&quot;username=%s&quot; % self.id)
++			c.append(&quot;fromuser=%s&quot; % self.id)
+ 			c.append(&quot;secret=%s&quot; % self.pw)
+ 			c.append(&quot;host=%s&quot; % self.host)
+ 			if self.port:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000213.html">[Destar-dev] r702 - branches/0.2.X
+</A></li>
+	<LI>Next message: <A HREF="000215.html">[Destar-dev] r704 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#214">[ date ]</a>
+              <a href="thread.html#214">[ thread ]</a>
+              <a href="subject.html#214">[ subject ]</a>
+              <a href="author.html#214">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

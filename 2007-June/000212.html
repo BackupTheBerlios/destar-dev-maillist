@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r701 - branches/0.2.X
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r701%20-%20branches/0.2.X&In-Reply-To=%3C200706072128.l57LS5hh018417%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000211.html">
+   <LINK REL="Next"  HREF="000213.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r701 - branches/0.2.X</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r701%20-%20branches/0.2.X&In-Reply-To=%3C200706072128.l57LS5hh018417%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r701 - branches/0.2.X">santiago at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun  7 23:28:05 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000211.html">[Destar-dev] r700 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000213.html">[Destar-dev] r702 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#212">[ date ]</a>
+              <a href="thread.html#212">[ thread ]</a>
+              <a href="subject.html#212">[ subject ]</a>
+              <a href="author.html#212">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-06-07 23:28:04 +0200 (Thu, 07 Jun 2007)
+New Revision: 701
+
+Modified:
+   branches/0.2.X/CHANGELOG.txt
+   branches/0.2.X/cfg_dialout_normal.py
+Log:
+* cfg_dialout_normal.py: Moved (reverted) SetVar to Set
+
+
+
+Modified: branches/0.2.X/CHANGELOG.txt
+===================================================================
+--- branches/0.2.X/CHANGELOG.txt	2007-06-06 22:22:03 UTC (rev 700)
++++ branches/0.2.X/CHANGELOG.txt	2007-06-07 21:28:04 UTC (rev 701)
+@@ -1,3 +1,6 @@
++2007-06-07:
++* cfg_dialout_normal.py: Moved (reverted) SetVar to Set
++
+ 2007-06-06:
+ * Added srvlookup setting for sip.conf
+ * Fixed typo in cfg_trunk_sip Dial cmd
+
+Modified: branches/0.2.X/cfg_dialout_normal.py
+===================================================================
+--- branches/0.2.X/cfg_dialout_normal.py	2007-06-06 22:22:03 UTC (rev 700)
++++ branches/0.2.X/cfg_dialout_normal.py	2007-06-07 21:28:04 UTC (rev 701)
+@@ -123,7 +123,7 @@
+ 		else:
+ 		       opts=&quot;TtW&quot;
+ 		if self.qlookup:
+-			c.appendExten(&quot;s&quot;,'SetVar(options=%sr)' % opts)
++			c.appendExten(&quot;s&quot;,'Set(options=%sr)' % opts)
+ 			c.appendExten(&quot;s&quot;,&quot;Set(dest=${DB(QUICKDIALLIST/GLOBAL/${ARG1})})&quot;,e=&quot;Goto(3)&quot;)
+ 			c.appendExten(&quot;s&quot;,'Set(ARG1=${dest})')
+ 			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG2} = n]?6:5)&quot;)
+@@ -133,7 +133,7 @@
+ 			c.appendExten(&quot;s&quot;,'Set(options=%s)' % opts)
+ 			c.appendExten(&quot;s&quot;,'Goto(11)')
+ 		else:
+-			c.appendExten(&quot;s&quot;,'SetVar(options=%sr)' % opts)
++			c.appendExten(&quot;s&quot;,'Set(options=%sr)' % opts)
+ 			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG2} = n]?4:3)&quot;)
+ 			c.appendExten(&quot;s&quot;,&quot;Authenticate(${ARG2})&quot;)
+ 			c.appendExten(&quot;s&quot;,&quot;GotoIf($[${ARG3} = 0]?5:8)&quot;)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000211.html">[Destar-dev] r700 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000213.html">[Destar-dev] r702 - branches/0.2.X
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#212">[ date ]</a>
+              <a href="thread.html#212">[ thread ]</a>
+              <a href="subject.html#212">[ subject ]</a>
+              <a href="author.html#212">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r732 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r732%20-%20trunk&In-Reply-To=%3C200706290058.l5T0w1MT022903%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000242.html">
+   <LINK REL="Next"  HREF="000244.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r732 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r732%20-%20trunk&In-Reply-To=%3C200706290058.l5T0w1MT022903%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r732 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun 29 02:58:01 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000242.html">[Destar-dev] r731 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000244.html">[Destar-dev] r733 - in trunk: . misc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#243">[ date ]</a>
+              <a href="thread.html#243">[ thread ]</a>
+              <a href="subject.html#243">[ subject ]</a>
+              <a href="author.html#243">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-06-29 02:57:59 +0200 (Fri, 29 Jun 2007)
+New Revision: 732
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/ConfigHelper.ptl
+   trunk/configlets.py
+Log:
+* Added logging information for configlets edition.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-06-29 00:55:35 UTC (rev 731)
++++ trunk/CHANGELOG.txt	2007-06-29 00:57:59 UTC (rev 732)
+@@ -1,3 +1,9 @@
++2007-06-28:
++* page_admin_cfwstate.ptl: small fix on subrutine call.
++* page_user_info.ptl: _q_level should be 1.
++* Added logging information for destar's users sessions.
++* Added logging information for configlets edition.
++
+ 2007-06-27:
+ * Added zaptel dynamic spans support (TDMoE)
+ 
+
+Modified: trunk/ConfigHelper.ptl
+===================================================================
+--- trunk/ConfigHelper.ptl	2007-06-29 00:55:35 UTC (rev 731)
++++ trunk/ConfigHelper.ptl	2007-06-29 00:57:59 UTC (rev 732)
+@@ -23,7 +23,7 @@
+ from quixote.html import htmlescape
+ from quixote import redirect
+ import backend
+-import types, string
++import types, string, time
+ 
+ 
+ class ROStringWidget(StringWidget):
+@@ -164,6 +164,8 @@
+ 	def saveConfig(withCallback=True):
+ 		&quot;&quot;&quot;Saves all values from the form into the configlet 'obj'.&quot;&quot;&quot;
+ 
++		print (&quot;[%s] Saving configlet '%s' with id '%s' in group '%s'&quot; % (time.asctime(time.localtime()), obj.name, obj._id, obj.groupName))
++
+ 		#print &quot;action&quot;, obj
+ 		for v in obj.variables:
+ 			if v.hide:
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-06-29 00:55:35 UTC (rev 731)
++++ trunk/configlets.py	2007-06-29 00:57:59 UTC (rev 732)
+@@ -300,12 +300,15 @@
+ 				if group[i]._id == _id:
+ 					for dep in group[i].dependent_objs:
+ 						self.deleteConfiglet(dep.configlet._id)
++					obj = group[i]
++					print (&quot;[%s] Deleting configlet '%s' with id '%s' from group '%s'&quot; % (time.asctime(time.localtime()), obj.name, obj._id, obj.groupName))
+ 					del group[i]
+ 					return
+ 					
+ 	def moveConfigletUp(self, _id):
+ 		obj = self.getConfiglet(_id)
+ 		configlet_list = self.groups[obj.groupName]
++		print (&quot;[%s] Moving up configlet '%s' with id '%s' in group '%s'&quot; % (time.asctime(time.localtime()), obj.name, obj._id, obj.groupName))
+ 		
+ 		for i in range(len(configlet_list)):
+ 			if configlet_list[i]._id == obj._id and i &gt; 0:
+@@ -317,6 +320,7 @@
+ 	def moveConfigletDown(self, _id):
+ 		obj = self.getConfiglet(_id)
+ 		configlet_list = self.groups[obj.groupName]
++		print (&quot;[%s] Moving down configlet '%s' with id '%s' in group '%s'&quot; % (time.asctime(time.localtime()), obj.name, obj._id, obj.groupName))
+ 		
+ 		for i in range(len(configlet_list)):
+ 			if configlet_list[i]._id == obj._id and i &lt; (len(configlet_list) -1):
+@@ -374,6 +378,7 @@
+ 	def addConfiglet(self, configlet):
+ 		if not self.groups.has_key(configlet.groupName):
+ 			self.groups[configlet.groupName] = []
++		print (&quot;[%s] Loading configlet '%s' with id '%s' in group '%s'&quot; % (time.asctime(time.localtime()), configlet.name, configlet._id, configlet.groupName))
+ 		self.groups[configlet.groupName].append(configlet)
+ 		
+ 	def generateUniqueId(self):
+@@ -662,7 +667,6 @@
+ 				cont = '&quot;&quot;&quot;%s&quot;&quot;&quot;' % _v
+ 			elif v.type==&quot;int&quot;:
+ 				if _v == 0:
+-					print v.name
+ 					continue
+ 				else:
+ 					cont = _v
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000242.html">[Destar-dev] r731 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000244.html">[Destar-dev] r733 - in trunk: . misc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#243">[ date ]</a>
+              <a href="thread.html#243">[ thread ]</a>
+              <a href="subject.html#243">[ subject ]</a>
+              <a href="author.html#243">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r552 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-January/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r552%20-%20trunk&In-Reply-To=%3C200701151652.l0FGqUNJ031339%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000014.html">
+   <LINK REL="Next"  HREF="000016.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r552 - trunk</H1>
+    <B>santiago at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r552%20-%20trunk&In-Reply-To=%3C200701151652.l0FGqUNJ031339%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r552 - trunk">santiago at mail.berlios.de
+       </A><BR>
+    <I>Mon Jan 15 17:52:30 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000014.html">[Destar-dev] r551 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000016.html">[Destar-dev] r553 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#15">[ date ]</a>
+              <a href="thread.html#15">[ thread ]</a>
+              <a href="subject.html#15">[ subject ]</a>
+              <a href="author.html#15">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: santiago
+Date: 2007-01-15 17:52:30 +0100 (Mon, 15 Jan 2007)
+New Revision: 552
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/cfg_opt_sip_network.py
+Log:
+* added sip tos option. Patch by Harald Holzer
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2007-01-15 16:43:44 UTC (rev 551)
++++ trunk/CHANGELOG.txt	2007-01-15 16:52:30 UTC (rev 552)
+@@ -1,6 +1,7 @@
+ 2007-01-15:
+ * Fixed recording. Patch by Harald Holzer
+ * dont add modules to modules.conf, if they does not exists (Bug #9708). Patch by Harald Holzer
++* added sip tos option. Patch by Harald Holzer
+ 
+ 2006-12-29:
+ * &quot;updated&quot; version
+
+Modified: trunk/cfg_opt_sip_network.py
+===================================================================
+--- trunk/cfg_opt_sip_network.py	2007-01-15 16:43:44 UTC (rev 551)
++++ trunk/cfg_opt_sip_network.py	2007-01-15 16:52:30 UTC (rev 552)
+@@ -36,7 +36,8 @@
+ 
+ 			VarType(&quot;bindaddr&quot;,	
+ 					title=_(&quot;Bind address&quot;), 
+-					len=25),
++					len=25,
++					optional=True),
+ 
+ 			VarType(&quot;globalnat&quot;,
+ 					title=_(&quot;Global NAT&quot;),
+@@ -57,16 +58,23 @@
+ 
+ 			VarType(&quot;extip&quot;,	
+ 					title=_(&quot;External ip&quot;), 
+-					len=25),
++					len=25,
++					optional=True),
+ 
+ 			VarType(&quot;intnet&quot;,	
+ 					title=_(&quot;Internal network&quot;), 
+-					len=25),
++					len=25,
++					optional=True),
+ 
+ 			VarType(&quot;intnetmask&quot;,	
+ 					title=_(&quot;Netmask&quot;), 
+-					len=25),
+-					
++					len=25,
++					optional=True),
++
++			VarType(&quot;tos&quot;,
++					title=_(&quot;TOS:&quot;),
++					len=10,
++					optional=True),
+ 		]
+ 
+ 	def checkConfig(self):
+@@ -94,6 +102,10 @@
+ 		if self.doBind:
+ 			c.append(&quot;bindaddr=%s&quot; % self.bindaddr)
+ 		if self.setExt:
+-			c.append(&quot;externip=%s&quot; % self.extip)
+-			c.append(&quot;localnet=%s/%s&quot; % (self.intnet,self.intnetmask))
++			if self.extip:
++				c.append(&quot;externip=%s&quot; % self.extip)
++			if self.intnet:
++				c.append(&quot;localnet=%s/%s&quot; % (self.intnet,self.intnetmask))
++		if self.tos:
++			c.append(&quot;tos=%s&quot; % self.tos)
+ 		c.append(&quot;nat=%s&quot; % self.globalnat)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000014.html">[Destar-dev] r551 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000016.html">[Destar-dev] r553 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#15">[ date ]</a>
+              <a href="thread.html#15">[ thread ]</a>
+              <a href="subject.html#15">[ subject ]</a>
+              <a href="author.html#15">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

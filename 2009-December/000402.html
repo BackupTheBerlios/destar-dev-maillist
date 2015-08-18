@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r848 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r848%20-%20trunk&In-Reply-To=%3C200912201625.nBKGPlfL028406%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000401.html">
+   <LINK REL="Next"  HREF="000403.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r848 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r848%20-%20trunk&In-Reply-To=%3C200912201625.nBKGPlfL028406%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r848 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 20 17:25:47 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000401.html">[Destar-dev] r847 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000403.html">[Destar-dev] r849 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#402">[ date ]</a>
+              <a href="thread.html#402">[ thread ]</a>
+              <a href="subject.html#402">[ subject ]</a>
+              <a href="author.html#402">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-20 17:25:46 +0100 (Sun, 20 Dec 2009)
+New Revision: 848
+
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/page_admin_cfwstate.ptl
+Log:
+* page_admin_cfwstate.ptl: Added CFTO, VMU and VMBS.
+
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-16 23:23:10 UTC (rev 847)
++++ trunk/CHANGELOG.txt	2009-12-20 16:25:46 UTC (rev 848)
+@@ -1,5 +1,8 @@
++2009-12-20
++* page_admin_cfwstate.ptl: Added CFTO, VMU and VMBS.
++
+ 2009-12-16
+-* cfg_opt_pbx.py cfg_app_*: separate context for all apps.
++* cfg_opt_pbx.py, cfg_app_*: separate context for all apps.
+ * Replaced CALLERIDNUM with CALLERID(num).
+ * Added cfg_app_cidblock.py to implement ex-girlfriend feature.
+ 
+
+Modified: trunk/page_admin_cfwstate.ptl
+===================================================================
+--- trunk/page_admin_cfwstate.ptl	2009-12-16 23:23:10 UTC (rev 847)
++++ trunk/page_admin_cfwstate.ptl	2009-12-20 16:25:46 UTC (rev 848)
+@@ -29,7 +29,10 @@
+ def CFList [plain] (pbx):
+ 	cfimlist = manager.getVarFamily(&quot;CFIM/%s&quot; % pbx)
+ 	cfbslist = manager.getVarFamily(&quot;CFBS/%s&quot; % pbx)
++	cftolist = manager.getVarFamily(&quot;CFTO/%s&quot; % pbx)
+ 	dndlist = manager.getVarFamily(&quot;DND/%s&quot; % pbx)
++	vmulist = manager.getVarFamily(&quot;VMU/%s&quot; % pbx)
++	vmbslist = manager.getVarFamily(&quot;VMBS/%s&quot; % pbx)
+ 	if cfimlist != []:
+ 		# TODO: use CSS
+ 		'&lt;table border=1 cellspacing=&quot;1&quot;&gt;'
+@@ -44,6 +47,21 @@
+ 		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+ 		htmltext(_(&quot;No CFIM entries found&quot;))
+ 		'&lt;/span&gt;&lt;/p&gt;'
++	if cftolist != []:
++		# TODO: use CSS
++		'&lt;table border=1 cellspacing=&quot;1&quot;&gt;'
++		'&lt;tbody&gt;&lt;thead&gt;'
++		'&lt;tr&gt;&lt;th&gt;%s&lt;/th&gt;&lt;/tr&gt;' % htmltext(_('Extension : CFTO Call Forwarning if Timeout')) 
++		'&lt;/thead&gt;'
++		for i in cftolist:
++			'&lt;tr&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % _(i)
++		'&lt;/tbody&gt;'
++		'&lt;/table&gt;&lt;br/&gt;&lt;br/&gt;'
++	else:
++		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++		htmltext(_(&quot;No CFTO entries found&quot;))
++		'&lt;/span&gt;&lt;/p&gt;'
++
+ 	if cfbslist != []:
+ 		# TODO: use CSS
+ 		'&lt;table border=1 cellspacing=&quot;1&quot;&gt;'
+@@ -72,6 +90,34 @@
+ 		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
+ 		htmltext(_(&quot;No DND entries found&quot;))
+ 		'&lt;/span&gt;&lt;/p&gt;'
++	if vmulist != []:
++		# TODO: use CSS
++		'&lt;table border=1 cellspacing=&quot;1&quot;&gt;'
++		'&lt;tbody&gt;&lt;thead&gt;'
++		'&lt;tr&gt;&lt;th&gt;%s&lt;/th&gt;&lt;/tr&gt;' % htmltext(_('Extensions with active VMU')) 
++		'&lt;/thead&gt;'
++		for i in vmulist:
++			'&lt;tr&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % _(i)
++		'&lt;/tbody&gt;'
++		'&lt;/table&gt;&lt;br/&gt;&lt;br/&gt;'
++	else:
++		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++		htmltext(_(&quot;No VMU entries found&quot;))
++		'&lt;/span&gt;&lt;/p&gt;'
++	if vmbslist != []:
++		# TODO: use CSS
++		'&lt;table border=1 cellspacing=&quot;1&quot;&gt;'
++		'&lt;tbody&gt;&lt;thead&gt;'
++		'&lt;tr&gt;&lt;th&gt;%s&lt;/th&gt;&lt;/tr&gt;' % htmltext(_('Extensions with active VMBS')) 
++		'&lt;/thead&gt;'
++		for i in vmbslist:
++			'&lt;tr&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % _(i)
++		'&lt;/tbody&gt;'
++		'&lt;/table&gt;&lt;br/&gt;&lt;br/&gt;'
++	else:
++		'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++		htmltext(_(&quot;No VMBS entries found&quot;))
++		'&lt;/span&gt;&lt;/p&gt;'
+ 
+ 
+ class Page(AccessControlled, Directory): 
+@@ -81,7 +127,7 @@
+ 	_q_desc    = _(&quot;Call forwarding state&quot;)
+ 	_q_link    = 'cfwstate'
+ 	_q_menupos = 10
+-	_q_level   = 2
++	_q_level   = 3
+ 
+ 	_q_exports = ['']
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000401.html">[Destar-dev] r847 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000403.html">[Destar-dev] r849 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#402">[ date ]</a>
+              <a href="thread.html#402">[ thread ]</a>
+              <a href="subject.html#402">[ subject ]</a>
+              <a href="author.html#402">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,347 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r830 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-April/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r830%20-%20trunk&In-Reply-To=%3C200904161306.n3GD6uGn011847%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000382.html">
+   <LINK REL="Next"  HREF="000384.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r830 - trunk</H1>
+    <B>tzafrir at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r830%20-%20trunk&In-Reply-To=%3C200904161306.n3GD6uGn011847%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r830 - trunk">tzafrir at mail.berlios.de
+       </A><BR>
+    <I>Thu Apr 16 15:06:56 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000382.html">[Destar-dev] Fwd: Multiple security issues
+</A></li>
+        <LI>Next message: <A HREF="000384.html">[Destar-dev] r830 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#383">[ date ]</a>
+              <a href="thread.html#383">[ thread ]</a>
+              <a href="subject.html#383">[ subject ]</a>
+              <a href="author.html#383">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: tzafrir
+Date: 2009-04-16 15:06:56 +0200 (Thu, 16 Apr 2009)
+New Revision: 830
+
+Modified:
+   trunk/backend.py
+   trunk/cfg_app_agentcallbacklogin.py
+   trunk/cfg_app_chanspy.py
+   trunk/cfg_app_disa.py
+   trunk/cfg_app_dnd.py
+   trunk/cfg_app_meetme.py
+   trunk/cfg_dialout_normal.py
+   trunk/cfg_ivr_autoatt.py
+   trunk/cfg_ivr_treenode.py
+   trunk/cfg_opt_voicemail.py
+   trunk/cfg_phone_queue.py
+   trunk/configlets.py
+Log:
+A first shot at Asterisk 1.6 compatibility: s/|/,/
+
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/backend.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -216,7 +216,7 @@
+ 	c.append(&quot;; get global dial options&quot;)
+ 	c.append(&quot;exten=s,n,Set(dopt=${DIAL_OPTIONS})&quot;)
+         if tapisupport:
+-	        c.append(&quot;exten=s,n,Set(dopt=${dopt}M(tapi^${UNIQUEID}|${ARG1}))&quot;)
++	        c.append(&quot;exten=s,n,Set(dopt=${dopt}M(tapi^${UNIQUEID},${ARG1}))&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; get early media&quot;)
+ 	c.append(&quot;exten=s,n,Set(emedia=${DB(EMEDIA/${ARG4}/${ARG3})})&quot;)
+@@ -231,10 +231,10 @@
+ 	c.append(&quot;; Dial&quot;)
+ 	c.append(&quot;exten=s,n(dialstart),NoOp()&quot;)
+         if tapisupport:
+-                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${ARG1})&quot;)
+-                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)&quot;)
+-                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: SET CALLERID ${CALLERID})&quot;)
+-                c.append(&quot;exten=s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)&quot;)
++                c.append(&quot;exten=s,n,UserEvent(TAPI,TAPIEVENT: LINE_NEWCALL ${ARG1})&quot;)
++                c.append(&quot;exten=s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_OFFERING)&quot;)
++                c.append(&quot;exten=s,n,UserEvent(TAPI,TAPIEVENT: SET CALLERID ${CALLERID})&quot;)
++                c.append(&quot;exten=s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLINFO LINECALLINFOSTATE_CALLERID)&quot;)
+ 	c.append(&quot;exten=s,n(MainDial),Dial(${ARG1}${prng},${dsec},TtWwr${dopt})&quot;)
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; Dial result was 'timeout'&quot;)
+@@ -277,11 +277,11 @@
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;exten=i,0,Hangup&quot;)
+         if tapisupport:
+-                c.append(&quot;exten=h,1,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;)
++                c.append(&quot;exten=h,1,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;)
+ 
+                 c.append(&quot;[macro-tapi];&quot;)
+-                c.append(&quot;exten=s,1,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;${ARG2}] LINE_CALLSTATE LINECALLSTATE_CONNECTED)&quot;)
+-                c.append(&quot;exten=s,2,UserEvent(TAPI|TAPIEVENT: [~${ARG1}&amp;!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)&quot;)
++                c.append(&quot;exten=s,1,UserEvent(TAPI,TAPIEVENT: [~${ARG1}&amp;${ARG2}] LINE_CALLSTATE LINECALLSTATE_CONNECTED)&quot;)
++                c.append(&quot;exten=s,2,UserEvent(TAPI,TAPIEVENT: [~${ARG1}&amp;!${ARG2}] LINE_CALLSTATE LINECALLSTATE_HANGUP)&quot;)
+ 
+ 	c.append(&quot;;&quot;)
+ 	c.append(&quot;; format: Macro(voicemail,&lt;VoiceMail arguments&gt;,PBX)&quot;)
+@@ -320,7 +320,7 @@
+ 	c.append(&quot;exten =&gt; s,n,Playback(vm-message)&quot;)
+ 	c.append(&quot;exten =&gt; s,n,Playback(is-now-being-recorded)&quot;)
+ 	c.append(&quot;exten =&gt; s,n,Playback(after-the-tone)&quot;)
+-	c.append(&quot;exten =&gt; s,n,Record(${ARG1}.${ARG2}|1|${ARG3})&quot;)
++	c.append(&quot;exten =&gt; s,n,Record(${ARG1}.${ARG2},1,${ARG3})&quot;)
+ 	c.append(&quot;exten =&gt; s,n,Playback(vm-message)&quot;)
+ 	c.append(&quot;exten =&gt; s,n,Playback(recorded)&quot;)
+ 
+
+Modified: trunk/cfg_app_agentcallbacklogin.py
+===================================================================
+--- trunk/cfg_app_agentcallbacklogin.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_app_agentcallbacklogin.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -17,6 +17,8 @@
+ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ #
+ 
++# FIXME: not available on 1.6. How do we tell Asterisk is 1.6? Any 
++# replacement dialplan?
+ 
+ from configlets import *
+ 
+
+Modified: trunk/cfg_app_chanspy.py
+===================================================================
+--- trunk/cfg_app_chanspy.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_app_chanspy.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -66,6 +66,6 @@
+ 		if self.password:
+ 			c.appendExten(self.ext, &quot;Authenticate(%s)&quot; % self.password, self.pbx)
+ 		if self.quiet:
+-			c.appendExten(self.ext, &quot;Chanspy(%s|q)&quot; % self.scanspec, self.pbx)
++			c.appendExten(self.ext, &quot;Chanspy(%s,q)&quot; % self.scanspec, self.pbx)
+ 		else: 
+ 			c.appendExten(self.ext, &quot;Chanspy(%s)&quot; % self.scanspec, self.pbx)
+
+Modified: trunk/cfg_app_disa.py
+===================================================================
+--- trunk/cfg_app_disa.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_app_disa.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -84,4 +84,4 @@
+ 		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Set(TIMEOUT(digit)=5)&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Set(TIMEOUT(response)=10)&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.ext ,&quot;Authenticate(%s)&quot; % self.pin, self.pbx)
+-		c.appendExten(&quot;%s&quot; % self.ext ,&quot;DISA(no-password|out-%s)&quot; % self.name, self.pbx)
++		c.appendExten(&quot;%s&quot; % self.ext ,&quot;DISA(no-password,out-%s)&quot; % self.name, self.pbx)
+
+Modified: trunk/cfg_app_dnd.py
+===================================================================
+--- trunk/cfg_app_dnd.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_app_dnd.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -65,8 +65,8 @@
+ 		c.appendExten(&quot;%s&quot; % self.set, &quot;Set(DB(DND/%s/${CALLERIDNUM})=True)&quot; % self.pbx, self.pbx)
+ 		if tapisupport:
+ 			needModule(&quot;app_cut&quot;)
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;Set(CHAN=${CUT(CHANNEL|-|1)})&quot;, self.pbx)
+-			c.appendExten(&quot;%s&quot; % self.set, &quot;UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: True)&quot;, self.pbx )
++			c.appendExten(&quot;%s&quot; % self.set, &quot;Set(CHAN=${CUT(CHANNEL,-,1)})&quot;, self.pbx)
++			c.appendExten(&quot;%s&quot; % self.set, &quot;UserEvent(ASTDB,Channel: ${CHAN}^Family: DND^Value: True)&quot;, self.pbx )
+ 				
+ 		c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(do-not-disturb)&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.set, &quot;Playback(activated)&quot;, self.pbx)
+@@ -74,8 +74,8 @@
+ 
+ 		c.appendExten(&quot;%s&quot; % self.unset, &quot;DBdel(DND/%s/${CALLERIDNUM})&quot; % self.pbx, self.pbx)
+ 		if tapisupport:
+-			c.appendExten(&quot;%s&quot; % self.unset, &quot;Set(CHAN=${CUT(CHANNEL|-|1)})&quot;, self.pbx)
+-			c.appendExten(&quot;%s&quot; % self.unset, &quot;UserEvent(ASTDB|Channel: ${CHAN}^Family: DND^Value: ^)&quot;, self.pbx )
++			c.appendExten(&quot;%s&quot; % self.unset, &quot;Set(CHAN=${CUT(CHANNEL,-,1)})&quot;, self.pbx)
++			c.appendExten(&quot;%s&quot; % self.unset, &quot;UserEvent(ASTDB,Channel: ${CHAN}^Family: DND^Value: ^)&quot;, self.pbx )
+ 		c.appendExten(&quot;%s&quot; % self.unset, &quot;Playback(do-not-disturb)&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.unset, &quot;Playback(cancelled)&quot;, self.pbx)
+ 		c.appendExten(&quot;%s&quot; % self.unset, &quot;Hangup&quot;, self.pbx)
+
+Modified: trunk/cfg_app_meetme.py
+===================================================================
+--- trunk/cfg_app_meetme.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_app_meetme.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -89,7 +89,7 @@
+ 		args=&quot;&quot;
+ 		if self.confno:
+ 			args += &quot;%d&quot; % self.confno
+-		args += &quot;|d&quot;
++		args += &quot;,d&quot;
+ 		if self.pin:
+ 			args += &quot;P|%d&quot; % self.pin
+ 		c.appendExten(self.ext, &quot;MeetMe(%s)&quot; % args, self.pbx)
+
+Modified: trunk/cfg_dialout_normal.py
+===================================================================
+--- trunk/cfg_dialout_normal.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_dialout_normal.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -184,11 +184,11 @@
+ 				        if tapisupport:
+ 						needModule(&quot;app_cut&quot;)
+ 					        c.append(&quot;exten=&gt;s,n,Set(chan=${CUT(CHANNEL,,1)})&quot;)
+-					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI|TAPIEVENT: LINE_NEWCALL ${chan})&quot;)
+-	    				        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALTONE)&quot;)
+-					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALING)&quot;)
+-					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_PROCEEDING)&quot;)
+-					c.append(&quot;exten=&gt;s,n,Dial(%s,%d|${options})&quot; % (obj.dial,self.ringtime))
++					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI,TAPIEVENT: LINE_NEWCALL ${chan})&quot;)
++	    				        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALTONE)&quot;)
++					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_DIALING)&quot;)
++					        c.append(&quot;exten=&gt;s,n,UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_PROCEEDING)&quot;)
++					c.append(&quot;exten=&gt;s,n,Dial(%s,%d,${options})&quot; % (obj.dial,self.ringtime))
+ 					unavail+=1
+ 					c.append('exten=&gt;s,n,GotoIf($[&quot;${DIALSTATUS}&quot; = &quot;CHANUNAVAIL&quot;]?unavail%s)' % unavail)
+ 			except KeyError:
+@@ -204,5 +204,5 @@
+ 		c.appendExten(&quot;t&quot;,&quot;NoCDR&quot;, context=context)
+ 		c.appendExten(&quot;t&quot;,&quot;Hangup&quot;, context=context)
+ 		if tapisupport:
+-		        c.appendExten(&quot;h&quot;,&quot;UserEvent(TAPI|TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;, context=context)
++		        c.appendExten(&quot;h&quot;,&quot;UserEvent(TAPI,TAPIEVENT: LINE_CALLSTATE LINECALLSTATE_IDLE)&quot;, context=context)
+ 
+
+Modified: trunk/cfg_ivr_autoatt.py
+===================================================================
+--- trunk/cfg_ivr_autoatt.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_ivr_autoatt.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -96,7 +96,7 @@
+ 
+ 			VarType(&quot;times&quot;,
+ 					title=_(&quot;Times string&quot;),
+-					hint=_(&quot;i.e. hours|weekdays|monthdays|months (comma separated)&quot;),
++					hint=_(&quot;i.e. hours,weekdays,monthdays,months (comma separated)&quot;),
+ 					default=&quot;&quot;,
+ 					optional=True,
+ 					len=300),
+
+Modified: trunk/cfg_ivr_treenode.py
+===================================================================
+--- trunk/cfg_ivr_treenode.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_ivr_treenode.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -97,7 +97,7 @@
+ 
+ 			VarType(&quot;times&quot;,
+ 					title=_(&quot;Times string&quot;),
+-					hint=_(&quot;i.e. *|*|25|dec,*|*|20|jul (comma separated)&quot;),
++					hint=_(&quot;i.e. *,*,25,dec,*,*,20,jul (comma separated)&quot;),
+ 					default=&quot;&quot;,
+ 					optional=True,
+ 					len=300),
+
+Modified: trunk/cfg_opt_voicemail.py
+===================================================================
+--- trunk/cfg_opt_voicemail.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_opt_voicemail.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -89,5 +89,5 @@
+ 
+ 		c.setSection(&quot;zonemessages&quot;)
+ 		# TODO: find out our own timezone somehow
+-		c.append(&quot;cest=Europe/Berlin|'vm-received' Q 'digits/at' k 'oclock' M&quot;)
++		c.append(&quot;cest=Europe/Berlin,'vm-received' Q 'digits/at' k 'oclock' M&quot;)
+ 
+
+Modified: trunk/cfg_phone_queue.py
+===================================================================
+--- trunk/cfg_phone_queue.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/cfg_phone_queue.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -242,9 +242,9 @@
+ 			else:          
+ 				options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+ 			if self.monitorfilename:
+-				mon_line = &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options)
++				mon_line = &quot;MixMonitor(%s.%s,%s)&quot; % (self.monitorfilename,self.monitorfileformat,options)
+ 			else:
+-				mon_line = &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options)
++				mon_line = &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s,%s)&quot; % (self.monitorfileformat,options)
+ 
+ 		qnames = []
+ 		if self.ext:
+@@ -270,7 +270,7 @@
+ 
+ 			if self.queuetimeout:
+ 				opt = opt + &quot;n&quot;
+-				extensions.appendExten(qname, &quot;Queue(%s|%s|||%s)&quot; % (self.name, opt, self.queuetimeout), self.pbx)
++				extensions.appendExten(qname, &quot;Queue(%s,%s,,,%s)&quot; % (self.name, opt, self.queuetimeout), self.pbx)
+ 				if self.queuetimeoutext:
+ 					import configlets
+ 					obj = configlets.configlet_tree.getConfigletByName(self.queuetimeoutext)
+@@ -279,7 +279,7 @@
+ 					except AttributeError:
+ 						pass
+ 			else:
+-				extensions.appendExten(qname, &quot;Queue(%s|%s)&quot; % (self.name, opt), self.pbx)
++				extensions.appendExten(qname, &quot;Queue(%s,%s)&quot; % (self.name, opt), self.pbx)
+ 		self.createPanelConfig()
+ 
+         def createPanelConfig(self):
+
+Modified: trunk/configlets.py
+===================================================================
+--- trunk/configlets.py	2007-11-27 14:10:11 UTC (rev 829)
++++ trunk/configlets.py	2009-04-16 13:06:56 UTC (rev 830)
+@@ -1045,9 +1045,9 @@
+ 				else:          
+ 					options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+ 				if self.monitorfilename:
+-					extensions.appendExten(tmp_ext, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=pbx)
++					extensions.appendExten(tmp_ext, &quot;MixMonitor(%s.%s,%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=pbx)
+ 				else:
+-					extensions.appendExten(tmp_ext, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options), context=pbx)
++					extensions.appendExten(tmp_ext, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s,%s)&quot; % (self.monitorfileformat,options), context=pbx)
+ 			self.createDialEntry(extensions, tmp_ext, pbx, self.ext)
+ 
+ 		for obj in configlet_tree:
+@@ -1144,9 +1144,9 @@
+ 							else:          
+ 								options = options+'v(%s)V(%s)' % (self.heardvol, self.spokenvol)        
+ 							if self.monitorfilename:
+-								c.appendExten(&quot;%s&quot; % obj.pattern, &quot;MixMonitor(%s.%s|%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=contextout)
++								c.appendExten(&quot;%s&quot; % obj.pattern, &quot;MixMonitor(%s.%s,%s)&quot; % (self.monitorfilename,self.monitorfileformat,options), context=contextout)
+ 							else:
+-								c.appendExten(&quot;%s&quot; % obj.pattern, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s|%s)&quot; % (self.monitorfileformat,options), context=contextout)
++								c.appendExten(&quot;%s&quot; % obj.pattern, &quot;MixMonitor(${TIMESTAMP}-${CALLERIDNAME}(${CALLERIDNUM})-${EXTEN}.%s,%s)&quot; % (self.monitorfileformat,options), context=contextout)
+ 						
+ 						secret = self.__getitem__(&quot;dialout_%s_secret&quot; % obj.name)							
+ 						if secret:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000382.html">[Destar-dev] Fwd: Multiple security issues
+</A></li>
+	<LI>Next message: <A HREF="000384.html">[Destar-dev] r830 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#383">[ date ]</a>
+              <a href="thread.html#383">[ thread ]</a>
+              <a href="subject.html#383">[ subject ]</a>
+              <a href="author.html#383">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

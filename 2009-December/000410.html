@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r856 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r856%20-%20trunk&In-Reply-To=%3C200912202227.nBKMR1Lv010244%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000409.html">
+   <LINK REL="Next"  HREF="000411.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r856 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r856%20-%20trunk&In-Reply-To=%3C200912202227.nBKMR1Lv010244%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r856 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 20 23:27:01 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000409.html">[Destar-dev] r855 - in trunk: . dahdi-gen dahdi-gen/Dahdi	dahdi-gen/Dahdi/Config dahdi-gen/Dahdi/Config/Gen	dahdi-gen/Dahdi/Hardware dahdi-gen/Dahdi/Xpp
+</A></li>
+        <LI>Next message: <A HREF="000411.html">[Destar-dev] r857 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#410">[ date ]</a>
+              <a href="thread.html#410">[ thread ]</a>
+              <a href="subject.html#410">[ subject ]</a>
+              <a href="author.html#410">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2009-12-20 23:27:00 +0100 (Sun, 20 Dec 2009)
+New Revision: 856
+
+Added:
+   trunk/page_admin_autodetect.ptl
+Modified:
+   trunk/CHANGELOG.txt
+   trunk/backend.py
+Log:
+* Added  page_admin_autodetect - needs more testing.
+
+
+Modified: trunk/CHANGELOG.txt
+===================================================================
+--- trunk/CHANGELOG.txt	2009-12-20 21:44:13 UTC (rev 855)
++++ trunk/CHANGELOG.txt	2009-12-20 22:27:00 UTC (rev 856)
+@@ -12,8 +12,9 @@
+ * cfg_opt_user.py: Added SAMBA_ENABLED option.
+ * Added sambautils.py
+ * cfg_phone_zap.py: added missing monitorinbound variable.
+-* Added dahdi-gen and created dahdi-gen/Dahdi/Config/Gen/Destar.pm
+-  as a proof-of-concept (thanks tzafrir).
++* Added  page_admin_autodetect, dahdi-gen and created
++  dahdi-gen/Dahdi/Config/Gen/Destar.pm as a
++  proof-of-concept (thanks tzafrir) - needs more testing.
+ 
+ 2009-12-16
+ * cfg_opt_pbx.py, cfg_app_*: separate context for all apps.
+
+Modified: trunk/backend.py
+===================================================================
+--- trunk/backend.py	2009-12-20 21:44:13 UTC (rev 855)
++++ trunk/backend.py	2009-12-20 22:27:00 UTC (rev 856)
+@@ -916,3 +916,24 @@
+ 	for c in configletsList():
+ 		cfg = globals()[c.__name__](autoAdd=False)
+ 		cfg.writeDoc()
++
++def dahdigenconf():
++	&quot;&quot;&quot;This calls dahdi_genconf.&quot;&quot;&quot;
++	dahdi_genconf = commands.getoutput('dahdi_genconf system destar')
++	if dahdi_genconf:
++		fn = os.path.join(configlets.CONF_DIR,&quot;destar_channels.py&quot;)
++		try:
++			try:
++				reload(sys)
++				sys.setdefaultencoding('utf-8')
++				execfile(fn)
++			except IOError:
++				try:
++					execfile(DESTAR_CFG)
++				except IOError:
++					print _(&quot;Warning: There is no %s or %s file yet.&quot; % (fn,DESTAR_CFG))
++		except NameError:
++			pass
++		return True
++	else:
++		return False
+
+Added: trunk/page_admin_autodetect.ptl
+===================================================================
+--- trunk/page_admin_autodetect.ptl	2009-12-20 21:44:13 UTC (rev 855)
++++ trunk/page_admin_autodetect.ptl	2009-12-20 22:27:00 UTC (rev 856)
+@@ -0,0 +1,66 @@
++# -*- coding: utf-8 -*-
++#
++# Copyright (C) 2005 by Holger Schurig
++# 
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++
++
++from Templates import *
++import backend
++import manager
++from quixote.directory import Directory, AccessControlled
++from quixote import get_request, get_session
++
++class Page(AccessControlled, Directory): 
++
++
++	_q_parent  = 'page_admin'
++	_q_title   = _(&quot;Autodetect Dahdi channels&quot;)
++	_q_desc    = _(&quot;Uses dahdi_genconf to autodetect channels and create DeStar's trunks&quot;)
++	_q_link    = 'genconf'
++	_q_menupos = 90
++	_q_level   = 3
++
++	_q_exports = ['']
++
++	def _q_access(self):
++		self.session = get_session()
++		self.request = get_request()
++		if self.session.level &lt; self._q_level:
++			cantAccessPage()
++
++	def _q_index [html] (self):
++		header(self._q_desc)
++		manager.connect()
++		if not manager.isConnected():
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			_(&quot;Asterisk is not running!&quot;)
++			'&lt;/span&gt;&lt;/p&gt;'
++		elif not manager.isLoggedIn():
++			# TODO: describe how to set this up
++			'&lt;p&gt;&lt;span class=&quot;errornotice&quot;&gt;'
++			_(&quot;The manager access is not working!&quot;)
++			'&lt;/span&gt;&lt;/p&gt;'
++		else:
++			'&lt;p&gt;'
++			_('Doing a reload, result is:')
++			'&lt;/p&gt;'
++
++			'&lt;tt&gt;&lt;p&gt;'
++			backend.dahdigenconf()
++			'&lt;/p&gt;&lt;/tt&gt;'
++
++		footer()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000409.html">[Destar-dev] r855 - in trunk: . dahdi-gen dahdi-gen/Dahdi	dahdi-gen/Dahdi/Config dahdi-gen/Dahdi/Config/Gen	dahdi-gen/Dahdi/Hardware dahdi-gen/Dahdi/Xpp
+</A></li>
+	<LI>Next message: <A HREF="000411.html">[Destar-dev] r857 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#410">[ date ]</a>
+              <a href="thread.html#410">[ thread ]</a>
+              <a href="subject.html#410">[ subject ]</a>
+              <a href="author.html#410">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>

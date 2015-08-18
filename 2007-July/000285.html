@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Destar-dev] r765 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/destar-dev/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r765%20-%20trunk&In-Reply-To=%3C200707262259.l6QMxEuC010193%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000284.html">
+   <LINK REL="Next"  HREF="000286.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Destar-dev] r765 - trunk</H1>
+    <B>alerios at BerliOS</B> 
+    <A HREF="mailto:destar-dev%40lists.berlios.de?Subject=Re%3A%20%5BDestar-dev%5D%20r765%20-%20trunk&In-Reply-To=%3C200707262259.l6QMxEuC010193%40sheep.berlios.de%3E"
+       TITLE="[Destar-dev] r765 - trunk">alerios at mail.berlios.de
+       </A><BR>
+    <I>Fri Jul 27 00:59:14 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000284.html">[Destar-dev] r764 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000286.html">[Destar-dev] r766 - branches
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#285">[ date ]</a>
+              <a href="thread.html#285">[ thread ]</a>
+              <a href="subject.html#285">[ subject ]</a>
+              <a href="author.html#285">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: alerios
+Date: 2007-07-27 00:59:05 +0200 (Fri, 27 Jul 2007)
+New Revision: 765
+
+Modified:
+   trunk/cfg_opt_settings.py
+Log:
+* Re-commit of some reverted changes on cfg_opt_settings.py
+
+
+Modified: trunk/cfg_opt_settings.py
+===================================================================
+--- trunk/cfg_opt_settings.py	2007-07-26 20:04:29 UTC (rev 764)
++++ trunk/cfg_opt_settings.py	2007-07-26 22:59:05 UTC (rev 765)
+@@ -20,7 +20,12 @@
+ 
+ from configlets import *
+ 
++STATIC_DIR = os.getenv('STATICPAGES_DIR','static') 
++styles = []
++for f in os.listdir('%s/themes/' % STATIC_DIR):
++	styles.append((f,f))
+ 
++
+ countries = {
+ 	&quot;at&quot;: {&quot;description&quot;: _(&quot;Austria&quot;),
+ 		&quot;ringcadence&quot;: &quot;1000,5000&quot;,
+@@ -322,16 +327,46 @@
+ 			type=&quot;choice&quot;,
+ 			options=countries_lookup),
+ 		     VarType(&quot;language&quot;,
+-			title=_(&quot;language&quot;),
++			title=_(&quot;Language&quot;),
+ 			hint=_(&quot;The language is used for voice prompts&quot;),
+ 			len=10,
+ 			type=&quot;string&quot;),
++		     VarType(&quot;header_text&quot;,
++			title=_(&quot;Header text&quot;),
++			len=20,
++			type=&quot;string&quot;),
++		     VarType(&quot;style&quot;,
++			title=_(&quot;Web UI theme to use&quot;),
++			type=&quot;choice&quot;,
++			options=styles),
++		     VarType(&quot;logo&quot;,
++			title=_(&quot;Web UI logo to use&quot;),
++			hint=&quot;/static/imgs/logo&quot;,
++			type=&quot;file&quot;,
++			optional=True),
+ 		     VarType(&quot;tapi&quot;,
+ 			title=_(&quot;Tapi Support&quot;),
+ 			type=&quot;bool&quot;,
+ 			default = True),
+ 		]
+ 
++	def checkConfig(self):
++		res = CfgOpt.checkConfig(self)
++		if res:
++			return res
++		max_size = 2000000
++		if self.logo:
++			upload = self.logo
++			pos = upload.fp.tell()  # Save current position in file.
++			upload.fp.seek(0, 2)    # Go to end of file.
++			size = upload.fp.tell() # Get new position (which is the file size).
++			upload.fp.seek(pos, 0)  # Return to previous position.
++			upload.size = size
++			if size &gt; max_size:
++				msg = &quot;The uploaded file is too big (size=%s, max=%s bytes)&quot;
++				msg %= (size, max_size)
++				return _(&quot;File bigger than %s bytes&quot;) % max_size
++		
+ 	def createAsteriskConfig(self):
+ 		country = countries[self.country]
+ 
+@@ -357,3 +392,16 @@
+ 		if self.tapi:
+ 			needModule(&quot;app_userevent&quot;)
+ 			needModule(&quot;app_cut&quot;)
++		if self.logo:
++			upload = self.logo
++			dest = '%s/imgs/logo' % STATIC_DIR
++			out = open(dest, 'wb')
++			# Copy file in chunks to avoid using lots of memory.
++			while 1:
++				chunk = upload.read(1024 * 1024)
++				if not chunk:
++				   break
++				out.write(chunk)
++			out.close()
++			upload.close()
++		self.logo = None 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000284.html">[Destar-dev] r764 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000286.html">[Destar-dev] r766 - branches
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#285">[ date ]</a>
+              <a href="thread.html#285">[ thread ]</a>
+              <a href="subject.html#285">[ subject ]</a>
+              <a href="author.html#285">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/destar-dev">More information about the Destar-dev
+mailing list</a><br>
+</body></html>
